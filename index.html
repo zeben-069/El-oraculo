@@ -1536,9 +1536,16 @@ function construir(){
      fuera imposible ofrecerle comer allí, porque los restaurantes del pueblo
      estaban fichados en otro corredor que el de las piscinas. */
   const RADIO_R = S.coche ? 18 : 10;
-  const cercaR = r => (r.la==null||base.la==null)
+  /* El radio se mide desde el centro de gravedad DEL DÍA —el sitio que pidió
+     el turista, o la fiesta que manda— y no desde la cama. En una escapada un
+     día se va a propósito a otro corredor: midiendo desde el alojamiento, los
+     únicos restaurantes «cerca» eran los de casa, y salía ir a ver el drago de
+     Icod y almorzar en Arico. Sin ancla, `centro` ES el alojamiento y esto no
+     cambia nada del plan de un día suelto. */
+  const origenR = (centro && centro.la!=null) ? centro : base;
+  const cercaR = r => (r.la==null||origenR.la==null)
     ? r.c===corr
-    : km(base.la,base.lo,r.la,r.lo) <= RADIO_R;
+    : km(origenR.la,origenR.lo,r.la,r.lo) <= RADIO_R;
   /* Las heladerías y dulcerías no son sitio de almorzar: se apartan aquí y
      se ofrecen aparte, para rematar la tarde. */
   const esRemate=r=>r.remate||/Heladería|Dulcería/i.test(r.tipo||'');
@@ -1628,6 +1635,7 @@ function construir(){
      Lo que manda es la parada de la mañana o del mediodía: es de donde
      saldrán con hambre. El alojamiento solo entra si el día no tiene
      ninguna parada antes de comer. */
+  let cercaDia=[];          /* los que quedan de paso, para no rotar fuera de ellos */
   const antesDeComer=paradas.filter(p=>p.la!=null&&['mañana','mediodía'].includes(p.fr));
   const puntosDia=(antesDeComer.length?antesDeComer:paradas.filter(p=>p.la!=null))
     .map(p=>({la:p.la,lo:p.lo,n:p.n}));
@@ -1643,6 +1651,7 @@ function construir(){
     /* 6 km en línea recta. En carretera de monte eso es fácilmente el doble. */
     const UMBRAL=6;
     const cerca=abiertos.filter(r=>r._desvio!=null&&r._desvio<=UMBRAL);
+    cercaDia=cerca;
     const lejos=abiertos.filter(r=>!(r._desvio!=null&&r._desvio<=UMBRAL));
     if(cerca.length&&lejos.length){
       paso('ok','comida · sin desviarse del día',
@@ -1657,9 +1666,16 @@ function construir(){
         UMBRAL+' km de las paradas. Se avisa del desvío en vez de callarlo.');
     }
   }
-  /* si han pedido cambiar de sitio, se rota la lista en vez de repetir el mismo */
-  const salto=(S.saltoComida||0)%Math.max(1,abiertos.length);
-  const rotados=abiertos.slice(salto).concat(abiertos.slice(0,salto));
+  /* Si han pedido cambiar de sitio —o es otro día de la escapada— se rota la
+     lista en vez de repetir el mismo. Pero la rotación NO puede saltarse la
+     cercanía: rotando sobre la lista entera, con solo dos o tres de paso, el
+     cuarto día empezaba a contar ya dentro de los lejanos y mandaba a comer a
+     otro valle. Se rota dentro de los que quedan de camino; los de lejos
+     siguen detrás, por si no hubiera ninguno cerca. */
+  const rotables = cercaDia.length ? cercaDia : abiertos;
+  const detras = cercaDia.length ? abiertos.filter(r=>cercaDia.indexOf(r)<0) : [];
+  const salto=(S.saltoComida||0)%Math.max(1,rotables.length);
+  const rotados=rotables.slice(salto).concat(rotables.slice(0,salto)).concat(detras);
   const opcionesComida=rotados.slice(0,5);
   let rest=opcionesComida[0]||null;
   /* uno de cada tres días el día se cierra con algo de tomar, no con una vista */

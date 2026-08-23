@@ -1,5 +1,5 @@
 const c=require('./banco.js');
-const {construir,S,km,BASES,LUGARES,REST}=c;
+const {construir,S,km,BASES,LUGARES,REST,minutosA}=c;
 const casos=[
  ['Tegueste',true,false,'pareja',null],       ['Tegueste',false,true,'familia','agua'],
  ['Santa Cruz de Tenerife',true,false,'pareja',null], ['Santa Cruz de Tenerife',false,true,'familia',null],
@@ -120,3 +120,70 @@ S.anclaElegida=null;
 console.log('  planes con ancla        : '+anclas.length);
 console.log('  REVIENTAN               : '+revientan);
 console.log('  el ancla no sale        : '+sinAncla);
+
+/* ── ESCAPADA · varios días seguidos ──────────────────────────────────
+   Otro camino que la tabla de arriba no pisa: en una escapada cada día
+   puede irse a otro corredor a propósito, y ahí se rompía la cercanía de la
+   comida. Salía ver el drago de Icod y almorzar en Arico, porque el radio
+   de restaurantes se medía desde la cama y la rotación por día se saltaba a
+   los que quedaban de paso. Se mide lo que de verdad duele: cuántos días
+   dejan la comida lejos de TODAS las paradas. */
+console.log('\n=== ESCAPADA · 4 días desde cada base ===');
+const lejosComida=[], dispersiones=[];
+let diasEsc=0, reventonesEsc=0;
+Object.keys(BASES).forEach(base=>{
+  const vistos=new Set(), comidos=new Set(), corrs=[];
+  const ini=new Date('2026-09-15T12:00:00');
+  for(let d=0; d<4; d++){
+    Object.assign(S,{base,coche:true,ninos:false,gente:2,comida:null,descartados:null,
+      prefTipo:null,idioma:'es',saltoComida:d,anclaElegida:null,ahora:null,forzarEvento:null,
+      fecha:new Date(ini.getTime()+d*86400000).toISOString().slice(0,10),
+      apetece:(d===0?'todo':d===1?'naturaleza':'playa'),_yaVistos:vistos,_yaComido:comidos});
+    let r; try{ r=construir(); }catch(e){ reventonesEsc++; break; }
+    /* si el día repite zona, la escapada siembra un ancla en otra: ese es el
+       trozo que mandaba la comida al otro lado de la isla */
+    if(corrs.indexOf(r.brief.corredor)>=0 && !(r.brief.evento_ancla&&r.brief.evento_ancla.distincion)){
+      const otra=LUGARES.filter(l=>l.la&&!l.cerrado&&(l.w||1)>=3&&!vistos.has(l.n)&&
+                   corrs.indexOf(l.c)<0 && minutosA(BASES[base],l.c)<=60)
+                 .sort((a,x)=>((x.w||1)-(a.w||1))||((x.v?1:0)-(a.v?1:0)));
+      if(otra.length){
+        S.anclaElegida=otra[(d*3)%Math.min(otra.length,6)].n;
+        try{ const r2=construir(); if(r2&&r2.brief&&(r2.brief.paradas||[]).length) r=r2; }
+        catch(e){ reventonesEsc++; S.anclaElegida=null; break; }
+        S.anclaElegida=null;
+      }
+    }
+    diasEsc++;
+    const b=r.brief;
+    corrs.push(b.corredor);
+    (b.paradas||[]).forEach(p=>vistos.add(p.nombre));
+    const pts=(b.paradas||[]).map(p=>LUGARES.find(x=>x.n===p.nombre)).filter(x=>x&&x.la!=null);
+    /* dispersión del día: en los planes de un día esto está a cero, aquí no.
+       Cuando la escapada siembra un ancla en otro corredor, las demás paradas
+       se siguen eligiendo alrededor del alojamiento, así que el día junta un
+       sitio lejano con otros de casa. PENDIENTE de decidir, no es regresión. */
+    let dispD=0;
+    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++)
+      dispD=Math.max(dispD,km(pts[i].la,pts[i].lo,pts[j].la,pts[j].lo));
+    dispersiones.push(+dispD.toFixed(1));
+    const rest=b.restaurante?REST.find(x=>x.n===b.restaurante.nombre):null;
+    if(rest) comidos.add(String(rest.n).toLowerCase().replace(/[^a-z0-9]/g,''));
+    if(pts.length&&rest&&rest.la!=null){
+      const desvio=Math.min(...pts.map(p=>km(p.la,p.lo,rest.la,rest.lo)));
+      if(desvio>8) lejosComida.push({base,d:d+1,km:+desvio.toFixed(1),rm:rest.m,
+        pm:pts.map(p=>p.m).filter((v,i,a)=>a.indexOf(v)===i).join('/')});
+    }
+  }
+});
+lejosComida.sort((a,b)=>b.km-a.km).slice(0,5).forEach(x=>
+  console.log('  '+String(x.km).padStart(5)+' km · '+x.base.slice(0,22).padEnd(23)+'día '+x.d+
+              ' · paradas en '+x.pm.slice(0,28)+' → comer en '+x.rm));
+S.saltoComida=0; S._yaVistos=null; S._yaComido=null;
+console.log('  días armados            : '+diasEsc);
+console.log('  REVIENTAN               : '+reventonesEsc);
+console.log('  COMIDA-LEJOS (>8 km de toda parada) : '+lejosComida.length);
+const dsE=dispersiones.slice().sort((a,b)=>a-b);
+console.log('  DISPERSO (>25 km en un día)         : '+dispersiones.filter(x=>x>25).length+
+            '   ← pendiente, ver CLAUDE.md');
+console.log('  dispersión mediana del día          : '+dsE[Math.floor(dsE.length/2)]+
+            ' km  (máx '+dsE[dsE.length-1]+')');
