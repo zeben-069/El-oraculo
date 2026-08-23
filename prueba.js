@@ -22,8 +22,8 @@ function probar(nombre,cfg){
   } else console.log('   COMER              — ninguno');
   if(b.o_si_prefieren_un_recinto) console.log('   alternativa        '+b.o_si_prefieren_un_recinto.nombre);
 }
-probar('Tegueste · coche · niños · playa',{base:'Tegueste',coche:true,ninos:true,gente:'familia',apetece:'agua'});
-probar('Tegueste · coche · sin niños',{base:'Tegueste',coche:true,gente:'pareja'});
-probar('Tegueste · SIN coche',{base:'Tegueste',coche:false,gente:'pareja'});
-probar('Adeje · coche · playa',{base:'Adeje',coche:true,gente:'pareja',apetece:'agua'});
-probar('Vilaflor · coche',{base:'Vilaflor de Chasna',coche:true,gente:'pareja'});
+probar('Tegueste · coche · niños · playa',{base:'Tegueste',coche:true,ninos:true,gente:4,apetece:'agua'});
+probar('Tegueste · coche · sin niños',{base:'Tegueste',coche:true,gente:2});
+probar('Tegueste · SIN coche',{base:'Tegueste',coche:false,gente:2});
+probar('Adeje · coche · playa',{base:'Adeje',coche:true,gente:2,apetece:'agua'});
+probar('Vilaflor · coche',{base:'Vilaflor de Chasna',coche:true,gente:2});

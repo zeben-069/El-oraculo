@@ -118,6 +118,11 @@ ofrecen al final, para cerrar la tarde con niños.
 
 ## Trampas conocidas
 
+**El ancla del turista pasa por un camino aparte.** Cuando eligen un sitio
+concreto (o cuando la escapada siembra otra zona), `construir()` mete esa
+parada antes del bucle. Ese trozo se ejecuta solo en ese caso, así que un
+fallo ahí no lo ve `lote.js`, que nunca pone ancla: pruébalo a mano.
+
 **Cuidado con los radios en línea recta.** Marcar «carretera dura» por radio
 alrededor de tres zonas marcó 101 sitios, incluidas las Charcas de Erjos y el
 Mirador de La Alegría, que están en carretera normal. Hubo que hacerlo por
@@ -198,8 +203,10 @@ restaurante está mal ubicado, tiene razón: vive allí.
 
 - **Partir `index.html`** en varios ficheros.
 - `datos/senderos-anaga.js` está cargado y no lo usa nadie.
-- Falta la opción **«pareja»** en la pregunta de con quién van: solo hay
-  «Familia con niños» y «Grupo, sin niños».
+- La pregunta de con quién van sí tiene las tres opciones («Dos adultos»,
+  «Familia con niños», «Grupo, sin niños»). Guarda en `S.gente` el **número**
+  de personas (2, 4 o 6), no una etiqueta: quien compare con cadenas se lleva
+  una rama muerta, que es justo lo que le pasaba al aviso de aforo.
 - Pocos restaurantes abiertos en domingo en algunos municipios (Arona: 15
   en 18 km). Es escasez de catálogo.
 - La imagen de compartir está dibujada a mano; `generar-imagen.html` la

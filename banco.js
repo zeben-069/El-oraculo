@@ -28,5 +28,5 @@ global.setInterval=()=>0;
 global.clearInterval=noop;
 
 const ctx=new Function(code+`;
-  return {construir,S,LUGARES,REST,BASES,km,tr};`)();
+  return {construir,S,LUGARES,REST,BASES,km,tr,minutosA};`)();
 module.exports=ctx;

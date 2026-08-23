@@ -17,8 +17,11 @@ const casos=[
  ['Granadilla de Abona',true,false,'pareja',null], ['El Sauzal',false,false,'pareja',null],
 ];
 const R=[];
+/* La app guarda en S.gente el NÚMERO de personas (2, 4 o 6), no la etiqueta:
+   así lo hace pGente() y así lo compara el aviso de aforo de los permisos. */
+const CUANTOS={pareja:2,familia:4,grupo:6};
 casos.forEach(([base,coche,ninos,gente,apetece])=>{
-  Object.assign(S,{base,coche,ninos,gente,apetece,anclaElegida:null,comida:null,ahora:null,
+  Object.assign(S,{base,coche,ninos,gente:CUANTOS[gente],apetece,anclaElegida:null,comida:null,ahora:null,
     saltoComida:0,descartados:null,prefTipo:null,fecha:'2026-09-15',idioma:'es'});
   let r; try{ r=construir(); }catch(e){ R.push({base,coche,err:e.message.slice(0,60)}); return; }
   const b=r.brief, bs=BASES[base];

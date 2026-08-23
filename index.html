@@ -694,7 +694,9 @@ Si es circular, dilo también: es una buena noticia y tranquiliza.
 
 PERMISOS: ANTES QUE NADA
 Si una parada trae "permiso_max_personas", eso va al principio, con el número.
-El límite importa de verdad: si son cinco plazas y van en grupo, avísalo claro, porque no caben.
+El límite importa de verdad: compáralo con "personas", que va al principio del
+informe. Si son más que el tope, dilo antes que nada y sin rodeos, porque no
+entran todos y a los que sobren los devuelven en la puerta.
 Di también los días de antelación con los que se pide. El permiso es gratis, pero sin él no se entra.
 
 CONTAR QUÉ ES UN SITIO
@@ -1314,6 +1316,12 @@ function construir(){
         ' <span class="no">solo hay '+filtrado.length+'</span>. Se amplía para no dejarles sin plan, y se dice.');
     }
   }
+  /* La última parada colocada, para medir el salto contra ella.
+     Se declara AQUÍ, y no junto a donde se usa para puntuar, porque el sitio
+     pedido la fija tres líneas más abajo: con la declaración debajo, elegir un
+     sitio concreto lanzaba ReferenceError (zona muerta del let) y el plan no
+     llegaba a construirse nunca. */
+  let ultimaParada=null;
   const usados=new Set(),paradas=[];
   /* EL SITIO QUE PIDIÓ EL TURISTA VA SIEMPRE, y en su franja */
   if(foco){
@@ -1394,8 +1402,6 @@ function construir(){
     -((S.ritmo==='tranquilo'&&x.sub>200)?8:0)
     -((ultimaParada&&x.la!=null&&ultimaParada.la!=null)
         ? Math.max(0,(km(ultimaParada.la,ultimaParada.lo,x.la,x.lo)-3))*1.4 : 0);
-  /* la última parada colocada, para medir el salto */
-  let ultimaParada=null;
   const tiposYa=new Set();
   /* REGLA DEL SENTIDO ÚNICO: se sale hacia lo más lejos y se vuelve acercándose.
      Nada de ir y volver dos veces: el día tiene que ser un arco, no un zigzag. */
@@ -1781,7 +1787,13 @@ function construir(){
       p.res_max
         ? 'Máximo <span class="am">'+p.res_max+' personas</span>, se pide con hasta '+
           p.res_dias+' días de antelación. '+
-          (S.gente==='grupo'&&p.res_max<=5?'<span class="no">Van en grupo: puede que no quepan.</span>':'Sin el permiso no se entra.')
+          /* Este aviso no salió nunca: comparaba S.gente con la cadena 'grupo' y
+             S.gente es el número de personas (2, 4 o 6), así que la rama estaba
+             muerta. Comparando los números también salta el caso de la familia
+             de cuatro con tope de tres, que la versión anterior no miraba. */
+          (S.gente>p.res_max
+            ? '<span class="no">Son '+S.gente+' y el tope es '+p.res_max+': no entran todos.</span>'
+            : 'Sin el permiso no se entra.')
         : 'Este sitio necesita reserva previa. Sin ella no se entra.');
   });
 
