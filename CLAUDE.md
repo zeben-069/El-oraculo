@@ -121,6 +121,21 @@ montaba un día de museos.
 mismo día, pero quien pide agua quiere agua: tras el charco de Bajamar
 quedaban excluidos Punta del Hidalgo y Jover por ser también charcos.
 
+**Ni el municipio ni la comida pedida pisan la cercanía.** El desvío a las
+paradas se calcula ANTES de filtrar. Un filtro (mismo municipio, pescado,
+canaria) solo se aplica si deja algo a menos de 6 km de alguna parada; si no,
+lo pedido pasa delante pero lo de al lado sigue en la lista. Con el santuario
+de La Laguna y una parada en El Rosario, el filtro de municipio tiraba los que
+estaban a 100 metros de la segunda parada, y pedir pescado dejaba 7 sitios, los
+7 en San Andrés a 12 km, habiendo 42 abiertos a menos de 6 km. Si lo que
+pidieron queda lejos, va igual en la lista y el informe lo dice con el número
+en `lo_que_pidieron_queda_lejos`: que elijan entre moverse o comer cerca.
+
+**Cada sitio de comer viaja con su desvío.** `km_de_desvio` y
+`queda_de_camino` en el informe, para el principal y para las alternativas.
+Sin eso el modelo se lo inventaba: llegó a ofrecer tres restaurantes a doce
+kilómetros como «alternativas sin rodeo».
+
 **El restaurante se mide desde el día, no desde la cama.** El radio de
 restaurantes (18 km con coche, 10 sin) sale del centro de gravedad del día
 —el sitio que pidió el turista, o la fiesta que manda—, no del alojamiento.
@@ -131,7 +146,12 @@ entera, el cuarto día empezaba a contar ya dentro de los lejanos. Las dos
 cosas juntas: de 31 días malos de 124 a 2.
 
 **Las heladerías no son sitio de almorzar.** Marcadas con `remate`. Se
-ofrecen al final, para cerrar la tarde con niños.
+ofrecen al final, en `para_rematar_el_dia`, y ya no solo con niños: un helado
+de camino al coche vale igual para dos adultos. Se buscan a 2,5 km de la
+última parada y, si ahí no hay, junto a cualquier otra parada del día —el
+informe dice junto a cuál en `junto_a`. Mirando solo la última, un día que
+acababa en La Esperanza se quedaba sin remate teniendo cuatro heladerías a
+400 m de la parada de la mañana.
 
 ---
 
@@ -178,9 +198,10 @@ node lote.js       # 24 planes en 21 municipios, con banderas
 
 `lote.js` es el que hay que pasar **después de tocar el motor**. Marca
 DISPERSO, SALTO, CIERRE-LEJOS, COMIDA-LEJOS, RECINTO, CURVAS-NOCHE.
-Referencia actual: dispersión mediana 4 km, cero banderas salvo 3 planes con
-la comida lejos (por escasez de restaurantes abiertos, no por lógica) y 3
-días de 2 paradas (por la regla del sentido único).
+Referencia actual: dispersión mediana 4 km, cero banderas salvo 1 plan con la
+comida lejos (Granadilla, dentro del mismo municipio) y 3 días de 2 paradas
+(por la regla del sentido único). Eran 3 los de comida lejos, y no era escasez
+de catálogo como se creía: era el filtro de municipio ganándole a la cercanía.
 
 Trae doce planes **con ancla**, que es el camino que la tabla no
 pisa: el sitio lo elige el turista y `construir()` lo mete antes del bucle.
@@ -239,6 +260,8 @@ restaurante está mal ubicado, tiene razón: vive allí.
   una rama muerta, que es justo lo que le pasaba al aviso de aforo.
 - Pocos restaurantes abiertos en domingo en algunos municipios (Arona: 15
   en 18 km). Es escasez de catálogo.
+- Nombres del registro dados la vuelta: hay una heladería fichada como
+  «Heladeria, la». Sale tal cual en el informe.
 - La imagen de compartir está dibujada a mano; `generar-imagen.html` la
   rehace en el navegador con las tipografías buenas.
 - Si algún día hay dominio propio, hay que cambiar la URL en **cuatro

@@ -658,10 +658,10 @@ Si una parada trae "reserva_obligatoria", eso es lo PRIMERO que dices del plan, 
 Si una parada trae "aviso_seguridad", dilo una vez, claro y sin dramatizar. Es un dato, no una advertencia paternal.
 Si el informe dice que van con niños, ten en cuenta que ya se han descartado los sitios no aptos. No hace falta que lo expliques, pero si te preguntan por alguno que falte, di la verdad.
 
-CON NIÑOS, EL FINAL DEL DÍA NO ES OTRA VISITA
-Si el informe trae "con_ninos_para_rematar", úsalo. Con críos, después de la playa y del paseo, lo que apetece es sentarse: un helado, un dulce, y ver caer la tarde.
+EL FINAL DEL DÍA NO TIENE QUE SER OTRA VISITA
+Si el informe trae "para_rematar_el_dia", úsalo. Después de la playa y del paseo lo que apetece es sentarse: un helado, un dulce, y ver caer la tarde. Con críos más todavía, pero vale igual para dos adultos de vuelta al coche.
 Dilo como lo diría alguien de aquí, en una frase, al final. No lo conviertas en otra parada con su horario.
-Si trae "sitios", nómbralos. Di lo cerca que están con las palabras que trae "lo_cerca_que_esta" — nunca en metros exactos, porque la posición es aproximada. Y avisa de que el horario no está confirmado.
+Si trae "sitios", nómbralos, y si trae "junto_a" di junto a qué parada quedan: puede no ser la última, sino una que les pilla de vuelta. Di lo cerca que están con las palabras que trae "lo_cerca_que_esta" — nunca en metros exactos, porque la posición es aproximada. Y avisa de que el horario no está confirmado.
 Si "sitios" viene vacío, no te inventes ningún nombre: habla en general, «un heladito por el paseo».
 
 LO QUE NOMBRAS DE PASO, NÓMBRALO ENTERO
@@ -746,6 +746,12 @@ Cuando el informe traiga "cuantas_al_dia", puedes decir si hay muchas o pocas: n
 
 SI NO HAY DE LO QUE PIDIERON
 Si el informe trae "no_hay_de_lo_que_pidieron", dilo antes de proponer nada: «de pescado por aquí cerca no tengo nada abierto ahora». No disimules ofreciendo otra cosa como si fuera lo que pidieron.
+Si trae "lo_que_pidieron_queda_lejos", tampoco lo disimules al revés: hay de lo que pidieron, pero obliga a desviarse. Dilo con el número —«de pescado, lo más cerca es X, a Y km de las paradas»— y ofrece al lado lo que sí queda de camino. Que elijan ellos entre moverse o comer cerca.
+
+CUÁNTO HAY QUE DESVIARSE PARA COMER
+Cada sitio de comer trae "km_de_desvio" y "queda_de_camino". Son los kilómetros hasta la parada más cercana del día, en línea recta.
+No llames «sin rodeo», «de camino» ni «al lado» a uno que traiga "queda_de_camino": false. Si el propuesto obliga a desviarse, dilo con su número antes de darlo por bueno, y señala cuáles de las alternativas sí quedan de paso.
+No sumes ni conviertas esos kilómetros a minutos: en carretera de monte no se parecen.
 
 SI ESTÁN YA POR LA CALLE
 Cuando el informe traiga "momento_del_dia", no les montes un día entero: les quedan unas horas. Plan corto, cerca, sencillo. Dos cosas como mucho.
@@ -928,6 +934,7 @@ function resaltar(txt,b){
   if(b.restaurante) marca(b.restaurante.nombre,'local');
   (b.otras_opciones_para_comer||[]).forEach(o=>marca(o.nombre,'local'));
   if(b.cerrar_tomando_algo) marca(b.cerrar_tomando_algo.nombre,'local');
+  ((b.para_rematar_el_dia||{}).sitios||[]).forEach(x=>marca(x.nombre,'local'));
   (b.cerca_pero_con_ojo||[]).forEach(x=>marca(x.nombre,'sitio'));
   if(b.sitio_cerrado_que_pidieron) marca(b.sitio_cerrado_que_pidieron.nombre,'ojo');
   try{
@@ -1561,6 +1568,40 @@ function construir(){
   /* si el veto deja la zona sin nada, se levanta: mejor repetir que no comer */
   if(!abiertos.length) abiertos=REST.filter(r=>cercaR(r)&&!esRemate(r)&&r.ab[ds]);
   const cerrados=REST.filter(r=>cercaR(r)&&!esRemate(r)&&!r.ab[ds]);
+
+  /* CUÁNTO HAY QUE DESVIARSE, y se calcula AQUÍ, antes de filtrar por
+     municipio o por tipo de comida. Calculándolo al final, esos filtros ya
+     habían tirado lo que estaba al lado: pidiendo pescado en La Laguna
+     quedaban 7 sitios, todos en San Andrés a 12 km, cuando había 42 abiertos
+     a menos de 6 km de las paradas. Lo que está de camino no se descarta:
+     como mucho pasa detrás. */
+  const antesDeComerR=paradas.filter(p=>p.la!=null&&['mañana','mediodía'].includes(p.fr));
+  const puntosR=(antesDeComerR.length?antesDeComerR:paradas.filter(p=>p.la!=null))
+    .map(p=>({la:p.la,lo:p.lo,n:p.n}));
+  if(!puntosR.length&&centro&&centro.la!=null) puntosR.push({la:centro.la,lo:centro.lo,n:base.et});
+  const UMBRAL=6;   /* 6 km en línea recta; en carretera de monte, el doble */
+  const desvioDe=r=>{
+    if(r.la==null||!puntosR.length) return null;
+    let mejor=null;
+    puntosR.forEach(p=>{const d=km(p.la,p.lo,r.la,r.lo); if(d!=null&&(mejor==null||d<mejor)) mejor=d;});
+    return mejor;
+  };
+  REST.forEach(r=>{ r._desvio=desvioDe(r); });
+  const deCamino=r=>r._desvio!=null&&r._desvio<=UMBRAL;
+  /* un filtro solo se aplica si no deja el día sin nada de camino */
+  const filtrar=(lista,fn,etiqueta)=>{
+    const paso1=lista.filter(fn);
+    if(!paso1.length) return lista;
+    if(lista.some(deCamino) && !paso1.some(deCamino)){
+      const cerca=lista.filter(deCamino);
+      paso('avi','comida · '+etiqueta+' obliga a desviarse',
+        'Con ese filtro no queda ninguno a menos de '+UMBRAL+' km de las paradas, y al lado hay <span class="si">'+
+        cerca.length+'</span>. Se mantienen los dos: primero lo que pidieron, detrás lo que está de camino.');
+      return paso1.concat(cerca.filter(r=>paso1.indexOf(r)<0));
+    }
+    return paso1;
+  };
+
   if(zonaFoco){
     const compatR = (zonaFoco==='anaga-cumbre')
       ? ['anaga-cumbre','anaga-norte','anaga-oeste'] : [zonaFoco,'anaga-cumbre'];
@@ -1573,12 +1614,16 @@ function construir(){
   }
   if(centro){
     abiertos.forEach(r=>{ r._d = km(centro.la,centro.lo,r.la,r.lo); });
-    const mismos=abiertos.filter(r=>r.m===muniFoco);
-    if(mismos.length){
+    /* El municipio se prioriza, pero no manda por encima de la cercanía: el
+       día puede tener paradas en dos municipios. Con el santuario de La
+       Laguna y Radazul (El Rosario), este filtro dejaba fuera los que estaban
+       a 100 metros de la segunda parada por ser de otro término. */
+    const antes=abiertos.length;
+    abiertos=filtrar(abiertos,r=>r.m===muniFoco,'el municipio');
+    const mismos=abiertos.filter(r=>r.m===muniFoco).length;
+    if(mismos&&mismos<antes)
       paso('ok','comida · en el mismo municipio',
-        '<span class="si">'+mismos.length+'</span> abiertos en '+muniFoco+' de los '+abiertos.length+' del corredor. Se prioriza el municipio.');
-      abiertos=mismos;
-    }
+        '<span class="si">'+mismos+'</span> abiertos en '+muniFoco+' de los '+antes+' del corredor. Se prioriza el municipio.');
     abiertos.sort((a,b)=>{
       if(S.comida==='canaria'){
         const ra=(a.gua==='registrado')?1:0, rb=(b.gua==='registrado')?1:0;
@@ -1589,7 +1634,7 @@ function construir(){
       return (a._d==null?99:a._d)-(b._d==null?99:b._d);
     });
   }
-  let faltaComida=null;
+  let faltaComida=null, pedidosComida=null, quePidieron=null;
   if(S.comida==='canaria'){
     /* entran los dos: guachinche registrado y cocina canaria. Solo cambia cómo se llaman. */
     const tip=abiertos.filter(r=>r.gua
@@ -1603,14 +1648,19 @@ function construir(){
         'Los dos se ofrecen; solo los registrados se llaman guachinche.');
     if(tip.length){
       paso('ok','preferencia de comida','Pidió <span class="si">comida típica canaria</span>. De '+abiertos.length+' abiertos, <span class="am">'+tip.length+'</span> encajan.');
-      abiertos=tip;
+      abiertos=filtrar(abiertos,r=>tip.indexOf(r)>=0,'la comida canaria');
+      pedidosComida=tip; quePidieron='comida canaria';
     }else{ faltaComida='comida canaria';
       paso('avi','preferencia de comida','Pidió comida canaria y <span class="no">ninguno de los abiertos hoy lo es</span>. Se le dice y se le ofrece lo que hay.');
     }
   }else if(S.comida==='pescado'){
     const pes=abiertos.filter(r=>/pescado|marisco|freidur|arrocer/i.test(r.tipo||'')
                               || /pescaito|cofrad|freidur|mar\b/i.test(r.n));
-    if(pes.length){abiertos=pes;paso('ok','preferencia de comida','Pidió <span class="si">pescado</span>: '+pes.length+' encajan.');}
+    if(pes.length){
+      paso('ok','preferencia de comida','Pidió <span class="si">pescado</span>: '+pes.length+' encajan.');
+      abiertos=filtrar(abiertos,r=>pes.indexOf(r)>=0,'el pescado');
+      pedidosComida=pes; quePidieron='pescado';
+    }
     else { faltaComida='pescado';
       paso('avi','preferencia de comida','Pidió pescado y <span class="no">no hay ninguno abierto cerca</span>. Se dice y se ofrece lo que hay.'); }
   }
@@ -1644,23 +1694,10 @@ function construir(){
      saldrán con hambre. El alojamiento solo entra si el día no tiene
      ninguna parada antes de comer. */
   let cercaDia=[];          /* los que quedan de paso, para no rotar fuera de ellos */
-  const antesDeComer=paradas.filter(p=>p.la!=null&&['mañana','mediodía'].includes(p.fr));
-  const puntosDia=(antesDeComer.length?antesDeComer:paradas.filter(p=>p.la!=null))
-    .map(p=>({la:p.la,lo:p.lo,n:p.n}));
-  if(!puntosDia.length&&centro&&centro.la!=null)
-    puntosDia.push({la:centro.la,lo:centro.lo,n:base.et});
-  if(puntosDia.length){
-    abiertos.forEach(r=>{
-      let mejor=null;
-      puntosDia.forEach(p=>{const d=km(p.la,p.lo,r.la,r.lo);
-        if(d!=null&&(mejor==null||d<mejor)) mejor=d;});
-      r._desvio=mejor;
-    });
-    /* 6 km en línea recta. En carretera de monte eso es fácilmente el doble. */
-    const UMBRAL=6;
-    const cerca=abiertos.filter(r=>r._desvio!=null&&r._desvio<=UMBRAL);
+  if(puntosR.length){
+    const cerca=abiertos.filter(deCamino);
     cercaDia=cerca;
-    const lejos=abiertos.filter(r=>!(r._desvio!=null&&r._desvio<=UMBRAL));
+    const lejos=abiertos.filter(r=>!deCamino(r));
     if(cerca.length&&lejos.length){
       paso('ok','comida · sin desviarse del día',
         '<span class="si">'+cerca.length+'</span> a menos de '+UMBRAL+
@@ -1685,6 +1722,24 @@ function construir(){
   const salto=(S.saltoComida||0)%Math.max(1,rotables.length);
   const rotados=rotables.slice(salto).concat(rotables.slice(0,salto)).concat(detras);
   const opcionesComida=rotados.slice(0,5);
+  /* Si pidieron pescado (o canaria) y lo que queda de camino no lo es, lo que
+     pidieron NO puede desaparecer de la lista: va igualmente, con su desvío
+     por delante, y que elijan entre moverse o comer al lado. */
+  let pedidoLejos=null;
+  if(pedidosComida&&pedidosComida.length&&!opcionesComida.some(r=>pedidosComida.indexOf(r)>=0)){
+    const mejor=pedidosComida.slice()
+      .sort((a,b)=>(a._desvio==null?99:a._desvio)-(b._desvio==null?99:b._desvio))[0];
+    if(mejor){
+      if(opcionesComida.length) opcionesComida[opcionesComida.length-1]=mejor;
+      else opcionesComida.push(mejor);
+      pedidoLejos={que:quePidieron,nombre:mejor.n,municipio:mejor.m,
+                   km:mejor._desvio!=null?Math.round(mejor._desvio):null};
+      paso('avi','comida · lo que pidieron queda lejos',
+        'De <span class="si">'+quePidieron+'</span> lo más cerca es <span class="am">'+mejor.n+
+        '</span>, a '+(pedidoLejos.km!=null?pedidoLejos.km+' km':'desmano')+
+        ' de las paradas. Va en la lista con el desvío dicho, no se cambia por otra cosa a la callada.');
+    }
+  }
   let rest=opcionesComida[0]||null;
   /* uno de cada tres días el día se cierra con algo de tomar, no con una vista */
   let cierreTomando=null;
@@ -1876,23 +1931,52 @@ function construir(){
        mientras cae el sol. No hay heladerías fichadas —solo tres cafeterías
        y dulcerías en 280 restaurantes— así que de momento se le pasa la
        idea al relato y que la cuente con lo que haya cerca. */
-    /* El remate de la tarde con críos, ahora con nombre y apellidos si hay
-       una heladería cerca de la última parada. Si no la hay, se dice en
-       general antes que inventarse un sitio. */
-    con_ninos_para_rematar: (S.ninos && paradas.length) ? (function(){
+    /* El remate de la tarde, con nombre y apellidos si hay una heladería
+       cerca. Se mira primero junto a la última parada, y si ahí no hay, junto
+       a cualquier otra del día siempre que quede DE VUELTA —más cerca de casa
+       que la última—, que es cuando de verdad se para a por un helado. Solo
+       junto a la última, un día que acababa en La Esperanza se quedaba sin
+       remate teniendo cuatro heladerías a 400 m de la parada de la mañana.
+       Si no hay ninguna, se dice en general antes que inventarse un sitio. */
+    para_rematar_el_dia: (paradas.length) ? (function(){
       const ult=paradas[paradas.length-1];
       if(ult&&ult.la!=null){
-        const cerca=REST.filter(r=>(r.remate||/Heladería|Dulcería/i.test(r.tipo||''))
-            &&r.la!=null&&km(ult.la,ult.lo,r.la,r.lo)<=2.5)
-          .sort((a,b)=>km(ult.la,ult.lo,a.la,a.lo)-km(ult.la,ult.lo,b.la,b.lo));
+        const esHelado=r=>(r.remate||/Heladería|Dulcería/i.test(r.tipo||''))&&r.la!=null;
+        const dDesde=(p,r)=>km(p.la,p.lo,r.la,r.lo);
+        let cerca=REST.filter(r=>esHelado(r)&&dDesde(ult,r)<=2.5)
+          .sort((a,b)=>dDesde(ult,a)-dDesde(ult,b));
+        let refPar=ult;
+        if(!cerca.length){
+          /* Si junto a la última no hay, vale cualquier otra parada del día:
+             el informe dice junto a CUÁL, y ya lo cuenta el relato como lo
+             que es. Filtrar además por «que quede de vuelta» dejaba fuera lo
+             evidente: durmiendo en Adeje, La Laguna queda más lejos de casa
+             que La Esperanza, y así se perdían cuatro heladerías a 400 m. */
+          let mejor=null;
+          paradas.filter(p=>p.la!=null&&p!==ult).forEach(p=>{
+            REST.filter(r=>esHelado(r)&&dDesde(p,r)<=2.5).forEach(r=>{
+              const d=dDesde(p,r);
+              if(mejor==null||d<mejor.d) mejor={p,d};
+            });
+          });
+          if(mejor){
+            refPar=mejor.p;
+            cerca=REST.filter(r=>esHelado(r)&&dDesde(mejor.p,r)<=2.5)
+                      .sort((a,b)=>dDesde(mejor.p,a)-dDesde(mejor.p,b));
+          }
+        }
+        const ref=refPar;
         if(cerca.length) return {
-          idea:'Con niños, el final del día no tiene por qué ser otra visita: un helado sentados viendo caer la tarde vale más que una parada más.',
+          idea: S.ninos
+            ? 'Con niños, el final del día no tiene por qué ser otra visita: un helado sentados viendo caer la tarde vale más que una parada más.'
+            : 'Para rematar, un helado o un dulce de camino a casa, después de la última parada. No es una parada más: es lo que apetece antes de coger el coche.',
           /* La distancia no se da en metros exactos: la posición de estas
              heladerías es aproximada —el registro solo trae la calle— y
              decir «a 0 metros» o «a 54 metros» suena a una precisión que no
              tenemos. Se dice en palabras, que es como lo diría cualquiera. */
+          junto_a:ref.n,
           sitios:cerca.slice(0,3).map(r=>{
-            const d=km(ult.la,ult.lo,r.la,r.lo)*1000;
+            const d=km(ref.la,ref.lo,r.la,r.lo)*1000;
             return {nombre:r.n, tipo:r.tipo, nota:r.nota||null,
               lo_cerca_que_esta: d<400?'ahí mismo' : d<1200?'a un paseo corto' : 'a un paseíto',
               direccion:r.ojo||null,
@@ -1900,7 +1984,9 @@ function construir(){
           como_decirlo:'Nómbralo al final, en una frase, como quien lo suelta de paso. No lo pongas como parada con su horario, y avisa de que el horario no está confirmado si lo mencionas.'};
       }
       return {
-        idea:'Con niños, el final del día no tiene por qué ser otra visita. Un helado o un dulce sentados donde estén, viendo caer la tarde, vale más que una parada más.',
+        idea: S.ninos
+          ? 'Con niños, el final del día no tiene por qué ser otra visita. Un helado o un dulce sentados donde estén, viendo caer la tarde, vale más que una parada más.'
+          : 'Para rematar, un helado o un dulce donde estén antes de volver. No hace falta otra visita.',
         sitios:null,
         como_decirlo:'No hay heladería fichada por aquí, así que no te inventes ningún nombre: dilo en general, «un heladito por el paseo».'};
     })() : null,
@@ -1986,6 +2072,8 @@ function construir(){
       /* Comprobado contra el registro del Servicio Administrativo de Turismo.
          Cinco sitios se anunciaban como registrados sin estarlo: la etiqueta
          se bajó y aquí va el porqué, para que Naira no afirme de más. */
+      km_de_desvio:rest._desvio!=null?Math.round(rest._desvio*10)/10:null,
+      queda_de_camino:rest._desvio!=null?(rest._desvio<=6):null,
       ojo_con_lo_de_guachinche:rest.gua_nota||null,
       fuente_del_registro:rest.gua_of||null,
       valoracion:rest.nota_g||null,en_registro_oficial:rest.reg||null,
@@ -2002,7 +2090,12 @@ function construir(){
     no_hay_de_lo_que_pidieron: faltaComida,
     otras_opciones_para_comer: opcionesComida.slice(1).map(r=>({nombre:r.n,municipio:r.m,
       horario:r.h,telefono:r.tel||null,tipo:r.tipo||null,valoracion:r.nota_g||null,
+      /* Sin este dato el modelo se inventaba cuál queda de camino: llegó a
+         ofrecer tres a doce kilómetros como «alternativas sin rodeo». */
+      km_de_desvio:r._desvio!=null?Math.round(r._desvio*10)/10:null,
+      queda_de_camino:r._desvio!=null?(r._desvio<=6):null,
       clasificacion:(r.gua==='registrado'?'guachinche registrado por el Cabildo':null)})),
+    lo_que_pidieron_queda_lejos: pedidoLejos,
     porques: conPorque.map(p=>({lugar:p.n,frase:p.fx})),
     sin_porque: sinPorque.map(p=>p.n),
     avisos: R.avisos
