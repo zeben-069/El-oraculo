@@ -74,3 +74,49 @@ console.log('  sin restaurante         : '+cnt(x=>!x.rest));
 console.log('  menos de 3 paradas      : '+cnt(x=>x.n<3));
 const ds=R.filter(x=>!x.err).map(x=>x.disp).sort((a,b)=>a-b);
 console.log('  dispersión mediana      : '+ds[Math.floor(ds.length/2)]+' km  (máx '+ds[ds.length-1]+')');
+
+/* ── ANCLAS · cuando el sitio lo elige el turista ──────────────────────
+   La tabla de arriba nunca pone ancla, y el ancla va por un camino aparte:
+   construir() mete esa parada antes del bucle. Un fallo ahí no lo ve nada
+   de lo anterior — así se coló un ReferenceError que dejaba muda la
+   pantalla al pedir un sitio concreto y reventaba la escapada entera. */
+const anclas=[];
+/* el sitio de más peso de cada municipio, sacado de los datos y no escrito a
+   mano, para que esto no se pudra cuando cambie el catálogo */
+['Adeje','Santa Cruz de Tenerife','San Cristóbal de La Laguna','Puerto de la Cruz',
+ 'Garachico','Vilaflor de Chasna','Candelaria','Icod de los Vinos'].forEach(muni=>{
+  const l=LUGARES.filter(x=>(x.co||x.m)===muni&&!x.cerrado&&x.la!=null&&!x.recinto)
+                 .sort((a,b)=>((b.w||1)-(a.w||1))||a.n.localeCompare(b.n,'es'))[0];
+  if(l&&BASES[muni]) anclas.push([muni,l.n,2]);
+});
+/* un recinto pedido a propósito: se excluyen como parada normal, pero si lo
+   piden por su nombre tiene que ir, que para eso lo han pedido */
+(function(){
+  const r=LUGARES.filter(l=>l.recinto&&!l.cerrado&&BASES[l.co||l.m])
+                 .sort((a,b)=>a.n.localeCompare(b.n,'es'))[0];
+  if(r) anclas.push([r.co||r.m,r.n,4]);
+})();
+/* y los sitios con permiso y tope de personas, con un grupo de seis, que es
+   lo que dispara el aviso de aforo */
+LUGARES.filter(l=>l.res&&l.res_max!=null&&BASES[l.m]).slice(0,3)
+       .forEach(l=>anclas.push([l.m,l.n,6]));
+
+console.log('\n=== ANCLAS · el sitio lo elige el turista ===');
+console.log('base                       personas  par  ¿va?  ancla');
+let revientan=0, sinAncla=0;
+anclas.forEach(([base,ancla,gente])=>{
+  Object.assign(S,{base,coche:true,ninos:false,gente,apetece:null,anclaElegida:ancla,
+    comida:null,ahora:null,saltoComida:0,descartados:null,prefTipo:null,
+    fecha:'2026-09-15',idioma:'es'});
+  let b; try{ b=construir().brief; }
+  catch(e){ revientan++;
+    return console.log(base.slice(0,25).padEnd(26)+'  REVIENTA: '+e.message.slice(0,44)+'  '+ancla.slice(0,30)); }
+  const ps=b.paradas||[], va=ps.some(p=>p.nombre===ancla);
+  if(!va) sinAncla++;
+  console.log(base.slice(0,25).padEnd(26)+String(gente).padStart(6)+String(ps.length).padStart(6)+
+    (va?'   sí  ':'   NO  ')+'  '+ancla.slice(0,38));
+});
+S.anclaElegida=null;
+console.log('  planes con ancla        : '+anclas.length);
+console.log('  REVIENTAN               : '+revientan);
+console.log('  el ancla no sale        : '+sinAncla);

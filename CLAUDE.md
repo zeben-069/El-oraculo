@@ -163,6 +163,12 @@ Referencia actual: dispersión mediana 4 km, cero banderas salvo 3 planes con
 la comida lejos (por escasez de restaurantes abiertos, no por lógica) y 3
 días de 2 paradas (por la regla del sentido único).
 
+Al final trae doce planes **con ancla**, que es el camino que la tabla no
+pisa: el sitio lo elige el turista y `construir()` lo mete antes del bucle.
+Referencia: 0 reventones y 0 planes donde el sitio pedido no salga. Los
+sitios no están escritos a mano —se sacan de los datos, el de más peso de
+cada municipio— así que la prueba no se pudre al cambiar el catálogo.
+
 **Con navegador** — `probar-web.js` con Playwright recorre siete flujos en
 Chrome contra la web desplegada y captura los errores de consola.
 
