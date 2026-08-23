@@ -21,6 +21,11 @@ global.fetch=()=>Promise.reject(new Error('sin red'));
 global.L=undefined;
 global.Image=function(){};
 global.requestAnimationFrame=noop;
+/* La cabecera se repinta cada dos minutos con setInterval. Fuera del navegador
+   ese temporizador no caduca nunca y deja el proceso de node colgado después de
+   imprimir el resultado; aquí no hay cabecera que repintar, así que se anula. */
+global.setInterval=()=>0;
+global.clearInterval=noop;
 
 const ctx=new Function(code+`;
   return {construir,S,LUGARES,REST,BASES,km,tr};`)();
