@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<!--
+  Generador de la imagen de compartir de Naira.
+
+  Por qué existe: la imagen que llevaba el zip la dibujé yo con una fuente
+  de sistema y se notaba. Aquí manda el navegador, que sí tiene Fraunces y
+  Figtree — las mismas de la app — y las dibuja como es debido.
+
+  Uso: abrir este archivo en el navegador, ajustar lo que quieras con los
+  controles, y pulsar «Descargar». Sale un JPG de 1200x630 listo para
+  meter en img/naira-social.jpg.
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Naira · generar imagen de compartir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..900,0..100,0..1&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --cal:#FBF5E9; --tea:#3E2B1C; --laurisilva:#2E5D4B; --malvasia:#E8B65A; }
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px;background:#2A2420;color:var(--cal);
+       font-family:Figtree,system-ui,sans-serif;display:flex;flex-direction:column;
+       align-items:center;gap:18px}
+  h1{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:22px;margin:0 0 4px}
+  p.nota{margin:0;font-size:13.5px;opacity:.7;max-width:640px;text-align:center;line-height:1.5}
+  canvas{width:100%;max-width:900px;height:auto;border-radius:12px;
+         box-shadow:0 10px 40px rgba(0,0,0,.45)}
+  .mandos{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;
+          max-width:900px;width:100%}
+  label{display:flex;flex-direction:column;gap:5px;font-size:12px;opacity:.85}
+  input[type=text],select{font-family:Figtree,sans-serif;font-size:13px;padding:8px 10px;
+    border-radius:8px;border:1.5px solid #55483C;background:#3A322A;color:var(--cal);min-width:210px}
+  button{font-family:Figtree,sans-serif;font-weight:600;font-size:14px;padding:11px 22px;
+    border:0;border-radius:999px;background:var(--malvasia);color:#2A2018;cursor:pointer}
+  button:hover{filter:brightness(1.08)}
+  .fila{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+</style>
+</head>
+<body>
+
+<div style="text-align:center">
+  <h1>Imagen de compartir de Naira</h1>
+  <p class="nota">Se dibuja con Fraunces y Figtree, las tipografías de la app.
+     Cambie lo que quiera y descargue. El archivo va a <code>img/naira-social.jpg</code>.</p>
+</div>
+
+<canvas id="lienzo" width="1200" height="630"></canvas>
+
+<div class="mandos">
+  <label>Título
+    <input type="text" id="titulo" value="Naira">
+  </label>
+  <label>Frase
+    <input type="text" id="frase" value="Su día en Tenerife, contado como se cuenta aquí">
+  </label>
+  <label>Pie
+    <input type="text" id="pie" value="Datos oficiales del Cabildo · El tiempo de AEMET">
+  </label>
+  <label>Luz
+    <select id="luz">
+      <option value="atardecer">Atardecer</option>
+      <option value="dia">Día</option>
+      <option value="amanecer">Amanecer</option>
+      <option value="noche">Noche</option>
+    </select>
+  </label>
+</div>
+
+<div class="fila">
+  <button id="descargar">Descargar JPG 1200×630</button>
+  <button id="png" style="background:#55483C;color:#FBF5E9">Descargar PNG</button>
+</div>
+
+<script>
+const c=document.getElementById('lienzo'), x=c.getContext('2d');
+
+/* Las cuatro luces, con la misma lógica que la cabecera de la app:
+   la isla no se ve igual a las ocho de la mañana que al caer el día. */
+const LUCES={
+  atardecer:{cielo:[['#2E5D4B',0],['#7E6A52',.42],['#D98E4E',.72],['#F2BC6E',1]],
+             sol:'#F2C14E', halo:'rgba(242,193,78,.42)', solY:.53, solR:150,
+             roca:'#8A7460', rocaSombra:'#6E5B4A', nieve:'#FBF5E9',
+             lomas:['#3E7A54','#2E5D4B'], lejos:'#5E8F6E',
+             titulo:'#FBF5E9', frase:'#F0DCC4', pie:'rgba(251,245,233,.62)'},
+  dia:      {cielo:[['#8FD3EC',0],['#BFE3F2',.55],['#E4F1F6',1]],
+             sol:'#F5C542', halo:'rgba(245,197,66,.30)', solY:.30, solR:92,
+             roca:'#9A8570', rocaSombra:'#7C6A58', nieve:'#FDFBF5',
+             lomas:['#3E7A54','#2E5D4B'], lejos:'#6FA37E',
+             titulo:'#2E4A3C', frase:'#3E2B1C', pie:'rgba(62,43,28,.62)'},
+  amanecer: {cielo:[['#4A5B7A',0],['#B08A7E',.45],['#EFC094',.75],['#F7DCB8',1]],
+             sol:'#F7D08A', halo:'rgba(247,208,138,.42)', solY:.56, solR:132,
+             roca:'#8E7A66', rocaSombra:'#70604F', nieve:'#FDFBF5',
+             lomas:['#42765A','#31604C'], lejos:'#618D72',
+             titulo:'#FBF5E9', frase:'#F5DEC4', pie:'rgba(251,245,233,.62)'},
+  noche:    {cielo:[['#141026',0],['#22203C',.5],['#3A3048',1]],
+             sol:'#EDE6DC', halo:'rgba(237,230,220,.16)', solY:.26, solR:64,
+             roca:'#4A4050', rocaSombra:'#3A3040', nieve:'#EDE6DC',
+             lomas:['#2A4A3C','#1E3A30'], lejos:'#3A5A4A',
+             titulo:'#EDE6DC', frase:'#C9BEDA', pie:'rgba(237,230,220,.55)'}
+};
+
+/* Papel recortado: cada capa se dibuja con su sombra pegada debajo, que es
+   lo que le da el relieve. */
+function capa(pts, relleno, dy=13, desenfoque=16, opacidad=.30){
+  x.save();
+  x.shadowColor='rgba(30,20,14,'+opacidad+')';
+  x.shadowBlur=desenfoque; x.shadowOffsetY=dy;
+  x.fillStyle=relleno;
+  x.beginPath();
+  pts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));
+  x.closePath(); x.fill();
+  x.restore();
+}
+
+function dibujar(){
+  const L=LUCES[document.getElementById('luz').value];
+  const W=1200,H=630;
+  x.clearRect(0,0,W,H);
+
+  /* cielo */
+  const g=x.createLinearGradient(0,0,0,H);
+  L.cielo.forEach(([col,p])=>g.addColorStop(p,col));
+  x.fillStyle=g; x.fillRect(0,0,W,H);
+
+  /* halo y sol */
+  const sy=H*L.solY;
+  const halo=x.createRadialGradient(600,sy,10,600,sy,L.solR*2.4);
+  halo.addColorStop(0,L.halo); halo.addColorStop(1,'rgba(0,0,0,0)');
+  x.fillStyle=halo; x.fillRect(0,0,W,H);
+  x.save();
+  x.shadowColor='rgba(30,20,14,.28)'; x.shadowBlur=22; x.shadowOffsetY=12;
+  x.fillStyle=L.sol; x.beginPath(); x.arc(600,sy,L.solR,0,Math.PI*2); x.fill();
+  x.restore();
+
+  /* montañas lejanas */
+  capa([[0,630],[0,438],[176,398],[344,430],[486,390],[570,434],[570,630]],L.lejos,11,14,.24);
+  capa([[1200,630],[1200,426],[1026,390],[878,422],[750,388],[668,430],[668,630]],L.lejos,11,14,.24);
+
+  /* el Teide: cono ancho, ladera este en sombra y la nieve arriba */
+  capa([[148,630],[452,432],[596,286],[628,236],[660,286],[832,448],[1092,630]],L.roca,16,20,.34);
+  x.fillStyle=L.rocaSombra;
+  x.beginPath(); x.moveTo(628,236); x.lineTo(660,286); x.lineTo(832,448);
+  x.lineTo(1092,630); x.lineTo(704,630); x.closePath(); x.fill();
+  capa([[594,288],[628,232],[662,288],[646,308],[628,266],[610,312]],L.nieve,5,8,.28);
+
+  /* laurisilva, dos verdes */
+  capa([[0,630],[0,538],[126,512],[272,534],[404,506],[474,546],[474,630]],L.lomas[0],13,16,.30);
+  capa([[1200,630],[1200,524],[1074,546],[936,518],[838,550],[796,630]],L.lomas[0],13,16,.30);
+  capa([[0,630],[0,590],[186,572],[366,588],[528,570],[566,630]],L.lomas[1],13,16,.32);
+  capa([[1200,630],[1200,582],[1028,596],[876,576],[796,598],[774,630]],L.lomas[1],13,16,.32);
+
+  /* el texto, con las tipografías de la app */
+  const t=document.getElementById('titulo').value.trim();
+  const f=document.getElementById('frase').value.trim();
+  const p=document.getElementById('pie').value.trim();
+
+  x.save();
+  x.shadowColor='rgba(20,14,10,.28)'; x.shadowBlur=14; x.shadowOffsetY=4;
+  x.fillStyle=L.titulo;
+  x.font='600 96px Fraunces, Georgia, serif';
+  x.fillText(t,72,132);
+  x.restore();
+
+  x.fillStyle=L.frase;
+  x.font='500 32px Figtree, system-ui, sans-serif';
+  x.fillText(f,76,184);
+
+  x.fillStyle=L.pie;
+  x.font='600 19px Figtree, system-ui, sans-serif';
+  x.fillText(p,76,590);
+}
+
+function bajar(tipo,ext,calidad){
+  const a=document.createElement('a');
+  a.download='naira-social.'+ext;
+  a.href=c.toDataURL(tipo,calidad);
+  a.click();
+}
+document.getElementById('descargar').onclick=()=>bajar('image/jpeg','jpg',.92);
+document.getElementById('png').onclick=()=>bajar('image/png','png');
+['titulo','frase','pie','luz'].forEach(id=>
+  document.getElementById(id).addEventListener('input',dibujar));
+
+/* Se espera a que las fuentes estén cargadas: si se dibuja antes, el navegador
+   usa la de repuesto y el resultado sale con otra letra sin avisar. */
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(dibujar);
+else window.addEventListener('load',dibujar);
+dibujar();
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "Naira · su guía de Tenerife",
+  "short_name": "Naira",
+  "description": "Un plan para su día en Tenerife, hecho a su medida: dónde ir, dónde comer y a qué hora.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF5E9",
+  "theme_color": "#2E5D4B",
+  "lang": "es",
+  "categories": ["travel", "lifestyle"],
+  "icons": [
+    { "src": "icono.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icono-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icono-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

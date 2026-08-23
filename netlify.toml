@@ -1,0 +1,44 @@
+# netlify.toml — le dice a Netlify dónde buscar las funciones
+#
+# Va en la RAÍZ de la carpeta, al lado de index.html:
+#
+#   naira/
+#     index.html
+#     netlify.toml        ← este archivo
+#     netlify/
+#       functions/
+#         naira.js
+#
+# Sin esto, Netlify a veces no reconoce la carpeta de funciones y las ignora
+# (en el registro sale "skipped"). Con esto, se la señalamos a dedo.
+
+[build]
+  functions = "netlify/functions"
+  publish = "."
+
+# La ruta bonita: /api/naira llama a la función naira.
+# El archivo también la declara por su cuenta, pero repetirla aquí no molesta
+# y cubre el caso de que Netlify no lea la configuración de dentro del archivo.
+[[redirects]]
+  from = "/api/naira"
+  to = "/.netlify/functions/naira"
+  status = 200
+  force = true
+
+# El manifiesto tiene que llegar con su tipo correcto o el navegador lo
+# ignora y no deja instalar la app en la pantalla de inicio.
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json; charset=utf-8"
+
+# Iconos e imagen de compartir: no cambian casi nunca, que se cacheen.
+[[headers]]
+  for = "/img/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/icono*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

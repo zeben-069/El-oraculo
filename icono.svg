@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Naira">
+  <defs><filter id="s" x="-20%" y="-20%" width="140%" height="140%">
+    <feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#102820" flood-opacity=".5"/>
+  </filter></defs>
+  <rect width="512" height="512" rx="112" fill="#2E5D4B"/>
+  <circle cx="256" cy="300" r="126" fill="#E8B65A" filter="url(#s)"/>
+  <path d="M120 432 L228 268 L256 222 L284 268 L392 432 Z" fill="#9A8570" filter="url(#s)"/>
+  <path d="M234 262 L256 220 L278 262 L267 276 L256 248 L245 280 Z" fill="#FBF5E9"/>
+  <rect x="0" y="432" width="512" height="80" fill="#1B4438" filter="url(#s)"/>
+</svg>
