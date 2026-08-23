@@ -158,10 +158,9 @@ Object.keys(BASES).forEach(base=>{
     corrs.push(b.corredor);
     (b.paradas||[]).forEach(p=>vistos.add(p.nombre));
     const pts=(b.paradas||[]).map(p=>LUGARES.find(x=>x.n===p.nombre)).filter(x=>x&&x.la!=null);
-    /* dispersión del día: en los planes de un día esto está a cero, aquí no.
-       Cuando la escapada siembra un ancla en otro corredor, las demás paradas
-       se siguen eligiendo alrededor del alojamiento, así que el día junta un
-       sitio lejano con otros de casa. PENDIENTE de decidir, no es regresión. */
+    /* dispersión del día: tiene que quedarse en cero por encima de 25 km. Era
+       45 de 124 cuando el radio se medía desde el alojamiento y el día podía
+       juntar un sitio sembrado lejos con otros de casa. */
     let dispD=0;
     for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++)
       dispD=Math.max(dispD,km(pts[i].la,pts[i].lo,pts[j].la,pts[j].lo));
@@ -183,7 +182,6 @@ console.log('  días armados            : '+diasEsc);
 console.log('  REVIENTAN               : '+reventonesEsc);
 console.log('  COMIDA-LEJOS (>8 km de toda parada) : '+lejosComida.length);
 const dsE=dispersiones.slice().sort((a,b)=>a-b);
-console.log('  DISPERSO (>25 km en un día)         : '+dispersiones.filter(x=>x>25).length+
-            '   ← pendiente, ver CLAUDE.md');
+console.log('  DISPERSO (>25 km en un día)         : '+dispersiones.filter(x=>x>25).length);
 console.log('  dispersión mediana del día          : '+dsE[Math.floor(dsE.length/2)]+
             ' km  (máx '+dsE[dsE.length-1]+')');

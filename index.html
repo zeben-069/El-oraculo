@@ -1174,9 +1174,16 @@ function construir(){
      por corredor: son 4 y todos son empalmes de sendero. */
   let RADIO = S.ahora ? 12 : (S.coche ? 18 : 10);
   if(S.ritmo==='tranquilo') RADIO = Math.min(RADIO, 8);   /* poco trote */
+  /* El radio sale del centro de gravedad DEL DÍA, no de la cama. Si el turista
+     pidió un sitio —o la escapada sembró uno en otro corredor—, el día se arma
+     alrededor de ESE sitio. Midiendo desde el alojamiento, el ancla se iba
+     lejos y las demás paradas se quedaban en casa: salían días con Bajamar y
+     Torviscas juntos, 65 km. Sin ancla, `centro` ES el alojamiento y esto es
+     exactamente lo de antes. */
+  const origenDia = (centro && centro.la!=null) ? centro : base;
   const alcance = l => {
-    if(l.la==null||base.la==null) return l.c===corr;
-    return km(base.la,base.lo,l.la,l.lo) <= RADIO;
+    if(l.la==null||origenDia.la==null) return l.c===corr;
+    return km(origenDia.la,origenDia.lo,l.la,l.lo) <= RADIO;
   };
   if(fuera&&fuera.size){
     const quedan=LUGARES.filter(l=>alcance(l)&&!l.cerrado&&!fuera.has(l.n)
@@ -1204,14 +1211,15 @@ function construir(){
     radioReal+=6;
     cand=LUGARES.filter(l=>(!vetados||!vetados.has(l.n))&&(!fuera||!fuera.has(l.n))
       &&l.n!==S.anclaElegida&&!l.cerrado
-      &&(l.la==null||base.la==null ? l.c===corr
-         : km(base.la,base.lo,l.la,l.lo)<=radioReal));
+      &&(l.la==null||origenDia.la==null ? l.c===corr
+         : km(origenDia.la,origenDia.lo,l.la,l.lo)<=radioReal));
   }
   if(radioReal!==RADIO)
     paso('avi','hubo que estirar el radio','Con '+RADIO+' km no llegaban a doce sitios, así que se abre a <span class="am">'+
       radioReal+' km</span>. Conviene avisar de que se anda más de lo normal.');
   const deOtraZona=cand.filter(l=>l.c!==corr).length;
-  paso('ok','el alcance del día','Radio de <span class="si">'+radioReal+' km</span> desde '+base.et+
+  paso('ok','el alcance del día','Radio de <span class="si">'+radioReal+' km</span> desde '+
+    (origenDia===base?base.et:(foco?foco.n:base.et))+
     (S.coche?' (van en coche)':' (sin coche, se acorta)')+
     ': <span class="am">'+cand.length+'</span> sitios'+
     (deOtraZona?', de ellos <span class="si">'+deOtraZona+'</span> que antes no salían por ser de otra zona.':'.'));

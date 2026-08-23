@@ -65,6 +65,16 @@ matrícula oficial, `desc` descripción del Cabildo, `bic`, `pos_aprox`.
 
 Cada una nació de un plan malo de verdad. No las quites sin entender cuál.
 
+**El día se arma alrededor del sitio pedido, no de la cama.** El radio de
+candidatos sale del centro de gravedad del día: el sitio que eligió el turista,
+o la fiesta que manda. Antes salía del alojamiento, y en una escapada eso
+juntaba un sitio lejano con otros de casa: hubo días con Bajamar y Torviscas,
+65 km. Medido sobre 124 días de escapada: de 45 días por encima de 25 km a
+**cero**, y el máximo baja de 64,8 a 12,6 km. Sin ancla, ese centro ES el
+alojamiento y no cambia nada. La regla del sentido único sigue midiendo desde
+la cama, así que el día sigue cerrando de camino a casa — solo que dentro de
+la zona del sitio pedido.
+
 **El alcance se mide en kilómetros, no en etiquetas.** Antes filtraba por
 corredor y eso obligaba a que alguien clasificara cada sitio a mano; en las
 fronteras fallaba. Las piscinas de Bajamar estaban fichadas en Anaga siendo
@@ -179,8 +189,9 @@ sitios no están escritos a mano —se sacan de los datos, el de más peso de
 cada municipio— así que la prueba no se pudre al cambiar el catálogo.
 
 Y cierra con la **escapada**: 4 días desde cada una de las 31 bases, 124 días.
-Referencia: 0 reventones y 2 días con la comida a más de 8 km de toda parada
-(los dos dentro del mismo municipio, que es geografía y no lógica).
+Referencia: 0 reventones, 0 días por encima de 25 km de dispersión (mediana 8,
+máximo 12,6) y 1 día con la comida a más de 8 km de toda parada — ese es en
+Granadilla, dentro del mismo municipio, que es geografía y no lógica.
 
 **Con navegador** — `probar-web.js` con Playwright recorre siete flujos en
 Chrome contra la web desplegada y captura los errores de consola.
@@ -220,15 +231,6 @@ restaurante está mal ubicado, tiene razón: vive allí.
 
 ## Pendiente
 
-- **Los días de escapada dispersan.** 45 de 124 pasan de 25 km, con máximos de
-  65 km (Bajamar y Torviscas el mismo día); en los planes de un día eso está a
-  cero. Cuando un día repite zona, la escapada siembra un ancla en otro
-  corredor, pero las demás paradas se siguen eligiendo alrededor del
-  alojamiento: el día acaba juntando un sitio lejano con otros de casa. Lo
-  arreglaría medir el alcance desde el ancla y no desde la cama, como ya se
-  hace con los restaurantes — pero eso toca la regla del radio, y antes hay
-  que decidir qué se quiere: ¿el día se arma alrededor del sitio lejano, o se
-  renuncia a sembrar tan lejos? `lote.js` ya lo mide en cada pasada.
 - **Partir `index.html`** en varios ficheros.
 - `datos/senderos-anaga.js` está cargado y no lo usa nadie.
 - La pregunta de con quién van sí tiene las tres opciones («Dos adultos»,
