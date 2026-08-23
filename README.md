@@ -14,7 +14,7 @@ Desplegada en Netlify: <https://leafy-cobbler-d24e23.netlify.app>
 
 | Fichero | Qué es |
 | --- | --- |
-| `index.html` | Todo: datos, CSS, motor de planificación y prompt (~2,3 MB) |
+| `index.html` | Todo: datos, CSS, motor de planificación y prompt (~1,1 MB) |
 | `datos/` | Senderos del Cabildo, hitos históricos y miradores |
 | `netlify/functions/naira.js` | Proxy a la API, para que la clave no salga del servidor |
 | `netlify/functions/tiempo.js` | El parte de AEMET (dos saltos, con reintentos) |
@@ -25,7 +25,8 @@ Desplegada en Netlify: <https://leafy-cobbler-d24e23.netlify.app>
 | `generar-imagen.html` | Rehace la imagen de compartir con las tipografías buenas |
 
 Los datos viven dentro de `index.html` como constantes: 589 lugares, 318
-restaurantes, 148 eventos, 31 municipios y sus 31 fotos.
+restaurantes, 148 eventos y 31 municipios. Las fotos de las fichas están en
+`img/estampas/`, una por municipio.
 
 ## Probar
 
@@ -72,5 +73,5 @@ de entorno en Netlify y **no van en el código**:
 
 ## Lo que falta
 
-La lista viva está al final de `CLAUDE.md`. Lo más gordo: sacar del HTML las 31
-fotos en base64 (1.169 KB, el 55% del fichero) y partir `index.html`.
+La lista viva está al final de `CLAUDE.md`. Lo más gordo que queda: partir
+`index.html`, que sigue llevando datos, CSS, motor y prompt en una sola pieza.

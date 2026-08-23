@@ -23,10 +23,11 @@ Desplegado en Netlify: `https://leafy-cobbler-d24e23.netlify.app`
 ## Estructura
 
 ```
-index.html                    TODO: datos, CSS, motor, prompt (~2,3 MB)
+index.html                    TODO: datos, CSS, motor, prompt (~1,1 MB)
 manifest.webmanifest          para instalar en la pantalla de inicio
 icono.svg / icono-*.png
 img/naira-social.jpg          previsualización al compartir
+img/estampas/*.jpg            las 31 fotos de municipio (una por ficha)
 netlify.toml
 netlify/functions/naira.js    proxy a la API (guarda la clave)
 netlify/functions/tiempo.js   AEMET, dos saltos con reintentos
@@ -36,9 +37,10 @@ datos/senderos-tenerife.js    225 itinerarios del Cabildo con desnivel
 datos/miradores.js            18 miradores de Santa Cruz
 ```
 
-**La deuda técnica principal:** `index.html` son 2,3 MB de una pieza, y el
-55% son 31 fotos de municipio en base64 dentro del código. Sacarlas a
-ficheros y partir el archivo es lo que más facilitaría todo lo demás.
+**La deuda técnica principal:** `index.html` sigue siendo una sola pieza con
+los datos, el CSS, el motor y el prompt dentro. Ya no lleva las fotos: las 31
+estampas salieron a `img/estampas/` y el fichero pasó de 2,3 MB a 1,1 MB (208 KB
+comprimido, contra 1,09 MB antes). Partir el archivo es lo que queda.
 
 ## Los datos
 
@@ -48,7 +50,7 @@ Dentro de `index.html`, como constantes:
 - `REST` (318) — restaurantes, incluidas 38 heladerías.
 - `EVENTOS` (148) — fiestas. **Sin coordenadas**, solo municipio y corredor.
 - `BASES` (31) — los municipios, con su centro y corredor.
-- `ESTAMPA` (31) — las fotos en base64.
+- `ESTAMPA` (31) — por municipio, la ruta de su foto (`f`) y su lema.
 
 Campos que el motor usa de un `LUGAR`: `n` nombre, `m` municipio, `c`
 corredor, `fr` franja, `dur` minutos, `tipo`, `w` peso, `et` etiquetas,
@@ -194,7 +196,6 @@ restaurante está mal ubicado, tiene razón: vive allí.
 
 ## Pendiente
 
-- **Sacar las imágenes del HTML.** 1.169 KB en base64, el 55% del fichero.
 - **Partir `index.html`** en varios ficheros.
 - `datos/senderos-anaga.js` está cargado y no lo usa nadie.
 - Falta la opción **«pareja»** en la pregunta de con quién van: solo hay
