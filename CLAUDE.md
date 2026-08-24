@@ -105,10 +105,20 @@ rivales cargaban con la penalización de la guagua. Se ofrecen aparte, en
 tiene `bus` en metros. Antes «sin coche» solo acortaba el radio y salía el
 mismo plan que con coche en cuatro de cuatro bases.
 
-**Con niños gana lo divertido.** `diversion` +7, aviso de seguridad −12.
-Antes «van con niños» solo descartaba lo peligroso y luego elegía igual que
-para una pareja: salía la casa de un coleccionista por delante del Museo de
-la Ciencia y el Cosmos.
+**Con niños gana lo divertido.** +9 a lo apto y divertido (playa, charco,
+piscina, parque, museo, jardín marcados «niños: Sí»), +3 a todo lo marcado
+«niños: Sí», aviso de seguridad −12. Antes «van con niños» solo descartaba lo
+peligroso y luego elegía igual que para una pareja: salía la casa de un
+coleccionista por delante del Museo de la Ciencia y el Cosmos. El peso alto
+hace falta desde que los `flex` compiten en todas las franjas: con +3 los
+senderos los desplazaban y los sitios «niños: Sí» bajaban al 42% de las
+paradas. Ahora son el 67% (24% en pareja) y el plan con niños es distinto al
+de pareja en el 99% de los casos.
+
+**Los `flex` compiten en todas las franjas.** Marcar una ficha `flex` es decir
+«esto vale a otra hora»; tenerlos de suplentes dejaba días cojos: 3 de 24
+planes se quedaban en dos paradas y la dispersión máxima era de 12,7 km.
+Compitiendo: 1 día de dos paradas y 9,6 km.
 
 **El reloj recorta el día.** Si el plan es para hoy, no se ofrece nada de
 por la mañana a las seis de la tarde.
@@ -232,6 +242,13 @@ Y cierra con la **escapada**: 4 días desde cada una de las 31 bases, 124 días.
 Referencia: 0 reventones, 0 días por encima de 25 km de dispersión (mediana 8,
 máximo 12,6) y 1 día con la comida a más de 8 km de toda parada — ese es en
 Granadilla, dentro del mismo municipio, que es geografía y no lógica.
+
+Y un bloque de **perfiles**: el mismo día en cuatro versiones (coche/guagua ×
+pareja/niños) desde las 31 bases. Referencia: 0 sitios no aptos con niños, 67%
+de paradas «niños: Sí» con niños contra 24% en pareja, 61% de tipo divertido,
+1% de planes iguales entre pareja y niños, 54% iguales entre coche y guagua
+—esos son legítimos: sitios que ya están junto a una parada— y 229 m de media
+a la guagua sin coche.
 
 **Con navegador** — `probar-web.js` con Playwright recorre siete flujos en
 Chrome contra la web desplegada y captura los errores de consola.
