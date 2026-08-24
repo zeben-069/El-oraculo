@@ -240,6 +240,11 @@ button.estampa .lienzo{
 button.estampa .lienzo img{
   display:block;width:100%;height:100%;object-fit:cover;object-position:center 42%;
 }
+.titulo-cartas{
+  font-family:var(--disp);font-size:17px;font-weight:800;color:var(--tea);
+  text-align:center;margin:2px 0 10px;letter-spacing:.01em;
+}
+body[data-luz="noche"] .titulo-cartas{color:var(--tea)}
 .cartas{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;width:100%}
 button.carta{
   background:#fff;border:1.5px solid var(--tea);border-radius:13px;padding:0;overflow:hidden;
@@ -256,6 +261,9 @@ button.carta .rotulo{
   display:block;padding:9px 8px 11px;text-align:center;font-family:var(--disp);
   font-size:14px;font-weight:700;line-height:1.15;color:var(--tea);letter-spacing:.01em;
 }
+/* Con tres carteles y dos columnas, el tercero se queda solo en la fila:
+   centrado se lee como algo querido y no como un hueco. */
+.cartas > .carta:last-child:nth-child(3){grid-column:1 / -1;width:calc(50% - 5px);margin:0 auto}
 body[data-luz="noche"] button.carta{background:#211A2C;border-color:#5B4C6E;box-shadow:3px 3px 0 #5B4C6E}
 body[data-luz="noche"] button.carta .rotulo{color:var(--tea)}
 @media(max-width:420px){.cartas{grid-template-columns:1fr 1fr;gap:9px}
@@ -867,6 +875,22 @@ const T={
      masTranquilo:'Otra cosa más tranquila',prefPlaya:'Prefiero playa o piscina',prefNat:'Prefiero naturaleza',cambComida:'Cambiar dónde comer',otroDia:'Otro sitio u otro día',mismoEstilo:'Otro sitio, el mismo estilo',comTipica:'Comida típica canaria',comPescado:'Pescado',comLoQueHaya:'Lo que haya bueno',ninguna:'Ninguna, quiero otro plan',volver:'Volver',ajustar:'Ajustar el plan',frMannana:'Por la mañana',frMediodia:'A mediodía, buscando dónde comer',frTarde:'Ya de tarde',frAtardecer:'Al caer el día',hayFiestas:'fiestas ese día — armar el plan alrededor',hayFiesta:'fiesta ese día — armar el plan alrededor',todoElDia:'todo el día',aquiMismo:'aquí mismo',min:'min',cualFiesta:'¿A cuál quiere ir?',sinFiestas:'Ese día no tengo ninguna fiesta fichada. Le armo el plan normal y ya.',mejorVamos:'Mejor vamos a',tengoApuntado:'tengo apuntado',cosas:'cosas',cosa:'cosa',
      donde:'¿Dónde se están quedando?',coche:'¿Llevan coche?',si_coche:'Sí, tenemos coche',
      no_coche:'No, vamos en guagua',como:'¿Cómo van? Lo pregunto por lo de los niños, que cambia bastante.',
+     tDia:'¿Qué tipo de día?',tComida:'¿Y para comer?',
+     qDia:'¿Qué tipo de día les apetece?',
+     qDiaNinos:'¿Qué tipo de día les apetece? Con niños cambia bastante la cosa.',
+     qComida:'Una cosa antes: ¿les apetece algo en concreto para comer?',
+     qOtroSitio:'¿Les busco otro sitio o cambiamos de tipo de comida?',
+     qMunicipio:'Dígame el municipio y le monto el día desde ahí.',
+     qNoEsHoy:'Eso es para hoy mismo. Como han elegido otro día, les monto el día entero.',
+     qMomento:'¿En qué momento del día están?',
+     qZona:'¿Por qué zona de la isla les apetece moverse?',
+     qZonaDetalle:z=>'En '+z+'. ¿Por dónde exactamente?',
+     qQueVer:m=>'En '+m+'. ¿Qué les apetece ver?',
+     qMasSitios:m=>'Más sitios de '+m+':',
+     qSorpresaHoy:'Va, sin más preguntas. A esta hora yo haría esto:',
+     qSorpresaHoyNinos:'Va, sin más preguntas. Con los peques y a esta hora, yo haría esto:',
+     qSorpresaDia:'Va, sin más preguntas. Para ese día yo haría esto:',
+     qSorpresaDiaNinos:'Va, sin más preguntas. Para ese día y con los peques, yo haría esto:',
      cSenderos:'Senderos',cAgua:'Playas y charcos',cMuseos:'Museos',cTodo:'Un poco de todo',cTipica:'Comida típica',cDeTodo:'Un poco de todo',
      dos:'Dos adultos',familia:'Familia con niños',grupo:'Grupo, sin niños',
      listo_c:'Perfecto, con coche tienen la isla entera. ¿Por dónde tiramos?',
@@ -886,6 +910,22 @@ const T={
      masTranquilo:'Something quieter',prefPlaya:'I would rather have beach or pool',prefNat:'I would rather have nature',cambComida:'Change where we eat',otroDia:'Another place or another day',mismoEstilo:'Another place, same style',comTipica:'Traditional Canarian food',comPescado:'Fish',comLoQueHaya:'Whatever is good',ninguna:'None, I want a different plan',volver:'Back',ajustar:'Adjust the plan',frMannana:'In the morning',frMediodia:'Midday, looking for lunch',frTarde:'Already afternoon',frAtardecer:'As the day ends',hayFiestas:'things on that day — build the plan around one',hayFiesta:'thing on that day — build the plan around it',todoElDia:'all day',aquiMismo:'right here',min:'min',cualFiesta:'Which one would you like?',sinFiestas:'I have nothing on for that day. Let me put together a normal plan instead.',mejorVamos:'Better we go to',tengoApuntado:'I have',cosas:'things',cosa:'thing',
      donde:'Where are you staying?',coche:'Do you have a car?',si_coche:'Yes, we have a car',
      no_coche:'No, we use the bus',como:'Who is coming? Travelling with children changes a lot.',
+     tDia:'What kind of day?',tComida:'And to eat?',
+     qDia:'What kind of day do you fancy?',
+     qDiaNinos:'What kind of day do you fancy? With children it changes quite a lot.',
+     qComida:'One thing first: do you fancy anything in particular to eat?',
+     qOtroSitio:'Shall I find you another place, or shall we change the kind of food?',
+     qMunicipio:'Tell me the town and I will build the day from there.',
+     qNoEsHoy:'That one is for today. As you picked another day, I will plan the whole day.',
+     qMomento:'What time of day are you at?',
+     qZona:'Which part of the island do you fancy moving around?',
+     qZonaDetalle:z=>'In '+z+'. Whereabouts exactly?',
+     qQueVer:m=>'In '+m+'. What would you like to see?',
+     qMasSitios:m=>'More places in '+m+':',
+     qSorpresaHoy:'Right, no more questions. At this hour, this is what I would do:',
+     qSorpresaHoyNinos:'Right, no more questions. With the little ones and at this hour, this is what I would do:',
+     qSorpresaDia:'Right, no more questions. For that day, this is what I would do:',
+     qSorpresaDiaNinos:'Right, no more questions. For that day and with the little ones, this is what I would do:',
      cSenderos:'Trails',cAgua:'Beaches and pools',cMuseos:'Museums',cTodo:'A bit of everything',cTipica:'Local food',cDeTodo:'A bit of everything',
      dos:'Two adults',familia:'Family with children',grupo:'Group, no children',
      listo_c:'With a car the whole island is yours. Where shall we start?',
@@ -905,6 +945,22 @@ const T={
      masTranquilo:'Etwas Ruhigeres',prefPlaya:'Lieber Strand oder Pool',prefNat:'Lieber Natur',cambComida:'Woanders essen',otroDia:'Anderer Ort oder anderer Tag',mismoEstilo:'Anderer Ort, gleicher Stil',comTipica:'Kanarische Hausmannskost',comPescado:'Fisch',comLoQueHaya:'Was gerade gut ist',ninguna:'Keine, ich möchte einen anderen Plan',volver:'Zurück',ajustar:'Plan anpassen',frMannana:'Am Vormittag',frMediodia:'Mittags, auf der Suche nach dem Essen',frTarde:'Schon am Nachmittag',frAtardecer:'Wenn der Tag ausklingt',hayFiestas:'Sachen an dem Tag — den Plan darum herum bauen',hayFiesta:'Sache an dem Tag — den Plan darum herum bauen',todoElDia:'den ganzen Tag',aquiMismo:'gleich hier',min:'Min.',cualFiesta:'Zu welcher möchten Sie?',sinFiestas:'Für diesen Tag habe ich nichts notiert. Ich baue Ihnen einen normalen Plan.',mejorVamos:'Besser wir fahren nach',tengoApuntado:'ich habe',cosas:'Sachen',cosa:'Sache',
      donde:'Wo wohnen Sie?',coche:'Haben Sie ein Auto?',si_coche:'Ja, wir haben ein Auto',
      no_coche:'Nein, wir fahren mit dem Bus',como:'Wer ist dabei? Mit Kindern ändert sich einiges.',
+     tDia:'Was für ein Tag?',tComida:'Und zum Essen?',
+     qDia:'Was für ein Tag soll es werden?',
+     qDiaNinos:'Was für ein Tag soll es werden? Mit Kindern ändert das einiges.',
+     qComida:'Eins noch: Haben Sie Lust auf etwas Bestimmtes zum Essen?',
+     qOtroSitio:'Soll ich Ihnen ein anderes Lokal suchen, oder wechseln wir die Küche?',
+     qMunicipio:'Sagen Sie mir die Gemeinde, dann baue ich den Tag von dort aus.',
+     qNoEsHoy:'Das ist für heute. Da Sie einen anderen Tag gewählt haben, plane ich den ganzen Tag.',
+     qMomento:'Wie spät ist es bei Ihnen gerade?',
+     qZona:'In welcher Gegend der Insel möchten Sie sich bewegen?',
+     qZonaDetalle:z=>'In '+z+'. Wo genau?',
+     qQueVer:m=>'In '+m+'. Was möchten Sie sehen?',
+     qMasSitios:m=>'Mehr Orte in '+m+':',
+     qSorpresaHoy:'Gut, keine Fragen mehr. Um diese Zeit würde ich das hier machen:',
+     qSorpresaHoyNinos:'Gut, keine Fragen mehr. Mit den Kleinen und um diese Zeit würde ich das hier machen:',
+     qSorpresaDia:'Gut, keine Fragen mehr. Für diesen Tag würde ich das hier machen:',
+     qSorpresaDiaNinos:'Gut, keine Fragen mehr. Für diesen Tag und mit den Kleinen würde ich das hier machen:',
      cSenderos:'Wanderwege',cAgua:'Strände und Meerbecken',cMuseos:'Museen',cTodo:'Von allem etwas',cTipica:'Typisch kanarisch',cDeTodo:'Von allem etwas',
      dos:'Zwei Erwachsene',familia:'Familie mit Kindern',grupo:'Gruppe, ohne Kinder',
      listo_c:'Mit Auto gehört Ihnen die ganze Insel. Womit fangen wir an?',
@@ -1002,8 +1058,13 @@ function opciones(lista){
    rótulo va DEBAJO y sale de tr(), no dentro del dibujo: los carteles
    originales traían el texto en español incrustado y en inglés y alemán no
    valían. */
-function cartas(lista){
+function cartas(lista,titulo){
   acc.replaceChildren(); acc.innerHTML='';
+  if(titulo){
+    const t=document.createElement('div');
+    t.className='titulo-cartas'; t.textContent=titulo;
+    acc.appendChild(t);
+  }
   const caja=document.createElement('div');
   caja.className='cartas';
   caja.innerHTML=lista.map((o,i)=>
@@ -3729,7 +3790,7 @@ function planB(brief){
   opciones(L.slice(0,6));
 }
 async function cambiarComida(){
-  await naira('¿Les busco otro sitio o cambiamos de tipo de comida?',340);
+  await naira(tr('qOtroSitio'),340);
   opciones([
     {t:tr('mismoEstilo'),fn:()=>{S.saltoComida=(S.saltoComida||0)+1;pedirPlan()}},
     {t:tr('comTipica'),fn:()=>{S.comida='canaria';S.saltoComida=0;pedirPlan()}},
@@ -3807,7 +3868,7 @@ async function arranque(){
   cuadriculaMunicipios(todos,k=>{S.base=k;pCoche()});
 }
 async function listaMunicipios(){
-  await naira('Dígame el municipio y le monto el día desde ahí.',330);
+  await naira(tr('qMunicipio'),330);
   const resto=Object.entries(BASES).sort((a,b)=>a[1].et.localeCompare(b[1].et));
   opciones(resto.map(([k,v])=>({t:v.et,fn:()=>{S.base=k;pCoche()}})));
 }
@@ -4072,10 +4133,10 @@ async function localizar(){
 async function queHora(){
   const esHoy = S.fecha===(new Date()).toISOString().slice(0,10);
   if(!esHoy){
-    await naira('Eso es para hoy mismo. Como han elegido otro día, les monto el día entero.',380);
+    await naira(tr('qNoEsHoy'),380);
     S.ahora=null; S.anclaElegida=null; queApetece(); return;
   }
-  await naira('¿En qué momento del día están?',330);
+  await naira(tr('qMomento'),330);
   opciones([
     {t:tr('frMannana'),fn:()=>{S.ahora='mañana';S.anclaElegida=null;queApetece()}},
     {t:tr('frMediodia'),fn:()=>{S.ahora='mediodia';S.anclaElegida=null;queApetece()}},
@@ -4084,7 +4145,7 @@ async function queHora(){
   ]);
 }
 async function elegirSitio(){
-  await naira('¿Por qué zona de la isla les apetece moverse?',360);
+  await naira(tr('qZona'),360);
   const ZONAS={
     'Norte y valle de La Orotava':['Norte'],
     'Isla Baja (Garachico, Icod, Buenavista)':['Isla Baja'],
@@ -4102,7 +4163,7 @@ async function elegirMunicipio(etZona,corrs){
   const co={};
   LUGARES.filter(l=>corrs.indexOf(l.c)>=0).forEach(l=>{ const k=l.co||l.m; co[k]=(co[k]||0)+1; });
   const lista=Object.entries(co).filter(([m,n])=>n>=2).sort((a,b)=>b[1]-a[1]);
-  await naira('En '+etZona.toLowerCase()+'. ¿Por dónde exactamente?',360);
+  await naira(tr('qZonaDetalle')(etZona.toLowerCase()),360);
   paso('ok','entrada · nivel 2, la comarca',
     '<span class="am">'+lista.length+'</span> comarcas. Anaga va aparte del casco de La Laguna: '+
     'Taganana y Bajamar son municipio de La Laguna, pero nadie que pida «ver La Laguna» quiere que le manden a Anaga.');
@@ -4113,7 +4174,7 @@ async function elegirMunicipio(etZona,corrs){
 async function elegirLugar(muni){
   const pool=LUGARES.filter(l=>(l.co||l.m)===muni)
     .sort((a,b)=>((b.w||1)-(a.w||1))||((b.fx?1:0)-(a.fx?1:0)));
-  await naira('En '+muni+'. ¿Qué les apetece ver?',360);
+  await naira(tr('qQueVer')(muni),360);
   paso('ok','entrada · nivel 3, el sitio','<span class="am">'+pool.length+'</span> sitios en '+muni+', los de más peso primero.');
   const top=pool.slice(0,10);
   opciones(top.map(l=>({t:l.n+(l.tipo?' · '+l.tipo.toLowerCase():''),
@@ -4126,7 +4187,7 @@ async function verMas(muni,desde){
   const pool=LUGARES.filter(l=>(l.co||l.m)===muni)
     .sort((a,b)=>((b.w||1)-(a.w||1))||((b.fx?1:0)-(a.fx?1:0)));
   const tramo=pool.slice(desde,desde+10);
-  await naira('Más sitios de '+muni+':',300);
+  await naira(tr('qMasSitios')(muni),300);
   opciones(tramo.map(l=>({t:l.n+(l.tipo?' · '+l.tipo.toLowerCase():''),
       fn:()=>{S.anclaElegida=l.n;queApetece()}}))
     .concat(pool.length>desde+10?[{t:tr('yMas'),fn:()=>verMas(muni,desde+10)}]:[])
@@ -4146,26 +4207,27 @@ async function sorprender(){
   paso('ok','sorpréndame', esHoy
     ? 'Sin preguntas: es hoy y son las <span class="am">'+h+':00</span>, así que se planifica lo que queda del día.'
     : 'Sin preguntas: la fecha elegida <span class="am">no es hoy</span>, así que se planifica el día entero, no lo que queda de este.');
-  await naira(esHoy
-    ? (S.ninos ? 'Va, sin más preguntas. Con los peques y a esta hora, yo haría esto:'
-               : 'Va, sin más preguntas. A esta hora yo haría esto:')
-    : (S.ninos ? 'Va, sin más preguntas. Para ese día y con los peques, yo haría esto:'
-               : 'Va, sin más preguntas. Para ese día yo haría esto:'),420);
+  await naira(tr(esHoy ? (S.ninos?'qSorpresaHoyNinos':'qSorpresaHoy')
+                       : (S.ninos?'qSorpresaDiaNinos':'qSorpresaDia')),420);
   pedirPlan();
 }
 async function queApetece(){
-  await naira(S.ninos
-    ? '¿Qué tipo de día les apetece? Con niños cambia bastante la cosa.'
-    : '¿Qué tipo de día les apetece?',380);
+  await naira(tr(S.ninos?'qDiaNinos':'qDia'),380);
+  /* Tres carteles: el de «un poco de todo» era el de la mesa puesta, que es
+     de comida y aquí no pinta nada. La opción no se pierde —quien no tiene
+     preferencia la necesita—, pero va como botón debajo. */
   cartas([
     {t:tr('cSenderos'),img:'senderos',        fn:()=>{S.apetece='naturaleza';preguntaComida()}},
     {t:tr('cAgua'),    img:'playas-y-charcos',fn:()=>{S.apetece='playa';preguntaComida()}},
-    {t:tr('cMuseos'),  img:'museos',          fn:()=>{S.apetece='museos';preguntaComida()}},
-    {t:tr('cTodo'),    img:'un-poco-de-todo', fn:()=>{S.apetece='todo';preguntaComida()}}
-  ]);
+    {t:tr('cMuseos'),  img:'museos',          fn:()=>{S.apetece='museos';preguntaComida()}}
+  ],tr('tDia'));
+  const b=document.createElement('button');
+  b.className='opt'; b.textContent=tr('cTodo');
+  b.onclick=()=>{acc.innerHTML='';burbuja(tr('cTodo'),'yo');S.apetece='todo';preguntaComida()};
+  acc.appendChild(b);
 }
 async function preguntaComida(){
-  await naira('Una cosa antes: ¿les apetece algo en concreto para comer?',360);
+  await naira(tr('qComida'),360);
   /* Dos cartas y no tres: el pescado sale de la pregunta porque la elección
      se lee de un vistazo con dos. El motor sigue sabiendo filtrar pescado —
      lo usa quien lo pide escribiendo— y el botón de «cambiar dónde comer»
@@ -4173,7 +4235,7 @@ async function preguntaComida(){
   cartas([
     {t:tr('cTipica'),img:'comida-tipica',  fn:()=>{S.comida='canaria';pedirPlan()}},
     {t:tr('cDeTodo'),img:'un-poco-de-todo',fn:()=>{S.comida=null;pedirPlan()}}
-  ]);
+  ],tr('tComida'));
 }
 function otroDia(){hilo.innerHTML='';naira('Dígame y se lo armo.',260).then(()=>menuPrincipal())}
 function reiniciar(){S.base=S.coche=S.gente=S.anclaElegida=S.comida=S.apetece=S.ahora=null;

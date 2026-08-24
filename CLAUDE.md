@@ -275,8 +275,13 @@ decía a la vez que Bajamar tenía socorristas y que estaba clasificada como
 PELIGROSA. Se resolvió contrastando con el portal oficial de turismo, no
 borrando el aviso.
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 122 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 139 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
+
+**Lo que dice Naira también pasa por `tr()`.** Nueve preguntas suyas estaban
+escritas en español a pelo —la zona, el municipio, el momento del día, el
+«sorpréndame»— y un inglés las veía en español. Las que llevan hueco
+(`qZonaDetalle`, `qQueVer`, `qMasSitios`) son funciones: `tr('qQueVer')(muni)`.
 
 **Los carteles no llevan el rótulo dentro.** Las dos preguntas con dibujo —qué
 tipo de día y qué apetece comer— se pintan con `cartas()`, y el rótulo va
