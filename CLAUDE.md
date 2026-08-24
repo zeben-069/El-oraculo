@@ -28,6 +28,7 @@ manifest.webmanifest          para instalar en la pantalla de inicio
 icono.svg / icono-*.png
 img/naira-social.jpg          previsualización al compartir
 img/estampas/*.jpg            las 31 fotos de municipio (una por ficha)
+img/cartas/*.jpg              los 5 carteles de las preguntas con dibujo
 netlify.toml
 netlify/functions/naira.js    proxy a la API (guarda la clave)
 netlify/functions/tiempo.js   AEMET, dos saltos con reintentos
@@ -274,8 +275,14 @@ decía a la vez que Bajamar tenía socorristas y que estaba clasificada como
 PELIGROSA. Se resolvió contrastando con el portal oficial de turismo, no
 borrando el aviso.
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 116 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 122 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
+
+**Los carteles no llevan el rótulo dentro.** Las dos preguntas con dibujo —qué
+tipo de día y qué apetece comer— se pintan con `cartas()`, y el rótulo va
+DEBAJO, sacado de `tr()`. Los carteles originales traían el texto incrustado
+y en español: así no valían en inglés ni en alemán. Se recortaron por el
+círculo, y si se añaden más hay que hacer lo mismo.
 
 **Los datos nuevos entran por el informe, nunca por fuera.** El prompt es
 largo (~2.600 palabras) a propósito: si añades un campo al informe y no lo
@@ -294,6 +301,9 @@ restaurante está mal ubicado, tiene razón: vive allí.
   «Familia con niños», «Grupo, sin niños»). Guarda en `S.gente` el **número**
   de personas (2, 4 o 6), no una etiqueta: quien compare con cadenas se lleva
   una rama muerta, que es justo lo que le pasaba al aviso de aforo.
+- La pregunta de qué comer ofrece dos cartas (comida típica / un poco de todo).
+  El pescado salió de ahí, pero el motor sigue sabiendo filtrarlo y el menú de
+  «cambiar dónde comer» lo mantiene.
 - Pocos restaurantes abiertos en domingo en algunos municipios (Arona: 15
   en 18 km). Es escasez de catálogo.
 - Los nombres del registro que venían dados la vuelta ya están enderezados

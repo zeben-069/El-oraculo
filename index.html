@@ -240,6 +240,26 @@ button.estampa .lienzo{
 button.estampa .lienzo img{
   display:block;width:100%;height:100%;object-fit:cover;object-position:center 42%;
 }
+.cartas{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;width:100%}
+button.carta{
+  background:#fff;border:1.5px solid var(--tea);border-radius:13px;padding:0;overflow:hidden;
+  cursor:pointer;box-shadow:2.5px 2.5px 0 var(--tea);display:flex;flex-direction:column;
+  transition:transform .11s cubic-bezier(.2,.7,.3,1),box-shadow .11s;font-family:var(--cuerpo);
+}
+button.carta:hover{transform:translate(-1.5px,-1.5px);box-shadow:4px 4px 0 var(--tea)}
+button.carta:active{transform:translate(2.5px,2.5px);box-shadow:0 0 0 var(--tea)}
+button.carta:focus-visible{outline:2.5px solid var(--malvasia);outline-offset:3px}
+button.carta .lamina{display:block;width:100%;aspect-ratio:1/1;background-color:var(--arena);
+  border-bottom:1.5px solid var(--tea)}
+button.carta .lamina img{display:block;width:100%;height:100%;object-fit:cover}
+button.carta .rotulo{
+  display:block;padding:9px 8px 11px;text-align:center;font-family:var(--disp);
+  font-size:14px;font-weight:700;line-height:1.15;color:var(--tea);letter-spacing:.01em;
+}
+body[data-luz="noche"] button.carta{background:#211A2C;border-color:#5B4C6E;box-shadow:3px 3px 0 #5B4C6E}
+body[data-luz="noche"] button.carta .rotulo{color:var(--tea)}
+@media(max-width:420px){.cartas{grid-template-columns:1fr 1fr;gap:9px}
+  button.carta .rotulo{font-size:13px}}
 button.estampa .lienzo.sin{display:grid;place-items:center;
   background:linear-gradient(140deg,var(--arena),var(--cal-hueso))}
 button.estampa .lienzo.sin .ico{font-size:34px;opacity:.55}
@@ -847,6 +867,7 @@ const T={
      masTranquilo:'Otra cosa más tranquila',prefPlaya:'Prefiero playa o piscina',prefNat:'Prefiero naturaleza',cambComida:'Cambiar dónde comer',otroDia:'Otro sitio u otro día',mismoEstilo:'Otro sitio, el mismo estilo',comTipica:'Comida típica canaria',comPescado:'Pescado',comLoQueHaya:'Lo que haya bueno',ninguna:'Ninguna, quiero otro plan',volver:'Volver',ajustar:'Ajustar el plan',frMannana:'Por la mañana',frMediodia:'A mediodía, buscando dónde comer',frTarde:'Ya de tarde',frAtardecer:'Al caer el día',hayFiestas:'fiestas ese día — armar el plan alrededor',hayFiesta:'fiesta ese día — armar el plan alrededor',todoElDia:'todo el día',aquiMismo:'aquí mismo',min:'min',cualFiesta:'¿A cuál quiere ir?',sinFiestas:'Ese día no tengo ninguna fiesta fichada. Le armo el plan normal y ya.',mejorVamos:'Mejor vamos a',tengoApuntado:'tengo apuntado',cosas:'cosas',cosa:'cosa',
      donde:'¿Dónde se están quedando?',coche:'¿Llevan coche?',si_coche:'Sí, tenemos coche',
      no_coche:'No, vamos en guagua',como:'¿Cómo van? Lo pregunto por lo de los niños, que cambia bastante.',
+     cSenderos:'Senderos',cAgua:'Playas y charcos',cMuseos:'Museos',cTodo:'Un poco de todo',cTipica:'Comida típica',cDeTodo:'Un poco de todo',
      dos:'Dos adultos',familia:'Familia con niños',grupo:'Grupo, sin niños',
      listo_c:'Perfecto, con coche tienen la isla entera. ¿Por dónde tiramos?',
      listo_s:'Perfecto. Sin coche también se hacen cosas buenas, solo hay que atar la vuelta. ¿Por dónde tiramos?',
@@ -865,6 +886,7 @@ const T={
      masTranquilo:'Something quieter',prefPlaya:'I would rather have beach or pool',prefNat:'I would rather have nature',cambComida:'Change where we eat',otroDia:'Another place or another day',mismoEstilo:'Another place, same style',comTipica:'Traditional Canarian food',comPescado:'Fish',comLoQueHaya:'Whatever is good',ninguna:'None, I want a different plan',volver:'Back',ajustar:'Adjust the plan',frMannana:'In the morning',frMediodia:'Midday, looking for lunch',frTarde:'Already afternoon',frAtardecer:'As the day ends',hayFiestas:'things on that day — build the plan around one',hayFiesta:'thing on that day — build the plan around it',todoElDia:'all day',aquiMismo:'right here',min:'min',cualFiesta:'Which one would you like?',sinFiestas:'I have nothing on for that day. Let me put together a normal plan instead.',mejorVamos:'Better we go to',tengoApuntado:'I have',cosas:'things',cosa:'thing',
      donde:'Where are you staying?',coche:'Do you have a car?',si_coche:'Yes, we have a car',
      no_coche:'No, we use the bus',como:'Who is coming? Travelling with children changes a lot.',
+     cSenderos:'Trails',cAgua:'Beaches and pools',cMuseos:'Museums',cTodo:'A bit of everything',cTipica:'Local food',cDeTodo:'A bit of everything',
      dos:'Two adults',familia:'Family with children',grupo:'Group, no children',
      listo_c:'With a car the whole island is yours. Where shall we start?',
      listo_s:'No car is fine, we just need to sort the way back. Where shall we start?',
@@ -883,6 +905,7 @@ const T={
      masTranquilo:'Etwas Ruhigeres',prefPlaya:'Lieber Strand oder Pool',prefNat:'Lieber Natur',cambComida:'Woanders essen',otroDia:'Anderer Ort oder anderer Tag',mismoEstilo:'Anderer Ort, gleicher Stil',comTipica:'Kanarische Hausmannskost',comPescado:'Fisch',comLoQueHaya:'Was gerade gut ist',ninguna:'Keine, ich möchte einen anderen Plan',volver:'Zurück',ajustar:'Plan anpassen',frMannana:'Am Vormittag',frMediodia:'Mittags, auf der Suche nach dem Essen',frTarde:'Schon am Nachmittag',frAtardecer:'Wenn der Tag ausklingt',hayFiestas:'Sachen an dem Tag — den Plan darum herum bauen',hayFiesta:'Sache an dem Tag — den Plan darum herum bauen',todoElDia:'den ganzen Tag',aquiMismo:'gleich hier',min:'Min.',cualFiesta:'Zu welcher möchten Sie?',sinFiestas:'Für diesen Tag habe ich nichts notiert. Ich baue Ihnen einen normalen Plan.',mejorVamos:'Besser wir fahren nach',tengoApuntado:'ich habe',cosas:'Sachen',cosa:'Sache',
      donde:'Wo wohnen Sie?',coche:'Haben Sie ein Auto?',si_coche:'Ja, wir haben ein Auto',
      no_coche:'Nein, wir fahren mit dem Bus',como:'Wer ist dabei? Mit Kindern ändert sich einiges.',
+     cSenderos:'Wanderwege',cAgua:'Strände und Meerbecken',cMuseos:'Museen',cTodo:'Von allem etwas',cTipica:'Typisch kanarisch',cDeTodo:'Von allem etwas',
      dos:'Zwei Erwachsene',familia:'Familie mit Kindern',grupo:'Gruppe, ohne Kinder',
      listo_c:'Mit Auto gehört Ihnen die ganze Insel. Womit fangen wir an?',
      listo_s:'Ohne Auto geht auch viel, wir müssen nur den Rückweg klären. Womit fangen wir an?',
@@ -973,6 +996,29 @@ function opciones(lista){
   acc.innerHTML='';
   lista.forEach(o=>{const b=document.createElement('button');b.className='opt';b.textContent=o.t;
     b.onclick=()=>{acc.innerHTML='';burbuja(o.t,'yo');o.fn()};acc.appendChild(b)});
+}
+/* Lo mismo que opciones(), pero con cartel. Se usa donde la pregunta se
+   entiende mejor de un vistazo: qué tipo de día y qué apetece comer. El
+   rótulo va DEBAJO y sale de tr(), no dentro del dibujo: los carteles
+   originales traían el texto en español incrustado y en inglés y alemán no
+   valían. */
+function cartas(lista){
+  acc.replaceChildren(); acc.innerHTML='';
+  const caja=document.createElement('div');
+  caja.className='cartas';
+  caja.innerHTML=lista.map((o,i)=>
+    '<button class="carta" data-i="'+i+'">'+
+      '<span class="lamina"><img src="img/cartas/'+o.img+'.jpg" alt="" loading="lazy" decoding="async"></span>'+
+      '<span class="rotulo">'+o.t+'</span></button>').join('');
+  caja.addEventListener('click',e=>{
+    const b=e.target.closest&&e.target.closest('.carta');
+    if(!b) return;
+    const o=lista[+b.getAttribute('data-i')];
+    acc.replaceChildren(); acc.innerHTML='';
+    burbuja(o.t,'yo');
+    o.fn();
+  });
+  acc.appendChild(caja);
 }
 function paso(clase,titulo,html){
   if(hRazon.querySelector('.vacio'))hRazon.innerHTML='';
@@ -4111,19 +4157,22 @@ async function queApetece(){
   await naira(S.ninos
     ? '¿Qué tipo de día les apetece? Con niños cambia bastante la cosa.'
     : '¿Qué tipo de día les apetece?',380);
-  opciones([
-    {t:tr('catNat'),fn:()=>{S.apetece='naturaleza';preguntaComida()}},
-    {t:tr('catAgua'),fn:()=>{S.apetece='playa';preguntaComida()}},
-    {t:tr('catMuseos2'),fn:()=>{S.apetece='museos';preguntaComida()}},
-    {t:tr('catTodo'),fn:()=>{S.apetece='todo';preguntaComida()}}
+  cartas([
+    {t:tr('cSenderos'),img:'senderos',        fn:()=>{S.apetece='naturaleza';preguntaComida()}},
+    {t:tr('cAgua'),    img:'playas-y-charcos',fn:()=>{S.apetece='playa';preguntaComida()}},
+    {t:tr('cMuseos'),  img:'museos',          fn:()=>{S.apetece='museos';preguntaComida()}},
+    {t:tr('cTodo'),    img:'un-poco-de-todo', fn:()=>{S.apetece='todo';preguntaComida()}}
   ]);
 }
 async function preguntaComida(){
   await naira('Una cosa antes: ¿les apetece algo en concreto para comer?',360);
-  opciones([
-    {t:tr('comTipica'),fn:()=>{S.comida='canaria';pedirPlan()}},
-    {t:tr('comPescado'),fn:()=>{S.comida='pescado';pedirPlan()}},
-    {t:tr('comLoQueHaya'),fn:()=>{S.comida=null;pedirPlan()}}
+  /* Dos cartas y no tres: el pescado sale de la pregunta porque la elección
+     se lee de un vistazo con dos. El motor sigue sabiendo filtrar pescado —
+     lo usa quien lo pide escribiendo— y el botón de «cambiar dónde comer»
+     lo mantiene. */
+  cartas([
+    {t:tr('cTipica'),img:'comida-tipica',  fn:()=>{S.comida='canaria';pedirPlan()}},
+    {t:tr('cDeTodo'),img:'un-poco-de-todo',fn:()=>{S.comida=null;pedirPlan()}}
   ]);
 }
 function otroDia(){hilo.innerHTML='';naira('Dígame y se lo armo.',260).then(()=>menuPrincipal())}
