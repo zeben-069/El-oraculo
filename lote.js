@@ -185,3 +185,62 @@ const dsE=dispersiones.slice().sort((a,b)=>a-b);
 console.log('  DISPERSO (>25 km en un día)         : '+dispersiones.filter(x=>x>25).length);
 console.log('  dispersión mediana del día          : '+dsE[Math.floor(dsE.length/2)]+
             ' km  (máx '+dsE[dsE.length-1]+')');
+
+/* ── PERFILES · cómo van cambia el plan ───────────────────────────────
+   Tres cosas que no comprueba nada de lo anterior: que el plan cambie según
+   vayan en coche o en guagua, que cambie si van con niños, y que con niños
+   sea seguro y divertido. La regla de la guagua nació porque «sin coche»
+   solo acortaba el radio y salía el mismo plan que en coche. */
+console.log('\n=== PERFILES · coche/guagua · pareja/niños ===');
+const perfil=(base,coche,ninos,gente,f)=>{
+  Object.assign(S,{base,coche,ninos,gente,apetece:null,comida:null,anclaElegida:null,ahora:null,
+    saltoComida:0,descartados:null,prefTipo:null,fecha:f,idioma:'es',_yaVistos:null,_yaComido:null});
+  try{ return construir().brief; }catch(e){ return null; }
+};
+const fichas=ns=>ns.map(n=>LUGARES.find(x=>x.n===n)||{});
+let igualesTransporte=0, igualesGente=0, juegos=0, repes=0, seguidos=0;
+const kids={paradas:0,si:0,prohibidos:[],peligro:[],divertidos:0};
+const pareja={paradas:0,si:0};
+const guagua={paradas:0,suma:0,con:0,lejos:0};
+const FECHAS=['2026-08-24','2026-09-15','2026-11-08'];
+Object.keys(BASES).forEach(base=>{
+  let anterior=null;
+  FECHAS.forEach(f=>{
+    const cp=perfil(base,true,false,2,f), gp=perfil(base,false,false,2,f),
+          cn=perfil(base,true,true,4,f), gn=perfil(base,false,true,4,f);
+    if(!cp||!gp||!cn||!gn) return;
+    juegos++;
+    const nom=b=>(b.paradas||[]).map(p=>p.nombre).join('|');
+    if(nom(cp)===nom(gp)) igualesTransporte++;
+    if(nom(cp)===nom(cn)) igualesGente++;
+    if(anterior!=null){ seguidos++; if(nom(cp)===anterior) repes++; }
+    anterior=nom(cp);
+    [cn,gn].forEach(b=>fichas((b.paradas||[]).map(p=>p.nombre)).forEach(l=>{
+      kids.paradas++;
+      if(l.ninos==='Sí') kids.si++;
+      if(l.ninos==='NO') kids.prohibidos.push(base+' · '+l.n);
+      /* sin seg_tipo se trata como peligro, que es lo prudente */
+      if(l.seg&&(!l.seg_tipo||l.seg_tipo==='peligro')) kids.peligro.push(base+' · '+l.n);
+      if(/Playa|Charco|Piscina|Parque|Museo|Jardín/.test(l.tipo||'')) kids.divertidos++;
+    }));
+    fichas((cp.paradas||[]).map(p=>p.nombre)).forEach(l=>{ pareja.paradas++; if(l.ninos==='Sí') pareja.si++; });
+    [gp,gn].forEach(b=>fichas((b.paradas||[]).map(p=>p.nombre)).forEach(l=>{
+      guagua.paradas++;
+      if(l.bus!=null){ guagua.con++; guagua.suma+=l.bus; if(l.bus>1500) guagua.lejos++; }
+    }));
+  });
+});
+const pc=(a,b)=>Math.round(a*100/Math.max(1,b))+'%';
+console.log('  juegos de 4 planes        : '+juegos);
+console.log('  coche = guagua            : '+pc(igualesTransporte,juegos)+'   (los iguales son sitios que ya están junto a una parada)');
+console.log('  pareja = con niños        : '+pc(igualesGente,juegos));
+console.log('  dos días seguidos iguales : '+pc(repes,seguidos));
+console.log('  CON NIÑOS · sitios «no aptos»      : '+kids.prohibidos.length);
+kids.prohibidos.slice(0,3).forEach(x=>console.log('       '+x));
+console.log('  CON NIÑOS · con aviso de peligro   : '+kids.peligro.length+
+            (kids.peligro.length?'   ('+[...new Set(kids.peligro.map(x=>x.split(' · ')[1]))].join(', ')+')':''));
+console.log('  CON NIÑOS · marcados «niños: Sí»   : '+pc(kids.si,kids.paradas)+
+            '   (en pareja: '+pc(pareja.si,pareja.paradas)+')');
+console.log('  CON NIÑOS · de tipo divertido      : '+pc(kids.divertidos,kids.paradas));
+console.log('  SIN COCHE · media a la guagua      : '+Math.round(guagua.suma/Math.max(1,guagua.con))+' m'+
+            '   · paradas a más de 1,5 km: '+guagua.lejos);

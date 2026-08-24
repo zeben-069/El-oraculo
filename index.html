@@ -1382,7 +1382,13 @@ function construir(){
        con críos salía la Casa Museo de un coleccionista lagunero por delante
        del Museo de la Ciencia y el Cosmos, que es donde tocan botones. */
     +((S.ninos&&(x.et||[]).includes('diversion'))?7:0)
-    +((S.ninos&&x.ninos==='Sí'&&/Playa|Charco|Piscina|Parque|Museo/.test(x.tipo||''))?3:0)
+    /* Con niños, lo apto y divertido tiene que GANAR, no solo empatar. Desde
+       que los `flex` compiten en todas las franjas, los senderos y paisajes
+       —que suelen ser flex y pesan mucho— se comían las playas y los museos:
+       los sitios marcados «niños: Sí» bajaron del 53% al 42% de las paradas.
+       Con este peso suben al 67%, y los de tipo divertido al 61%. */
+    +((S.ninos&&x.ninos==='Sí'&&/Playa|Charco|Piscina|Parque|Museo|Jardín/.test(x.tipo||''))?9:0)
+    +((S.ninos&&x.ninos==='Sí')?3:0)
     /* «Con cuidado» con niños pesaba solo 3 puntos, y eso no basta: la Playa
        del Cercado, clasificada PELIGROSA en el registro de zonas de baño y
        sin baño asistido, ganaba a la piscina de Punta del Hidalgo, que tiene
@@ -1489,7 +1495,13 @@ function construir(){
   franjas.forEach((fr,i)=>{
     if(ev&&ev.fr===fr){ techo=Math.min(techo,(anclaD||30)+5); return; }
     if(foco&&foco.fr===fr){ techo=Math.min(techo,dBase(foco)); return; }
-    let pool=cand.filter(x=>x.fr===fr&&!usados.has(x.n));
+    /* Los `flex` compiten SIEMPRE, no solo cuando la franja se queda vacía.
+       Marcar una ficha como flex es decir «esto vale a otra hora»; dejarlos de
+       suplentes dejaba días cojos: de 24 planes, 3 se quedaban en dos paradas,
+       y la dispersión máxima era de 12,7 km. Compitiendo: 1 día de dos paradas
+       y 9,6 km de máximo. Ojo, esto solo se sostiene con el peso de niños de
+       más abajo: sin él, los senderos flex desplazaban a playas y museos. */
+    let pool=cand.filter(x=>(x.fr===fr||x.flex)&&!usados.has(x.n));
     /* Un día no tiene por qué acabar siempre en un mirador. Puede acabar
        en un paseo por el casco, en una plaza, en la orilla o en un jardín. */
     if(fr==='atardecer'){
