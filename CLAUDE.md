@@ -280,7 +280,7 @@ decía a la vez que Bajamar tenía socorristas y que estaba clasificada como
 PELIGROSA. Se resolvió contrastando con el portal oficial de turismo, no
 borrando el aviso.
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 149 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 171 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **Lo que dice Naira también pasa por `tr()`.** Nueve preguntas suyas estaban
@@ -309,6 +309,22 @@ recortarlos por el centro les cortaría el pico.
 **Los datos nuevos entran por el informe, nunca por fuera.** El prompt es
 largo (~2.600 palabras) a propósito: si añades un campo al informe y no lo
 mencionas ahí, el modelo lo ignora. Ya pasó con todo un día de trabajo.
+
+**Los festivos no se escriben a mano.** La matriz de TITSA trae tres horarios
+—laborable, finde y festivo— y los tres están cargados. El código conocía un
+solo festivo, el 15 de agosto de 2026, puesto a mano en dos sitios: en Navidad
+o el Día de Canarias daba el horario de un día normal. En 341 de 849 pares de
+municipios la última guagua cambia en festivo, y en 272 sale ANTES, alguna
+quince horas antes. Ahora `tipoDeDia()` mira los festivos fijos de Canarias y
+calcula el Viernes Santo (algoritmo de la Pascua), que se mueve.
+
+**Los datos también hablan tres idiomas.** El tipo de sitio (32 valores
+cerrados) y el lema de cada municipio se traducen con tabla; el horario del
+restaurante es texto libre y se traduce con `horarioTr()`, que toca SOLO las
+palabras: comprobado sobre los 318, no cambia un solo número. Y `pintaFijos()`
+repinta la cabecera, la fecha, el pie y el botón del panel al cambiar de
+idioma, que antes se quedaban en español para siempre porque `arranque()` solo
+rehace el hilo.
 
 **Zeben corrige.** Si dice que una playa no es buena con niños o que un
 restaurante está mal ubicado, tiene razón: vive allí.

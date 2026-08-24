@@ -572,9 +572,9 @@ if(typeof L==='undefined'){
   </svg>
   <div class="marca">
     <h1>Nair<em>a</em></h1>
-    <p class="lema">Su día en Tenerife, contado como se cuenta aquí</p>
+    <p class="lema" id="lemaCab">Su día en Tenerife, contado como se cuenta aquí</p>
   </div>
-  <div class="barra" id="barra"><span class="et">Día</span>
+  <div class="barra" id="barra"><span class="et" id="etDiaTit">Día</span>
     <input type="date" id="fechaLibre" min="2026-08-01" max="2027-12-31">
     <span class="et" id="etDia"></span>
   </div>
@@ -591,7 +591,7 @@ if(typeof L==='undefined'){
   </div>
 </section>
 
-<footer class="pie">
+<footer class="pie" id="pieFuentes">
   Cartografía y fototeca: <code>GRAFCAN — IDECanarias</code>. Horarios de guagua: <code>GTFS de TITSA</code>.
   Lugares e itinerarios: <code>datos.tenerife.es</code>. Naira no inventa horarios: lo que no sabe, lo dice.
 </footer>
@@ -804,6 +804,9 @@ Y si la última sale de madrugada, dilo con naturalidad: «hay guaguas hasta tar
 Cuando el informe traiga "cuantas_al_dia", puedes decir si hay muchas o pocas: no es lo mismo una cada hora que tres al día.
 
 SI NO HAY DE LO QUE PIDIERON
+LOS DÍAS QUE CIERRA
+Si el sitio de comer trae "dias_que_cierra", dilo en una frase corta al dar el horario: «cierra lunes y martes». Vienen de los días de apertura fichados, así que son ciertos aunque el horario escrito no los mencione. No los conviertas en un aviso: es un dato práctico.
+
 Si el informe trae "no_hay_de_lo_que_pidieron", dilo antes de proponer nada: «de pescado por aquí cerca no tengo nada abierto ahora». No disimules ofreciendo otra cosa como si fuera lo que pidieron.
 Si trae "lo_que_pidieron_queda_lejos", tampoco lo disimules al revés: hay de lo que pidieron, pero obliga a desviarse. Dilo con el número —«de pescado, lo más cerca es X, a Y km de las paradas»— y ofrece al lado lo que sí queda de camino. Que elijan ellos entre moverse o comer cerca.
 
@@ -916,6 +919,20 @@ const T={
      zNorte:'Norte y valle de La Orotava',zIslaBaja:'Isla Baja (Garachico, Icod, Buenavista)',
      zMetropolitana:'La Laguna, Santa Cruz y Anaga',zGuimar:'Este y valle de Güímar',
      zSur:'Sur y suroeste',zCumbre:'Cumbre y Teide',
+     mapaNo:'El mapa no ha cargado',
+     mapaNoTxt:'Sin conexión o con el navegador bloqueando recursos externos. Cada parada de abajo lleva su enlace con la coordenada exacta.',
+     imgNo:'No he podido hacer la imagen. Le dejo el plan en texto.',
+     selloSinApi:'Naira, sin conexión a la API',
+     plantillas:m=>'Naira ha narrado con plantillas porque la API no contestó. Motivo: '+m+'. El motor y el plan son exactamente los mismos: solo cambia quién pone las palabras.',
+     escapadaNo:'No he podido armar la escapada entera. Pruebe con un día suelto.',
+     rutaNo:'Ahora mismo no tengo la ruta histórica cargada.',
+     evento:'evento',eventos:'eventos',sinEventos:'sin eventos',
+     verPanel:'Ver cómo se armó ▲',cerrarPanel:'Cerrar el detalle ▼',
+     lema:'Su día en Tenerife, contado como se cuenta aquí',etDia:'Día',
+     fuentes:'Cartografía y fototeca: <code>GRAFCAN — IDECanarias</code>. Horarios de guagua: <code>GTFS de TITSA</code>. Lugares e itinerarios: <code>datos.tenerife.es</code>. Naira no inventa horarios: lo que no sabe, lo dice.',
+     bienNinos:'bien con niños',noNinos:'NO para niños',nSitios:'sitios',
+     gMapa:'El día en el mapa',gParadas:'Las paradas',gEmpieza:'Dónde empieza exactamente',
+     gComer:'Dónde comer — elijan ustedes',
      tGente:'¿Con quién viajan?',
      tCoche:'¿Coche o guagua?',
      cConCoche:'Con coche',cSinCoche:'Sin coche, en guagua',
@@ -957,6 +974,20 @@ const T={
      zNorte:'North and the Orotava valley',zIslaBaja:'Isla Baja (Garachico, Icod, Buenavista)',
      zMetropolitana:'La Laguna, Santa Cruz and Anaga',zGuimar:'East and the Güímar valley',
      zSur:'South and south-west',zCumbre:'The summit and Teide',
+     mapaNo:'The map did not load',
+     mapaNoTxt:'No connection, or the browser is blocking external resources. Every stop below has its own link with the exact coordinates.',
+     imgNo:'I could not make the image. Here is the plan in text.',
+     selloSinApi:'Naira, no connection to the API',
+     plantillas:m=>'Naira narrated this from templates because the API did not answer. Reason: '+m+'. The engine and the plan are exactly the same: only who puts the words changes.',
+     escapadaNo:'I could not put the whole trip together. Try a single day.',
+     rutaNo:'I do not have the historic route loaded right now.',
+     evento:'event',eventos:'events',sinEventos:'no events',
+     verPanel:'See how it was built ▲',cerrarPanel:'Close the details ▼',
+     lema:'Your day in Tenerife, told the way we tell it here',etDia:'Day',
+     fuentes:'Maps and photo library: <code>GRAFCAN — IDECanarias</code>. Bus timetables: <code>GTFS from TITSA</code>. Places and routes: <code>datos.tenerife.es</code>. Naira never invents opening hours: what she does not know, she says so.',
+     bienNinos:'good with children',noNinos:'NOT for children',nSitios:'places',
+     gMapa:'The day on the map',gParadas:'The stops',gEmpieza:'Where it starts exactly',
+     gComer:'Where to eat — you choose',
      tGente:'Who is travelling?',
      tCoche:'Car or bus?',
      cConCoche:'With a car',cSinCoche:'By bus',
@@ -998,6 +1029,20 @@ const T={
      zNorte:'Norden und das Orotava-Tal',zIslaBaja:'Isla Baja (Garachico, Icod, Buenavista)',
      zMetropolitana:'La Laguna, Santa Cruz und Anaga',zGuimar:'Osten und das Güímar-Tal',
      zSur:'Süden und Südwesten',zCumbre:'Gipfel und Teide',
+     mapaNo:'Die Karte wurde nicht geladen',
+     mapaNoTxt:'Keine Verbindung, oder der Browser blockiert externe Inhalte. Jeder Stopp unten hat seinen eigenen Link mit den genauen Koordinaten.',
+     imgNo:'Ich konnte das Bild nicht erstellen. Hier ist der Plan als Text.',
+     selloSinApi:'Naira, ohne Verbindung zur API',
+     plantillas:m=>'Naira hat mit Vorlagen erzählt, weil die API nicht geantwortet hat. Grund: '+m+'. Motor und Plan sind genau dieselben: es ändert sich nur, wer die Worte setzt.',
+     escapadaNo:'Ich konnte die ganze Reise nicht zusammenstellen. Versuchen Sie es mit einem einzelnen Tag.',
+     rutaNo:'Die historische Route ist gerade nicht geladen.',
+     evento:'Veranstaltung',eventos:'Veranstaltungen',sinEventos:'keine Veranstaltungen',
+     verPanel:'Wie es gebaut wurde ▲',cerrarPanel:'Details schließen ▼',
+     lema:'Ihr Tag auf Teneriffa, erzählt wie man es hier erzählt',etDia:'Tag',
+     fuentes:'Karten und Fotothek: <code>GRAFCAN — IDECanarias</code>. Busfahrpläne: <code>GTFS von TITSA</code>. Orte und Routen: <code>datos.tenerife.es</code>. Naira erfindet keine Öffnungszeiten: was sie nicht weiß, sagt sie.',
+     bienNinos:'gut mit Kindern',noNinos:'NICHTS für Kinder',nSitios:'Orte',
+     gMapa:'Der Tag auf der Karte',gParadas:'Die Stopps',gEmpieza:'Wo es genau beginnt',
+     gComer:'Wo essen — Sie wählen',
      tGente:'Wer reist mit?',
      tCoche:'Auto oder Bus?',
      cConCoche:'Mit Auto',cSinCoche:'Mit dem Bus',
@@ -1012,7 +1057,95 @@ const T={
      copiado:'Kopiert. Schicken Sie ihn, wem Sie möchten.',
      antes:'So sah es hier aus im Jahr',pensando:'Naira überlegt…'}
 };
+/* QUÉ DÍA ES PARA LA GUAGUA. La matriz de TITSA trae tres horarios —laborable,
+   finde y festivo— y los tres están cargados (849 pares de municipios cada
+   uno). Pero el único festivo que conocía el código era el 15 de agosto de
+   2026, escrito a mano en dos sitios: en Navidad o el Día de Canarias daba el
+   horario de un día normal, que es justo cuando alguien se queda tirado.
+   Los fijos son los de Canarias; el Viernes Santo se calcula, que se mueve. */
+const FESTIVOS_FIJOS=['01-01','01-06','02-02','05-01','05-30','08-15','10-12','11-01','12-06','12-08','12-25'];
+function viernesSanto(anno){
+  /* cómputo de la Pascua (algoritmo gregoriano anónimo) */
+  const a=anno%19, b=Math.floor(anno/100), c=anno%100;
+  const d=Math.floor(b/4), e=b%4, f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3);
+  const h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4;
+  const l=(32+2*e+2*i-h-k)%7, m=Math.floor((a+11*h+22*l)/451);
+  const mes=Math.floor((h+l-7*m+114)/31), dia=((h+l-7*m+114)%31)+1;
+  const pascua=new Date(Date.UTC(anno,mes-1,dia));
+  const vs=new Date(pascua.getTime()-2*86400000);   /* dos días antes */
+  return vs.toISOString().slice(0,10);
+}
+function esFestivo(f){
+  if(!f) return false;
+  if(FESTIVOS_FIJOS.indexOf(f.slice(5))>=0) return true;
+  return f===viernesSanto(+f.slice(0,4));
+}
+/* laborable / finde / festivo, en un solo sitio */
+const tipoDeDia=f=>esFestivo(f)?'festivo':(diaSemana(f)===0||diaSemana(f)===6?'finde':'laborable');
 const tr=k=>(T[S.idioma]||T.es)[k]||T.es[k];
+/* El tipo de sitio es un dato y viene en español. Son 32 valores cerrados,
+   así que se traducen con una tabla; lo que no esté, sale tal cual. */
+const TIPOS={
+ en:{'Barranco':'Ravine','Bodega':'Winery','Casco histórico':'Old town','Caserío':'Hamlet',
+     'Castillo':'Castle','Charco':'Rock pool','Edificio':'Building','Escultura':'Sculpture',
+     'Faro':'Lighthouse','Iglesia':'Church','Jardín':'Garden','Mercado':'Market',
+     'Mirador':'Viewpoint','Monte / bosque':'Woodland','Museo':'Museum',
+     'Museo / bodega':'Museum and winery','Naturaleza':'Nature','Paisaje':'Landscape',
+     'Parque acuático':'Water park','Parque etnográfico':'Heritage park',
+     'Parque temático':'Theme park','Patrimonio':'Heritage site','Piscina':'Sea pool',
+     'Playa':'Beach','Plaza':'Square','Quesería':'Cheese dairy','Refugio':'Mountain refuge',
+     'Sendero':'Trail','Transporte':'Transport','Volcán':'Volcano',
+     'Árbol / monumento natural':'Notable tree','Área recreativa':'Picnic area'},
+ de:{'Barranco':'Schlucht','Bodega':'Weingut','Casco histórico':'Altstadt','Caserío':'Weiler',
+     'Castillo':'Burg','Charco':'Naturbecken','Edificio':'Gebäude','Escultura':'Skulptur',
+     'Faro':'Leuchtturm','Iglesia':'Kirche','Jardín':'Garten','Mercado':'Markt',
+     'Mirador':'Aussichtspunkt','Monte / bosque':'Wald','Museo':'Museum',
+     'Museo / bodega':'Museum und Weingut','Naturaleza':'Natur','Paisaje':'Landschaft',
+     'Parque acuático':'Wasserpark','Parque etnográfico':'Freilichtmuseum',
+     'Parque temático':'Themenpark','Patrimonio':'Kulturerbe','Piscina':'Meerwasserbecken',
+     'Playa':'Strand','Plaza':'Platz','Quesería':'Käserei','Refugio':'Berghütte',
+     'Sendero':'Wanderweg','Transporte':'Verkehr','Volcán':'Vulkan',
+     'Árbol / monumento natural':'Naturdenkmal','Área recreativa':'Rastplatz'}
+};
+const tipoTr=t=>{ if(!t) return t; const m=TIPOS[S.idioma]; return (m&&m[t])||t; };
+/* El lema de cada municipio va en las tres lenguas dentro de la propia ficha */
+const lemaTr=e=>!e?'':(S.idioma==='en'?(e.lema_en||e.lema):S.idioma==='de'?(e.lema_de||e.lema):e.lema)||'';
+/* El horario es texto libre y viene en español («L-J 13:00-18:00 · V y S hasta
+   las 24:00 · lunes cerrado»). Se traducen SOLO las palabras: los números no
+   se tocan nunca, que es la regla de la casa con los horarios. */
+const HORAS={
+ en:{dias:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+     letras:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+     pal:[[/todos los d[íi]as/gi,'every day'],[/hasta las/gi,'until'],[/hasta/gi,'until'],
+          [/cerrad[oa]s?/gi,'closed'],[/solo mediod[íi]a/gi,'lunchtime only'],[/s[óo]lo|solo/gi,'only'],
+          [/mediod[íi]a/gi,'lunchtime'],[/noche/gi,'evening'],[/festivos/gi,'public holidays'],
+          [/abre/gi,'opens'],[/tambi[ée]n/gi,'also'],[/\by\b/gi,'and']]},
+ de:{dias:['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
+     letras:['So','Mo','Di','Mi','Do','Fr','Sa'],
+     pal:[[/todos los d[íi]as/gi,'täglich'],[/hasta las/gi,'bis'],[/hasta/gi,'bis'],
+          [/cerrad[oa]s?/gi,'geschlossen'],[/solo mediod[íi]a/gi,'nur mittags'],[/s[óo]lo|solo/gi,'nur'],
+          [/mediod[íi]a/gi,'mittags'],[/noche/gi,'abends'],[/festivos/gi,'Feiertage'],
+          [/abre/gi,'öffnet'],[/tambi[ée]n/gi,'auch'],[/\by\b/gi,'und']]}
+};
+const ES_DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const ES_LETRAS=['D','L','M','X','J','V','S'];
+function horarioTr(h){
+  if(!h||S.idioma==='es') return h;
+  const M=HORAS[S.idioma]; if(!M) return h;
+  let t=h;
+  /* primero los nombres completos, en plural y en singular */
+  ES_DIAS.forEach((d,i)=>{
+    const base=d.replace('miércoles','mi[ée]rcoles').replace('sábado','s[áa]bado');
+    t=t.replace(new RegExp(base+'s\\b','gi'),M.dias[i]+'s');
+    t=t.replace(new RegExp(base+'\\b','gi'),M.dias[i]);
+  });
+  /* luego las abreviaturas de una letra, solo cuando van sueltas */
+  ES_LETRAS.forEach((L,i)=>{
+    t=t.replace(new RegExp('(^|[\\s·\\-–(])'+L+'(?=[\\s·\\-–,)]|$)','g'),'$1'+M.letras[i]);
+  });
+  M.pal.forEach(([re,por])=>{ t=t.replace(re,por); });
+  return t;
+}
 
 /* ===================== ESTADO ===================== */
 let S={fecha:(new Date()).toISOString().slice(0,10),base:null,coche:null,gente:null,verif:false,ultimoBrief:null,prompt:PROMPT_BASE,anclaElegida:null,comida:null,ninos:false,apetece:null,ahora:null,saltoComida:0,idioma:'es',aqui:null};
@@ -1649,7 +1782,7 @@ function construir(){
   /* Si el navegador dice que están lejos de donde duermen y van sin coche,
      lo primero es la última guagua. Es el aviso que evita que se queden tirados. */
   if(S.aqui && !S.coche && S.aqui!==S.base){
-    const tipoU=(f==='2026-08-15')?'festivo':(diaSemana(f)===0||diaSemana(f)===6?'finde':'laborable');
+    const tipoU=tipoDeDia(f);
     const rr=(MATRIZ[tipoU]||{})[BASES[S.aqui].m+'|'+BASES[S.base].m];
     if(rr){
       const hh=Math.floor(rr.ultima/60), mm=rr.ultima%60;
@@ -2042,7 +2175,7 @@ function construir(){
 
   if(!S.coche){
     const ds2=diaSemana(f);
-    const tipoDia = (f==='2026-08-15') ? 'festivo' : (ds2===0||ds2===6 ? 'finde' : 'laborable');
+    const tipoDia = tipoDeDia(f);
     /* el destino real: el municipio del ancla o de la primera parada */
     const destMuni = (foco&&foco.m) || (paradas[0]&&paradas[0].m) || corr;
     const clave = destMuni+'|'+base.m;
@@ -2299,6 +2432,12 @@ function construir(){
             ' km en línea recta del punto de partida'+(S.coche?', o sea lejos del coche. Avísalo y di cómo se vuelve.':'. Avísalo y mira cómo se vuelve.')
           : null)})),
     restaurante: rest?{nombre:rest.n,municipio:rest.m,horario:rest.h,telefono:rest.tel,
+      /* Sacados de los días de apertura, no del texto: 64 fichas tienen días
+         de cierre que el horario escrito no menciona, así que Naira no podía
+         contarlos por mucho que estuvieran en los datos. */
+      dias_que_cierra: (function(){const N=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+        const c=(rest.ab||[]).map((v,i)=>v?null:N[i]).filter(Boolean);
+        return c.length&&c.length<7?c:null;})(),
       nota:rest.nota,ojo:rest.ojo||null,nota_extra:rest.nota2||null,
       clasificacion:(rest.gua==='registrado'?'guachinche registrado por el Cabildo, fuente oficial'
                     :(rest.gua==='canaria'?'usa el nombre guachinche pero no está en el registro oficial':null)),
@@ -2401,9 +2540,8 @@ function mapaDia(grupos,alto){
     if(typeof L==='undefined'){
       /* si la librería del mapa no cargó, no se deja un hueco negro */
       el.classList.add('sinMapa');
-      el.innerHTML='<div class="avisoMapa"><b>El mapa no ha cargado</b>'+
-        '<span>Sin conexión o con el navegador bloqueando recursos externos. '+
-        'Cada parada de abajo lleva su enlace con la coordenada exacta.</span>'+
+      el.innerHTML='<div class="avisoMapa"><b>'+tr('mapaNo')+'</b>'+
+        '<span>'+tr('mapaNoTxt')+'</span>'+
         '<a href="https://www.google.com/maps/dir/?api=1&destination='+pts[0].la+','+pts[0].lo+
         '" target="_blank" rel="noopener">Abrir en Google Maps ▸</a></div>';
       return;
@@ -2632,7 +2770,7 @@ async function compartirImagen(b,base){
     setTimeout(()=>URL.revokeObjectURL(a.href),4000);
     burbuja(tr('imgBajada'),'sis');
   }catch(e){
-    burbuja('No he podido hacer la imagen. Le dejo el plan en texto.','sis');
+    burbuja(tr('imgNo'),'sis');
     compartir(b,base);
   }
 }
@@ -2662,12 +2800,12 @@ function urlCalendario(b,base){
   (b.paradas||[]).forEach(p=>lineas.push([ORD[p.franja]||9,
     (ET[p.franja]||'')+': '+p.nombre+(p.duracion_min?' ('+p.duracion_min+' min)':'')]));
   if(b.restaurante) lineas.push([2,'Comer: '+b.restaurante.nombre+', '+b.restaurante.municipio+
-    ' — '+(b.restaurante.horario||'')+(b.restaurante.telefono?' — tel '+b.restaurante.telefono:'')]);
+    ' — '+horarioTr(b.restaurante.horario||'')+(b.restaurante.telefono?' — tel '+b.restaurante.telefono:'')]);
   if(b.cerrar_tomando_algo) lineas.push([5,'Para rematar: '+b.cerrar_tomando_algo.nombre+
     ', '+b.cerrar_tomando_algo.municipio]);
   lineas.sort((a,c)=>a[0]-c[0]).forEach(x=>L.push('• '+x[1]));
   const g=b.regreso;
-  if(g&&g.ultima_salida) L.push('','VUELTA: última guagua a las '+g.ultima_salida+
+  if(g&&g.ultima_salida) L.push('',tr('tjVuelta')+': '+tr('tjUltima').toLowerCase()+' '+g.ultima_salida+
     (g.con_trasbordo?', cambio en '+g.cambio_en:', línea '+g.linea));
   if((b.avisos||[]).length){ L.push('','OJO:'); b.avisos.forEach(a=>L.push('• '+a)); }
   L.push('','Deje el sitio como lo encontró: la basura se baja, no se deja.');
@@ -2734,7 +2872,7 @@ function bloqueMapas(b,base){
   if(horaBaño) LUGARES.filter(l=>l.c===b.corredor&&!l.cerrado&&l.la&&
       ['Playa','Charco','Piscina'].includes(l.tipo)&&!yaAgua.has(l.n)).slice(0,3)
     .forEach(l=>agua.push({la:l.la,lo:l.lo,nombre:l.n,
-      sub:l.tipo+(l.ninos==='Sí'?' · bien con niños':(l.ninos==='NO'?' · NO para niños':''))}));
+      sub:tipoTr(l.tipo)+(l.ninos==='Sí'?' · '+tr('bienNinos'):(l.ninos==='NO'?' · '+tr('noNinos'):''))}));
 
   /* EL MAPA DEL DÍA, todo junto y con la ruta trazada */
   const mapa=mapaDia([
@@ -2743,13 +2881,13 @@ function bloqueMapas(b,base){
     {clase:'comer',et:'Dónde comer',puntos:come},
     {clase:'agua',et:'Para el bañito',puntos:agua}
   ],320);
-  if(mapa) G.push('<div class="grupo"><i>El día en el mapa</i>'+mapa+'</div>');
+  if(mapa) G.push('<div class="grupo"><i>'+tr('gMapa')+'</i>'+mapa+'</div>');
 
   /* Las fichas, cada una con su punto exacto y sus botones para cambiarla.
      El plan deja de ser algo que se lee y pasa a ser algo que se ajusta:
      el motor ya sabía descartar y buscar alternativas, solo faltaba dejar
      que lo pidiera el turista en vez de tener que rehacer el plan entero. */
-  if(ruta.length) G.push('<div class="grupo"><i>Las paradas</i>'+
+  if(ruta.length) G.push('<div class="grupo"><i>'+tr('gParadas')+'</i>'+
     ruta.map(p=>{const l=LUGARES.find(x=>x.n===p.nombre)||{};
       /* urlDe respeta los sitios de posición aproximada */
       const ficha=tarjeta('',p.nombre,urlDe({...l,la:p.la,lo:p.lo}),
@@ -2770,7 +2908,7 @@ function bloqueMapas(b,base){
     G.push('<div class="grupo"><i>La ruta del sendero</i>'+
       tarjeta('🥾','Trazado de '+p.nombre,urlSendero(p.nombre),
         (l.fx||'')+' · Descárguenlo antes de salir: arriba puede no haber cobertura',true,null,'Sendero')+
-      tarjeta('📍','Dónde empieza exactamente',urlPin(p.la,p.lo),
+      tarjeta('📍',tr('gEmpieza'),urlPin(p.la,p.lo),
         'Les lleva a la cabecera: '+p.la.toFixed(5)+', '+p.lo.toFixed(5),false,null,'Sendero')+
       /* El trazado completo no lo tenemos dibujado; en Wikiloc la gente sube
          estas rutas con su matrícula oficial, así que se enlaza la búsqueda.
@@ -2780,7 +2918,7 @@ function bloqueMapas(b,base){
         l.mat+' · rutas subidas por otra gente, fuera de Naira',false,null,'Sendero') : '')+'</div>');
   });
 
-  if(come.length) G.push('<div class="grupo"><i>Dónde comer — elijan ustedes</i>'+
+  if(come.length) G.push('<div class="grupo"><i>'+tr('gComer')+'</i>'+
     come.slice(0,5).map(r=>{const rr=REST.find(x=>x.n===r.nombre)||{};
       /* urlDe: si la posición del sitio es aproximada, busca por nombre en
          vez de navegar a una coordenada que no es la puerta. */
@@ -2807,7 +2945,7 @@ function dibujaRuta(b){
     P.push({fr:p.franja,n:p.nombre,tipo:l.tipo||'',dur:p.duracion_min,
       sub:(l.fx||p.cuando_no||l.no||'').slice(0,140),
       chips:[l.tipo,p.duracion_min?p.duracion_min+' min':null,
-             l.ninos==='Sí'?'bien con niños':null].filter(Boolean),
+             l.ninos==='Sí'?tr('bienNinos'):null].filter(Boolean),
       ojo:p.aviso_seguridad||p.reserva_obligatoria||null,
       clase:['Playa','Charco','Piscina'].includes(l.tipo)?'bano':''});
   });
@@ -2816,7 +2954,7 @@ function dibujaRuta(b){
     chips:[ev.hora||null,ev.municipio].filter(Boolean),clase:'fiesta'});
   if(b.restaurante) P.push({fr:(b.momento_de_comer?(S.ahora==='atardecer'?'atardecer':'tarde'):'mediodía'),
     n:b.restaurante.nombre,tipo:'Comer',
-    sub:b.restaurante.horario||'',
+    sub:horarioTr(b.restaurante.horario||''),
     chips:[b.restaurante.municipio,b.restaurante.valoracion?b.restaurante.valoracion+'★':null,
            b.restaurante.telefono].filter(Boolean),
     ojo:b.restaurante.ojo||null,clase:'comer'});
@@ -3263,7 +3401,7 @@ function narrarLocal(b){
     let c='';
     if(b.no_hay_de_lo_que_pidieron) c+=F.noHay(b.no_hay_de_lo_que_pidieron);
     c+=(b.momento_de_comer?F.paraX(b.momento_de_comer):F.paraComer)+r.nombre+F.en+r.municipio+'.';
-    if(r.horario) c+=F.abre+r.horario+'.';
+    if(r.horario) c+=F.abre+horarioTr(r.horario)+'.';
     if(r.clasificacion&&/registrado|registered|eingetragen/i.test(r.clasificacion)) c+=F.registrado;
     else if(r.clasificacion) c+=F.noRegistrado;
     if(r.nota) c+=' '+r.nota+'.';
@@ -3278,7 +3416,7 @@ function narrarLocal(b){
         o+='\n\n· '+x.nombre+(x.municipio&&x.municipio!==r.municipio?F.en+x.municipio:'')+'.';
         if(x.tipo) o+=' '+x.tipo+'.';
         if(x.valoracion) o+=' '+x.valoracion+F.nota;
-        if(x.horario) o+='\n  '+x.horario+'.';
+        if(x.horario) o+='\n  '+horarioTr(x.horario)+'.';
         if(x.telefono) o+=F.tel+x.telefono;
       });
       t.push(o);
@@ -3310,7 +3448,7 @@ function narrarLocal(b){
   if(ct){
     let c=F.rematar(ct.nombre,ct.municipio);
     c+=ct.tipo?F.esDe+ct.tipo.toLowerCase()+'.':'.';
-    if(ct.horario) c+=F.abre+ct.horario+'.';
+    if(ct.horario) c+=F.abre+horarioTr(ct.horario)+'.';
     if(ct.telefono) c+=F.tel+ct.telefono;
     t.push(c);
   }
@@ -3470,12 +3608,11 @@ async function pedirPlan(){
     if(t.parentNode) t.remove();
     const texto=narrarLocal(brief);
     const rev=revisar(texto,brief);
-    burbuja(texto,'naira','<span class="sello">Naira, sin conexión a la API</span>'
+    burbuja(texto,'naira','<span class="sello">'+tr('selloSinApi')+'</span>'
       +dibujaRuta(brief)+bloqueMapas(brief,BASES[S.base]));
     pintarAudit(texto,rev);
     const motivo=(e&&e.message)?String(e.message):'motivo desconocido';
-    burbuja('Naira ha narrado con plantillas porque la API no contestó. Motivo: '+motivo+
-      '. El motor y el plan son exactamente los mismos: solo cambia quién pone las palabras.','sis');
+    burbuja(tr('plantillas')(motivo),'sis');
   }
   planB(brief);
   /* Ya tiene el plan delante: a partir de aquí puede preguntar por escrito.
@@ -3689,7 +3826,7 @@ async function escapada(dias){
   try{ jornadas=planVariosDias(dias); }
   catch(e){
     if(t.parentNode) t.remove();
-    burbuja('No he podido armar la escapada entera. Pruebe con un día suelto.','sis');
+    burbuja(tr('escapadaNo'),'sis');
     menuPrincipal(); return;
   }
   if(t.parentNode) t.remove();
@@ -3870,37 +4007,37 @@ async function cambiarComida(){
    descargar y analizar antes de pintar nada. Si falta la imagen, la ficha
    sigue funcionando con el color y el icono. */
 const ESTAMPA={
-  "Adeje": {"f":"img/estampas/adeje.jpg", "lema":"Playa y sol del suroeste"},
-  "Arafo": {"f":"img/estampas/arafo.jpg", "lema":"El pueblo de la música"},
-  "Arico": {"f":"img/estampas/arico.jpg", "lema":"El muelle de Tajao"},
-  "Arona": {"f":"img/estampas/arona.jpg", "lema":"Playa y ambiente"},
-  "Buenavista del Norte": {"f":"img/estampas/buenavista-del-norte.jpg", "lema":"Teno y el faro"},
-  "Candelaria": {"f":"img/estampas/candelaria.jpg", "lema":"La basílica y los menceyes"},
-  "El Rosario": {"f":"img/estampas/el-rosario.jpg", "lema":"Monteverde camino del Teide"},
-  "El Sauzal": {"f":"img/estampas/el-sauzal.jpg", "lema":"Los Lavaderos y el mirador"},
-  "El Tanque": {"f":"img/estampas/el-tanque.jpg", "lema":"El pueblo en alto"},
-  "Fasnia": {"f":"img/estampas/fasnia.jpg", "lema":"Los Roques y la costa"},
-  "Garachico": {"f":"img/estampas/garachico.jpg", "lema":"El Caletón y el Roque"},
-  "Granadilla de Abona": {"f":"img/estampas/granadilla-de-abona.jpg", "lema":"El Médano y el viento"},
-  "Guía de Isora": {"f":"img/estampas/guia-de-isora.jpg", "lema":"Alcalá y los puertitos"},
-  "Güímar": {"f":"img/estampas/guimar.jpg", "lema":"Las pirámides y el valle"},
-  "Icod de los Vinos": {"f":"img/estampas/icod-de-los-vinos.jpg", "lema":"El Drago Milenario"},
-  "La Guancha": {"f":"img/estampas/la-guancha.jpg", "lema":"Charcos entre plataneras"},
-  "La Matanza de Acentejo": {"f":"img/estampas/la-matanza-de-acentejo.jpg", "lema":"Viñedos y vendimia"},
-  "La Orotava": {"f":"img/estampas/la-orotava.jpg", "lema":"Tradición y balcones de tea"},
-  "La Victoria de Acentejo": {"f":"img/estampas/la-victoria-de-acentejo.jpg", "lema":"Bodegas y buena mesa"},
-  "Los Realejos": {"f":"img/estampas/los-realejos.jpg", "lema":"Naturaleza y aventura"},
-  "Los Silos": {"f":"img/estampas/los-silos.jpg", "lema":"El esqueleto de la ballena"},
-  "Puerto de la Cruz": {"f":"img/estampas/puerto-de-la-cruz.jpg", "lema":"Martiánez y el paseo"},
-  "San Cristóbal de La Laguna": {"f":"img/estampas/san-cristobal-de-la-laguna.jpg", "lema":"Casco Patrimonio de la Humanidad"},
-  "San Juan de la Rambla": {"f":"img/estampas/san-juan-de-la-rambla.jpg", "lema":"El Charco de La Laja"},
-  "San Miguel de Abona": {"f":"img/estampas/san-miguel-de-abona.jpg", "lema":"El castillo y las medianías"},
-  "Santa Cruz de Tenerife": {"f":"img/estampas/santa-cruz-de-tenerife.jpg", "lema":"La capital y su bahía"},
-  "Santa Úrsula": {"f":"img/estampas/santa-ursula.jpg", "lema":"La Giganta y el valle"},
-  "Santiago del Teide": {"f":"img/estampas/santiago-del-teide.jpg", "lema":"Los Gigantes y los delfines"},
-  "Tacoronte": {"f":"img/estampas/tacoronte.jpg", "lema":"Tierra de viñedos"},
-  "Tegueste": {"f":"img/estampas/tegueste.jpg", "lema":"Romería y carretas"},
-  "Vilaflor de Chasna": {"f":"img/estampas/vilaflor-de-chasna.jpg", "lema":"El Paisaje Lunar y el pinar"}
+  "Adeje": {"f":"img/estampas/adeje.jpg", "lema":"Playa y sol del suroeste", "lema_en":"Beach and sun in the south-west", "lema_de":"Strand und Sonne im Südwesten"},
+  "Arafo": {"f":"img/estampas/arafo.jpg", "lema":"El pueblo de la música", "lema_en":"The town of music", "lema_de":"Das Dorf der Musik"},
+  "Arico": {"f":"img/estampas/arico.jpg", "lema":"El muelle de Tajao", "lema_en":"The little harbour of Tajao", "lema_de":"Der kleine Hafen von Tajao"},
+  "Arona": {"f":"img/estampas/arona.jpg", "lema":"Playa y ambiente", "lema_en":"Beach and buzz", "lema_de":"Strand und Leben"},
+  "Buenavista del Norte": {"f":"img/estampas/buenavista-del-norte.jpg", "lema":"Teno y el faro", "lema_en":"Teno and the lighthouse", "lema_de":"Teno und der Leuchtturm"},
+  "Candelaria": {"f":"img/estampas/candelaria.jpg", "lema":"La basílica y los menceyes", "lema_en":"The basilica and the menceyes", "lema_de":"Die Basilika und die Menceyes"},
+  "El Rosario": {"f":"img/estampas/el-rosario.jpg", "lema":"Monteverde camino del Teide", "lema_en":"Laurel forest on the way to Teide", "lema_de":"Lorbeerwald auf dem Weg zum Teide"},
+  "El Sauzal": {"f":"img/estampas/el-sauzal.jpg", "lema":"Los Lavaderos y el mirador", "lema_en":"Los Lavaderos and the viewpoint", "lema_de":"Los Lavaderos und der Aussichtspunkt"},
+  "El Tanque": {"f":"img/estampas/el-tanque.jpg", "lema":"El pueblo en alto", "lema_en":"The town up high", "lema_de":"Das Dorf in der Höhe"},
+  "Fasnia": {"f":"img/estampas/fasnia.jpg", "lema":"Los Roques y la costa", "lema_en":"Los Roques and the coast", "lema_de":"Los Roques und die Küste"},
+  "Garachico": {"f":"img/estampas/garachico.jpg", "lema":"El Caletón y el Roque", "lema_en":"El Caletón and the Roque", "lema_de":"El Caletón und der Roque"},
+  "Granadilla de Abona": {"f":"img/estampas/granadilla-de-abona.jpg", "lema":"El Médano y el viento", "lema_en":"El Médano and the wind", "lema_de":"El Médano und der Wind"},
+  "Guía de Isora": {"f":"img/estampas/guia-de-isora.jpg", "lema":"Alcalá y los puertitos", "lema_en":"Alcalá and the little harbours", "lema_de":"Alcalá und die kleinen Häfen"},
+  "Güímar": {"f":"img/estampas/guimar.jpg", "lema":"Las pirámides y el valle", "lema_en":"The pyramids and the valley", "lema_de":"Die Pyramiden und das Tal"},
+  "Icod de los Vinos": {"f":"img/estampas/icod-de-los-vinos.jpg", "lema":"El Drago Milenario", "lema_en":"The thousand-year-old dragon tree", "lema_de":"Der tausendjährige Drachenbaum"},
+  "La Guancha": {"f":"img/estampas/la-guancha.jpg", "lema":"Charcos entre plataneras", "lema_en":"Rock pools among banana groves", "lema_de":"Naturbecken zwischen Bananenplantagen"},
+  "La Matanza de Acentejo": {"f":"img/estampas/la-matanza-de-acentejo.jpg", "lema":"Viñedos y vendimia", "lema_en":"Vineyards and harvest", "lema_de":"Weinberge und Lese"},
+  "La Orotava": {"f":"img/estampas/la-orotava.jpg", "lema":"Tradición y balcones de tea", "lema_en":"Tradition and tea-wood balconies", "lema_de":"Tradition und Balkone aus Tea-Holz"},
+  "La Victoria de Acentejo": {"f":"img/estampas/la-victoria-de-acentejo.jpg", "lema":"Bodegas y buena mesa", "lema_en":"Wineries and good eating", "lema_de":"Weingüter und gutes Essen"},
+  "Los Realejos": {"f":"img/estampas/los-realejos.jpg", "lema":"Naturaleza y aventura", "lema_en":"Nature and adventure", "lema_de":"Natur und Abenteuer"},
+  "Los Silos": {"f":"img/estampas/los-silos.jpg", "lema":"El esqueleto de la ballena", "lema_en":"The whale skeleton", "lema_de":"Das Walskelett"},
+  "Puerto de la Cruz": {"f":"img/estampas/puerto-de-la-cruz.jpg", "lema":"Martiánez y el paseo", "lema_en":"Martiánez and the promenade", "lema_de":"Martiánez und die Promenade"},
+  "San Cristóbal de La Laguna": {"f":"img/estampas/san-cristobal-de-la-laguna.jpg", "lema":"Casco Patrimonio de la Humanidad", "lema_en":"A World Heritage old town", "lema_de":"Altstadt des Weltkulturerbes"},
+  "San Juan de la Rambla": {"f":"img/estampas/san-juan-de-la-rambla.jpg", "lema":"El Charco de La Laja", "lema_en":"El Charco de La Laja", "lema_de":"El Charco de La Laja"},
+  "San Miguel de Abona": {"f":"img/estampas/san-miguel-de-abona.jpg", "lema":"El castillo y las medianías", "lema_en":"The castle and the midlands", "lema_de":"Die Burg und das Hinterland"},
+  "Santa Cruz de Tenerife": {"f":"img/estampas/santa-cruz-de-tenerife.jpg", "lema":"La capital y su bahía", "lema_en":"The capital and its bay", "lema_de":"Die Hauptstadt und ihre Bucht"},
+  "Santa Úrsula": {"f":"img/estampas/santa-ursula.jpg", "lema":"La Giganta y el valle", "lema_en":"La Giganta and the valley", "lema_de":"La Giganta und das Tal"},
+  "Santiago del Teide": {"f":"img/estampas/santiago-del-teide.jpg", "lema":"Los Gigantes y los delfines", "lema_en":"Los Gigantes and the dolphins", "lema_de":"Los Gigantes und die Delfine"},
+  "Tacoronte": {"f":"img/estampas/tacoronte.jpg", "lema":"Tierra de viñedos", "lema_en":"Land of vineyards", "lema_de":"Land der Weinberge"},
+  "Tegueste": {"f":"img/estampas/tegueste.jpg", "lema":"Romería y carretas", "lema_en":"Pilgrimage and ox carts", "lema_de":"Wallfahrt und Ochsenkarren"},
+  "Vilaflor de Chasna": {"f":"img/estampas/vilaflor-de-chasna.jpg", "lema":"El Paisaje Lunar y el pinar", "lema_en":"The Lunar Landscape and the pine forest", "lema_de":"Die Mondlandschaft und der Kiefernwald"}
 };
 function fichaMunicipio(k,v){
   const e=ESTAMPA[v.m]||null;
@@ -3909,8 +4046,8 @@ function fichaMunicipio(k,v){
     (e? '<span class="lienzo"><img src="'+e.f+'" alt="" loading="lazy" decoding="async"></span>'
       : '<span class="lienzo sin"><span class="ico">🏝</span></span>')+
     '<span class="pie"><b>'+v.et+'</b>'+
-      (e&&e.lema?'<span class="lema2">'+e.lema+'</span>':'')+
-      '<span class="cuenta">'+n+' sitios</span></span></button>';
+      (e&&lemaTr(e)?'<span class="lema2">'+lemaTr(e)+'</span>':'')+
+      '<span class="cuenta">'+n+' '+tr('nSitios')+'</span></span></button>';
 }
 function cuadriculaMunicipios(lista,alPulsar){
   acc.replaceChildren(); acc.innerHTML='';
@@ -4023,7 +4160,7 @@ function elegirEvento(){
    temático, y meterlo entre un charco y un mirador lo estropearía. */
 function rutaHistorica(tramo){
   if(typeof HITOS_HISTORICOS==='undefined'){
-    naira('Ahora mismo no tengo la ruta histórica cargada.',300).then(()=>menuPrincipal());
+    naira(tr('rutaNo'),300).then(()=>menuPrincipal());
     return;
   }
   if(!tramo){
@@ -4257,7 +4394,7 @@ async function elegirLugar(muni){
   await naira(tr('qQueVer')(muni),360);
   paso('ok','entrada · nivel 3, el sitio','<span class="am">'+pool.length+'</span> sitios en '+muni+', los de más peso primero.');
   const top=pool.slice(0,10);
-  opciones(top.map(l=>({t:l.n+(l.tipo?' · '+l.tipo.toLowerCase():''),
+  opciones(top.map(l=>({t:l.n+(l.tipo?' · '+tipoTr(l.tipo).toLowerCase():''),
       fn:()=>{S.anclaElegida=l.n;queApetece()}}))
     .concat(pool.length>10?[{t:tr('verMas'),fn:()=>verMas(muni,10)}]:[])
     .concat([{t:tr('cambMuni'),fn:()=>elegirSitio()}]));
@@ -4268,7 +4405,7 @@ async function verMas(muni,desde){
     .sort((a,b)=>((b.w||1)-(a.w||1))||((b.fx?1:0)-(a.fx?1:0)));
   const tramo=pool.slice(desde,desde+10);
   await naira(tr('qMasSitios')(muni),300);
-  opciones(tramo.map(l=>({t:l.n+(l.tipo?' · '+l.tipo.toLowerCase():''),
+  opciones(tramo.map(l=>({t:l.n+(l.tipo?' · '+tipoTr(l.tipo).toLowerCase():''),
       fn:()=>{S.anclaElegida=l.n;queApetece()}}))
     .concat(pool.length>desde+10?[{t:tr('yMas'),fn:()=>verMas(muni,desde+10)}]:[])
     .concat([{t:tr('volver'),fn:()=>elegirLugar(muni)}]));
@@ -4334,6 +4471,7 @@ Object.entries(IDIOMAS).forEach(([k,v])=>{
   b.title=v.et;
   b.onclick=()=>{
     S.idioma=k;
+    pintaFijos();          /* cabecera, fecha, pie y botón del panel */
     cajaIdi.querySelectorAll('button').forEach(o=>o.setAttribute('aria-pressed','false'));
     b.setAttribute('aria-pressed','true');
     S.base=S.coche=S.gente=S.anclaElegida=S.comida=S.apetece=S.ahora=null;
@@ -4350,10 +4488,29 @@ const inpF=document.getElementById('fechaLibre'), etDia=document.getElementById(
   S.fecha = (hoy<min)?min : (hoy>max)?max : hoy;
   inpF.value=S.fecha;
 })();
+/* Lo que NO cuelga de la conversación —la cabecera, la barra de la fecha, el
+   pie y el botón del panel— no lo repintaba nadie al cambiar de idioma: se
+   quedaba en español para siempre. arranque() solo rehace el hilo. */
+function pintaFijos(){
+  const lema=document.getElementById('lemaCab'); if(lema) lema.textContent=tr('lema');
+  const et=document.getElementById('etDiaTit');  if(et) et.textContent=tr('etDia');
+  const pie=document.getElementById('pieFuentes');
+  if(pie) pie.innerHTML=tr('fuentes');
+  if(typeof btnPanel!=='undefined'&&btnPanel)
+    btnPanel.textContent=(hRazon&&hRazon.closest&&hRazon.closest('.panel')&&
+      hRazon.closest('.panel').getAttribute('data-abierto')==='1')?tr('cerrarPanel'):tr('verPanel');
+  pintaDia();
+}
 function pintaDia(){
   const d=diaSemana(S.fecha);
   const ev=EVENTOS.filter(e=>e.f===S.fecha);
-  etDia.textContent=DIAS[d]+(ev.length?' · '+ev.length+' evento'+(ev.length>1?'s':''):' · sin eventos');
+  /* El día de la semana lo escribe el navegador en el idioma elegido, igual
+     que la fecha del plan: aquí salía «domingo» en inglés y en alemán. */
+  const LOCD={es:'es-ES',en:'en-GB',de:'de-DE'}[S.idioma]||'es-ES';
+  let diaTxt; try{ diaTxt=new Date(S.fecha+'T12:00:00').toLocaleDateString(LOCD,{weekday:'long'}); }
+  catch(e){ diaTxt=DIAS[d]; }
+  etDia.textContent=diaTxt+(ev.length?' · '+ev.length+' '+tr(ev.length>1?'eventos':'evento')
+                                     :' · '+tr('sinEventos'));
 }
 inpF.addEventListener('change',e=>{ S.fecha=e.target.value; pintaDia(); if(S.base) otroDia(); });
 pintaDia();
@@ -4370,7 +4527,7 @@ btnPanel.onclick=()=>{
   const ab=panel.getAttribute('data-abierto')==='1';
   panel.setAttribute('data-abierto',ab?'0':'1');
   btnPanel.setAttribute('aria-expanded',String(!ab));
-  btnPanel.textContent=ab?'Ver cómo se armó ▲':'Cerrar el detalle ▼';
+  btnPanel.textContent=ab?tr('verPanel'):tr('cerrarPanel');
 };
 document.getElementById('btnBorrarVal').onclick=()=>{
   try{localStorage.removeItem(VAL_KEY);}catch(e){}
@@ -4379,7 +4536,7 @@ document.getElementById('btnBorrarVal').onclick=()=>{
 document.getElementById('btnCerrar').onclick=()=>{
   panel.setAttribute('data-abierto','0');
   btnPanel.setAttribute('aria-expanded','false');
-  btnPanel.textContent='Ver cómo se armó ▲';
+  btnPanel.textContent=tr('verPanel');
 };
 
 /* ── La luz del día: la cabecera y la paleta cambian según la hora ── */
