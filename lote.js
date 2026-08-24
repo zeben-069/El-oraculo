@@ -202,7 +202,9 @@ let igualesTransporte=0, igualesGente=0, juegos=0, repes=0, seguidos=0;
 const kids={paradas:0,si:0,prohibidos:[],peligro:[],divertidos:0};
 const pareja={paradas:0,si:0};
 const guagua={paradas:0,suma:0,con:0,lejos:0};
-const FECHAS=['2026-08-24','2026-09-15','2026-11-08'];
+/* Ninguna puede ser HOY: para hoy el motor recorta el día según la hora, así
+   que la referencia cambiaba sola cada vez que pasaban unas horas. */
+const FECHAS=['2026-10-06','2026-09-15','2026-11-08'];
 Object.keys(BASES).forEach(base=>{
   let anterior=null;
   FECHAS.forEach(f=>{

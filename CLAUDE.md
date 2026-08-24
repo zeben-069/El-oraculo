@@ -226,6 +226,10 @@ node prueba.js     # unos pocos escenarios, con detalle
 node lote.js       # 24 planes en 21 municipios, con banderas
 ```
 
+Ninguna prueba usa **la fecha de hoy**: para hoy el motor recorta el día según
+la hora, así que una referencia con la fecha de hoy cambia sola con el paso de
+las horas. Ya pasó con el bloque de perfiles.
+
 `lote.js` es el que hay que pasar **después de tocar el motor**. Marca
 DISPERSO, SALTO, CIERRE-LEJOS, COMIDA-LEJOS, RECINTO, CURVAS-NOCHE.
 Referencia actual: dispersión mediana 4 km, cero banderas salvo 1 plan con la
@@ -275,7 +279,7 @@ decía a la vez que Bajamar tenía socorristas y que estaba clasificada como
 PELIGROSA. Se resolvió contrastando con el portal oficial de turismo, no
 borrando el aviso.
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 139 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 142 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **Lo que dice Naira también pasa por `tr()`.** Nueve preguntas suyas estaban
@@ -283,8 +287,9 @@ escritas en español a pelo —la zona, el municipio, el momento del día, el
 «sorpréndame»— y un inglés las veía en español. Las que llevan hueco
 (`qZonaDetalle`, `qQueVer`, `qMasSitios`) son funciones: `tr('qQueVer')(muni)`.
 
-**Los carteles no llevan el rótulo dentro.** Las dos preguntas con dibujo —qué
-tipo de día y qué apetece comer— se pintan con `cartas()`, y el rótulo va
+**Los carteles no llevan el rótulo dentro.** Las tres preguntas con dibujo
+—coche o guagua, qué tipo de día y qué apetece comer— se pintan con
+`cartas()`, y el rótulo va
 DEBAJO, sacado de `tr()`. Los carteles originales traían el texto incrustado
 y en español: así no valían en inglés ni en alemán. Se recortaron por el
 círculo, y si se añaden más hay que hacer lo mismo.

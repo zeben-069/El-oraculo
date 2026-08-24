@@ -891,6 +891,8 @@ const T={
      qSorpresaHoyNinos:'Va, sin más preguntas. Con los peques y a esta hora, yo haría esto:',
      qSorpresaDia:'Va, sin más preguntas. Para ese día yo haría esto:',
      qSorpresaDiaNinos:'Va, sin más preguntas. Para ese día y con los peques, yo haría esto:',
+     tCoche:'¿Coche o guagua?',
+     cConCoche:'Con coche',cSinCoche:'Sin coche, en guagua',
      cSenderos:'Senderos',cAgua:'Playas y charcos',cMuseos:'Museos',cTodo:'Un poco de todo',cTipica:'Comida típica',cDeTodo:'Un poco de todo',
      dos:'Dos adultos',familia:'Familia con niños',grupo:'Grupo, sin niños',
      listo_c:'Perfecto, con coche tienen la isla entera. ¿Por dónde tiramos?',
@@ -926,6 +928,8 @@ const T={
      qSorpresaHoyNinos:'Right, no more questions. With the little ones and at this hour, this is what I would do:',
      qSorpresaDia:'Right, no more questions. For that day, this is what I would do:',
      qSorpresaDiaNinos:'Right, no more questions. For that day and with the little ones, this is what I would do:',
+     tCoche:'Car or bus?',
+     cConCoche:'With a car',cSinCoche:'By bus',
      cSenderos:'Trails',cAgua:'Beaches and pools',cMuseos:'Museums',cTodo:'A bit of everything',cTipica:'Local food',cDeTodo:'A bit of everything',
      dos:'Two adults',familia:'Family with children',grupo:'Group, no children',
      listo_c:'With a car the whole island is yours. Where shall we start?',
@@ -961,6 +965,8 @@ const T={
      qSorpresaHoyNinos:'Gut, keine Fragen mehr. Mit den Kleinen und um diese Zeit würde ich das hier machen:',
      qSorpresaDia:'Gut, keine Fragen mehr. Für diesen Tag würde ich das hier machen:',
      qSorpresaDiaNinos:'Gut, keine Fragen mehr. Für diesen Tag und mit den Kleinen würde ich das hier machen:',
+     tCoche:'Auto oder Bus?',
+     cConCoche:'Mit Auto',cSinCoche:'Mit dem Bus',
      cSenderos:'Wanderwege',cAgua:'Strände und Meerbecken',cMuseos:'Museen',cTodo:'Von allem etwas',cTipica:'Typisch kanarisch',cDeTodo:'Von allem etwas',
      dos:'Zwei Erwachsene',familia:'Familie mit Kindern',grupo:'Gruppe, ohne Kinder',
      listo_c:'Mit Auto gehört Ihnen die ganze Insel. Womit fangen wir an?',
@@ -3875,11 +3881,16 @@ async function listaMunicipios(){
 async function pCoche(){
   const b=BASES[S.base];
   await naira(b?('En '+b.et+', muy bien. '+tr('coche')):tr('coche'),330);
-  opciones([
-    {t:tr('si_coche'),fn:()=>{S.coche=true;pGente()}},
-    {t:tr('no_coche'),fn:()=>{S.coche=false;pGente()}},
-    {t:'↩ '+tr('otro_muni'),fn:()=>arranque()}
-  ]);
+  /* Dos carteles: el coche y la guagua de la TITSA. Lo de volver al
+     municipio sigue siendo un botón: no es una respuesta a la pregunta. */
+  cartas([
+    {t:tr('cConCoche'),img:'con-coche',fn:()=>{S.coche=true;pGente()}},
+    {t:tr('cSinCoche'),img:'sin-coche',fn:()=>{S.coche=false;pGente()}}
+  ],tr('tCoche'));
+  const b2=document.createElement('button');
+  b2.className='opt'; b2.textContent='↩ '+tr('otro_muni');
+  b2.onclick=()=>{acc.innerHTML='';arranque()};
+  acc.appendChild(b2);
 }
 async function pGente(){await naira(tr('como'),360);
   opciones([
