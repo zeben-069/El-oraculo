@@ -240,6 +240,25 @@ button.estampa .lienzo{
 button.estampa .lienzo img{
   display:block;width:100%;height:100%;object-fit:cover;object-position:center 42%;
 }
+.franjas{display:flex;flex-direction:column;gap:9px;width:100%}
+button.franja{
+  position:relative;display:block;width:100%;padding:0;overflow:hidden;
+  border:1.5px solid var(--tea);border-radius:13px;background:var(--arena);
+  box-shadow:2.5px 2.5px 0 var(--tea);cursor:pointer;
+  transition:transform .11s cubic-bezier(.2,.7,.3,1),box-shadow .11s;
+}
+button.franja:hover{transform:translate(-1.5px,-1.5px);box-shadow:4px 4px 0 var(--tea)}
+button.franja:active{transform:translate(2.5px,2.5px);box-shadow:0 0 0 var(--tea)}
+button.franja:focus-visible{outline:2.5px solid var(--malvasia);outline-offset:3px}
+button.franja img{display:block;width:100%;height:auto}
+button.franja .velo{position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(27,21,18,.62) 0%,rgba(27,21,18,.38) 45%,rgba(27,21,18,.02) 84%)}
+button.franja .rot{
+  position:absolute;left:14px;right:74px;top:50%;transform:translateY(-50%);
+  text-align:left;color:var(--cal);font-family:var(--disp);font-weight:800;
+  font-size:16px;line-height:1.2;text-shadow:0 1px 3px rgba(0,0,0,.55);
+}
+@media(max-width:420px){button.franja .rot{font-size:15px;left:12px;right:66px}}
 .titulo-cartas{
   font-family:var(--disp);font-size:17px;font-weight:800;color:var(--tea);
   text-align:center;margin:2px 0 10px;letter-spacing:.01em;
@@ -894,6 +913,9 @@ const T={
      qSorpresaHoyNinos:'Va, sin más preguntas. Con los peques y a esta hora, yo haría esto:',
      qSorpresaDia:'Va, sin más preguntas. Para ese día yo haría esto:',
      qSorpresaDiaNinos:'Va, sin más preguntas. Para ese día y con los peques, yo haría esto:',
+     zNorte:'Norte y valle de La Orotava',zIslaBaja:'Isla Baja (Garachico, Icod, Buenavista)',
+     zMetropolitana:'La Laguna, Santa Cruz y Anaga',zGuimar:'Este y valle de Güímar',
+     zSur:'Sur y suroeste',zCumbre:'Cumbre y Teide',
      tGente:'¿Con quién viajan?',
      tCoche:'¿Coche o guagua?',
      cConCoche:'Con coche',cSinCoche:'Sin coche, en guagua',
@@ -932,6 +954,9 @@ const T={
      qSorpresaHoyNinos:'Right, no more questions. With the little ones and at this hour, this is what I would do:',
      qSorpresaDia:'Right, no more questions. For that day, this is what I would do:',
      qSorpresaDiaNinos:'Right, no more questions. For that day and with the little ones, this is what I would do:',
+     zNorte:'North and the Orotava valley',zIslaBaja:'Isla Baja (Garachico, Icod, Buenavista)',
+     zMetropolitana:'La Laguna, Santa Cruz and Anaga',zGuimar:'East and the Güímar valley',
+     zSur:'South and south-west',zCumbre:'The summit and Teide',
      tGente:'Who is travelling?',
      tCoche:'Car or bus?',
      cConCoche:'With a car',cSinCoche:'By bus',
@@ -970,6 +995,9 @@ const T={
      qSorpresaHoyNinos:'Gut, keine Fragen mehr. Mit den Kleinen und um diese Zeit würde ich das hier machen:',
      qSorpresaDia:'Gut, keine Fragen mehr. Für diesen Tag würde ich das hier machen:',
      qSorpresaDiaNinos:'Gut, keine Fragen mehr. Für diesen Tag und mit den Kleinen würde ich das hier machen:',
+     zNorte:'Norden und das Orotava-Tal',zIslaBaja:'Isla Baja (Garachico, Icod, Buenavista)',
+     zMetropolitana:'La Laguna, Santa Cruz und Anaga',zGuimar:'Osten und das Güímar-Tal',
+     zSur:'Süden und Südwesten',zCumbre:'Gipfel und Teide',
      tGente:'Wer reist mit?',
      tCoche:'Auto oder Bus?',
      cConCoche:'Mit Auto',cSinCoche:'Mit dem Bus',
@@ -1089,6 +1117,29 @@ function cartas(lista,titulo){
       '<span class="rotulo">'+o.t+'</span></button>').join('');
   caja.addEventListener('click',e=>{
     const b=e.target.closest&&e.target.closest('.carta');
+    if(!b) return;
+    const o=lista[+b.getAttribute('data-i')];
+    acc.replaceChildren(); acc.innerHTML='';
+    burbuja(o.t,'yo');
+    o.fn();
+  });
+  acc.appendChild(caja);
+}
+/* Las zonas de la isla: franjas anchas con el rótulo ENCIMA, sobre un velo
+   oscuro que va de izquierda a derecha. El velo hace falta porque las seis
+   fotos tienen brillos muy distintos —el casco de La Orotava es casi blanco
+   y el monteverde de Anaga casi negro— y un texto claro sin velo se pierde
+   en unas y canta en otras. El rótulo, como todo, sale de tr(). */
+function franjas(lista){
+  acc.replaceChildren(); acc.innerHTML='';
+  const caja=document.createElement('div');
+  caja.className='franjas';
+  caja.innerHTML=lista.map((o,i)=>
+    '<button class="franja" data-i="'+i+'">'+
+      '<img src="img/zonas/'+o.img+'.jpg" alt="" loading="lazy" decoding="async">'+
+      '<span class="velo"></span><span class="rot">'+o.t+'</span></button>').join('');
+  caja.addEventListener('click',e=>{
+    const b=e.target.closest&&e.target.closest('.franja');
     if(!b) return;
     const o=lista[+b.getAttribute('data-i')];
     acc.replaceChildren(); acc.innerHTML='';
@@ -4168,17 +4219,24 @@ async function queHora(){
 }
 async function elegirSitio(){
   await naira(tr('qZona'),360);
-  const ZONAS={
-    'Norte y valle de La Orotava':['Norte'],
-    'Isla Baja (Garachico, Icod, Buenavista)':['Isla Baja'],
-    'La Laguna, Santa Cruz y Anaga':['Metropolitana','Anaga'],
-    'Este y valle de Güímar':['Este','Valle de Güímar'],
-    'Sur y suroeste':['Sur','Suroeste'],
-    'Cumbre y Teide':['Cumbre']
-  };
+  /* El nombre de la zona sale de tr(): estaba escrito en español a pelo y un
+     inglés leía «Norte y valle de La Orotava». Los corredores, que son lo que
+     usa el motor para calcular tiempos, no se traducen. */
+  const ZONAS=[
+    ['zNorte',        ['Norte'],                  'norte'],
+    ['zIslaBaja',     ['Isla Baja'],              'isla-baja'],
+    ['zMetropolitana',['Metropolitana','Anaga'],  'metropolitana'],
+    ['zGuimar',       ['Este','Valle de Güímar'], 'guimar'],
+    ['zSur',          ['Sur','Suroeste'],         'sur'],
+    ['zCumbre',       ['Cumbre'],                 'cumbre']
+  ];
   paso('ok','entrada · nivel 1, la zona','Seis zonas. Después el municipio y después el sitio. Así no hay que adivinar de una lista corta.');
-  opciones(Object.entries(ZONAS).map(([et,corrs])=>({t:et,fn:()=>elegirMunicipio(et,corrs)}))
-    .concat([{t:tr('meDaIgual'),fn:()=>{S.anclaElegida=null;queApetece()}}]));
+  franjas(ZONAS.map(([clave,corrs,img])=>({t:tr(clave),img,
+    fn:()=>elegirMunicipio(tr(clave),corrs)})));
+  const b3=document.createElement('button');
+  b3.className='opt'; b3.textContent=tr('meDaIgual');
+  b3.onclick=()=>{acc.innerHTML='';burbuja(tr('meDaIgual'),'yo');S.anclaElegida=null;queApetece()};
+  acc.appendChild(b3);
 }
 
 async function elegirMunicipio(etZona,corrs){

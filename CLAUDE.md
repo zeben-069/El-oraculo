@@ -29,6 +29,7 @@ icono.svg / icono-*.png
 img/naira-social.jpg          previsualización al compartir
 img/estampas/*.jpg            las 31 fotos de municipio (una por ficha)
 img/cartas/*.jpg              los 10 carteles de las preguntas con dibujo
+img/zonas/*.jpg               las 6 franjas de las zonas de la isla
 netlify.toml
 netlify/functions/naira.js    proxy a la API (guarda la clave)
 netlify/functions/tiempo.js   AEMET, dos saltos con reintentos
@@ -279,13 +280,21 @@ decía a la vez que Bajamar tenía socorristas y que estaba clasificada como
 PELIGROSA. Se resolvió contrastando con el portal oficial de turismo, no
 borrando el aviso.
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 143 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 149 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **Lo que dice Naira también pasa por `tr()`.** Nueve preguntas suyas estaban
 escritas en español a pelo —la zona, el municipio, el momento del día, el
 «sorpréndame»— y un inglés las veía en español. Las que llevan hueco
 (`qZonaDetalle`, `qQueVer`, `qMasSitios`) son funciones: `tr('qQueVer')(muni)`.
+
+**Las zonas van con el rótulo ENCIMA, sobre un velo.** Son franjas anchas y
+bajas, y el rótulo cabe dentro. El velo (un degradado oscuro de izquierda a
+derecha) no es adorno: las seis fotos tienen brillos muy distintos —el casco
+de La Orotava es casi blanco y el monteverde de Anaga casi negro— y un texto
+claro sin velo se pierde en unas y canta en otras. Los nombres de zona
+también salen de `tr()`: estaban escritos en español a pelo. Los corredores,
+que son lo que usa el motor, no se traducen.
 
 **Los carteles no llevan el rótulo dentro.** Las cuatro preguntas con dibujo
 —coche o guagua, con quién viajan, qué tipo de día y qué apetece comer— se
