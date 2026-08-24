@@ -37,6 +37,7 @@ datos/hitos-historicos.js     46 hitos del itinerario de Santa Cruz
 datos/senderos-anaga.js       7 caminos de Anaga (CARGADO PERO SIN USAR)
 datos/senderos-tenerife.js    225 itinerarios del Cabildo con desnivel
 datos/miradores.js            18 miradores de Santa Cruz
+fotos.js                      la lista de fotos que faltan, y las mete
 ```
 
 **La deuda técnica principal:** `index.html` sigue siendo una sola pieza con
@@ -352,8 +353,15 @@ restaurante está mal ubicado, tiene razón: vive allí.
   `guagua_mas_cercana`, así que no se oculta, pero está sin decidir si debería
   descartarlas. Probé a penalizar el cierre y a acortar el radio sin coche: no
   mejoró nada medible y empeoraba esto, así que se quitó.
-- Falta foto de los sitios (playas, museos). Hay estampa por municipio, no por
-  sitio.
+- **Fotos por sitio.** La ficha ya las admite: `marco()` usa `l.foto` si la
+  hay y, si no, una ortofoto aérea de GRAFCAN. Para una playa se defiende;
+  para un museo es un tejado. Barrido de 744 planes: de 589 sitios del
+  catálogo solo **198 salen alguna vez**, y de esos solo **82** tienen el
+  aéreo inútil. Con **40 fotos** se arregla el 82% de esas paradas.
+  `fotos.js` sin argumentos escribe `fotos-pendientes.md` con la lista
+  agrupada por pueblo; con una carpeta como argumento, mete las fotos:
+  recorta al cuadrado, deja 240 px, comprime y añade el campo a la ficha.
+  Los ficheros se emparejan por el nombre sin acentos.
 - La imagen de compartir está dibujada a mano; `generar-imagen.html` la
   rehace en el navegador con las tipografías buenas.
 - Si algún día hay dominio propio, hay que cambiar la URL en **cuatro
