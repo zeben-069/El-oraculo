@@ -145,6 +145,25 @@ los que quedan a menos de 6 km de alguna parada: rotando sobre la lista
 entera, el cuarto día empezaba a contar ya dentro de los lejanos. Las dos
 cosas juntas: de 31 días malos de 124 a 2.
 
+**El día no se remata siempre igual.** El remate se elige entre lo que hay
+**de vuelta a casa**, rotando por fecha: un mirador al atardecer, un paseo por
+el casco, un parque, un heladito o una tapita — y a veces dos combinados
+(mirador y luego el helado). Nunca repite el tipo con el que ya cierra el día:
+si el día acaba en un mirador, el remate no es otro mirador. Antes el cierre
+tomando algo saltaba uno de cada tres días por semilla y el helado se ofrecía
+siempre, así que todos los días remataban igual. Va en `parada_de_vuelta`,
+`cerrar_tomando_algo` y `para_rematar_el_dia`; si no hay nada, no se ofrece
+nada y el relato cierra con la última parada.
+
+**En `seg` no todo es un peligro.** Conviven avisos de seguridad de verdad (50),
+avisos de acceso (`seg_tipo:'acceso'`: pista de tierra, carretera estrecha,
+obras, cortes por romería), notas que no avisan de nada (`'nota'`) y un aviso
+sobre el relato de un sitio (`'relato'`). Sin etiqueta se trata como peligro,
+que es lo prudente. Sin distinguir, la ficha de Las Teresitas —«la mejor para
+familias de toda la zona metropolitana»— viajaba al informe como
+`aviso_seguridad` y el modelo la leía como una advertencia. Ahora salen por
+`ojo_para_llegar`, `nota_del_sitio` y `el_relato_no_esta_probado`.
+
 **Las heladerías no son sitio de almorzar.** Marcadas con `remate`. Se
 ofrecen al final, en `para_rematar_el_dia`, y ya no solo con niños: un helado
 de camino al coche vale igual para dos adultos. Se buscan a 2,5 km de la
@@ -260,8 +279,16 @@ restaurante está mal ubicado, tiene razón: vive allí.
   una rama muerta, que es justo lo que le pasaba al aviso de aforo.
 - Pocos restaurantes abiertos en domingo en algunos municipios (Arona: 15
   en 18 km). Es escasez de catálogo.
-- Nombres del registro dados la vuelta: hay una heladería fichada como
-  «Heladeria, la». Sale tal cual en el informe.
+- Los nombres del registro que venían dados la vuelta ya están enderezados
+  («Heladeria, la» → «La Heladería»; «El Tanque, Espacio Cultural» → «Espacio
+  Cultural El Tanque»). Si se importa más registro, volverán a aparecer.
+- Sin coche salen paradas a 1,7–2,3 km de la parada de guagua (19 de 744
+  planes barridos, todas senderos y paisajes). El informe lo dice en
+  `guagua_mas_cercana`, así que no se oculta, pero está sin decidir si debería
+  descartarlas. Probé a penalizar el cierre y a acortar el radio sin coche: no
+  mejoró nada medible y empeoraba esto, así que se quitó.
+- Falta foto de los sitios (playas, museos). Hay estampa por municipio, no por
+  sitio.
 - La imagen de compartir está dibujada a mano; `generar-imagen.html` la
   rehace en el navegador con las tipografías buenas.
 - Si algún día hay dominio propio, hay que cambiar la URL en **cuatro
