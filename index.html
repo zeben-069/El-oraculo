@@ -261,9 +261,12 @@ button.carta .rotulo{
   display:block;padding:9px 8px 11px;text-align:center;font-family:var(--disp);
   font-size:14px;font-weight:700;line-height:1.15;color:var(--tea);letter-spacing:.01em;
 }
+.cartas.anchas{grid-template-columns:1fr}
+button.carta.ancha .lamina{aspect-ratio:16/9;background-color:var(--cal)}
+button.carta.ancha .lamina img{object-fit:contain}
 /* Con tres carteles y dos columnas, el tercero se queda solo en la fila:
    centrado se lee como algo querido y no como un hueco. */
-.cartas > .carta:last-child:nth-child(3){grid-column:1 / -1;width:calc(50% - 5px);margin:0 auto}
+.cartas:not(.anchas) > .carta:last-child:nth-child(3){grid-column:1 / -1;width:calc(50% - 5px);margin:0 auto}
 body[data-luz="noche"] button.carta{background:#211A2C;border-color:#5B4C6E;box-shadow:3px 3px 0 #5B4C6E}
 body[data-luz="noche"] button.carta .rotulo{color:var(--tea)}
 @media(max-width:420px){.cartas{grid-template-columns:1fr 1fr;gap:9px}
@@ -891,6 +894,7 @@ const T={
      qSorpresaHoyNinos:'Va, sin más preguntas. Con los peques y a esta hora, yo haría esto:',
      qSorpresaDia:'Va, sin más preguntas. Para ese día yo haría esto:',
      qSorpresaDiaNinos:'Va, sin más preguntas. Para ese día y con los peques, yo haría esto:',
+     tGente:'¿Con quién viajan?',
      tCoche:'¿Coche o guagua?',
      cConCoche:'Con coche',cSinCoche:'Sin coche, en guagua',
      cSenderos:'Senderos',cAgua:'Playas y charcos',cMuseos:'Museos',cTodo:'Un poco de todo',cTipica:'Comida típica',cDeTodo:'Un poco de todo',
@@ -928,6 +932,7 @@ const T={
      qSorpresaHoyNinos:'Right, no more questions. With the little ones and at this hour, this is what I would do:',
      qSorpresaDia:'Right, no more questions. For that day, this is what I would do:',
      qSorpresaDiaNinos:'Right, no more questions. For that day and with the little ones, this is what I would do:',
+     tGente:'Who is travelling?',
      tCoche:'Car or bus?',
      cConCoche:'With a car',cSinCoche:'By bus',
      cSenderos:'Trails',cAgua:'Beaches and pools',cMuseos:'Museums',cTodo:'A bit of everything',cTipica:'Local food',cDeTodo:'A bit of everything',
@@ -965,6 +970,7 @@ const T={
      qSorpresaHoyNinos:'Gut, keine Fragen mehr. Mit den Kleinen und um diese Zeit würde ich das hier machen:',
      qSorpresaDia:'Gut, keine Fragen mehr. Für diesen Tag würde ich das hier machen:',
      qSorpresaDiaNinos:'Gut, keine Fragen mehr. Für diesen Tag und mit den Kleinen würde ich das hier machen:',
+     tGente:'Wer reist mit?',
      tCoche:'Auto oder Bus?',
      cConCoche:'Mit Auto',cSinCoche:'Mit dem Bus',
      cSenderos:'Wanderwege',cAgua:'Strände und Meerbecken',cMuseos:'Museen',cTodo:'Von allem etwas',cTipica:'Typisch kanarisch',cDeTodo:'Von allem etwas',
@@ -1072,9 +1078,13 @@ function cartas(lista,titulo){
     acc.appendChild(t);
   }
   const caja=document.createElement('div');
-  caja.className='cartas';
+  /* Los carteles apaisados (los de con quién viajan) van uno por fila y con
+     el dibujo entero a la vista: recortarlos por el centro les cortaría el
+     pico del bocadillo. */
+  const anchos=lista.every(o=>o.ancho);
+  caja.className='cartas'+(anchos?' anchas':'');
   caja.innerHTML=lista.map((o,i)=>
-    '<button class="carta" data-i="'+i+'">'+
+    '<button class="carta'+(o.ancho?' ancha':'')+'" data-i="'+i+'">'+
       '<span class="lamina"><img src="img/cartas/'+o.img+'.jpg" alt="" loading="lazy" decoding="async"></span>'+
       '<span class="rotulo">'+o.t+'</span></button>').join('');
   caja.addEventListener('click',e=>{
@@ -3893,11 +3903,12 @@ async function pCoche(){
   acc.appendChild(b2);
 }
 async function pGente(){await naira(tr('como'),360);
-  opciones([
-    {t:tr('dos'),fn:()=>{S.gente=2;S.ninos=false;listo()}},
-    {t:tr('familia'),fn:()=>{S.gente=4;S.ninos=true;listo()}},
-    {t:tr('grupo'),fn:()=>{S.gente=6;S.ninos=false;listo()}}
-  ])}
+  cartas([
+    {t:tr('dos'),    img:'dos-adultos',ancho:true,fn:()=>{S.gente=2;S.ninos=false;listo()}},
+    {t:tr('familia'),img:'familia',    ancho:true,fn:()=>{S.gente=4;S.ninos=true;listo()}},
+    {t:tr('grupo'),  img:'grupo',      ancho:true,fn:()=>{S.gente=6;S.ninos=false;listo()}}
+  ],tr('tGente'));
+}
 async function listo(){
   await naira(S.coche?tr('listo_c'):tr('listo_s'),360);
   menuPrincipal();

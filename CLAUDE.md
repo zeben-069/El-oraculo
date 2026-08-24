@@ -28,7 +28,7 @@ manifest.webmanifest          para instalar en la pantalla de inicio
 icono.svg / icono-*.png
 img/naira-social.jpg          previsualización al compartir
 img/estampas/*.jpg            las 31 fotos de municipio (una por ficha)
-img/cartas/*.jpg              los 5 carteles de las preguntas con dibujo
+img/cartas/*.jpg              los 10 carteles de las preguntas con dibujo
 netlify.toml
 netlify/functions/naira.js    proxy a la API (guarda la clave)
 netlify/functions/tiempo.js   AEMET, dos saltos con reintentos
@@ -279,7 +279,7 @@ decía a la vez que Bajamar tenía socorristas y que estaba clasificada como
 PELIGROSA. Se resolvió contrastando con el portal oficial de turismo, no
 borrando el aviso.
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 142 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 143 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **Lo que dice Naira también pasa por `tr()`.** Nueve preguntas suyas estaban
@@ -287,12 +287,15 @@ escritas en español a pelo —la zona, el municipio, el momento del día, el
 «sorpréndame»— y un inglés las veía en español. Las que llevan hueco
 (`qZonaDetalle`, `qQueVer`, `qMasSitios`) son funciones: `tr('qQueVer')(muni)`.
 
-**Los carteles no llevan el rótulo dentro.** Las tres preguntas con dibujo
-—coche o guagua, qué tipo de día y qué apetece comer— se pintan con
-`cartas()`, y el rótulo va
+**Los carteles no llevan el rótulo dentro.** Las cuatro preguntas con dibujo
+—coche o guagua, con quién viajan, qué tipo de día y qué apetece comer— se
+pintan con `cartas()`, y el rótulo va
 DEBAJO, sacado de `tr()`. Los carteles originales traían el texto incrustado
 y en español: así no valían en inglés ni en alemán. Se recortaron por el
-círculo, y si se añaden más hay que hacer lo mismo.
+círculo, y si se añaden más hay que hacer lo mismo. Los de «con quién viajan»
+son apaisados y con forma de bocadillo: van uno por fila, con `ancho:true`, y
+se pintan con `object-fit:contain` sobre el color del fondo, porque
+recortarlos por el centro les cortaría el pico.
 
 **Los datos nuevos entran por el informe, nunca por fuera.** El prompt es
 largo (~2.600 palabras) a propósito: si añades un campo al informe y no lo
