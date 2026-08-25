@@ -233,6 +233,10 @@ Ninguna prueba usa **la fecha de hoy**: para hoy el motor recorta el día según
 la hora, así que una referencia con la fecha de hoy cambia sola con el paso de
 las horas. Ya pasó con el bloque de perfiles.
 
+`herramientas-horarios.js` cruza el texto del horario de cada restaurante con
+su array de días abiertos y canta las contradicciones. Referencia: de 318
+restaurantes, 76 mencionan días de cierre y **cero se contradicen**.
+
 `lote.js` es el que hay que pasar **después de tocar el motor**. Marca
 DISPERSO, SALTO, CIERRE-LEJOS, COMIDA-LEJOS, RECINTO, CURVAS-NOCHE.
 Referencia actual: dispersión mediana 4 km, cero banderas salvo 1 plan con la
@@ -319,6 +323,12 @@ o el Día de Canarias daba el horario de un día normal. En 341 de 849 pares de
 municipios la última guagua cambia en festivo, y en 272 sale ANTES, alguna
 quince horas antes. Ahora `tipoDeDia()` mira los festivos fijos de Canarias y
 calcula el Viernes Santo (algoritmo de la Pascua), que se mueve.
+
+**Las notas del catálogo van en español y las traduce el modelo.** `nota`,
+`nota_extra` y `ojo` son apuntes escritos a mano (142 restaurantes con `ojo`,
+308 con nota libre). La ficha los enseña tal cual —son datos—, pero el prompt
+manda traducirlos al idioma de la conversación al contarlos, que traducir un
+dato no es inventarlo.
 
 **Los datos también hablan tres idiomas.** El tipo de sitio (32 valores
 cerrados) y el lema de cada municipio se traducen con tabla; el horario del

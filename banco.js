@@ -28,5 +28,5 @@ global.setInterval=()=>0;
 global.clearInterval=noop;
 
 const ctx=new Function(code+`;
-  return {construir,S,LUGARES,REST,BASES,km,tr,minutosA,tipoTr,horarioTr};`)();
+  return {construir,S,LUGARES,REST,BASES,km,tr,minutosA,tipoTr,horarioTr,tipoDeDia,esFestivo};`)();
 module.exports=ctx;

@@ -767,6 +767,9 @@ Si trae "quien_lo_dice", no hace falta que cites la fuente en el plan; con que e
 Si un sitio está declarado Bien de Interés Cultural, lo puedes decir, pero como quien lo menciona de paso, no como un sello de calidad.
 Y si NO trae "que_es", no te inventes la historia del sitio. Nómbralo y sigue.
 
+LAS NOTAS DEL CATÁLOGO VIENEN EN ESPAÑOL
+Los campos "nota", "nota_extra" y "ojo" de un sitio o un restaurante son apuntes escritos a mano, siempre en español —«En Ifonche, arriba. Se sube desde Vilaflor», «Ojo con los días que cierra»—. Son datos buenos y hay que contarlos, pero DILOS EN EL IDIOMA DE LA CONVERSACIÓN: tradúcelos fielmente, sin adornarlos ni añadirles nada. Traducir un dato no es inventarlo; dejarlo en español en un plan en inglés o alemán, sí es un descuido.
+
 QUÉ DÍA Y QUÉ HORA ES
 El informe trae "ahora_mismo" con la fecha y la hora de verdad, y su campo "como_hablar". Hazle caso.
 Si el plan es para hoy, no propongas nada que ya haya pasado a estas horas.
@@ -920,6 +923,8 @@ const T={
      qSorpresaDiaNinos:'Va, sin más preguntas. Para ese día y con los peques, yo haría esto:',
      zNorte:'Norte y valle de La Orotava',zIslaBaja:'Isla Baja (Garachico, Icod, Buenavista)',
      zMetropolitana:'La Laguna, Santa Cruz y Anaga',zGuimar:'Este y valle de Güímar',
+     gSendero:'La ruta del sendero',gBanito:'Para el bañito',qDigame:'Dígame y se lo armo.',
+     frDeManana:'Por la mañana',frDeMediodia:'A mediodía',frDeTarde:'Por la tarde',frDeAtardecer:'Al caer el día',frDeNoche:'De noche',
      zSur:'Sur y suroeste',zCumbre:'Cumbre y Teide',
      mapaNo:'El mapa no ha cargado',
      mapaNoTxt:'Sin conexión o con el navegador bloqueando recursos externos. Cada parada de abajo lleva su enlace con la coordenada exacta.',
@@ -976,6 +981,8 @@ const T={
      qSorpresaDiaNinos:'Right, no more questions. For that day and with the little ones, this is what I would do:',
      zNorte:'North and the Orotava valley',zIslaBaja:'Isla Baja (Garachico, Icod, Buenavista)',
      zMetropolitana:'La Laguna, Santa Cruz and Anaga',zGuimar:'East and the Güímar valley',
+     gSendero:'The trail route',gBanito:'For a dip',qDigame:'Tell me and I will put it together.',
+     frDeManana:'In the morning',frDeMediodia:'At midday',frDeTarde:'In the afternoon',frDeAtardecer:'As the day ends',frDeNoche:'At night',
      zSur:'South and south-west',zCumbre:'The summit and Teide',
      mapaNo:'The map did not load',
      mapaNoTxt:'No connection, or the browser is blocking external resources. Every stop below has its own link with the exact coordinates.',
@@ -1032,6 +1039,8 @@ const T={
      qSorpresaDiaNinos:'Gut, keine Fragen mehr. Für diesen Tag und mit den Kleinen würde ich das hier machen:',
      zNorte:'Norden und das Orotava-Tal',zIslaBaja:'Isla Baja (Garachico, Icod, Buenavista)',
      zMetropolitana:'La Laguna, Santa Cruz und Anaga',zGuimar:'Osten und das Güímar-Tal',
+     gSendero:'Der Wegverlauf',gBanito:'Zum Baden',qDigame:'Sagen Sie es mir und ich stelle es zusammen.',
+     frDeManana:'Am Vormittag',frDeMediodia:'Mittags',frDeTarde:'Am Nachmittag',frDeAtardecer:'Zum Tagesausklang',frDeNoche:'Abends',
      zSur:'Süden und Südwesten',zCumbre:'Gipfel und Teide',
      mapaNo:'Die Karte wurde nicht geladen',
      mapaNoTxt:'Keine Verbindung, oder der Browser blockiert externe Inhalte. Jeder Stopp unten hat seinen eigenen Link mit den genauen Koordinaten.',
@@ -2917,7 +2926,7 @@ function bloqueMapas(b,base){
   /* el sendero, con su trazado aparte */
   ruta.filter(p=>p.sendero).forEach(p=>{
     const l=LUGARES.find(x=>x.n===p.nombre)||{};
-    G.push('<div class="grupo"><i>La ruta del sendero</i>'+
+    G.push('<div class="grupo"><i>'+tr('gSendero')+'</i>'+
       tarjeta('🥾','Trazado de '+p.nombre,urlSendero(p.nombre),
         (l.fx||'')+' · Descárguenlo antes de salir: arriba puede no haber cobertura',true,null,'Sendero')+
       tarjeta('📍',tr('gEmpieza'),urlPin(p.la,p.lo),
@@ -2937,7 +2946,7 @@ function bloqueMapas(b,base){
       return tarjeta(iconoDe(rr.tipo),r.nombre,urlDe({...rr,la:r.la,lo:r.lo}),
         r.sub+(rr.tel?' · '+rr.tel:''),false,rr,rr.tipo);}).join('')+'</div>');
 
-  if(agua.length) G.push('<div class="grupo"><i>Para el bañito</i>'+
+  if(agua.length) G.push('<div class="grupo"><i>'+tr('gBanito')+'</i>'+
     agua.slice(0,4).map(x=>{const l=LUGARES.find(y=>y.n===x.nombre)||{};
       return tarjeta(iconoDe(l.tipo),x.nombre,urlDe({...l,la:x.la,lo:x.lo}),x.sub,false,l,l.tipo);}).join('')+'</div>');
 
@@ -2975,8 +2984,11 @@ function dibujaRuta(b){
   const ICO={'Comer':'🍽','Fiesta':'🎉','Playa':'🏖','Charco':'🌊','Piscina':'🌊','Mirador':'🌄',
     'Sendero':'🥾','Museo':'🏛','Casco histórico':'🏘','Caserío':'🏘','Iglesia':'⛪','Castillo':'🏰',
     'Volcán':'🌋','Jardín':'🌴','Mercado':'🧺'};
-  const ET={'mañana':'Por la mañana','mediodía':'A mediodía','tarde':'Por la tarde',
-            'atardecer':'Al caer el día','noche':'De noche'};
+  /* Las franjas de la lista de paradas estaban en español a pelo: un inglés
+     veía «Al caer el día» dentro de un plan por lo demás traducido. Ahora
+     salen de tr(), como todo. */
+  const ET={'mañana':tr('frDeManana'),'mediodía':tr('frDeMediodia'),'tarde':tr('frDeTarde'),
+            'atardecer':tr('frDeAtardecer'),'noche':tr('frDeNoche')};
   /* la parada extra que no tiene nadie: el mismo sitio, cuarenta años atrás */
   const viejo=(b.paradas||[]).map(p=>LUGARES.find(x=>x.n===p.nombre)).filter(x=>x&&x.la)[0];
   if(viejo) window._focoViejo={la:viejo.la,lo:viejo.lo,n:viejo.n};
@@ -4466,7 +4478,7 @@ async function preguntaComida(){
     {t:tr('cDeTodo'),img:'un-poco-de-todo',fn:()=>{S.comida=null;pedirPlan()}}
   ],tr('tComida'));
 }
-function otroDia(){hilo.innerHTML='';naira('Dígame y se lo armo.',260).then(()=>menuPrincipal())}
+function otroDia(){hilo.innerHTML='';naira(tr('qDigame'),260).then(()=>menuPrincipal())}
 function reiniciar(){S.base=S.coche=S.gente=S.anclaElegida=S.comida=S.apetece=S.ahora=null;
   S.ninos=false;S.saltoComida=0;
   /* los descartes son de ESE plan: si no se limpian, alguien que dijo «esta
