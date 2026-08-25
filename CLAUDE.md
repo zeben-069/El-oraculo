@@ -38,6 +38,7 @@ datos/senderos-anaga.js       7 caminos de Anaga (CARGADO PERO SIN USAR)
 datos/senderos-tenerife.js    225 itinerarios del Cabildo con desnivel
 datos/miradores.js            18 miradores de Santa Cruz
 fotos.js                      la lista de fotos que faltan, y las mete
+fotos-buscar.js               busca candidatas en Commons (se ejecuta en su máquina)
 ```
 
 **La deuda técnica principal:** `index.html` sigue siendo una sola pieza con
@@ -362,6 +363,12 @@ restaurante está mal ubicado, tiene razón: vive allí.
   agrupada por pueblo; con una carpeta como argumento, mete las fotos:
   recorta al cuadrado, deja 240 px, comprime y añade el campo a la ficha.
   Los ficheros se emparejan por el nombre sin acentos.
+  `fotos-buscar.js` busca candidatas en Wikimedia Commons y guarda autor y
+  licencia; **hay que ejecutarlo fuera de aquí**, porque desde el contenedor
+  de trabajo el proxy deniega Commons, Wikipedia y hasta GRAFCAN. Ojo: ese
+  guion tiene que guardarse el `fetch` de verdad ANTES de cargar `banco.js`,
+  que lo sustituye por un tapón que siempre falla. Si una foto trae crédito,
+  la ficha lo cita al pie del plan: la licencia lo exige.
 - La imagen de compartir está dibujada a mano; `generar-imagen.html` la
   rehace en el navegador con las tipografías buenas.
 - Si algún día hay dominio propio, hay que cambiar la URL en **cuatro

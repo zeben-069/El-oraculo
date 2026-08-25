@@ -79,6 +79,12 @@ async function meter(dir){
   const nav=await chromium.launch(); const pag=await nav.newPage();
   let puestas=0; const sinPareja=[], ambiguos=[];
   let html=fs.readFileSync('index.html','utf8');
+  /* Si vienen de Commons, cada foto trae autor y licencia: hay que citarlos,
+     así que el crédito entra en la ficha junto a la foto. Las fotos propias
+     no llevan crédito y no pasa nada. */
+  let creditos={};
+  const fc=path.join(dir,'creditos.json');
+  if(fs.existsSync(fc)){ try{ creditos=JSON.parse(fs.readFileSync(fc,'utf8')); }catch(e){} }
   for(const f of ficheros){
     const clave=norm(path.basename(f).replace(/\.[a-z]+$/i,''));
     let cand=LUGARES.filter(l=>norm(l.n)===clave);
@@ -99,7 +105,9 @@ async function meter(dir){
     /* se le añade el campo a la ficha, sin tocar nada más del fichero */
     const ancla='{"n":'+JSON.stringify(l.n)+',';
     if(html.split(ancla).length-1!==1){ console.log('OJO, no puedo situar la ficha de '+l.n); continue; }
-    html=html.replace(ancla, ancla+'"foto":"img/sitios/'+slug+'.jpg",');
+    const cr=creditos[l.n];
+    const campoCr=cr?'"credito":'+JSON.stringify((cr.autor||'')+' · '+(cr.licencia||'')+' · '+(cr.fuente||''))+',':'';
+    html=html.replace(ancla, ancla+'"foto":"img/sitios/'+slug+'.jpg",'+campoCr);
     puestas++;
     console.log('  ✓ '+f.padEnd(38)+'→ '+l.n);
   }

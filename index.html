@@ -259,6 +259,8 @@ button.franja .rot{
   font-size:16px;line-height:1.2;text-shadow:0 1px 3px rgba(0,0,0,.55);
 }
 @media(max-width:420px){button.franja .rot{font-size:15px;left:12px;right:66px}}
+.credito-fotos{font-size:10.5px;line-height:1.4;color:var(--tea-suave);margin:8px 2px 0;font-family:var(--mono)}
+body[data-luz="noche"] .credito-fotos{color:#9C8CB0}
 .titulo-cartas{
   font-family:var(--disp);font-size:17px;font-weight:800;color:var(--tea);
   text-align:center;margin:2px 0 10px;letter-spacing:.01em;
@@ -933,6 +935,7 @@ const T={
      bienNinos:'bien con niños',noNinos:'NO para niños',nSitios:'sitios',
      gMapa:'El día en el mapa',gParadas:'Las paradas',gEmpieza:'Dónde empieza exactamente',
      gComer:'Dónde comer — elijan ustedes',
+     fotoDe:'Fotos:',
      tGente:'¿Con quién viajan?',
      tCoche:'¿Coche o guagua?',
      cConCoche:'Con coche',cSinCoche:'Sin coche, en guagua',
@@ -988,6 +991,7 @@ const T={
      bienNinos:'good with children',noNinos:'NOT for children',nSitios:'places',
      gMapa:'The day on the map',gParadas:'The stops',gEmpieza:'Where it starts exactly',
      gComer:'Where to eat — you choose',
+     fotoDe:'Photos:',
      tGente:'Who is travelling?',
      tCoche:'Car or bus?',
      cConCoche:'With a car',cSinCoche:'By bus',
@@ -1043,6 +1047,7 @@ const T={
      bienNinos:'gut mit Kindern',noNinos:'NICHTS für Kinder',nSitios:'Orte',
      gMapa:'Der Tag auf der Karte',gParadas:'Die Stopps',gEmpieza:'Wo es genau beginnt',
      gComer:'Wo essen — Sie wählen',
+     fotoDe:'Fotos:',
      tGente:'Wer reist mit?',
      tCoche:'Auto oder Bus?',
      cConCoche:'Mit Auto',cSinCoche:'Mit dem Bus',
@@ -2881,6 +2886,13 @@ function bloqueMapas(b,base){
     {clase:'comer',et:'Dónde comer',puntos:come},
     {clase:'agua',et:'Para el bañito',puntos:agua}
   ],320);
+  /* Las fotos de sitio que vienen de fuera piden citar al autor. Se cita una
+     vez, al pie del plan, en vez de repetirlo en cada ficha. */
+  const conCredito=(b.paradas||[]).map(p=>LUGARES.find(l=>l.n===p.nombre))
+    .filter(l=>l&&l.credito);
+  if(conCredito.length)
+    G.push('<div class="credito-fotos">'+tr('fotoDe')+' '+
+      conCredito.map(l=>l.n+': '+l.credito).join(' · ')+'</div>');
   if(mapa) G.push('<div class="grupo"><i>'+tr('gMapa')+'</i>'+mapa+'</div>');
 
   /* Las fichas, cada una con su punto exacto y sus botones para cambiarla.
