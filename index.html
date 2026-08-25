@@ -373,6 +373,16 @@ a.mapa .foto{flex:0 0 auto;width:62px;height:62px;border-radius:11px;background-
   background-position:center;background-color:var(--arena);position:relative;
   display:grid;place-items:center;border:1.5px solid var(--arena)}
 a.mapa .foto .ico{font-size:26px;line-height:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,.45))}
+/* El telón es el dibujo del pueblo, no una foto del sitio: se apaga un poco
+   para que se lea como fondo y el icono siga mandando. */
+/* El telón es la estampa del pueblo desenfocada: se queda el color y el aire
+   del sitio, y el nombre que llevan escrito dentro deja de leerse a medias
+   («LA OROTA»). El icono va limpio encima, que es quien dice qué es. */
+a.mapa .foto.telon{position:relative;overflow:hidden;background-color:var(--arena)}
+a.mapa .foto.telon::before{content:'';position:absolute;inset:-6px;
+  background-image:inherit;background-size:cover;background-position:center;
+  filter:blur(3px) saturate(.9) brightness(.86)}
+a.mapa .foto.telon .ico,a.mapa .foto.telon .orden{position:relative;z-index:1}
 a.mapa .foto.conFondo .ico{font-size:23px}
 a.mapa .foto .orden{position:absolute;top:-7px;left:-7px;width:24px;height:24px;border-radius:50%;
   background:var(--cochinilla);color:var(--cal);display:grid;place-items:center;
@@ -3119,14 +3129,23 @@ function miniAerea(la,lo,px){
     '&BBOX='+(lo-r)+','+(la-r)+','+(lo+r)+','+(la+r)+
     '&WIDTH='+px+'&HEIGHT='+px;
 }
+/* Tipos donde la ortofoto aérea no cuenta nada: de un museo, una iglesia o
+   un casco solo se ve el tejado. Son 203 fichas del catálogo. */
+const AEREO_INUTIL=/Museo|Iglesia|Casco|Edificio|Escultura|Mercado|Bodega|Quesería|Castillo|Patrimonio|Plaza|Caserío|Transporte|Faro/;
 function marco(item,tipo,orden){
   const ico=iconoDe(tipo);
-  /* El icono va SIEMPRE. La foto, si la hay, va detrás como fondo,
-     así la ficha se ve bien aunque la imagen no cargue. */
+  /* El icono va SIEMPRE. Detrás va, por este orden: la foto del sitio si la
+     hay; si no y el aéreo no sirve para ese tipo, la estampa de su municipio,
+     que es un dibujo y se lee como telón de fondo, no como foto del sitio;
+     y si no, la ortofoto aérea, que para una playa o un charco sí vale. */
+  const est = (item&&!item.foto&&AEREO_INUTIL.test(tipo||(item&&item.tipo)||'')&&item.m&&ESTAMPA[item.m])
+              ? ESTAMPA[item.m].f : null;
   const fondo = (item&&item.foto) ? 'background-image:url('+item.foto+')'
+              : est                ? 'background-image:url('+est+')'
               : (item&&item.la)   ? 'background-image:url('+miniAerea(item.la,item.lo)+')'
               : '';
-  return '<span class="foto'+(fondo?' conFondo':'')+'" style="'+fondo+'">'+
+  const clase='foto'+(fondo?' conFondo':'')+(est?' telon':'');
+  return '<span class="'+clase+'" style="'+fondo+'">'+
     '<span class="ico">'+ico+'</span>'+
     (orden?'<b class="orden">'+orden+'</b>':'')+'</span>';
 }

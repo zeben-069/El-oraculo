@@ -364,6 +364,13 @@ restaurante está mal ubicado, tiene razón: vive allí.
   `guagua_mas_cercana`, así que no se oculta, pero está sin decidir si debería
   descartarlas. Probé a penalizar el cierre y a acortar el radio sin coche: no
   mejoró nada medible y empeoraba esto, así que se quitó.
+- **Cuando no hay foto, telón del pueblo.** Para 203 fichas (iglesias, cascos,
+  museos, caseríos) la ortofoto aérea solo enseñaba un tejado. Ahora esas usan
+  la estampa de su municipio **desenfocada** detrás del icono: se queda el
+  color y el aire del sitio. Desenfocada a propósito, porque las estampas
+  llevan el nombre del pueblo escrito dentro y al recortarlas salía medio
+  rótulo («LA OROTA»). Playas, charcos y paisajes siguen con el aéreo, que
+  ahí sí dice algo.
 - **Fotos por sitio.** La ficha ya las admite: `marco()` usa `l.foto` si la
   hay y, si no, una ortofoto aérea de GRAFCAN. Para una playa se defiende;
   para un museo es un tejado. Barrido de 744 planes: de 589 sitios del
