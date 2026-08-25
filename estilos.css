@@ -190,7 +190,10 @@ button.franja .velo{position:absolute;inset:0;
   background:linear-gradient(90deg,rgba(27,21,18,.62) 0%,rgba(27,21,18,.38) 45%,rgba(27,21,18,.02) 84%)}
 button.franja .rot{
   position:absolute;left:14px;right:74px;top:50%;transform:translateY(-50%);
-  text-align:left;color:var(--cal);font-family:var(--disp);font-weight:800;
+  /* color fijo, NO var(--cal): de noche esa variable se vuelve casi negra
+     (#171214) y el rótulo desaparecía sobre la foto. Aquí siempre hay foto y
+     velo oscuro debajo, así que el texto va claro en los dos temas. */
+  text-align:left;color:#FBF5E9;font-family:var(--disp);font-weight:800;
   font-size:16px;line-height:1.2;text-shadow:0 1px 3px rgba(0,0,0,.55);
 }
 @media(max-width:420px){button.franja .rot{font-size:15px;left:12px;right:66px}}

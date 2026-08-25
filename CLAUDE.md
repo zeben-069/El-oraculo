@@ -301,7 +301,17 @@ decía a la vez que Bajamar tenía socorristas y que estaba clasificada como
 PELIGROSA. Se resolvió contrastando con el portal oficial de turismo, no
 borrando el aviso.
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 171 claves en tres idiomas
+**Elegir sitio es elegir PUEBLO y TIPO, no un nombre de una lista.** Zona →
+pueblo → qué tipo de día (senderos, playas, museos, un poco de todo), y el
+ancla la pone el motor: el sitio de más peso de ese tipo **a menos de 6 km del
+centro urbano** del pueblo. Antes salía la lista de los treinta sitios del
+municipio, y un turista recién llegado no puede elegir lo que no conoce. El
+centro es el de `BASES`, no el centroide de los sitios: La Orotava va de la
+costa a la cumbre y con el centroide ganaba el Observatorio del Teide, a 10 km
+y 2.400 m de altura. Quien sí sabe lo que quiere ver tiene el botón «Prefiero
+elegir el sitio yo».
+
+**Todo texto de interfaz pasa por `tr()`.** Hay 182 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **Lo que dice Naira también pasa por `tr()`.** Nueve preguntas suyas estaban

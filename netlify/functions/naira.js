@@ -75,7 +75,9 @@ exports.handler = async function (event) {
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 700,
+        // 700 cortaba el plan a media frase: un día con el tiempo, tres
+        // paradas, restaurante y alternativas no cabe en 700 tokens.
+        max_tokens: 1800,
         system: cuerpo.system,
         messages: cuerpo.messages
       })
