@@ -78,7 +78,10 @@ async function meter(dir){
   fs.mkdirSync('img/sitios',{recursive:true});
   const nav=await chromium.launch(); const pag=await nav.newPage();
   let puestas=0; const sinPareja=[], ambiguos=[];
-  let html=fs.readFileSync('index.html','utf8');
+  /* Las fichas ya no viven en index.html: al partirlo, LUGARES se fue a
+     datos/lugares.js. El campo se inserta ahí. */
+  const FICHERO='datos/lugares.js';
+  let html=fs.readFileSync(FICHERO,'utf8');
   /* Si vienen de Commons, cada foto trae autor y licencia: hay que citarlos,
      así que el crédito entra en la ficha junto a la foto. Las fotos propias
      no llevan crédito y no pasa nada. */
@@ -113,7 +116,7 @@ async function meter(dir){
   }
   await nav.close();
   if(puestas){
-    fs.writeFileSync('index.html',html);
+    fs.writeFileSync(FICHERO,html);
     console.log('\n'+puestas+' fotos puestas. Pasa ahora: node lote.js');
   }
   if(sinPareja.length) console.log('\nsin pareja (renómbralos como el sitio): '+sinPareja.join(', '));

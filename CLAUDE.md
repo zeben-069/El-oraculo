@@ -23,7 +23,13 @@ Desplegado en Netlify: `https://leafy-cobbler-d24e23.netlify.app`
 ## Estructura
 
 ```
-index.html                    TODO: datos, CSS, motor, prompt (~1,1 MB)
+index.html                    el motor y la interfaz (~228 KB)
+estilos.css                   el CSS (27 KB)
+prompt.js                     el prompt de Naira (18 KB)
+datos/lugares.js              LUGARES (328 KB)
+datos/restaurantes.js         REST (118 KB)
+datos/eventos.js              EVENTOS · datos/bases.js · datos/estampas.js
+datos/titsa-matriz.js         MATRIZ (338 KB) · datos/titsa-regreso.js · datos/ine.js
 manifest.webmanifest          para instalar en la pantalla de inicio
 icono.svg / icono-*.png
 img/naira-social.jpg          previsualización al compartir
@@ -41,10 +47,18 @@ fotos.js                      la lista de fotos que faltan, y las mete
 fotos-buscar.js               busca candidatas en Commons (se ejecuta en su máquina)
 ```
 
-**La deuda técnica principal:** `index.html` sigue siendo una sola pieza con
-los datos, el CSS, el motor y el prompt dentro. Ya no lleva las fotos: las 31
-estampas salieron a `img/estampas/` y el fichero pasó de 2,3 MB a 1,1 MB (208 KB
-comprimido, contra 1,09 MB antes). Partir el archivo es lo que queda.
+**`index.html` ya está partido.** Era una sola pieza de 1,1 MB con los datos,
+el CSS, el motor y el prompt dentro; ahora son 228 KB de motor e interfaz, y
+los 827 KB de datos, los 27 de CSS y los 18 del prompt viven en ficheros
+aparte que el navegador carga con su propio `<script>` antes que el motor.
+Como son `<script>` clásicos, las constantes de nivel superior siguen estando
+disponibles para el motor igual que cuando vivían dentro.
+
+**Quien toque los ficheros de datos, que sepa esto:** `banco.js` los junta en
+el orden en que aparecen en `index.html` —los lee de las etiquetas `<script
+src=...>`, no de una lista escrita a mano—, así que añadir otro fichero de
+datos no obliga a tocar las pruebas. Y `fotos.js` escribe en
+`datos/lugares.js`, no en `index.html`.
 
 ## Los datos
 
@@ -268,10 +282,11 @@ Chrome contra la web desplegada y captura los errores de consola.
 Y siempre, antes de dar nada por bueno:
 
 ```
-node -e "const s=require('fs').readFileSync('index.html','utf8');
-new Function(s.slice(s.indexOf('/* ===================== DATOS'),s.lastIndexOf('</script>')));
-console.log('sintaxis OK');"
+node -e "const c=require('./banco.js'); console.log('sintaxis OK ·',c.LUGARES.length,'sitios')"
 ```
+
+Eso compila **las piezas juntas**, en el mismo orden que el navegador: si un
+fichero de datos se queda a medias o el motor no cuadra con ellos, salta ahí.
 
 ---
 

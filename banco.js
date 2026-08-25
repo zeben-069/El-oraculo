@@ -3,8 +3,16 @@
    niños...) y se llama a construir(). No prueba la conversación ni la API,
    pero sí lo que de verdad decide: qué paradas salen y qué restaurante. */
 const fs=require('fs');
+/* index.html se partió: los datos y el prompt viven en ficheros aparte y el
+   navegador los carga con su propio <script> antes que el motor. Aquí se
+   juntan en el mismo orden y se ejecutan de una pieza, que es exactamente lo
+   que hace el navegador. El orden lo dicta index.html, no una lista escrita
+   a mano: si mañana se añade otro fichero de datos, esto lo sigue. */
 const src=fs.readFileSync('./index.html','utf8');
-const code=src.slice(src.indexOf('/* ===================== DATOS'), src.lastIndexOf('</script>'));
+const piezas=[...src.matchAll(/<script src="([^"]+)"><\/script>/g)].map(m=>m[1])
+  .filter(f=>/^(datos\/|prompt\.js)/.test(f));
+const code=piezas.map(f=>fs.readFileSync('./'+f,'utf8')).join('\n')+'\n'+
+  src.slice(src.indexOf('/* ===================== DATOS'), src.lastIndexOf('</script>'));
 
 const noop=()=>{};
 const elem=()=>({style:{},classList:{add:noop,remove:noop,toggle:noop},
