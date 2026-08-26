@@ -83,6 +83,20 @@ matrícula oficial, `desc` descripción del Cabildo, `bic`, `pos_aprox`.
 
 Cada una nació de un plan malo de verdad. No las quites sin entender cuál.
 
+**Qué se mueve estos días.** Las 148 fiestas solo se veían si caían justo en
+la fecha elegida. `agenda()` saca las de los próximos 21 días, ordenadas por
+día y por lo que se tarda en llegar; elegir una salta la fecha del plan a ese
+día y la fiesta manda. No hay agenda oficial de las fiestas de los 31
+municipios: esto es de lo poco que Naira ofrece y no se encuentra en otro
+sitio, y es lo que mueve al turista fuera de los cuatro sitios de siempre.
+
+**Cuando manda un ancla, algo tiene que tirar HACIA ella.** El día tenía una
+sola fuerza, la de volver a casa, así que con una romería en Arafo las paradas
+se pegaban al borde del radio por el lado de casa: 11 km de la fiesta, en El
+Rosario. Con el contrapeso (1,2 por km más allá de 3 desde el ancla): 5,7 km
+y comiendo en Arafo. En Güímar, de 12,8 km a 1,4. La dispersión mediana de la
+escapada baja de 7,4 a 5,2 km y los 24 planes de un día no se mueven.
+
 **El día se arma alrededor del sitio pedido, no de la cama.** El radio de
 candidatos sale del centro de gravedad del día: el sitio que eligió el turista,
 o la fiesta que manda. Antes salía del alojamiento, y en una escapada eso

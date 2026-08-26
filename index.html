@@ -288,6 +288,8 @@ const T={
      frDeManana:'Por la mañana',frDeMediodia:'A mediodía',frDeTarde:'Por la tarde',frDeAtardecer:'Al caer el día',frDeNoche:'De noche',
      holaSolo:'¡Buenas! ',
      elijoYo:'Prefiero elegir el sitio yo',
+     agenda:'Qué se mueve estos días',
+     qAgenda:(d,n)=>'Hay '+n+' '+(n===1?'cosa apuntada':'cosas apuntadas')+' en los próximos '+d+' días. ¿Le armo el día alrededor de alguna?',
      zSur:'Sur y suroeste',zCumbre:'Cumbre y Teide',
      mapaNo:'El mapa no ha cargado',
      mapaNoTxt:'Sin conexión o con el navegador bloqueando recursos externos. Cada parada de abajo lleva su enlace con la coordenada exacta.',
@@ -348,6 +350,8 @@ const T={
      frDeManana:'In the morning',frDeMediodia:'At midday',frDeTarde:'In the afternoon',frDeAtardecer:'As the day ends',frDeNoche:'At night',
      holaSolo:'Hello! ',
      elijoYo:'I would rather pick the place myself',
+     agenda:'What is on these days',
+     qAgenda:(d,n)=>'I have '+n+' '+(n===1?'thing':'things')+' on in the next '+d+' days. Shall I build the day around one of them?',
      zSur:'South and south-west',zCumbre:'The summit and Teide',
      mapaNo:'The map did not load',
      mapaNoTxt:'No connection, or the browser is blocking external resources. Every stop below has its own link with the exact coordinates.',
@@ -408,6 +412,8 @@ const T={
      frDeManana:'Am Vormittag',frDeMediodia:'Mittags',frDeTarde:'Am Nachmittag',frDeAtardecer:'Zum Tagesausklang',frDeNoche:'Abends',
      holaSolo:'Hallo! ',
      elijoYo:'Ich wähle den Ort lieber selbst',
+     agenda:'Was in diesen Tagen los ist',
+     qAgenda:(d,n)=>'Ich habe '+n+' '+(n===1?'Sache':'Sachen')+' in den nächsten '+d+' Tagen. Soll ich den Tag darum herum bauen?',
      zSur:'Süden und Südwesten',zCumbre:'Gipfel und Teide',
      mapaNo:'Die Karte wurde nicht geladen',
      mapaNoTxt:'Keine Verbindung, oder der Browser blockiert externe Inhalte. Jeder Stopp unten hat seinen eigenen Link mit den genauen Koordinaten.',
@@ -1083,6 +1089,13 @@ function construir(){
        bandera azul. Con críos, un aviso de seguridad no es un matiz. */
     -((S.ninos&&x.ninos==='Con cuidado')?(esPeligro(x)?12:6):0)
     -Math.max(0,(dBase(x)-4))*0.9
+    /* Y si el día lo manda un ancla —el sitio que pidieron o la fiesta—, algo
+       tiene que tirar HACIA ella. Sin esto solo tiraba la fuerza de volver a
+       casa, así que las paradas se pegaban al borde del radio por el lado de
+       casa: con una romería en Arafo salían paradas a 11 km de la fiesta, en
+       El Rosario. Quien va a una fiesta quiere el día EN esa fiesta: pasear
+       por el pueblo, comer allí y bañarse al lado. */
+    -(((foco||focoEvento)&&x._d!=null) ? Math.max(0,(x._d-3))*1.2 : 0)
     /* EL DÍA SE CIERRA CERCA DE CASA. Un atardecer bonito a 20 km del
        alojamiento significa conducir de noche después. Se penaliza el doble
        la distancia en la última franja, para que el remate caiga de vuelta:
@@ -3519,6 +3532,58 @@ function elegirEvento(){
   });
 }
 
+/* ============ QUÉ SE MUEVE ESTOS DÍAS ============
+   Las 148 fiestas estaban ahí, pero solo se veían si caían justo en la fecha
+   elegida: quien no sabe que el sábado hay romería en Tejina, no se entera.
+   Esto las saca a la luz. No hay una agenda oficial de las fiestas de los 31
+   municipios, así que esto es de lo poco que ofrece Naira y no se encuentra
+   en otro sitio: mueve al turista fuera de los cuatro sitios de siempre, y
+   al residente le resuelve el fin de semana.
+   Elegir una salta la fecha del plan al día de la fiesta, que si no, no
+   cuadraría nada. */
+const DIAS_AGENDA=21;
+function proximasFiestas(desde,cuantos){
+  const fin=new Date(new Date(desde+'T12:00:00').getTime()+DIAS_AGENDA*86400000)
+    .toISOString().slice(0,10);
+  const base=BASES[S.base];
+  return EVENTOS.filter(e=>e.f>=desde&&e.f<=fin)
+    .sort((a,b)=> a.f<b.f?-1:a.f>b.f?1
+      : (base?minutosA(base,a.c)-minutosA(base,b.c):0))
+    .slice(0,cuantos||10);
+}
+function fechaCorta(f){
+  const LOC={es:'es-ES',en:'en-GB',de:'de-DE'}[S.idioma]||'es-ES';
+  try{ return new Date(f+'T12:00:00').toLocaleDateString(LOC,{weekday:'short',day:'numeric',month:'short'}); }
+  catch(e){ return f.split('-').reverse().join('/'); }
+}
+async function agenda(){
+  const lista=proximasFiestas(S.fecha,10);
+  await naira(tr('qAgenda')(DIAS_AGENDA,lista.length),340);
+  paso('ok','entrada · lo que se mueve',
+    'De las <span class="am">'+EVENTOS.length+'</span> fiestas del calendario, '+
+    '<span class="si">'+lista.length+'</span> caen en los próximos '+DIAS_AGENDA+' días. '+
+    'No hay agenda oficial de las fiestas de los 31 municipios: esto es lo que hay.');
+  const base=BASES[S.base];
+  const L=lista.map(e=>{
+    const todoDia=esFiestaDeTodoElDia(e);
+    const cuando=todoDia?tr('todoElDia'):(e.h||e.fr);
+    const lejos=(base&&e.m===base.m)?tr('aquiMismo'):(base?minutosA(base,e.c)+' '+tr('min'):e.c);
+    return {t:fechaCorta(e.f)+' · '+e.n+'\n'+e.m+' · '+cuando+' · '+lejos,
+      fn:()=>{
+        S.fecha=e.f; pintaDia();
+        const inp=document.getElementById('fechaLibre'); if(inp) inp.value=e.f;
+        S.anclaElegida=null; S.ahora=null;
+        S.forzarEvento=e.n;
+        S.fiestaTodoElDia=todoDia?e.n:null;
+        paso('ok','la fiesta manda el día','Se salta la fecha al <span class="am">'+e.f+
+          '</span>, que es cuando es <span class="si">'+e.n+'</span>. El día se arma alrededor de ella.');
+        pedirPlan();
+      }};
+  });
+  L.push({t:tr('volver'),fn:()=>menuPrincipal()});
+  opciones(L);
+}
+
 /* ============ LA RUTA HISTÓRICA DE SANTA CRUZ ============
    Los 46 hitos llevaban días cargados en datos/hitos-historicos.js sin que
    nadie los pintara. No encajan como parada suelta —son 46 puntos a pocos
@@ -3583,6 +3648,8 @@ function menuPrincipal(){
     {t:tr('plan'),fn:()=>{S.anclaElegida=null;S.descartados=null;S.prefTipo=null;S.ritmo=null;queApetece()}},
     {t:tr('sitio'),fn:()=>elegirSitio()},
     {t:tr('escapada'),fn:()=>pedirDias()},
+    /* la agenda solo si de verdad hay algo en las próximas semanas */
+    ...(proximasFiestas(S.fecha,1).length?[{t:'🎉 '+tr('agenda'),fn:()=>agenda()}]:[]),
     {t:tr('ahora'),fn:()=>pedirUbicacion()},
     {t:tr('cambiar'),fn:()=>reiniciar()}
   ];
