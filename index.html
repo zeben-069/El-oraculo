@@ -289,6 +289,7 @@ const T={
      holaSolo:'¡Buenas! ',
      elijoYo:'Prefiero elegir el sitio yo',
      agenda:'¿Qué evento hay hoy?',hoyEs:'hoy',mananaEs:'mañana',
+     fueraMapa:(k)=>'· fuera del mapa, a '+k+' km',
      qAgenda:(d,n)=>'Hay '+n+' '+(n===1?'cosa apuntada':'cosas apuntadas')+' en los próximos '+d+' días. ¿Le armo el día alrededor de alguna?',
      zSur:'Sur y suroeste',zCumbre:'Cumbre y Teide',
      mapaNo:'El mapa no ha cargado',
@@ -305,6 +306,7 @@ const T={
      bienNinos:'bien con niños',noNinos:'NO para niños',nSitios:'sitios',
      gMapa:'El día en el mapa',gParadas:'Las paradas',gEmpieza:'Dónde empieza exactamente',
      gComer:'Dónde comer — elijan ustedes',
+     capCama:'Dónde duermen',gRemate:'Para rematar',capRuta:'La ruta del día',capComer:'Dónde comer',capAgua:'Para el bañito',
      fotoDe:'Fotos:',
      tGente:'¿Con quién viajan?',
      tCoche:'¿Coche o guagua?',
@@ -351,6 +353,7 @@ const T={
      holaSolo:'Hello! ',
      elijoYo:'I would rather pick the place myself',
      agenda:'What is on today?',hoyEs:'today',mananaEs:'tomorrow',
+     fueraMapa:(k)=>'· off the map, '+k+' km away',
      qAgenda:(d,n)=>'I have '+n+' '+(n===1?'thing':'things')+' on in the next '+d+' days. Shall I build the day around one of them?',
      zSur:'South and south-west',zCumbre:'The summit and Teide',
      mapaNo:'The map did not load',
@@ -367,6 +370,7 @@ const T={
      bienNinos:'good with children',noNinos:'NOT for children',nSitios:'places',
      gMapa:'The day on the map',gParadas:'The stops',gEmpieza:'Where it starts exactly',
      gComer:'Where to eat — you choose',
+     capCama:'Where you sleep',gRemate:'To round it off',capRuta:'The day\'s route',capComer:'Where to eat',capAgua:'For a swim',
      fotoDe:'Photos:',
      tGente:'Who is travelling?',
      tCoche:'Car or bus?',
@@ -413,6 +417,7 @@ const T={
      holaSolo:'Hallo! ',
      elijoYo:'Ich wähle den Ort lieber selbst',
      agenda:'Was ist heute los?',hoyEs:'heute',mananaEs:'morgen',
+     fueraMapa:(k)=>'· außerhalb der Karte, '+k+' km entfernt',
      qAgenda:(d,n)=>'Ich habe '+n+' '+(n===1?'Sache':'Sachen')+' in den nächsten '+d+' Tagen. Soll ich den Tag darum herum bauen?',
      zSur:'Süden und Südwesten',zCumbre:'Gipfel und Teide',
      mapaNo:'Die Karte wurde nicht geladen',
@@ -429,6 +434,7 @@ const T={
      bienNinos:'gut mit Kindern',noNinos:'NICHTS für Kinder',nSitios:'Orte',
      gMapa:'Der Tag auf der Karte',gParadas:'Die Stopps',gEmpieza:'Wo es genau beginnt',
      gComer:'Wo essen — Sie wählen',
+     capCama:'Wo Sie schlafen',gRemate:'Zum Abschluss',capRuta:'Die Route des Tages',capComer:'Wo essen',capAgua:'Zum Baden',
      fotoDe:'Fotos:',
      tGente:'Wer reist mit?',
      tCoche:'Auto oder Bus?',
@@ -1761,6 +1767,36 @@ function construir(){
     preferencia_de_comida:S.comida||'sin preferencia',
     van_con_ninos:S.ninos,
     les_apetece:S.apetece||'sin preferencia',
+    /* Cuando la carta que pulsaron promete algo que aquí no existe.
+       Naira presume de no inventar; callarse que no hay senderos y servir un
+       mirador como si fuera lo pedido es inventar por omisión. Esto va al
+       informe para que lo diga con todas las letras y siga ofreciendo lo
+       bueno que sí hay. */
+    /* Ojo con el nombre: «no_hay_de_lo_que_pidieron» ya estaba cogido más
+       abajo por la comida (faltaComida) y, siendo el mismo objeto, la última
+       clave ganaba y esta se perdía entera sin dar error. */
+    no_hay_de_lo_que_pidieron_para_ver: S.faltaNucleo?{
+      pidieron: ({naturaleza:'senderos',playa:'playas o charcos',museos:'museos'})[S.faltaNucleo.pedido]||S.faltaNucleo.pedido,
+      /* la clave sin traducir, para el relato de plantillas: «pidieron» va en
+         español y colarlo dentro de una frase en inglés canta */
+      que_pidieron:S.faltaNucleo.pedido,
+      por_la_zona_de: S.faltaNucleo.muni,
+      en_su_lugar: S.faltaNucleo.enSuLugar||null,
+      /* A veces el día acaba pasando por uno de todos modos, más lejos: en
+         Vilaflor no hay playa, pero el plan baja a El Duque al atardecer.
+         Decir «no hay» y luego llevarlos a una queda raro si no se enlaza. */
+      pero_el_dia_pasa_por: (()=>{
+        const nuc=NUCLEO_DIA[S.faltaNucleo.pedido]; if(!nuc) return null;
+        const v=paradas.filter(p=>nuc.test(p.tipo||'')&&p.n!==S.faltaNucleo.enSuLugar).map(p=>p.n);
+        return v.length?v:null;
+      })(),
+      como_decirlo:'Dilo tú primero, en una frase y sin dramatizar: por esa zona '+
+        'no tienes ninguno fichado. Y sigue enseguida con lo que SÍ hay, que es '+
+        'bueno. Ni te disculpes ni lo repitas: una vez, al principio, y a contar el plan. '+
+        'Si viene "pero_el_dia_pasa_por", enlaza con eso: por ahí no lo hay, pero el día '+
+        'acaba pasando por uno. '+
+        'Lo que no puedes hacer es callarlo y servir lo otro como si fuera lo que pidieron.'
+    }:null,
     momento_del_dia:S.ahora||null,
     sitio_cerrado_que_pidieron:R.cerrado_pedido||null,
     /* Sitios que se quedan fuera del plan pero merece la pena nombrar.
@@ -1964,18 +2000,35 @@ function mapaDia(grupos,alto){
          '<br><a href="'+urlPin(p.la,p.lo)+
          '" target="_blank" rel="noopener">Cómo llegar ▸</a>');
     });
-    const bb=L.latLngBounds(pts.map(p=>[p.la,p.lo]));
-    if(pts.length===1) m.setView([pts[0].la,pts[0].lo],16);
-    else m.fitBounds(bb.pad(0.22));
+    /* El encuadre es EL DÍA, no la carretera hasta el día. Durmiendo en
+       Buenavista y con el plan en Santa Úrsula, la cama está a 39 km y
+       estiraba el mapa hasta dejar el día entero en una esquina: la parada y
+       el restaurante, a 5 km uno de otro, salían pegados. La cama se sigue
+       pintando —si cae fuera, la leyenda lo dice— pero no manda en el zoom. */
+    const delDia=pts.filter(p=>p.clase!=='base');
+    const enc=delDia.length?delDia:pts;
+    if(enc.length===1) m.setView([enc[0].la,enc[0].lo],14);
+    else m.fitBounds(L.latLngBounds(enc.map(p=>[p.la,p.lo])).pad(0.22));
     /* si el mapa nace dentro de una burbuja que aún se está animando,
        hay que decirle que vuelva a medirse o sale a cuartos */
     setTimeout(()=>m.invalidateSize(),300);
   };
   setTimeout(()=>pintar(12),80);
 
+  /* Si la cama queda fuera del encuadre, la leyenda lo dice con los km, que
+     es más útil que una chincheta que no se ve. */
+  const dia=pts.filter(p=>p.clase!=='base'), cama=pts.find(p=>p.clase==='base');
+  let lejosCama=null;
+  if(cama&&dia.length){
+    const cx=dia.reduce((a,p)=>a+p.la,0)/dia.length, cy=dia.reduce((a,p)=>a+p.lo,0)/dia.length;
+    const radio=Math.max(...dia.map(p=>km(cx,cy,p.la,p.lo)));
+    const d=km(cx,cy,cama.la,cama.lo);
+    if(d>Math.max(radio*1.6,4)) lejosCama=Math.round(d);
+  }
   const ley=grupos.filter(g=>g.puntos.some(p=>p.la)).map(g=>
     '<span class="ley"><i style="background:'+({ruta:'#A93B2B',comer:'#D99A2B',agua:'#2C6E7F',
-      base:'#2E5D4B',sendero:'#3E2B1C'})[g.clase]+'"></i>'+g.et+'</span>').join('');
+      base:'#2E5D4B',sendero:'#3E2B1C'})[g.clase]+'"></i>'+g.et+
+      ((g.clase==='base'&&lejosCama!=null)?' <b>'+tr('fueraMapa')(lejosCama)+'</b>':'')+'</span>').join('');
   return '<div class="lienzo" id="'+id+'" style="height:'+(alto||300)+'px"></div>'+
          '<div class="leyenda">'+ley+'</div>';
 }
@@ -2240,7 +2293,7 @@ function bloqueMapas(b,base){
   /* 1 · las paradas del día, numeradas en el orden en que se hacen */
   const ruta=(b.paradas||[]).map(p=>{
     const l=LUGARES.find(x=>x.n===p.nombre);
-    return l&&l.la?{la:l.la,lo:l.lo,nombre:p.nombre,sub:l.tipo||'',fr:p.franja,
+    return l&&l.la?{la:l.la,lo:l.lo,nombre:p.nombre,sub:l.tipo?tipoTr(l.tipo):'',fr:p.franja,
                     sendero:l.tipo==='Sendero'}:null;
   }).filter(Boolean).sort((a,c)=>(ORD[a.fr]||9)-(ORD[c.fr]||9));
   ruta.forEach((p,i)=>{p.orden=i+1;});
@@ -2250,11 +2303,12 @@ function bloqueMapas(b,base){
   if(b.restaurante){const r=REST.find(x=>x.n===b.restaurante.nombre);
     if(r&&r.la) come.push({la:r.la,lo:r.lo,nombre:r.n,
       sub:(r.tipo||'')+(r.nota_g?' · '+r.nota_g+'★':''),ico:'★'});}
-  (b.otras_opciones_para_comer||[]).forEach(o=>{const r=REST.find(x=>x.n===o.nombre);
-    if(r&&r.la) come.push({la:r.la,lo:r.lo,nombre:r.n,
-      sub:(r.tipo||'')+(r.nota_g?' · '+r.nota_g+'★':'')});});
+  /* Las alternativas NO van al mapa. En Santa Úrsula los cinco guachinches
+     caen en 500 metros: a la escala del día son cinco chinchetas una encima
+     de otra y tapan la del que se propone, que es la que importa. La lista de
+     abajo ya las trae con teléfono y horario. */
   if(b.cerrar_tomando_algo){const r=REST.find(x=>x.n===b.cerrar_tomando_algo.nombre);
-    if(r&&r.la) come.push({la:r.la,lo:r.lo,nombre:r.n,sub:'Para rematar'});}
+    if(r&&r.la) come.push({la:r.la,lo:r.lo,nombre:r.n,sub:tr('gRemate')});}
 
   /* 3 · dónde bañarse */
   const agua=[];
@@ -2270,10 +2324,12 @@ function bloqueMapas(b,base){
 
   /* EL MAPA DEL DÍA, todo junto y con la ruta trazada */
   const mapa=mapaDia([
-    {clase:'base',et:'Dónde duermen',puntos:[{la:base.la,lo:base.lo,nombre:base.et,sub:'Su alojamiento',ico:'⌂'}]},
-    {clase:'ruta',et:'La ruta del día',puntos:ruta},
-    {clase:'comer',et:'Dónde comer',puntos:come},
-    {clase:'agua',et:'Para el bañito',puntos:agua}
+    /* Los rótulos de la leyenda estaban escritos en español a pelo: en inglés
+       y en alemán el mapa seguía diciendo «Dónde duermen». */
+    {clase:'base',et:tr('capCama'),puntos:[{la:base.la,lo:base.lo,nombre:base.et,sub:tr('capCama'),ico:'⌂'}]},
+    {clase:'ruta',et:tr('capRuta'),puntos:ruta},
+    {clase:'comer',et:tr('capComer'),puntos:come},
+    {clase:'agua',et:tr('capAgua'),puntos:agua}
   ],320);
   /* Las fotos de sitio que vienen de fuera piden citar al autor. Se cita una
      vez, al pie del plan, en vez de repetirlo en cada ficha. */
@@ -2553,6 +2609,9 @@ const N={
   manana:(n,d)=>'Empiezan la mañana por '+n+', que con calma son cosa de '+d+' minutos.',
   mananaEv:(n,h)=>' Y a mediodía, al lío: '+n+h+'.',
   noHay:(t)=>'De '+t+' por aquí cerca no tengo nada abierto ahora mismo, así que les digo lo que sí hay.\n',
+  noHayVer:(k,m)=>'Le digo la verdad: por '+m+' no tengo ninguna ficha de '+
+    ({naturaleza:'senderos',playa:'playas ni charcos',museos:'museos'}[k]||k)+
+    '. Le cuento lo que sí hay, que merece la pena.\n',
   paraComer:'Para comer, ',
   paraX:(x)=>'Para '+x+', ',
   abre:' Abre ',
@@ -2616,6 +2675,9 @@ const N={
   manana:(n,d)=>'Start the morning at '+n+' — about '+d+' minutes taking it easy.',
   mananaEv:(n,h)=>' And at midday, straight to '+n+h+'.',
   noHay:(t)=>'There is no '+t+' open near here right now, so let me tell you what there is.\n',
+  noHayVer:(k,m)=>'Straight with you: around '+m+' I have no '+
+    ({naturaleza:'trails',playa:'beaches or rock pools',museos:'museums'}[k]||k)+
+    ' on file. Here is what there is, and it is worth it.\n',
   paraComer:'For lunch, ',
   paraX:(x)=>'For '+x+', ',
   abre:' Open ',
@@ -2679,6 +2741,9 @@ const N={
   manana:(n,d)=>'Beginnen Sie den Morgen bei '+n+' — in Ruhe etwa '+d+' Minuten.',
   mananaEv:(n,h)=>' Und mittags direkt zu '+n+h+'.',
   noHay:(t)=>'In der Nähe hat gerade nichts mit '+t+' offen, deshalb sage ich Ihnen, was es gibt.\n',
+  noHayVer:(k,m)=>'Ganz ehrlich: rund um '+m+' habe ich keine '+
+    ({naturaleza:'Wanderwege',playa:'Strände oder Meerbecken',museos:'Museen'}[k]||k)+
+    ' verzeichnet. Hier ist, was es gibt, und es lohnt sich.\n',
   paraComer:'Zum Essen: ',
   paraX:(x)=>'Für '+x+': ',
   abre:' Geöffnet ',
@@ -2803,6 +2868,12 @@ function narrarLocal(b){
     return p?' '+p.frase:'';
   };
 
+  /* El relato local (el de la escapada, que no pasa por el modelo) también
+     tiene que decirlo: si no, en un idioma se avisa y en otro no. */
+  if(b.no_hay_de_lo_que_pidieron_para_ver){
+    const q=b.no_hay_de_lo_que_pidieron_para_ver;
+    t.push(F.noHayVer(q.que_pidieron,q.por_la_zona_de).trim());
+  }
   const man=de('mañana');
   let cuerpo='';
   if(man) cuerpo+=F.manana(man.nombre,man.duracion_min)+porque(man.nombre);
@@ -3397,9 +3468,9 @@ function planB(brief){
      kilómetros, paradas cortas, nada de caminatas— y rota la comida para que
      al menos se note que se pidió otra cosa. */
   L.push({t:tr('masTranquilo'),fn:()=>{
-    S.ritmo='tranquilo'; S.apetece=null; S.saltoComida=(S.saltoComida||0)+1; pedirPlan();}});
-  if(S.apetece!=='playa') L.push({t:tr('prefPlaya'),fn:()=>{S.apetece='playa';pedirPlan()}});
-  if(S.apetece!=='naturaleza') L.push({t:tr('prefNat'),fn:()=>{S.apetece='naturaleza';pedirPlan()}});
+    S.ritmo='tranquilo'; S.apetece=null; S.faltaNucleo=null; S.saltoComida=(S.saltoComida||0)+1; pedirPlan();}});
+  if(S.apetece!=='playa') L.push({t:tr('prefPlaya'),fn:()=>{S.apetece='playa';S.faltaNucleo=null;pedirPlan()}});
+  if(S.apetece!=='naturaleza') L.push({t:tr('prefNat'),fn:()=>{S.apetece='naturaleza';S.faltaNucleo=null;pedirPlan()}});
   L.push({t:tr('cambComida'),fn:()=>cambiarComida()});
   L.push({t:tr('ajustar'),fn:()=>{S.ahora=null;queApetece()}});
   L.push({t:tr('otroDia'),fn:()=>otroDia()});
@@ -3845,6 +3916,22 @@ const TIPOS_DIA={
   playa:/Playa|Charco|Piscina/,
   museos:/Museo|Iglesia|Casco|Patrimonio|Plaza|Castillo|Mercado|Edificio|Escultura|Caserío|Bodega|Quesería|Faro/
 };
+/* El NÚCLEO de cada carta: lo que la carta promete de verdad.
+   La carta dice «Senderos» y enseña un dibujo de gente andando, pero
+   TIPOS_DIA.naturaleza también deja pasar miradores, árboles y áreas
+   recreativas. En Santa Úrsula, que no tiene un solo sendero fichado, el
+   ancla salía Mirador de Chipeque y el panel lo daba por bueno en verde:
+   nadie se enteraba de que lo pedido no estaba. Con el núcleo, un sendero
+   de verdad gana a un mirador; y si no hay ninguno, se dice. */
+const NUCLEO_DIA={
+  naturaleza:/^Sendero$/,                    /* la carta dibuja gente andando */
+  playa:/^(Playa|Charco|Piscina)$/,          /* agua es agua */
+  museos:TIPOS_DIA.museos };                 /* aquí la carta promete «cosas de ver del pueblo»,
+                                                y el casco histórico lo es tanto como el museo:
+                                                apretarlo a /^Museo/ mandaba a quien pedía museos
+                                                en La Matanza hasta El Sauzal, saltándose el casco
+                                                de su propio pueblo. */
+const COMO_SE_PIDIO={ naturaleza:'cSenderos', playa:'cAgua', museos:'cMuseos' };
 async function queApeteceEn(muni){
   await naira(tr(S.ninos?'qDiaNinos':'qDia'),380);
   const pool=LUGARES.filter(l=>(l.co||l.m)===muni&&!l.cerrado&&l.la!=null&&!l.recinto);
@@ -3870,14 +3957,52 @@ async function queApeteceEn(muni){
       const aTiro=hay.filter(l=>km(cen.la,cen.lo,l.la,l.lo)<=6);
       if(aTiro.length) hay=aTiro;
     }
+
+    /* Lo que la carta promete, en tres escalones. Antes había uno solo —lo de
+       más peso del pueblo que pasara el filtro ancho— y por eso «Senderos» en
+       Santa Úrsula daba un mirador sin decir ni pío.
+         1. un sendero DE VERDAD en el pueblo,
+         2. si no, uno a menos de 6 km aunque sea del pueblo de al lado
+            —el alcance se mide en kilómetros, no en etiquetas: los de La
+            Matanza están a 5,2 km del centro de Santa Úrsula y no salían
+            nunca por ser de otro término—,
+         3. y si tampoco, se ancla en lo mejor que haya Y SE DICE. Eso último
+            es lo que pidió Zeben: «mira, por esta zona no tengo ningún
+            sendero fichado, pero hay un mirador muy bonito». */
+    const nuc=NUCLEO_DIA[ap];
+    let deFuera=null;
+    S.faltaNucleo=null;
+    if(nuc){
+      const propios=hay.filter(l=>nuc.test(l.tipo||''));
+      if(propios.length) hay=propios;
+      else{
+        const vecinos=cen&&cen.la!=null
+          ? LUGARES.filter(l=>!l.cerrado&&!l.recinto&&l.la!=null&&nuc.test(l.tipo||'')&&
+              (l.co||l.m)!==muni&&km(cen.la,cen.lo,l.la,l.lo)<=6)
+              .sort((a,b)=>km(cen.la,cen.lo,a.la,a.lo)-km(cen.la,cen.lo,b.la,b.lo))
+          : [];
+        if(vecinos.length){ hay=vecinos.slice(); deFuera=Math.round(km(cen.la,cen.lo,vecinos[0].la,vecinos[0].lo)*10)/10; }
+        else S.faltaNucleo={pedido:ap, muni:muni};
+      }
+    }
+
     const l=hay.sort(porPeso)[0]||null;
+    if(S.faltaNucleo&&l) S.faltaNucleo.enSuLugar=l.n;
     S.apetece=ap; S.anclaElegida=l?l.n:null;
-    paso(dentro.length?'ok':'avi','entrada · el pueblo y el tipo de día',
-      'Pidieron <span class="si">'+muni+'</span> y un día de <span class="am">'+ap+'</span>. '+
-      (dentro.length
-        ? 'De '+pool.length+' sitios del pueblo, <span class="am">'+dentro.length+'</span> son de ese tipo; '+
-          'el día se arma alrededor de <span class="si">'+(l?l.n:'—')+'</span>, el de más peso.'
-        : 'En ese pueblo <span class="no">no hay nada de ese tipo</span>, así que se ancla en lo mejor que tiene y el motor abre el radio.'));
+    const carta=COMO_SE_PIDIO[ap]?tr(COMO_SE_PIDIO[ap]).toLowerCase():ap;
+    paso(S.faltaNucleo?'avi':'ok','entrada · el pueblo y el tipo de día',
+      'Pidieron <span class="si">'+muni+'</span> y la carta de <span class="am">'+carta+'</span>. '+
+      (S.faltaNucleo
+        ? 'En '+muni+' y a 6 km alrededor <span class="no">no hay ni uno fichado</span>. '+
+          'Se ancla en <span class="si">'+(l?l.n:'—')+'</span>, lo mejor que hay, y el informe lo dice '+
+          'para que Naira lo cuente en vez de colarlo como si fuera lo pedido.'
+        : deFuera!=null
+          ? 'En '+muni+' no hay ninguno, pero sí a <span class="am">'+deFuera+' km</span> del centro, '+
+            'en '+(l?l.m:'?')+'. El alcance se mide en kilómetros, no en términos municipales: '+
+            'el día se arma alrededor de <span class="si">'+(l?l.n:'—')+'</span>.'
+          : 'De '+pool.length+' sitios del pueblo, <span class="am">'+
+            hay.length+'</span> son de lo que pidieron; el día se arma alrededor de '+
+            '<span class="si">'+(l?l.n:'—')+'</span>, el de más peso.'));
     preguntaComida();
   };
   cartas([
@@ -3902,7 +4027,7 @@ async function elegirLugar(muni){
   paso('ok','entrada · nivel 3, el sitio','<span class="am">'+pool.length+'</span> sitios en '+muni+', los de más peso primero.');
   const top=pool.slice(0,10);
   opciones(top.map(l=>({t:l.n+(l.tipo?' · '+tipoTr(l.tipo).toLowerCase():''),
-      fn:()=>{S.anclaElegida=l.n;queApetece()}}))
+      fn:()=>{S.anclaElegida=l.n;S.faltaNucleo=null;queApetece()}}))
     .concat(pool.length>10?[{t:tr('verMas'),fn:()=>verMas(muni,10)}]:[])
     .concat([{t:tr('cambMuni'),fn:()=>elegirSitio()}]));
 }
@@ -3913,7 +4038,7 @@ async function verMas(muni,desde){
   const tramo=pool.slice(desde,desde+10);
   await naira(tr('qMasSitios')(muni),300);
   opciones(tramo.map(l=>({t:l.n+(l.tipo?' · '+tipoTr(l.tipo).toLowerCase():''),
-      fn:()=>{S.anclaElegida=l.n;queApetece()}}))
+      fn:()=>{S.anclaElegida=l.n;S.faltaNucleo=null;queApetece()}}))
     .concat(pool.length>desde+10?[{t:tr('yMas'),fn:()=>verMas(muni,desde+10)}]:[])
     .concat([{t:tr('volver'),fn:()=>elegirLugar(muni)}]));
 }
@@ -3941,13 +4066,13 @@ async function queApetece(){
      de comida y aquí no pinta nada. La opción no se pierde —quien no tiene
      preferencia la necesita—, pero va como botón debajo. */
   cartas([
-    {t:tr('cSenderos'),img:'senderos',        fn:()=>{S.apetece='naturaleza';preguntaComida()}},
-    {t:tr('cAgua'),    img:'playas-y-charcos',fn:()=>{S.apetece='playa';preguntaComida()}},
-    {t:tr('cMuseos'),  img:'museos',          fn:()=>{S.apetece='museos';preguntaComida()}}
+    {t:tr('cSenderos'),img:'senderos',        fn:()=>{S.apetece='naturaleza';S.faltaNucleo=null;preguntaComida()}},
+    {t:tr('cAgua'),    img:'playas-y-charcos',fn:()=>{S.apetece='playa';S.faltaNucleo=null;preguntaComida()}},
+    {t:tr('cMuseos'),  img:'museos',          fn:()=>{S.apetece='museos';S.faltaNucleo=null;preguntaComida()}}
   ],tr('tDia'));
   const b=document.createElement('button');
   b.className='opt'; b.textContent=tr('cTodo');
-  b.onclick=()=>{acc.innerHTML='';burbuja(tr('cTodo'),'yo');S.apetece='todo';preguntaComida()};
+  b.onclick=()=>{acc.innerHTML='';burbuja(tr('cTodo'),'yo');S.apetece='todo';S.faltaNucleo=null;preguntaComida()};
   acc.appendChild(b);
 }
 async function preguntaComida(){
@@ -3962,7 +4087,7 @@ async function preguntaComida(){
   ],tr('tComida'));
 }
 function otroDia(){hilo.innerHTML='';naira(tr('qDigame'),260).then(()=>menuPrincipal())}
-function reiniciar(){S.base=S.coche=S.gente=S.anclaElegida=S.comida=S.apetece=S.ahora=null;
+function reiniciar(){S.base=S.coche=S.gente=S.anclaElegida=S.comida=S.apetece=S.ahora=S.faltaNucleo=null;
   S.ninos=false;S.saltoComida=0;
   /* los descartes son de ESE plan: si no se limpian, alguien que dijo «esta
      no» a una playa en marzo no volvería a verla nunca */

@@ -162,6 +162,22 @@ por la mañana a las seis de la tarde.
 La Laguna y pedía playa; el foco recortaba a 7 km, ahí no hay costa, y le
 montaba un día de museos.
 
+**La carta que pulsan promete algo concreto, y si no lo hay se dice.** La
+carta de «Senderos» dibuja gente andando, pero el filtro de detrás
+(`TIPOS_DIA.naturaleza`) también deja pasar miradores, árboles y áreas
+recreativas. En Santa Úrsula, que **no tiene un solo sendero fichado**, el ancla
+salía Mirador de Chipeque y el panel lo daba por bueno en verde: nadie se
+enteraba de que lo pedido no estaba. Ahora hay un `NUCLEO_DIA` —lo que la carta
+promete de verdad— y tres escalones: uno del núcleo en el pueblo; si no, uno a
+menos de 6 km aunque sea de otro término (los dos senderos de La Matanza están
+a 5,2 km del centro de Santa Úrsula y **no podían salir nunca**, que es otra vez
+lo de Bajamar y Tegueste); y si tampoco, se ancla en lo mejor que haya **y se
+dice**, por `no_hay_de_lo_que_pidieron_para_ver`. De 108 combinaciones de
+comarca × carta: 79 dan lo pedido en el pueblo, 22 lo traen de al lado y 7 se
+avisan. Ojo con el núcleo de `museos`: apretarlo a `/^Museo/` mandaba a quien
+pedía museos en La Matanza hasta El Sauzal saltándose el casco de su propio
+pueblo, así que ahí el núcleo es el filtro ancho.
+
 **La variedad de tipos no pisa lo que piden.** Se evita repetir tipo en el
 mismo día, pero quien pide agua quiere agua: tras el charco de Bajamar
 quedaban excluidos Punta del Hidalgo y Jover por ser también charcos.
@@ -245,6 +261,22 @@ funciona es comparar sin acentos ni artículos contra los que ya existen.
 **El registro de hostelería no trae coordenadas**, solo la calle. Lo que se
 añade desde ahí va con `pos_aprox`, y entonces el botón de mapa busca por
 nombre en vez de navegar a una chincheta inventada.
+
+**El mapa encuadra el DÍA, no la carretera hasta el día.** Durmiendo en
+Buenavista con el plan en Santa Úrsula, la cama queda a 39 km y estiraba el
+encuadre hasta dejar el día entero en una esquina: la parada y el restaurante,
+a 5 km uno de otro, salían pegados. Y se pintaban **las cinco** opciones de
+comer, que en Santa Úrsula caen en 500 metros: cinco chinchetas una encima de
+otra tapando la del sitio que se propone. Ahora el `fitBounds` ignora la clase
+`base` —la cama se sigue pintando y la leyenda avisa con los km si queda
+fuera— y al mapa solo va el restaurante propuesto y el remate; las
+alternativas están en la lista de abajo con su teléfono.
+
+**Cuidado al añadir campos al informe: los nombres se pisan sin avisar.**
+`no_hay_de_lo_que_pidieron` ya estaba cogido por la comida. Al reusarlo para
+los sitios, siendo el mismo objeto literal, la última clave ganaba y la nueva
+se perdía **entera y sin error**. Se llama
+`no_hay_de_lo_que_pidieron_para_ver`.
 
 **Google Maps: `/maps/dir/?destination=` para navegar.** `/maps/search/?query=`
 busca en la zona y enseña el negocio de al lado en vez del punto.
@@ -330,6 +362,12 @@ elegir el sitio yo».
 
 **Todo texto de interfaz pasa por `tr()`.** Hay 182 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
+
+**La leyenda del mapa también.** Los cuatro rótulos —«Dónde duermen», «La
+ruta del día», «Dónde comer», «Para el bañito»— y los globos de las chinchetas
+estaban escritos en español a pelo: en inglés y en alemán el mapa seguía
+hablando español. Van por `capCama`, `capRuta`, `capComer`, `capAgua` y
+`gRemate`, y el tipo del sitio por `tipoTr()`.
 
 **Lo que dice Naira también pasa por `tr()`.** Nueve preguntas suyas estaban
 escritas en español a pelo —la zona, el municipio, el momento del día, el
