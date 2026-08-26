@@ -381,6 +381,14 @@ restaurante está mal ubicado, tiene razón: vive allí.
   «cambiar dónde comer» lo mantiene.
 - Pocos restaurantes abiertos en domingo en algunos municipios (Arona: 15
   en 18 km). Es escasez de catálogo.
+- Las comarcas (`co`) usan el **nombre oficial del municipio**. Había seis
+  pares duplicados —«Granadilla» y «Granadilla de Abona», «Buenavista» y
+  «Buenavista del Norte», «Santa Cruz», «San Miguel», «La Laguna», «Vilaflor»—
+  y salían dos veces en la lista de pueblos. Unificados: 127 fichas. De paso,
+  con el nombre oficial el centro urbano de `BASES` sí se encuentra, que es lo
+  que usa el ancla. Las comarcas que NO son un municipio siguen con su nombre
+  propio: «Anaga norte — Taganana y Benijo», «Anaga cumbre — Cruz del Carmen»,
+  «Anaga oeste», «Costa de La Laguna — Bajamar y Punta del Hidalgo».
 - Los nombres del registro que venían dados la vuelta ya están enderezados
   («Heladeria, la» → «La Heladería»; «El Tanque, Espacio Cultural» → «Espacio
   Cultural El Tanque»). Si se importa más registro, volverán a aparecer.
