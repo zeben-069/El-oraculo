@@ -6,6 +6,7 @@
    falta 589 fotos: hacen falta pocas y bien elegidas.
 
        node fotos.js                 la lista de qué fotografiar, por pueblo
+       node fotos.js buscar          arma buscar-fotos.html para elegirlas a mano
        node fotos.js entrada/        mete las fotos de esa carpeta
 
    Al meterlas: recorta al cuadrado por el centro, deja 240 px, comprime,
@@ -71,6 +72,28 @@ function lista(){
   console.log('Con las 40 primeras se arregla el 82% de esas paradas.');
 }
 
+/* Una página suelta para elegir las fotos a mano. Se abre en el navegador
+   de casa —que es el que tiene internet de verdad; desde aquí el proxy
+   deniega Commons—, se pulsa la buena de cada sitio y se baja un zip con
+   las fotos y sus créditos. Ese zip es justo lo que come `node fotos.js`. */
+function pagina(){
+  const orden=ranking();
+  const falta=orden.map(([n,v])=>({l:LUGARES.find(x=>x.n===n)||{},n,v}))
+    .filter(x=>x.l.n&&!x.l.foto&&AEREO_MAL.test(x.l.tipo||''));
+  const sitios=falta.map(x=>({n:x.n,m:x.l.m,tipo:x.l.tipo,v:x.v}));
+  const plantilla=fs.readFileSync('plantilla-buscar.html','utf8');
+  /* El hueco de la plantilla es el comentario MÁS los corchetes vacíos.
+     Sustituyendo solo el comentario queda un array seguido de otro par de
+     corchetes y el navegador no compila la página. */
+  const HUECO='/*LISTA*'+'/[]';
+  if(plantilla.split(HUECO).length!==2) throw new Error('la plantilla no trae el hueco de la lista');
+  fs.writeFileSync('buscar-fotos.html',
+    plantilla.replace(HUECO,JSON.stringify(sitios,null,0)));
+  console.log('escrito buscar-fotos.html con '+sitios.length+' sitios,');
+  console.log('ordenados por lo que salen en los planes: los de arriba son los que más se notan.');
+  console.log('Se abre en el navegador, se pulsan las fotos buenas y se baja el zip.');
+}
+
 async function meter(dir){
   const {chromium}=require('playwright');
   const ficheros=fs.readdirSync(dir).filter(f=>/\.(jpe?g|png|webp)$/i.test(f));
@@ -124,4 +147,6 @@ async function meter(dir){
 }
 
 const arg=process.argv[2];
-if(!arg) lista(); else meter(arg).catch(e=>{console.error(e.message);process.exit(1)});
+if(!arg) lista();
+else if(arg==='buscar') pagina();
+else meter(arg).catch(e=>{console.error(e.message);process.exit(1)});

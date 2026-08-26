@@ -288,7 +288,7 @@ const T={
      frDeManana:'Por la mañana',frDeMediodia:'A mediodía',frDeTarde:'Por la tarde',frDeAtardecer:'Al caer el día',frDeNoche:'De noche',
      holaSolo:'¡Buenas! ',
      elijoYo:'Prefiero elegir el sitio yo',
-     agenda:'Qué se mueve estos días',
+     agenda:'¿Qué evento hay hoy?',hoyEs:'hoy',mananaEs:'mañana',
      qAgenda:(d,n)=>'Hay '+n+' '+(n===1?'cosa apuntada':'cosas apuntadas')+' en los próximos '+d+' días. ¿Le armo el día alrededor de alguna?',
      zSur:'Sur y suroeste',zCumbre:'Cumbre y Teide',
      mapaNo:'El mapa no ha cargado',
@@ -350,7 +350,7 @@ const T={
      frDeManana:'In the morning',frDeMediodia:'At midday',frDeTarde:'In the afternoon',frDeAtardecer:'As the day ends',frDeNoche:'At night',
      holaSolo:'Hello! ',
      elijoYo:'I would rather pick the place myself',
-     agenda:'What is on these days',
+     agenda:'What is on today?',hoyEs:'today',mananaEs:'tomorrow',
      qAgenda:(d,n)=>'I have '+n+' '+(n===1?'thing':'things')+' on in the next '+d+' days. Shall I build the day around one of them?',
      zSur:'South and south-west',zCumbre:'The summit and Teide',
      mapaNo:'The map did not load',
@@ -412,7 +412,7 @@ const T={
      frDeManana:'Am Vormittag',frDeMediodia:'Mittags',frDeTarde:'Am Nachmittag',frDeAtardecer:'Zum Tagesausklang',frDeNoche:'Abends',
      holaSolo:'Hallo! ',
      elijoYo:'Ich wähle den Ort lieber selbst',
-     agenda:'Was in diesen Tagen los ist',
+     agenda:'Was ist heute los?',hoyEs:'heute',mananaEs:'morgen',
      qAgenda:(d,n)=>'Ich habe '+n+' '+(n===1?'Sache':'Sachen')+' in den nächsten '+d+' Tagen. Soll ich den Tag darum herum bauen?',
      zSur:'Süden und Südwesten',zCumbre:'Gipfel und Teide',
      mapaNo:'Die Karte wurde nicht geladen',
@@ -3556,19 +3556,26 @@ function fechaCorta(f){
   try{ return new Date(f+'T12:00:00').toLocaleDateString(LOC,{weekday:'short',day:'numeric',month:'short'}); }
   catch(e){ return f.split('-').reverse().join('/'); }
 }
+function hoyISO(){ return (new Date()).toISOString().slice(0,10); }
 async function agenda(){
-  const lista=proximasFiestas(S.fecha,10);
+  /* arranca en HOY, no en la fecha que tengan puesta: la pregunta es «qué hay
+     ahora», y si les cuadra otro día ya cambian la fecha al elegir. */
+  const hoy=hoyISO();
+  const lista=proximasFiestas(S.fecha<hoy?hoy:S.fecha,10);
   await naira(tr('qAgenda')(DIAS_AGENDA,lista.length),340);
   paso('ok','entrada · lo que se mueve',
     'De las <span class="am">'+EVENTOS.length+'</span> fiestas del calendario, '+
     '<span class="si">'+lista.length+'</span> caen en los próximos '+DIAS_AGENDA+' días. '+
     'No hay agenda oficial de las fiestas de los 31 municipios: esto es lo que hay.');
   const base=BASES[S.base];
+  const manana=new Date(new Date(hoy+'T12:00:00').getTime()+86400000).toISOString().slice(0,10);
   const L=lista.map(e=>{
     const todoDia=esFiestaDeTodoElDia(e);
     const cuando=todoDia?tr('todoElDia'):(e.h||e.fr);
     const lejos=(base&&e.m===base.m)?tr('aquiMismo'):(base?minutosA(base,e.c)+' '+tr('min'):e.c);
-    return {t:fechaCorta(e.f)+' · '+e.n+'\n'+e.m+' · '+cuando+' · '+lejos,
+    const cabecera=(e.f===hoy)?tr('hoyEs').toUpperCase()+' · ':
+                   (e.f===manana)?tr('mananaEs')+' · ':fechaCorta(e.f)+' · ';
+    return {t:cabecera+e.n+'\n'+e.m+' · '+cuando+' · '+lejos,
       fn:()=>{
         S.fecha=e.f; pintaDia();
         const inp=document.getElementById('fechaLibre'); if(inp) inp.value=e.f;
@@ -3649,7 +3656,10 @@ function menuPrincipal(){
     {t:tr('sitio'),fn:()=>elegirSitio()},
     {t:tr('escapada'),fn:()=>pedirDias()},
     /* la agenda solo si de verdad hay algo en las próximas semanas */
-    ...(proximasFiestas(S.fecha,1).length?[{t:'🎉 '+tr('agenda'),fn:()=>agenda()}]:[]),
+    /* Genérico, no «este finde»: la Virgen del Carmen del Puerto cae en
+       martes y la caminata a Candelaria en viernes. Las fiestas de aquí no
+       entienden de fines de semana. */
+    ...(proximasFiestas(hoyISO(),1).length?[{t:'🪘 '+tr('agenda'),fn:()=>agenda()}]:[]),
     {t:tr('ahora'),fn:()=>pedirUbicacion()},
     {t:tr('cambiar'),fn:()=>reiniciar()}
   ];

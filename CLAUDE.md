@@ -45,6 +45,8 @@ datos/senderos-tenerife.js    225 itinerarios del Cabildo con desnivel
 datos/miradores.js            18 miradores de Santa Cruz
 fotos.js                      la lista de fotos que faltan, y las mete
 fotos-buscar.js               busca candidatas en Commons (se ejecuta en su máquina)
+plantilla-buscar.html         el molde de la página de elegir fotos
+buscar-fotos.html             esa página ya con los 82 sitios dentro
 ```
 
 **`index.html` ya está partido.** Era una sola pieza de 1,1 MB con los datos,
@@ -429,7 +431,21 @@ restaurante está mal ubicado, tiene razón: vive allí.
   Los ficheros se emparejan por el nombre sin acentos.
   `fotos-buscar.js` busca candidatas en Wikimedia Commons y guarda autor y
   licencia; **hay que ejecutarlo fuera de aquí**, porque desde el contenedor
-  de trabajo el proxy deniega Commons, Wikipedia y hasta GRAFCAN. Ojo: ese
+  de trabajo el proxy deniega Commons, Wikipedia y hasta GRAFCAN.
+  Y como Zeben no programa, hay un camino que no pide consola:
+  `node fotos.js buscar` mete los 82 sitios pendientes —ordenados por lo que
+  salen en los planes— dentro de `plantilla-buscar.html` y escribe
+  `buscar-fotos.html`. Esa página se abre en el navegador de casa, busca ella
+  sola en Commons, y con pulsar la foto buena de cada sitio arma un zip con
+  las fotos y un `creditos.json`. Ese zip es exactamente lo que come
+  `node fotos.js esa-carpeta/`. Detalles que costaron: el zip se escribe a
+  mano y hay que marcar la **bandera UTF-8** (bit 11) o los acentos de
+  «Casa del Plátano.jpg» salen rotos; solo busca **lo que asoma por la
+  pantalla**, que 82 llamadas de golpe a Commons es una espera larga y fea; y
+  se descarta la candidata **sin autor o sin licencia**, que sin crédito no se
+  puede publicar. Para probarla sin red: `?api=...` apunta a otra Commons —hay
+  una de mentira en el borrador— y sin `Access-Control-Allow-Origin` el
+  navegador tira la respuesta, igual que haría la de verdad. Ojo: ese
   guion tiene que guardarse el `fetch` de verdad ANTES de cargar `banco.js`,
   que lo sustituye por un tapón que siempre falla. Si una foto trae crédito,
   la ficha lo cita al pie del plan: la licencia lo exige.

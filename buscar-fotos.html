@@ -1,0 +1,156 @@
+<meta charset="utf-8"><title>Fotos para Naira</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+ body{font-family:system-ui,sans-serif;background:#FBF5E9;color:#3E2B1C;margin:0;padding:16px 14px 90px}
+ h1{font:800 21px/1.2 Georgia,serif;margin:0 0 4px}
+ p.ayuda{margin:6px 0 16px;font-size:14px;line-height:1.5;color:#6B5238}
+ .sitio{background:#fff;border:1.5px solid #3E2B1C;border-radius:14px;padding:12px;margin:0 0 14px;
+        box-shadow:2.5px 2.5px 0 #3E2B1C}
+ .sitio h2{font:700 16px/1.25 Georgia,serif;margin:0 0 2px}
+ .sitio .meta{font-size:12px;color:#6B5238;margin:0 0 10px}
+ .fila{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+ .cand{border:2px solid transparent;border-radius:10px;overflow:hidden;cursor:pointer;background:#E8D9BE;padding:0}
+ .cand img{display:block;width:100%;height:110px;object-fit:cover}
+ .cand small{display:block;padding:4px 6px;font-size:10px;line-height:1.3;text-align:left}
+ .cand.elegida{border-color:#2E5D4B;box-shadow:0 0 0 3px rgba(46,93,75,.25)}
+ .ninguna{border:1.5px dashed #A93B2B;color:#A93B2B;background:#fff;border-radius:10px;cursor:pointer;font-size:13px}
+ .ninguna.elegida{background:#A93B2B;color:#fff}
+ .barra{position:fixed;left:0;right:0;bottom:0;background:#2E5D4B;color:#FBF5E9;padding:12px 14px;
+        display:flex;gap:12px;align-items:center;justify-content:space-between;font-size:14px}
+ .barra button{font:700 15px system-ui;background:#FBF5E9;color:#2E5D4B;border:0;border-radius:10px;
+        padding:10px 16px;cursor:pointer}
+ .barra button[disabled]{opacity:.5;cursor:default}
+ .estado{font-size:12px;color:#6B5238}
+</style>
+<h1>Fotos para Naira</h1>
+<p class="ayuda">
+ Pulse la foto que <b>de verdad sea el sitio</b>. Si ninguna vale, pulse «ninguna vale» y a otra cosa.
+ Cuando termine —o cuando se canse— pulse <b>Descargar</b> abajo: se baja un zip con lo elegido y sus
+ créditos. Ese zip es lo que hay que mandar. No hace falta hacerlas todas de una vez.
+</p>
+<div id="lista"></div>
+<div class="barra">
+  <span id="cuenta">0 elegidas</span>
+  <button id="bajar" disabled>Descargar el zip</button>
+</div>
+<script>
+/* ------------------------------------------------------------------
+   Busca candidatas en Wikimedia Commons desde el propio navegador, que
+   es el que tiene internet. No instala nada y no manda nada a ningún
+   sitio: todo pasa aquí dentro y acaba en un zip en Descargas.
+   El zip se arma a mano (sin comprimir, que un JPEG ya viene comprimido)
+   para no depender de ninguna librería de fuera. ------------------- */
+const SITIOS = [{"n":"Museo de la Ciencia y el Cosmos","m":"San Cristóbal de La Laguna","tipo":"Museo","v":53},{"n":"Casa del Plátano","m":"Icod de los Vinos","tipo":"Museo","v":53},{"n":"ARTlandya, el Mundo de las Muñecas","m":"Icod de los Vinos","tipo":"Museo","v":43},{"n":"Casa La Bodega","m":"Arona","tipo":"Museo","v":40},{"n":"Casco histórico de Candelaria","m":"Candelaria","tipo":"Casco histórico","v":40},{"n":"Espacio de Arte la Casa de Piedra","m":"Garachico","tipo":"Museo","v":40},{"n":"Museo de Historia de Granadilla","m":"Granadilla de Abona","tipo":"Museo","v":37},{"n":"Museo del Pescador","m":"Puerto de la Cruz","tipo":"Museo","v":37},{"n":"Museo de Artesanía Iberoamericana","m":"La Orotava","tipo":"Museo","v":36},{"n":"Igueste de Candelaria","m":"Candelaria","tipo":"Caserío","v":33},{"n":"Museo de Antropología de Tenerife","m":"San Cristóbal de La Laguna","tipo":"Museo","v":33},{"n":"Museo y Parque Etnográfico de Pinolere","m":"La Orotava","tipo":"Museo","v":30},{"n":"Absurdia, Mundo de Ilusiones","m":"Adeje","tipo":"Museo","v":27},{"n":"Ecomuseo de El Tanque","m":"Santiago del Teide","tipo":"Museo","v":27},{"n":"El Tesoro de la Concepción","m":"La Orotava","tipo":"Museo","v":25},{"n":"Casa Fuerte de Adeje","m":"Adeje","tipo":"Museo","v":24},{"n":"Casa El Llano, Fiestas y Tradiciones","m":"Los Realejos","tipo":"Museo","v":24},{"n":"Casa Museo Cayetano Gómez Felipe","m":"San Cristóbal de La Laguna","tipo":"Museo","v":23},{"n":"Casa de los Balcones","m":"La Orotava","tipo":"Casco histórico","v":23},{"n":"Centro de Visitantes Telesforo Bravo","m":"La Orotava","tipo":"Museo","v":22},{"n":"Mercado de La Laguna","m":"San Cristóbal de La Laguna","tipo":"Mercado","v":22},{"n":"Caserío de Las Vegas","m":"Granadilla de Abona","tipo":"Caserío","v":21},{"n":"Conjunto Histórico Villa y Puerto de Garachico","m":"Garachico","tipo":"Casco histórico","v":20},{"n":"Casco histórico de Vilaflor","m":"Vilaflor de Chasna","tipo":"Casco histórico","v":20},{"n":"Observatorio del Teide (Izaña)","m":"La Orotava","tipo":"Museo","v":18},{"n":"Mercadillo del Agricultor de El Palmar","m":"Buenavista del Norte","tipo":"Mercado","v":17},{"n":"Casco histórico de Garachico","m":"Garachico","tipo":"Casco histórico","v":17},{"n":"Museo de Arte Contemporáneo Eduardo Westerdahl","m":"Puerto de la Cruz","tipo":"Museo","v":17},{"n":"Casco histórico de Güímar","m":"Güímar","tipo":"Casco histórico","v":14},{"n":"Museo de Historia y Antropología (Casa Lercaro)","m":"San Cristóbal de La Laguna","tipo":"Museo","v":13},{"n":"Conjunto Histórico de Guía de Isora","m":"Guía de Isora","tipo":"Casco histórico","v":13},{"n":"Caserío de Masca","m":"Buenavista del Norte","tipo":"Casco histórico","v":13},{"n":"Casco de Garachico","m":"Garachico","tipo":"Casco histórico","v":12},{"n":"Conjunto Histórico de Arona","m":"Arona","tipo":"Casco histórico","v":11},{"n":"Erjos","m":"Santiago del Teide","tipo":"Caserío","v":11},{"n":"Iglesia de Nuestra Señora de la Luz","m":"Guía de Isora","tipo":"Iglesia","v":11},{"n":"Conjunto Histórico de Arico el Nuevo","m":"Arico","tipo":"Casco histórico","v":10},{"n":"Museo Etnográfico Juan Évora","m":"Vilaflor de Chasna","tipo":"Museo","v":10},{"n":"Casco histórico de La Laguna","m":"San Cristóbal de La Laguna","tipo":"Casco histórico","v":10},{"n":"Casa del Vino","m":"El Sauzal","tipo":"Museo / bodega","v":9},{"n":"Villa de Arico","m":"Arico","tipo":"Casco histórico","v":8},{"n":"Salinas de Buenavista del Norte","m":"Buenavista del Norte","tipo":"Casco histórico","v":8},{"n":"Conjunto Histórico de Los Silos","m":"Los Silos","tipo":"Casco histórico","v":8},{"n":"Museo LM Arte Colección","m":"San Cristóbal de La Laguna","tipo":"Museo","v":8},{"n":"Caserío de Icor","m":"Arico","tipo":"Casco histórico","v":8},{"n":"San Miguel de Abona","m":"San Miguel de Abona","tipo":"Casco histórico","v":8},{"n":"Casco histórico de Icod de los Vinos","m":"Icod de los Vinos","tipo":"Casco histórico","v":8},{"n":"San Cristóbal de La Laguna (Casco)","m":"San Cristóbal de La Laguna","tipo":"Casco histórico","v":8},{"n":"Villa de San Juan de la Rambla","m":"San Juan de la Rambla","tipo":"Casco histórico","v":8},{"n":"MUNA (Naturaleza y Arqueología)","m":"Santa Cruz de Tenerife","tipo":"Museo","v":8},{"n":"Iglesia del Sagrado Corazón (Fasnia)","m":"Fasnia","tipo":"Iglesia","v":7},{"n":"Caserio de Casas Altas","m":"Arona","tipo":"Casco histórico","v":7},{"n":"Casco histórico de Adeje","m":"Adeje","tipo":"Casco histórico","v":6},{"n":"Casco histórico de Arafo","m":"Arafo","tipo":"Casco histórico","v":6},{"n":"Casco histórico de La Orotava","m":"La Orotava","tipo":"Casco histórico","v":6},{"n":"Conjunto Histórico El Realejo Alto","m":"Los Realejos","tipo":"Casco histórico","v":6},{"n":"Rambla de Santa Cruz","m":"Santa Cruz de Tenerife","tipo":"Casco histórico","v":6},{"n":"Auditorio de Tenerife","m":"Santa Cruz de Tenerife","tipo":"Museo","v":6},{"n":"Los Bailaderos o Teno Alto","m":"Buenavista del Norte","tipo":"Caserío","v":5},{"n":"Centro de Interpretación museo etnográfico Casa de los Zamorano","m":"Tegueste","tipo":"Museo","v":5},{"n":"Caserío de Talavera","m":"Los Silos","tipo":"Caserío","v":4},{"n":"Mercadillo del Agricultor de Los Silos","m":"Los Silos","tipo":"Mercado","v":4},{"n":"Museum Malvasía","m":"Icod de los Vinos","tipo":"Museo / bodega","v":4},{"n":"Caserío de Las Fuentes","m":"Guía de Isora","tipo":"Caserío","v":4},{"n":"Caseríos de Chirche y Aripe","m":"Guía de Isora","tipo":"Casco histórico","v":4},{"n":"Casco histórico de Puerto de la Cruz","m":"Puerto de la Cruz","tipo":"Casco histórico","v":4},{"n":"Museo Histórico Militar de Canarias","m":"Santa Cruz de Tenerife","tipo":"Museo","v":4},{"n":"Espacio Cultural El Tanque","m":"Santa Cruz de Tenerife","tipo":"Museo","v":4},{"n":"Ex-convento de San Agustín","m":"San Cristóbal de La Laguna","tipo":"Casco histórico","v":4},{"n":"Fundación Cristino de Vera","m":"San Cristóbal de La Laguna","tipo":"Museo","v":4},{"n":"Conjunto Histórico de Tegueste","m":"Tegueste","tipo":"Casco histórico","v":4},{"n":"Sanatorio de Abades","m":"Arico","tipo":"Casco histórico","v":3},{"n":"Iglesia de Nuestra Señora de la Victoria","m":"La Victoria de Acentejo","tipo":"Iglesia","v":2},{"n":"Hacienda de los Príncipes","m":"Los Realejos","tipo":"Casco histórico","v":2},{"n":"Antigua Estación de Tren","m":"Santa Cruz de Tenerife","tipo":"Museo","v":2},{"n":"Convento de Santa Catalina de Siena","m":"San Cristóbal de La Laguna","tipo":"Casco histórico","v":2},{"n":"Castillo de San Cristóbal","m":"Santa Cruz de Tenerife","tipo":"Museo","v":2},{"n":"Cementerio de San Rafael y San Roque","m":"Santa Cruz de Tenerife","tipo":"Casco histórico","v":2},{"n":"Plaza del Príncipe","m":"Santa Cruz de Tenerife","tipo":"Plaza","v":2},{"n":"Era de los Brezos","m":"Adeje","tipo":"Patrimonio","v":1},{"n":"Buenavista del Norte","m":"Buenavista del Norte","tipo":"Casco histórico","v":1},{"n":"Museo de Arte Sacro Santa Clara","m":"San Cristóbal de La Laguna","tipo":"Museo","v":1}];
+/* la de verdad; ?api=... la cambia, que es como se prueba esto sin red */
+const API=new URLSearchParams(location.search).get('api')||'https://commons.wikimedia.org/w/api.php';
+const elegidas={};      /* nombre del sitio → {blob, autor, licencia, pagina} */
+
+const $=(t,a,h)=>{const e=document.createElement(t);if(a)Object.assign(e,a);if(h)e.innerHTML=h;return e;};
+const cuenta=()=>{const n=Object.values(elegidas).filter(Boolean).length;
+  document.getElementById('cuenta').textContent=n+(n===1?' elegida':' elegidas');
+  document.getElementById('bajar').disabled=!n;};
+
+async function candidatas(s){
+  const q=encodeURIComponent(s.n+' '+s.m+' Tenerife');
+  const u=API+'?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrsearch='+q+
+          '&gsrlimit=4&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=640'+
+          '&iiextmetadatafilter=Artist|LicenseShortName';
+  const r=await fetch(u); if(!r.ok) throw new Error('la búsqueda falló ('+r.status+')');
+  const j=await r.json();
+  const pgs=(j.query&&j.query.pages)?Object.values(j.query.pages):[];
+  return pgs.map(p=>{
+    const ii=(p.imageinfo||[])[0]; if(!ii) return null;
+    const m=ii.extmetadata||{};
+    const autor=((m.Artist||{}).value||'').replace(/<[^>]*>/g,'').trim();
+    const lic=((m.LicenseShortName||{}).value||'').trim();
+    if(!autor||!lic) return null;          /* sin crédito claro no se usa */
+    return {url:ii.thumburl||ii.url, pagina:ii.descriptionurl, autor, licencia:lic};
+  }).filter(Boolean);
+}
+
+function pinta(s,caja){
+  const fila=$('div',{className:'fila'});
+  caja.appendChild(fila);
+  const marca=(btn)=>{[...caja.querySelectorAll('.cand,.ninguna')].forEach(b=>b.classList.remove('elegida'));
+    btn.classList.add('elegida');};
+  candidatas(s).then(async cs=>{
+    if(!cs.length){ fila.appendChild($('p',{className:'meta'},'Commons no devuelve nada con crédito claro para este sitio.')); return; }
+    cs.forEach(c=>{
+      const b=$('button',{className:'cand'});
+      b.appendChild($('img',{src:c.url,loading:'lazy',crossOrigin:'anonymous'}));
+      b.appendChild($('small',null,c.autor.slice(0,40)+'<br>'+c.licencia));
+      b.onclick=async()=>{
+        marca(b); b.textContent='bajando…';
+        try{
+          const r=await fetch(c.url); const blob=await r.blob();
+          elegidas[s.n]={blob,autor:c.autor,licencia:c.licencia,pagina:c.pagina};
+        }catch(e){ elegidas[s.n]=null; alert('No se pudo bajar esa foto: '+e.message); }
+        b.textContent=''; b.appendChild($('img',{src:c.url,crossOrigin:'anonymous'}));
+        b.appendChild($('small',null,c.autor.slice(0,40)+'<br>'+c.licencia));
+        cuenta();
+      };
+      fila.appendChild(b);
+    });
+    const no=$('button',{className:'ninguna'},'ninguna vale');
+    no.onclick=()=>{marca(no); elegidas[s.n]=null; cuenta();};
+    fila.appendChild(no);
+  }).catch(e=>fila.appendChild($('p',{className:'meta'},'Error buscando: '+e.message)));
+}
+
+/* ---- zip a mano, sin comprimir ---- */
+const TABLA=(()=>{const t=new Uint32Array(256);
+  for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}return t;})();
+const crc32=u8=>{let c=0xFFFFFFFF;for(let i=0;i<u8.length;i++)c=TABLA[(c^u8[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0;};
+function zip(ficheros){           /* [{nombre, datos:Uint8Array}] */
+  const enc=new TextEncoder(), trozos=[], central=[];
+  let off=0;
+  const u32=n=>new Uint8Array([n&255,(n>>8)&255,(n>>16)&255,(n>>>24)&255]);
+  const u16=n=>new Uint8Array([n&255,(n>>8)&255]);
+  ficheros.forEach(f=>{
+    const nom=enc.encode(f.nombre), c=crc32(f.datos), n=f.datos.length;
+    const cab=[enc.encode('PK\x03\x04'),u16(20),u16(0x800),u16(0),u16(0),u16(0),u32(c),u32(n),u32(n),u16(nom.length),u16(0),nom];
+    cab.forEach(x=>trozos.push(x)); trozos.push(f.datos);
+    central.push([enc.encode('PK\x01\x02'),u16(20),u16(20),u16(0x800),u16(0),u16(0),u16(0),u32(c),u32(n),u32(n),
+                  u16(nom.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(off),nom]);
+    off+=cab.reduce((a,x)=>a+x.length,0)+n;
+  });
+  const ini=off; let tam=0;
+  central.forEach(c=>{c.forEach(x=>{trozos.push(x);tam+=x.length;});});
+  [enc.encode('PK\x05\x06'),u16(0),u16(0),u16(ficheros.length),u16(ficheros.length),u32(tam),u32(ini),u16(0)]
+    .forEach(x=>trozos.push(x));
+  return new Blob(trozos,{type:'application/zip'});
+}
+
+document.getElementById('bajar').onclick=async()=>{
+  const ficheros=[], creditos={};
+  for(const [nombre,d] of Object.entries(elegidas)){
+    if(!d) continue;
+    const buf=new Uint8Array(await d.blob.arrayBuffer());
+    ficheros.push({nombre:nombre.replace(/[\/\\:]/g,' ')+'.jpg',datos:buf});
+    creditos[nombre]={autor:d.autor,licencia:d.licencia,fuente:'Wikimedia Commons',pagina:d.pagina};
+  }
+  ficheros.push({nombre:'creditos.json',datos:new TextEncoder().encode(JSON.stringify(creditos,null,1))});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(zip(ficheros));
+  a.download='fotos-naira.zip'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+};
+
+/* Se busca solo lo que asoma por la pantalla: 82 sitios de golpe son 82
+   llamadas a Commons a la vez, y una espera larga antes de ver nada. */
+const mirilla=new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(!e.isIntersecting) return;
+    mirilla.unobserve(e.target);
+    pinta(e.target._sitio,e.target); });
+},{rootMargin:'600px'});
+
+SITIOS.forEach(s=>{
+  const caja=$('div',{className:'sitio'});
+  caja.appendChild($('h2',null,s.n));
+  caja.appendChild($('p',{className:'meta'},s.tipo+' · '+s.m+' · sale en '+s.v+' planes'));
+  caja._sitio=s;
+  document.getElementById('lista').appendChild(caja);
+  mirilla.observe(caja);
+});
+cuenta();
+</script>
