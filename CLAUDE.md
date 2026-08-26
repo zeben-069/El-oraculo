@@ -43,6 +43,7 @@ datos/hitos-historicos.js     46 hitos del itinerario de Santa Cruz
 datos/senderos-anaga.js       7 caminos de Anaga (CARGADO PERO SIN USAR)
 datos/senderos-tenerife.js    225 itinerarios del Cabildo con desnivel
 datos/miradores.js            18 miradores de Santa Cruz
+empaquetar.js                 arma el zip que se suelta en Netlify Drop
 fotos.js                      la lista de fotos que faltan, y las mete
 fotos-buscar.js               busca candidatas en Commons (se ejecuta en su máquina)
 plantilla-buscar.html         el molde de la página de elegir fotos
