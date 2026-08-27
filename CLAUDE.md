@@ -174,9 +174,11 @@ a 5,2 km del centro de Santa Úrsula y **no podían salir nunca**, que es otra v
 lo de Bajamar y Tegueste); y si tampoco, se ancla en lo mejor que haya **y se
 dice**, por `no_hay_de_lo_que_pidieron_para_ver`. De 108 combinaciones de
 comarca × carta: 79 dan lo pedido en el pueblo, 22 lo traen de al lado y 7 se
-avisan. Ojo con el núcleo de `museos`: apretarlo a `/^Museo/` mandaba a quien
-pedía museos en La Matanza hasta El Sauzal saltándose el casco de su propio
-pueblo, así que ahí el núcleo es el filtro ancho.
+avisan. Y si el pueblo tiene uno pero lejos del casco —el museo de Vilaflor
+está a 7,5 km, subiendo al Teide— no se dice «no hay»: se dice que lo hay y a
+cuánto, por `lo_hay_pero_lejos_del_pueblo`. Probé a dejar `museos` con el
+filtro ancho para que el casco valiera como museo, y **es peor**: se calla que
+en ese pueblo no hay museo, que es justo lo que hay que decir.
 
 **La variedad de tipos no pisa lo que piden.** Se evita repetir tipo en el
 mismo día, pero quien pide agua quiere agua: tras el charco de Bajamar
@@ -205,6 +207,17 @@ almorzar en Arico. Y la rotación por día (`saltoComida`) gira **dentro** de
 los que quedan a menos de 6 km de alguna parada: rotando sobre la lista
 entera, el cuarto día empezaba a contar ya dentro de los lejanos. Las dos
 cosas juntas: de 31 días malos de 124 a 2.
+
+**El regalo de camino.** Entre la cama y la primera parada suele quedar un
+mirador a un paso de la carretera. En un mirador se está media hora, se sacan
+dos fotos y se ve media isla: no es una parada, es lo que suelta quien vive
+aquí. Va en `de_camino_al_primer_sitio`, medido por **desvío** —lo que se
+alarga el viaje por pasar— como los restaurantes, no en línea recta: hasta 3
+km, y solo con coche, que a quien va en guagua no puedes decirle que se baje a
+mitad de trayecto. Sale en el 12% de los planes, con 1,2 km de desvío mediano;
+el techo es el catálogo, que solo tiene **25 miradores**. El de vuelta ya
+existía: es una de las rotaciones del remate. Lo que cambió ahí es el tono, en
+el prompt: el de ida se cuenta como un regalo y el de vuelta como un secreto.
 
 **El día no se remata siempre igual.** El remate se elige entre lo que hay
 **de vuelta a casa**, rotando por fecha: un mirador al atardecer, un paseo por
@@ -427,6 +440,10 @@ restaurante está mal ubicado, tiene razón: vive allí.
 
 - **Partir `index.html`** en varios ficheros.
 - `datos/senderos-anaga.js` está cargado y no lo usa nadie.
+- `datos/miradores.js` tampoco lo usa nadie, pero no hace falta: de sus 18
+  puntos, 7 están dentro del Palmetum y no son sitios a los que se vaya, y de
+  los 11 restantes **10 ya están en `LUGARES`**. El único que falta es el
+  Mirador de Taborno. No es la mina que parecía.
 - La pregunta de con quién van sí tiene las tres opciones («Dos adultos»,
   «Familia con niños», «Grupo, sin niños»). Guarda en `S.gente` el **número**
   de personas (2, 4 o 6), no una etiqueta: quien compare con cadenas se lleva

@@ -1533,6 +1533,40 @@ function construir(){
       else if(!remateSitio&&!remateTomar) remateTomar=null;
     }
   }
+  /* ── EL REGALITO DE IDA ───────────────────────────────────────────────
+     Idea de Zeben: entre la casa y la primera parada suele quedar un mirador
+     a un paso de la carretera. En un mirador se está media hora, se sacan dos
+     fotos y se ve media isla; no es una parada más, es un regalo que hace la
+     que vive aquí. El de vuelta ya existía —es una de las rotaciones del
+     remate—; el de IDA no había forma de que saliera.
+     El desvío se mide como con los restaurantes: lo que se alarga el viaje
+     por pasar por ahí, no la distancia en línea recta. Y solo con coche: a
+     quien va en guagua no le puedes decir que se baje a mitad de trayecto. */
+  const primParada=paradas.filter(p=>p.la!=null)[0]||null;
+  const dCasaPrim=(primParada&&base.la!=null)?km(base.la,base.lo,primParada.la,primParada.lo):null;
+  let regaloIda=null;
+  if(S.coche&&primParada&&dCasaPrim!=null&&dCasaPrim>=4){
+    const desvio=x=>km(base.la,base.lo,x.la,x.lo)+km(x.la,x.lo,primParada.la,primParada.lo)-dCasaPrim;
+    /* Mirador, paisaje o faro: sitios de parar, mirar y seguir. Un drago o
+       una plaza también se ven en diez minutos, pero no es lo mismo y el
+       relato («se ve media isla») no cuadraría. */
+    const DE_VISTA=/^(Mirador|Paisaje|Faro)$/;
+    regaloIda=LUGARES.filter(x=>DE_VISTA.test(x.tipo||'')&&x.la!=null&&!x.cerrado&&!x.recinto
+        &&!usados.has(x.n)&&x.carretera!=='dura'
+        &&x.n!==(remateSitio&&remateSitio.n)
+        /* que sea otro sitio, no el mismo al que van */
+        &&km(x.la,x.lo,primParada.la,primParada.lo)>1
+        &&desvio(x)<=3)
+      .map(x=>({l:x,d:desvio(x)}))
+      .sort((a,b)=>((b.l.w||1)-(a.l.w||1))||(a.d-b.d))[0]||null;
+    if(regaloIda)
+      paso('ok','de regalo, de camino al primer sitio',
+        'Entre la cama y <span class="si">'+primParada.n+'</span> queda '+
+        '<span class="si">'+regaloIda.l.n+'</span>, a <span class="am">'+
+        (Math.round(regaloIda.d*10)/10)+' km</span> de desvío. Media hora, dos fotos y media isla. '+
+        'Va como un apunte de quien vive aquí, no como otra parada.');
+  }
+
   let cierreTomando=null;
   if(remateTomar==='tapa'&&paraTapa.length) cierreTomando=paraTapa[0];
   if(remateSitio||remateTomar){
@@ -1782,6 +1816,10 @@ function construir(){
       que_pidieron:S.faltaNucleo.pedido,
       por_la_zona_de: S.faltaNucleo.muni,
       en_su_lugar: S.faltaNucleo.enSuLugar||null,
+      /* Lo hay en el municipio, pero lejos del pueblo: el museo de Vilaflor
+         está a 7,5 km, arriba. Decirlo es más honesto que decir que no hay. */
+      lo_hay_pero_lejos_del_pueblo: S.faltaNucleo.lejos
+        ? S.faltaNucleo.lejos.map(x=>({nombre:x.n, km_del_centro_del_pueblo:x.d})) : null,
       /* A veces el día acaba pasando por uno de todos modos, más lejos: en
          Vilaflor no hay playa, pero el plan baja a El Duque al atardecer.
          Decir «no hay» y luego llevarlos a una queda raro si no se enlaza. */
@@ -1795,6 +1833,8 @@ function construir(){
         'bueno. Ni te disculpes ni lo repitas: una vez, al principio, y a contar el plan. '+
         'Si viene "pero_el_dia_pasa_por", enlaza con eso: por ahí no lo hay, pero el día '+
         'acaba pasando por uno. '+
+        'Y si viene "lo_hay_pero_lejos_del_pueblo", no digas que no hay: di que haberlo lo hay, '+
+        'pero que está a esos kilómetros del casco, para que sepan a qué atenerse. '+
         'Lo que no puedes hacer es callarlo y servir lo otro como si fuera lo que pidieron.'
     }:null,
     momento_del_dia:S.ahora||null,
@@ -1889,6 +1929,21 @@ function construir(){
     /* El remate que no se come: un mirador al atardecer, un paseo por el
        casco, un parque. Va DE VUELTA a casa y nunca repite el tipo con el
        que ya cierra el día. */
+    /* El regalo de ida: un mirador que queda de camino al primer sitio.
+       No es una parada del plan y no debe contarse como tal: es el apunte
+       que suelta la guía de aquí, en una frase, y a otra cosa. */
+    de_camino_al_primer_sitio: regaloIda?{
+      nombre:regaloIda.l.n, municipio:regaloIda.l.m, tipo:regaloIda.l.tipo||null,
+      minutos:regaloIda.l.dur||null,
+      km_de_desvio:Math.round(regaloIda.d*10)/10,
+      antes_de:primParada?primParada.n:null,
+      que_se_ve:regaloIda.l.fx||regaloIda.l.no||null,
+      como_contarlo:'Esto NO es una parada del plan: es un regalo. Suéltalo en UNA frase, '+
+        'con la confianza de quien vive aquí y le cuenta un sitio a un amigo —«y de regalo te '+
+        'digo una cosa: de camino te queda X, que se para un momento, se sacan dos fotos y se '+
+        've media isla»—. Media hora larga, no más. No le pongas hora ni lo numeres con las '+
+        'paradas. Y si el sitio no trae "que_se_ve", nómbralo y sigue: no te inventes lo que se ve.'
+    }:null,
     parada_de_vuelta: remateSitio?{
       que_es:remateTipo, nombre:remateSitio.n, municipio:remateSitio.m,
       tipo:remateSitio.tipo||null,
@@ -2609,6 +2664,9 @@ const N={
   manana:(n,d)=>'Empiezan la mañana por '+n+', que con calma son cosa de '+d+' minutos.',
   mananaEv:(n,h)=>' Y a mediodía, al lío: '+n+h+'.',
   noHay:(t)=>'De '+t+' por aquí cerca no tengo nada abierto ahora mismo, así que les digo lo que sí hay.\n',
+  regalo:(n,d)=>'Y de regalo le digo una cosa: de camino le queda '+n+', '+
+    (d<0.5?'sin apenas desviarse':'a '+String(d).replace('.',',')+' km de desvío')+'. '+
+    'Se para un momento, se sacan dos fotos y se sigue.',
   noHayVer:(k,m)=>'Le digo la verdad: por '+m+' no tengo ninguna ficha de '+
     ({naturaleza:'senderos',playa:'playas ni charcos',museos:'museos'}[k]||k)+
     '. Le cuento lo que sí hay, que merece la pena.\n',
@@ -2675,6 +2733,9 @@ const N={
   manana:(n,d)=>'Start the morning at '+n+' — about '+d+' minutes taking it easy.',
   mananaEv:(n,h)=>' And at midday, straight to '+n+h+'.',
   noHay:(t)=>'There is no '+t+' open near here right now, so let me tell you what there is.\n',
+  regalo:(n,d)=>'And here is a little gift: '+n+' is right on your way'+
+    (d<0.5?'':', only '+d+' km off the route')+'. '+
+    'You stop for a moment, take a couple of photos and carry on.',
   noHayVer:(k,m)=>'Straight with you: around '+m+' I have no '+
     ({naturaleza:'trails',playa:'beaches or rock pools',museos:'museums'}[k]||k)+
     ' on file. Here is what there is, and it is worth it.\n',
@@ -2741,6 +2802,9 @@ const N={
   manana:(n,d)=>'Beginnen Sie den Morgen bei '+n+' — in Ruhe etwa '+d+' Minuten.',
   mananaEv:(n,h)=>' Und mittags direkt zu '+n+h+'.',
   noHay:(t)=>'In der Nähe hat gerade nichts mit '+t+' offen, deshalb sage ich Ihnen, was es gibt.\n',
+  regalo:(n,d)=>'Und als kleines Geschenk: '+n+' liegt direkt auf dem Weg'+
+    (d<0.5?'':', nur '+String(d).replace('.',',')+' km Umweg')+'. '+
+    'Kurz anhalten, zwei Fotos, weiter geht es.',
   noHayVer:(k,m)=>'Ganz ehrlich: rund um '+m+' habe ich keine '+
     ({naturaleza:'Wanderwege',playa:'Strände oder Meerbecken',museos:'Museen'}[k]||k)+
     ' verzeichnet. Hier ist, was es gibt, und es lohnt sich.\n',
@@ -2874,6 +2938,9 @@ function narrarLocal(b){
     const q=b.no_hay_de_lo_que_pidieron_para_ver;
     t.push(F.noHayVer(q.que_pidieron,q.por_la_zona_de).trim());
   }
+  /* El regalo de ida: una frase, antes de empezar el día. */
+  if(b.de_camino_al_primer_sitio)
+    t.push(F.regalo(b.de_camino_al_primer_sitio.nombre,b.de_camino_al_primer_sitio.km_de_desvio));
   const man=de('mañana');
   let cuerpo='';
   if(man) cuerpo+=F.manana(man.nombre,man.duracion_min)+porque(man.nombre);
@@ -3926,11 +3993,7 @@ const TIPOS_DIA={
 const NUCLEO_DIA={
   naturaleza:/^Sendero$/,                    /* la carta dibuja gente andando */
   playa:/^(Playa|Charco|Piscina)$/,          /* agua es agua */
-  museos:TIPOS_DIA.museos };                 /* aquí la carta promete «cosas de ver del pueblo»,
-                                                y el casco histórico lo es tanto como el museo:
-                                                apretarlo a /^Museo/ mandaba a quien pedía museos
-                                                en La Matanza hasta El Sauzal, saltándose el casco
-                                                de su propio pueblo. */
+  museos:/^Museo/ };                         /* y museo es museo: si en el pueblo no hay, se dice */
 const COMO_SE_PIDIO={ naturaleza:'cSenderos', playa:'cAgua', museos:'cMuseos' };
 async function queApeteceEn(muni){
   await naira(tr(S.ninos?'qDiaNinos':'qDia'),380);
@@ -3976,13 +4039,27 @@ async function queApeteceEn(muni){
       const propios=hay.filter(l=>nuc.test(l.tipo||''));
       if(propios.length) hay=propios;
       else{
+        /* Sin mirar el término: lo de al lado y lo del propio pueblo que
+           quedó fuera del corte de los 6 km entran por igual. */
         const vecinos=cen&&cen.la!=null
           ? LUGARES.filter(l=>!l.cerrado&&!l.recinto&&l.la!=null&&nuc.test(l.tipo||'')&&
-              (l.co||l.m)!==muni&&km(cen.la,cen.lo,l.la,l.lo)<=6)
+              km(cen.la,cen.lo,l.la,l.lo)<=6)
               .sort((a,b)=>km(cen.la,cen.lo,a.la,a.lo)-km(cen.la,cen.lo,b.la,b.lo))
           : [];
-        if(vecinos.length){ hay=vecinos.slice(); deFuera=Math.round(km(cen.la,cen.lo,vecinos[0].la,vecinos[0].lo)*10)/10; }
-        else S.faltaNucleo={pedido:ap, muni:muni};
+        if(vecinos.length){
+          hay=vecinos.slice();
+          deFuera=Math.round(km(cen.la,cen.lo,vecinos[0].la,vecinos[0].lo)*10)/10;
+        } else {
+          /* «No tengo museos por Vilaflor» sería mentir a medias: hay uno, el
+             Etnográfico Juan Évora, solo que está a 7,5 km del pueblo subiendo
+             al Teide. Se dice eso, que es lo que de verdad pasa. */
+          const lejos=cen&&cen.la!=null
+            ? LUGARES.filter(l=>(l.co||l.m)===muni&&!l.cerrado&&!l.recinto&&l.la!=null&&nuc.test(l.tipo||''))
+                .map(l=>({n:l.n,d:Math.round(km(cen.la,cen.lo,l.la,l.lo)*10)/10}))
+                .sort((a,b)=>a.d-b.d).slice(0,2)
+            : [];
+          S.faltaNucleo={pedido:ap, muni:muni, lejos:lejos.length?lejos:null};
+        }
       }
     }
 
