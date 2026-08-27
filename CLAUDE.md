@@ -48,6 +48,9 @@ fotos.js                      la lista de fotos que faltan, y las mete
 fotos-buscar.js               busca candidatas en Commons (se ejecuta en su máquina)
 plantilla-buscar.html         el molde de la página de elegir fotos
 buscar-fotos.html             esa página ya con los 82 sitios dentro
+miradores.js                  arma la página de miradores, y mete los elegidos
+plantilla-miradores.html      su molde
+buscar-miradores.html         esa página, lista para abrir
 ```
 
 **`index.html` ya está partido.** Era una sola pieza de 1,1 MB con los datos,
@@ -515,6 +518,26 @@ restaurante está mal ubicado, tiene razón: vive allí.
   guion tiene que guardarse el `fetch` de verdad ANTES de cargar `banco.js`,
   que lo sustituye por un tapón que siempre falla. Si una foto trae crédito,
   la ficha lo cita al pie del plan: la licencia lo exige.
+- **Miradores: no se pueden traer desde aquí.** Zeben pidió sacarlos de
+  webtenerife o de datos.tenerife.es. Comprobado: la política de red del
+  contenedor deniega **todo** lo de fuera (403 en el CONNECT), y la búsqueda
+  web da títulos pero no coordenadas, que es lo único que serviría. Así que
+  igual que con las fotos, lo hace el navegador de casa: `node miradores.js
+  buscar` escribe `buscar-miradores.html`, que le pregunta a **Overpass**
+  (OpenStreetMap, `tourism=viewpoint`) por el rectángulo de la isla. OSM es
+  ODbL: cada ficha se lleva `of:'OpenStreetMap (ODbL) · n12345'`, que la
+  licencia pide citarlo.
+  Tres cosas que la página **no** decide, a propósito: si el mirador vale;
+  de qué municipio es —el más cercano de `BASES` se equivoca de lo lindo:
+  Taborno cae en Anaga y le tocaba Tegueste, Chirche es Guía de Isora y le
+  tocaba Vilaflor, así que el desplegable **empieza vacío** y sin elegirlo la
+  ficha no se baja—; y si la carretera es de las duras. Eso lo marca quien
+  vive allí.
+  Al meterlos (`node miradores.js miradores.json`) el **corredor no sale del
+  municipio** sino del vecino fichado más cercano: Santa Cruz es
+  «Metropolitana» y el Mirador de Taborno es Anaga, que a efectos de tiempos
+  de viaje no tiene nada que ver. Y se descarta lo repetido por nombre o por
+  estar a menos de 150 m de un mirador ya fichado.
 - La imagen de compartir está dibujada a mano; `generar-imagen.html` la
   rehace en el navegador con las tipografías buenas.
 - Si algún día hay dominio propio, hay que cambiar la URL en **cuatro

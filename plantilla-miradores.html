@@ -1,0 +1,200 @@
+<meta charset="utf-8"><title>Miradores para Naira</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+ body{font-family:system-ui,sans-serif;background:#FBF5E9;color:#3E2B1C;margin:0;padding:16px 14px 110px}
+ h1{font:800 21px/1.2 Georgia,serif;margin:0 0 4px}
+ p.ayuda{margin:6px 0 14px;font-size:14px;line-height:1.5;color:#6B5238}
+ .barraSup{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+ .barraSup button{font:600 14px system-ui;background:#2E5D4B;color:#FBF5E9;border:0;border-radius:10px;
+        padding:9px 14px;cursor:pointer}
+ .barraSup button[disabled]{opacity:.5;cursor:default}
+ .sitio{background:#fff;border:1.5px solid #3E2B1C;border-radius:14px;padding:11px 12px;margin:0 0 10px;
+        box-shadow:2.5px 2.5px 0 #3E2B1C}
+ .sitio.si{border-color:#2E5D4B;box-shadow:2.5px 2.5px 0 #2E5D4B;background:#F4FAF6}
+ .cab{display:flex;gap:10px;align-items:flex-start}
+ .cab label{flex:1;font:700 16px/1.3 Georgia,serif;cursor:pointer}
+ .cab input{width:22px;height:22px;margin:2px 0 0;flex:none;cursor:pointer}
+ .meta{font-size:12px;color:#6B5238;margin:3px 0 0}
+ .meta a{color:#2C6E7F}
+ .detalle{margin:10px 0 0;display:none;gap:8px;flex-wrap:wrap}
+ .sitio.si .detalle{display:flex}
+ .detalle label{font-size:12px;color:#6B5238;display:flex;flex-direction:column;gap:3px}
+ .detalle select,.detalle input[type=text]{font:400 14px system-ui;padding:6px 8px;border:1.5px solid #C9B896;
+        border-radius:8px;background:#fff;color:#3E2B1C}
+ .detalle input[type=text]{min-width:min(320px,100%)}
+ .dura{flex-direction:row!important;align-items:center;gap:6px!important;font-size:13px}
+ .ya{opacity:.55}
+ .ya .cab label::after{content:' · ya está en Naira';font:400 12px system-ui;color:#A93B2B}
+ .barra{position:fixed;left:0;right:0;bottom:0;background:#2E5D4B;color:#FBF5E9;padding:12px 14px;
+        display:flex;gap:12px;align-items:center;justify-content:space-between;font-size:14px}
+ .barra button{font:700 15px system-ui;background:#FBF5E9;color:#2E5D4B;border:0;border-radius:10px;
+        padding:10px 16px;cursor:pointer}
+ .barra button[disabled]{opacity:.5;cursor:default}
+ .aviso{background:#fff;border:1.5px dashed #A93B2B;color:#A93B2B;border-radius:12px;padding:12px;
+        font-size:14px;line-height:1.5}
+</style>
+<h1>Miradores para Naira</h1>
+<p class="ayuda">
+ Esta página le pregunta a <b>OpenStreetMap</b> qué miradores hay fichados en Tenerife. Yo no puedo
+ entrar en esas webs desde donde trabajo; su navegador sí. Marque los que <b>de verdad valgan</b> —los
+ que usted mandaría a alguien—, díganos de qué municipio son y, si se llega por carretera estrecha y de
+ curvas, márquelo: eso Naira lo usa para no mandar a nadie de noche por ahí. Luego pulse
+ <b>Descargar</b> abajo y mándeme el fichero. Los que ya están en Naira salen apagados.
+</p>
+<div class="barraSup">
+  <button id="pedir">Buscar los miradores</button>
+  <span id="estado" class="meta"></span>
+</div>
+<div id="lista"></div>
+<div class="barra">
+  <span id="cuenta">0 marcados</span>
+  <button id="bajar" disabled>Descargar</button>
+</div>
+<script>
+/* ------------------------------------------------------------------
+   De dónde salen: de OpenStreetMap, preguntándole por los puntos
+   marcados como mirador (tourism=viewpoint) dentro del rectángulo de
+   Tenerife. Se pide desde el navegador porque Overpass deja consultarlo
+   desde una página; desde el contenedor de trabajo la red está cerrada.
+   Los datos de OSM son ODbL: hay que citar la fuente, y por eso cada
+   ficha se lleva su origen y el número de nodo.
+   Lo que NO hace esta página es decidir: filtrar lo que vale de lo que
+   no, y de qué municipio es cada uno, lo hace quien vive aquí. ------ */
+const BASES = /*BASES*/{};
+const YA     = /*YA*/[];          /* los que Naira ya tiene, para no repetir */
+const API = new URLSearchParams(location.search).get('api')
+          || 'https://overpass-api.de/api/interpreter';
+const CONSULTA = `[out:json][timeout:90];
+nwr["tourism"="viewpoint"](27.95,-16.96,28.62,-16.08);
+out center tags;`;
+
+const elegidos = {};    /* id de OSM → ficha */
+const $=(t,a,h)=>{const e=document.createElement(t);if(a)Object.assign(e,a);if(h)e.innerHTML=h;return e;};
+const esc=s=>String(s==null?'':s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const km=(a,b,c,d)=>Math.hypot((a-c)*111,(b-d)*111*Math.cos(a*Math.PI/180));
+
+const cuenta=()=>{const n=Object.keys(elegidos).length;
+  document.getElementById('cuenta').textContent=n+(n===1?' marcado':' marcados');
+  document.getElementById('bajar').disabled=!n;};
+
+/* El municipio NO viene puesto de antemano, a propósito. Proponer el centro
+   urbano más cercano se equivoca de lo lindo en una isla de barrancos: el
+   Mirador de Taborno cae en Anaga (Santa Cruz) y el más cercano es Tegueste;
+   Chirche es Guía de Isora y le tocaba Vilaflor. Un municipio mal puesto sin
+   que nadie lo mire es un dato inventado, así que hay que elegirlo. El más
+   cercano se enseña solo como pista. */
+function municipioCerca(la,lo){
+  let mejor=null,d=1e9;
+  Object.keys(BASES).forEach(k=>{const b=BASES[k];
+    const x=km(la,lo,b.la,b.lo); if(x<d){d=x;mejor=k;}});
+  return mejor;
+}
+/* ¿lo tenemos ya? por nombre o por estar a menos de 150 metros */
+function yaEsta(n,la,lo){
+  const norm=s=>String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9]+/g,' ').trim();
+  return YA.some(y=>norm(y.n)===norm(n)||km(la,lo,y.la,y.lo)<0.15);
+}
+
+function ficha(p){
+  const la=p.lat!=null?p.lat:(p.center&&p.center.lat);
+  const lo=p.lon!=null?p.lon:(p.center&&p.center.lon);
+  const t=p.tags||{};
+  const nombre=t['name:es']||t.name;
+  if(!nombre||la==null||lo==null) return null;   /* sin nombre no le sirve a nadie */
+  return {id:p.type[0]+p.id, n:nombre, la:+la.toFixed(5), lo:+lo.toFixed(5),
+          desc:t.description||t['description:es']||null,
+          repe:yaEsta(nombre,la,lo)};
+}
+
+function pinta(f){
+  const caja=$('div',{className:'sitio'+(f.repe?' ya':'')});
+  const cab=$('div',{className:'cab'});
+  const chk=$('input',{type:'checkbox',id:'c'+f.id});
+  const lab=$('label',{htmlFor:'c'+f.id},esc(f.n));
+  cab.appendChild(chk); cab.appendChild(lab);
+  caja.appendChild(cab);
+  caja.appendChild($('p',{className:'meta'},
+    f.la+', '+f.lo+' · <a href="https://www.google.com/maps/search/?api=1&query='+f.la+','+f.lo+
+    '" target="_blank" rel="noopener">verlo en el mapa ▸</a>'+
+    (f.desc?' · '+esc(f.desc.slice(0,90)):'')));
+
+  const det=$('div',{className:'detalle'});
+  const cerca=municipioCerca(f.la,f.lo);
+  const lm=$('label',null,'Municipio · el más cercano es '+esc(cerca)+', pero mírelo');
+  const sel=$('select');
+  sel.appendChild($('option',{value:'',textContent:'— elija el municipio —'}));
+  Object.keys(BASES).sort().forEach(k=>sel.appendChild($('option',{value:k,textContent:k})));
+  lm.appendChild(sel);
+
+  const lf=$('label',null,'¿Cuándo se disfruta?');
+  const fr=$('select');
+  [['atardecer','Al caer el día'],['mañana','Por la mañana'],['tarde','Por la tarde']]
+    .forEach(([v,e])=>fr.appendChild($('option',{value:v,textContent:e})));
+  lf.appendChild(fr);
+
+  const ln=$('label',null,'Una línea suya (opcional)');
+  const nota=$('input',{type:'text',placeholder:'qué se ve desde ahí, o cómo se llega'});
+  ln.appendChild(nota);
+
+  const ld=$('label',{className:'dura'});
+  const dura=$('input',{type:'checkbox'});
+  ld.appendChild(dura); ld.appendChild(document.createTextNode('Carretera estrecha y de curvas'));
+
+  det.appendChild(lm); det.appendChild(lf); det.appendChild(ln); det.appendChild(ld);
+  caja.appendChild(det);
+
+  const guarda=()=>{
+    if(!chk.checked){ delete elegidos[f.id]; caja.classList.remove('si'); cuenta(); return; }
+    caja.classList.add('si');
+    /* marcado pero sin municipio todavía: ni cuenta ni se baja */
+    if(!sel.value){ delete elegidos[f.id]; sel.style.borderColor='#A93B2B'; cuenta(); return; }
+    sel.style.borderColor='';
+    elegidos[f.id]={nombre:f.n, la:f.la, lo:f.lo, municipio:sel.value, franja:fr.value,
+      nota:nota.value.trim()||null, carretera_dura:dura.checked,
+      fuente:'OpenStreetMap (ODbL) · '+f.id};
+    cuenta();
+  };
+  [chk,sel,fr,nota,dura].forEach(e=>e.addEventListener('change',guarda));
+  nota.addEventListener('input',guarda);
+  return caja;
+}
+
+document.getElementById('pedir').onclick=async()=>{
+  const b=document.getElementById('pedir'), est=document.getElementById('estado');
+  b.disabled=true; est.textContent='preguntando a OpenStreetMap…';
+  try{
+    const r=await fetch(API,{method:'POST',body:'data='+encodeURIComponent(CONSULTA),
+      headers:{'Content-Type':'application/x-www-form-urlencoded'}});
+    if(!r.ok) throw new Error('respondió '+r.status);
+    const j=await r.json();
+    const fichas=(j.elements||[]).map(ficha).filter(Boolean)
+      .sort((a,c)=>(a.repe?1:0)-(c.repe?1:0)||a.n.localeCompare(c.n,'es'));
+    const lista=document.getElementById('lista');
+    lista.innerHTML='';
+    if(!fichas.length){ lista.appendChild($('div',{className:'aviso'},
+      'No ha devuelto ninguno con nombre. Puede ser que Overpass esté saturado: espere un minuto y '+
+      'vuelva a pulsar.')); }
+    fichas.forEach(f=>lista.appendChild(pinta(f)));
+    const nuevos=fichas.filter(f=>!f.repe).length;
+    est.textContent=fichas.length+' con nombre · '+nuevos+' que Naira no tiene';
+  }catch(e){
+    document.getElementById('lista').innerHTML='';
+    document.getElementById('lista').appendChild($('div',{className:'aviso'},
+      'No se ha podido preguntar: '+esc(e.message)+'. Si insiste, pruebe dentro de un rato: '+
+      'Overpass es gratis y a veces está lleno.'));
+    est.textContent='';
+  }
+  b.disabled=false;
+};
+
+document.getElementById('bajar').onclick=()=>{
+  const datos={generado:new Date().toISOString().slice(0,10),
+    fuente:'OpenStreetMap · tourism=viewpoint · ODbL',
+    miradores:Object.values(elegidos)};
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(datos,null,1)],{type:'application/json'}));
+  a.download='miradores.json'; a.click();
+};
+cuenta();
+</script>
