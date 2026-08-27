@@ -311,7 +311,7 @@ const T={
      tGente:'¿Con quién viajan?',
      tCoche:'¿Coche o guagua?',
      cConCoche:'Con coche',cSinCoche:'Sin coche, en guagua',
-     cSenderos:'Senderos',cAgua:'Playas y charcos',cMuseos:'Museos',cTodo:'Un poco de todo',cTipica:'Comida típica',cDeTodo:'Un poco de todo',
+     cSenderos:'Senderos',cAgua:'Playas y charcos',cMuseos:'Museos y cascos',cTodo:'Un poco de todo',cTipica:'Comida típica',cDeTodo:'Un poco de todo',
      dos:'Dos adultos',familia:'Familia con niños',grupo:'Grupo, sin niños',
      listo_c:'Perfecto, con coche tienen la isla entera. ¿Por dónde tiramos?',
      listo_s:'Perfecto. Sin coche también se hacen cosas buenas, solo hay que atar la vuelta. ¿Por dónde tiramos?',
@@ -375,7 +375,7 @@ const T={
      tGente:'Who is travelling?',
      tCoche:'Car or bus?',
      cConCoche:'With a car',cSinCoche:'By bus',
-     cSenderos:'Trails',cAgua:'Beaches and pools',cMuseos:'Museums',cTodo:'A bit of everything',cTipica:'Local food',cDeTodo:'A bit of everything',
+     cSenderos:'Trails',cAgua:'Beaches and pools',cMuseos:'Museums and old towns',cTodo:'A bit of everything',cTipica:'Local food',cDeTodo:'A bit of everything',
      dos:'Two adults',familia:'Family with children',grupo:'Group, no children',
      listo_c:'With a car the whole island is yours. Where shall we start?',
      listo_s:'No car is fine, we just need to sort the way back. Where shall we start?',
@@ -439,7 +439,7 @@ const T={
      tGente:'Wer reist mit?',
      tCoche:'Auto oder Bus?',
      cConCoche:'Mit Auto',cSinCoche:'Mit dem Bus',
-     cSenderos:'Wanderwege',cAgua:'Strände und Meerbecken',cMuseos:'Museen',cTodo:'Von allem etwas',cTipica:'Typisch kanarisch',cDeTodo:'Von allem etwas',
+     cSenderos:'Wanderwege',cAgua:'Strände und Meerbecken',cMuseos:'Museen und Altstädte',cTodo:'Von allem etwas',cTipica:'Typisch kanarisch',cDeTodo:'Von allem etwas',
      dos:'Zwei Erwachsene',familia:'Familie mit Kindern',grupo:'Gruppe, ohne Kinder',
      listo_c:'Mit Auto gehört Ihnen die ganze Insel. Womit fangen wir an?',
      listo_s:'Ohne Auto geht auch viel, wir müssen nur den Rückweg klären. Womit fangen wir an?',
@@ -3993,7 +3993,13 @@ const TIPOS_DIA={
 const NUCLEO_DIA={
   naturaleza:/^Sendero$/,                    /* la carta dibuja gente andando */
   playa:/^(Playa|Charco|Piscina)$/,          /* agua es agua */
-  museos:/^Museo/ };                         /* y museo es museo: si en el pueblo no hay, se dice */
+  /* La carta de museos abarca a propósito el casco histórico, la iglesia, la
+     plaza y el caserío: un día de museos en un pueblo de aquí es eso, y
+     apretarla a /^Museo/ dejaba fuera pueblos enteros. Para que abarcar más
+     no sea prometer una cosa y dar otra, el rótulo de la carta lo dice:
+     «Museos y cascos», no «Museos». El aviso salta solo cuando el pueblo no
+     tiene NADA de esto, que entonces sí hay que decirlo. */
+  museos:TIPOS_DIA.museos };
 const COMO_SE_PIDIO={ naturaleza:'cSenderos', playa:'cAgua', museos:'cMuseos' };
 async function queApeteceEn(muni){
   await naira(tr(S.ninos?'qDiaNinos':'qDia'),380);

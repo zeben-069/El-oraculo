@@ -176,9 +176,19 @@ dice**, por `no_hay_de_lo_que_pidieron_para_ver`. De 108 combinaciones de
 comarca × carta: 79 dan lo pedido en el pueblo, 22 lo traen de al lado y 7 se
 avisan. Y si el pueblo tiene uno pero lejos del casco —el museo de Vilaflor
 está a 7,5 km, subiendo al Teide— no se dice «no hay»: se dice que lo hay y a
-cuánto, por `lo_hay_pero_lejos_del_pueblo`. Probé a dejar `museos` con el
-filtro ancho para que el casco valiera como museo, y **es peor**: se calla que
-en ese pueblo no hay museo, que es justo lo que hay que decir.
+cuánto, por `lo_hay_pero_lejos_del_pueblo`.
+
+**El núcleo de museos abarca a propósito, y por eso el rótulo cambió.** Un día
+de museos en un pueblo de aquí es el casco, la iglesia, la plaza y el caserío
+tanto como el museo; apretarlo a `/^Museo/` dejaba 18 comarcas sin respuesta
+—Candelaria, Güímar, Arafo, Guía de Isora— teniendo un casco declarado a
+doscientos metros. Pero abarcar más con la carta diciendo «Museos» a secas es
+otra vez prometer una cosa y dar otra. Lo que arregla las dos es el **rótulo**:
+`cMuseos` dice «Museos y cascos» / «Museums and old towns» / «Museen und
+Altstädte», y entonces el filtro ancho es lo que promete. Con eso: 33 comarcas
+dan lo pedido en el pueblo, 3 lo traen de al lado y **ninguna** se queda sin
+respuesta. El aviso sigue saltando donde toca —senderos en Fasnia, playa en
+Vilaflor—, que ahí no es una etiqueta ancha, es que no lo hay.
 
 **La variedad de tipos no pisa lo que piden.** Se evita repetir tipo en el
 mismo día, pero quien pide agua quiere agua: tras el charco de Bajamar
