@@ -512,7 +512,16 @@ restaurante está mal ubicado, tiene razón: vive allí.
   «Casa del Plátano.jpg» salen rotos; solo busca **lo que asoma por la
   pantalla**, que 82 llamadas de golpe a Commons es una espera larga y fea; y
   se descarta la candidata **sin autor o sin licencia**, que sin crédito no se
-  puede publicar. Para probarla sin red: `?api=...` apunta a otra Commons —hay
+  puede publicar. Se pregunta a Commons **tres veces por sitio**, no una: el
+  nombre entero con el pueblo, el nombre sin el genérico de delante («Casco
+  histórico de Candelaria» → «Candelaria», quitando también el «de» que queda
+  colgando) y el pueblo con el tipo. Con una sola consulta, media lista salía
+  vacía. Y lo que Commons no tiene no se pierde: el botón **«esta la hago yo»**
+  arma dentro del zip un `las-hago-yo.md` **agrupado por pueblo**, con el
+  nombre exacto que tiene que llevar cada fichero, para hacerlas con el móvil
+  de una tirada. Para las tres cuartas partes de estos sitios —un guachinche,
+  la casa de un coleccionista, un caserío— la foto de quien vive allí es la
+  única que va a existir. Para probarla sin red: `?api=...` apunta a otra Commons —hay
   una de mentira en el borrador— y sin `Access-Control-Allow-Origin` el
   navegador tira la respuesta, igual que haría la de verdad. Ojo: ese
   guion tiene que guardarse el `fetch` de verdad ANTES de cargar `banco.js`,

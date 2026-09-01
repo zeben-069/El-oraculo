@@ -13,7 +13,8 @@
  .cand img{display:block;width:100%;height:110px;object-fit:cover}
  .cand small{display:block;padding:4px 6px;font-size:10px;line-height:1.3;text-align:left}
  .cand.elegida{border-color:#2E5D4B;box-shadow:0 0 0 3px rgba(46,93,75,.25)}
- .ninguna{border:1.5px dashed #A93B2B;color:#A93B2B;background:#fff;border-radius:10px;cursor:pointer;font-size:13px}
+ .ninguna{border:1.5px dashed #A93B2B;color:#A93B2B;background:#fff;border-radius:10px;cursor:pointer;font-size:13px;
+        padding:8px 10px;line-height:1.3}
  .ninguna.elegida{background:#A93B2B;color:#fff}
  .barra{position:fixed;left:0;right:0;bottom:0;background:#2E5D4B;color:#FBF5E9;padding:12px 14px;
         display:flex;gap:12px;align-items:center;justify-content:space-between;font-size:14px}
@@ -24,9 +25,10 @@
 </style>
 <h1>Fotos para Naira</h1>
 <p class="ayuda">
- Pulse la foto que <b>de verdad sea el sitio</b>. Si ninguna vale, pulse «ninguna vale» y a otra cosa.
- Cuando termine —o cuando se canse— pulse <b>Descargar</b> abajo: se baja un zip con lo elegido y sus
- créditos. Ese zip es lo que hay que mandar. No hace falta hacerlas todas de una vez.
+ Pulse la foto que <b>de verdad sea el sitio</b>. Si ninguna vale, pulse <b>«esta la hago yo»</b>: de esas
+ se arma una lista por pueblo para que las haga con el móvil cuando pase por allí, que para media
+ docena de estas su foto va a ser mejor que cualquiera de aquí. Cuando termine —o cuando se canse—
+ pulse <b>Descargar</b> abajo. No hace falta hacerlas todas de una vez.
 </p>
 <div id="lista"></div>
 <div class="barra">
@@ -46,13 +48,40 @@ const API=new URLSearchParams(location.search).get('api')||'https://commons.wiki
 const elegidas={};      /* nombre del sitio → {blob, autor, licencia, pagina} */
 
 const $=(t,a,h)=>{const e=document.createElement(t);if(a)Object.assign(e,a);if(h)e.innerHTML=h;return e;};
-const cuenta=()=>{const n=Object.values(elegidas).filter(Boolean).length;
-  document.getElementById('cuenta').textContent=n+(n===1?' elegida':' elegidas');
-  document.getElementById('bajar').disabled=!n;};
+const cuenta=()=>{
+  const v=Object.values(elegidas);
+  const n=v.filter(x=>x&&x.blob).length, mias=v.filter(x=>x&&x.mio).length;
+  document.getElementById('cuenta').textContent=
+    n+(n===1?' elegida':' elegidas')+(mias?'  ·  '+mias+' para hacer yo':'');
+  document.getElementById('bajar').disabled=!(n+mias);};
 
-async function candidatas(s){
-  const q=encodeURIComponent(s.n+' '+s.m+' Tenerife');
-  const u=API+'?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrsearch='+q+
+/* Se pregunta VARIAS veces, no una. Con «Casco histórico de Candelaria
+   Candelaria Tenerife» Commons no encuentra nada; con «Candelaria Tenerife»
+   sí. Se prueban tres formas y se juntan los resultados sin repetir:
+     1. el nombre entero con el pueblo,
+     2. el nombre sin el genérico de delante («Casco histórico de», «Museo
+        de», «Conjunto Histórico de»…), que es lo que suele estar en el pie
+        de la foto,
+     3. el pueblo a secas con una palabra del tipo, para el caso feo. */
+const GENERICO=/^(casco (histórico|antiguo)|conjunto histórico|museo( de| del| y)?|centro de (visitantes|interpretación)|espacio (de arte|cultural)|casa( museo)?|ecomuseo|mercadillo del agricultor|iglesia de|conjunto|caserío de|villa de)\s+/i;
+function consultas(s){
+  /* quitar el genérico deja «de Candelaria»: hay que llevarse también el
+     artículo o la preposición que queda colgando delante */
+  const corto=s.n.replace(GENERICO,'')
+    .replace(/^(de\s+la|de\s+los|de\s+las|del|de|la|el|los|las)\s+/i,'').trim();
+  const tipo=(s.tipo||'').split('/')[0].trim();
+  const qs=[s.n+' '+s.m+' Tenerife'];
+  /* si lo que queda ES el pueblo («Casco histórico de Candelaria» → «Candelaria»),
+     esa consulta ya la cubre la tercera: no se repite */
+  if(corto&&corto.toLowerCase()!==s.n.toLowerCase()&&corto.toLowerCase()!==s.m.toLowerCase())
+    qs.push(corto+' '+s.m+' Tenerife');
+  qs.push(s.m+' '+tipo+' Tenerife');
+  return [...new Set(qs)];
+}
+
+async function unaBusqueda(q){
+  const u=API+'?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrsearch='+
+          encodeURIComponent(q)+
           '&gsrlimit=4&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=640'+
           '&iiextmetadatafilter=Artist|LicenseShortName';
   const r=await fetch(u); if(!r.ok) throw new Error('la búsqueda falló ('+r.status+')');
@@ -66,6 +95,20 @@ async function candidatas(s){
     if(!autor||!lic) return null;          /* sin crédito claro no se usa */
     return {url:ii.thumburl||ii.url, pagina:ii.descriptionurl, autor, licencia:lic};
   }).filter(Boolean);
+}
+
+async function candidatas(s){
+  const vistas=new Set(), todas=[];
+  let fallo=null;
+  for(const q of consultas(s)){
+    if(todas.length>=6) break;
+    let r=[];
+    try{ r=await unaBusqueda(q); }catch(e){ fallo=e; continue; }
+    r.forEach(c=>{ const k=c.pagina||c.url;
+      if(!vistas.has(k)){ vistas.add(k); todas.push(c); } });
+  }
+  if(!todas.length&&fallo) throw fallo;   /* si TODAS fallaron, es un error de red */
+  return todas.slice(0,6);
 }
 
 function pinta(s,caja){
@@ -91,8 +134,8 @@ function pinta(s,caja){
       };
       fila.appendChild(b);
     });
-    const no=$('button',{className:'ninguna'},'ninguna vale');
-    no.onclick=()=>{marca(no); elegidas[s.n]=null; cuenta();};
+    const no=$('button',{className:'ninguna'},'esta la hago yo');
+    no.onclick=()=>{marca(no); elegidas[s.n]={mio:true,m:s.m,tipo:s.tipo}; cuenta();};
     fila.appendChild(no);
   }).catch(e=>fila.appendChild($('p',{className:'meta'},'Error buscando: '+e.message)));
 }
@@ -122,14 +165,34 @@ function zip(ficheros){           /* [{nombre, datos:Uint8Array}] */
 }
 
 document.getElementById('bajar').onclick=async()=>{
-  const ficheros=[], creditos={};
+  const ficheros=[], creditos={}, mias={};
   for(const [nombre,d] of Object.entries(elegidas)){
     if(!d) continue;
+    if(d.mio){ (mias[d.m||'Sin pueblo']=mias[d.m||'Sin pueblo']||[]).push({n:nombre,tipo:d.tipo}); continue; }
     const buf=new Uint8Array(await d.blob.arrayBuffer());
     ficheros.push({nombre:nombre.replace(/[\/\\:]/g,' ')+'.jpg',datos:buf});
     creditos[nombre]={autor:d.autor,licencia:d.licencia,fuente:'Wikimedia Commons',pagina:d.pagina};
   }
   ficheros.push({nombre:'creditos.json',datos:new TextEncoder().encode(JSON.stringify(creditos,null,1))});
+
+  /* Las que va a hacer él, agrupadas POR PUEBLO: así se hacen de una tirada
+     cuando pase por allí, en vez de un viaje por foto. Cada línea lleva el
+     nombre EXACTO que tiene que tener el fichero, que es como se emparejan. */
+  const pueblos=Object.keys(mias).sort((a,b)=>mias[b].length-mias[a].length);
+  if(pueblos.length){
+    const L=['# Fotos para hacer con el móvil',''];
+    L.push('Están por pueblo, para hacerlas de una tirada cuando pase por allí.');
+    L.push('Cada foto tiene que llamarse EXACTAMENTE como pone debajo, y todas');
+    L.push('juntas en una carpeta. Da igual el tamaño: ya se recortan solas.');
+    L.push('');
+    pueblos.forEach(m=>{
+      L.push('## '+m+'  ('+mias[m].length+')');
+      mias[m].forEach(x=>L.push('- [ ] '+x.n+(x.tipo?'  · '+x.tipo:'')+
+        '\n      el fichero: «'+x.n.replace(/[\/\\:]/g,' ')+'.jpg»'));
+      L.push('');
+    });
+    ficheros.push({nombre:'las-hago-yo.md',datos:new TextEncoder().encode(L.join('\n'))});
+  }
   const a=document.createElement('a');
   a.href=URL.createObjectURL(zip(ficheros));
   a.download='fotos-naira.zip'; a.click();
