@@ -48,7 +48,9 @@ fusionar.js                   junta sitios repetidos (ensayo sin tocar nada)
 fotos.js                      la lista de fotos que faltan, y las mete
 fotos-buscar.js               busca candidatas en Commons (se ejecuta en su máquina)
 plantilla-buscar.html         el molde de la página de elegir fotos
-buscar-fotos.html             esa página ya con los 82 sitios dentro
+buscar-fotos.html             esa página con los sitios que faltan dentro
+plantilla-subir.html          el molde de la página de subir fotos propias
+subir-fotos.html              esa página, para las fotos que hace él
 miradores.js                  arma la página de miradores, y mete los elegidos
 plantilla-miradores.html      su molde
 buscar-miradores.html         esa página, lista para abrir
@@ -553,7 +555,20 @@ restaurante está mal ubicado, tiene razón: vive allí.
   nombre exacto que tiene que llevar cada fichero, para hacerlas con el móvil
   de una tirada. Para las tres cuartas partes de estos sitios —un guachinche,
   la casa de un coleccionista, un caserío— la foto de quien vive allí es la
-  única que va a existir. Para probarla sin red: `?api=...` apunta a otra Commons —hay
+  única que va a existir, y para esas está la otra mitad del camino:
+  `node fotos.js subir` escribe **`subir-fotos.html`**, donde se sueltan las
+  fotos del móvil y se elige **de una lista** de qué sitio es cada una. El
+  emparejado de `meter()` es por el nombre del fichero y del móvil salen como
+  `IMG_4821.jpg`: renombrar diez a mano en el teléfono es justo el fastidio
+  que hace que esto no se haga nunca. La página escribe ella el nombre,
+  recorta al cuadrado y achica a 240 px —de 140 KB a 4—, así que se pueden
+  subir veinte fotos sin que el zip pese nada. Dos detalles que costaron: las
+  fotos de móvil vienen **giradas por EXIF** y salen tumbadas si se dibujan a
+  pelo (`createImageBitmap` con `imageOrientation:'from-image'` las endereza),
+  y dos fotos para el mismo sitio se pisarían dentro del zip, así que la
+  segunda se rechaza. Estas fotos son suyas: no llevan `creditos.json` y la
+  ficha no cita a nadie.
+  Para probarla sin red: `?api=...` apunta a otra Commons —hay
   una de mentira en el borrador— y sin `Access-Control-Allow-Origin` el
   navegador tira la respuesta, igual que haría la de verdad. Ojo: ese
   guion tiene que guardarse el `fetch` de verdad ANTES de cargar `banco.js`,
