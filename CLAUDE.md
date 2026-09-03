@@ -44,6 +44,7 @@ datos/senderos-anaga.js       7 caminos de Anaga (CARGADO PERO SIN USAR)
 datos/senderos-tenerife.js    225 itinerarios del Cabildo con desnivel
 datos/miradores.js            18 miradores de Santa Cruz
 empaquetar.js                 arma el zip que se suelta en Netlify Drop
+fusionar.js                   junta sitios repetidos (ensayo sin tocar nada)
 fotos.js                      la lista de fotos que faltan, y las mete
 fotos-buscar.js               busca candidatas en Commons (se ejecuta en su máquina)
 plantilla-buscar.html         el molde de la página de elegir fotos
@@ -492,13 +493,36 @@ restaurante está mal ubicado, tiene razón: vive allí.
   llevan el nombre del pueblo escrito dentro y al recortarlas salía medio
   rótulo («LA OROTA»). Playas, charcos y paisajes siguen con el aéreo, que
   ahí sí dice algo.
+- **Sitios repetidos: pasa, y duele de tres maneras.** Garachico tenía TRES
+  fichas del mismo casco y La Laguna dos, porque cada fuente que se importó
+  —Cabildo, Bienes de Interés Cultural, redacción propia— lo llamaba distinto:
+  «Casco histórico de Garachico», «Conjunto Histórico Villa y Puerto de
+  Garachico», «Casco de Garachico». El turista lo ve dos veces en la lista, el
+  motor puede meter las dos en el mismo día creyéndolas paradas distintas, y
+  las fotos se hacen por duplicado. `fusionar.js` los junta: no borra, **funde**
+  —el peso mayor, el texto más largo, la parada de guagua más cercana, la foto
+  con su crédito— y sin argumentos hace un ensayo sin tocar nada. Los grupos
+  van escritos a mano y no se detectan solos: «Montaña Grande» y «Circular
+  Montaña Grande» están a 450 m y son cosas distintas. Ojo con el `dur`: coger
+  el mayor le ponía 120 minutos al Mirador Pico del Inglés, y en un mirador se
+  está veinticinco. Quedaron 579 sitios.
+
+- **Descripciones que no eran del sitio.** Al importar los puntos de interés
+  del Cabildo, la descripción de un **árbol monumental** cercano se pegó a la
+  ficha de al lado: el Mirador Pico del Inglés contaba que «está ramificado
+  desde la base y el tronco principal está muerto». Se detectan exacto por
+  `sub_of:'Árbol monumental'` en fichas que no son un árbol —eran **14**— y no
+  es un detalle de catálogo: `desc` viaja al informe como `que_es` y el prompt
+  manda contarlo como la historia oficial, así que Naira lo estaba diciendo. Se
+  les quita `desc`, `desc_of` y `sub_of`: sin descripción, la regla es callarse.
+
 - **Fotos por sitio.** La ficha ya las admite: `marco()` usa `l.foto` si la
   hay y, si no, una ortofoto aérea de GRAFCAN. Para una playa se defiende;
   para un museo es un tejado. Barrido de 744 planes: de 589 sitios del
   catálogo solo **198 salen alguna vez**, y de esos solo **82** tienen el
   aéreo inútil. Con **40 fotos** se arregla el 82% de esas paradas.
-  **Van 25 puestas**, elegidas por Zeben en Commons y todas con autor y
-  licencia: quedan 57, y de las 1.163 paradas del barrido donde el aéreo no
+  **Van 33 puestas**, elegidas por Zeben en Commons y todas con autor y
+  licencia: quedan 47, y de las 1.163 paradas del barrido donde el aéreo no
   dice nada, **389 ya enseñan una foto de verdad (33%)**. Las 25 ocupan
   476 KB en total, que es lo que pesan 240 px al 82% de calidad — el zip de
   Netlify pasa de 1,6 a 2,0 MB.
