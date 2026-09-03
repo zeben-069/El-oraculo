@@ -3695,6 +3695,25 @@ function fechaCorta(f){
   catch(e){ return f.split('-').reverse().join('/'); }
 }
 function hoyISO(){ return (new Date()).toISOString().slice(0,10); }
+/* Un icono por fiesta, sacado DEL NOMBRE. Etiquetar 148 fiestas a mano es
+   trabajo que no se va a hacer nunca, y encima se pudre al añadir más. De
+   las 148: 35 romerías, 33 procesiones, 18 de música, 5 ferias, 3 de fuegos
+   y 54 que se quedan en fiesta a secas, que también está bien: el icono
+   tiene que decir algo, y si no lo sabe, mejor el genérico que uno inventado.
+   Los nombres van en español en el catálogo, así que la regla no depende del
+   idioma de la conversación. */
+const ICONOS_FIESTA=[
+  ['🐂',/romer[íi]a|carreta|arrastre|traída del agua/i],
+  ['🎆',/fuego|pirotecni|traca|quema|pandorga/i],
+  ['⛪',/procesi[óo]n|bajada|subida|traslado|embarcaci[óo]n|ofrenda|v[íi]a crucis|peregrinaci[óo]n|misa/i],
+  ['🎶',/verbena|baile|orquesta|concierto|festival|actuaci[óo]n|m[úu]sica|banda|parranda|humor|gala|pregón/i],
+  ['🧺',/feria|mercadillo|mercado|muestra|exposici[óo]n|artesan|vendimia/i],
+  ['🤼',/lucha canaria|juegos tradicionales|regata|carrera/i]
+];
+function iconoFiesta(n){
+  const x=ICONOS_FIESTA.find(([i,re])=>re.test(n||''));
+  return x?x[0]:'🪘';
+}
 async function agenda(){
   /* arranca en HOY, no en la fecha que tengan puesta: la pregunta es «qué hay
      ahora», y si les cuadra otro día ya cambian la fecha al elegir. */
@@ -3709,11 +3728,12 @@ async function agenda(){
   const manana=new Date(new Date(hoy+'T12:00:00').getTime()+86400000).toISOString().slice(0,10);
   const L=lista.map(e=>{
     const todoDia=esFiestaDeTodoElDia(e);
+    const icono=iconoFiesta(e.n);
     const cuando=todoDia?tr('todoElDia'):(e.h||e.fr);
     const lejos=(base&&e.m===base.m)?tr('aquiMismo'):(base?minutosA(base,e.c)+' '+tr('min'):e.c);
     const cabecera=(e.f===hoy)?tr('hoyEs').toUpperCase()+' · ':
                    (e.f===manana)?tr('mananaEs')+' · ':fechaCorta(e.f)+' · ';
-    return {t:cabecera+e.n+'\n'+e.m+' · '+cuando+' · '+lejos,
+    return {t:cabecera+icono+' '+e.n+'\n'+e.m+' · '+cuando+' · '+lejos,
       fn:()=>{
         S.fecha=e.f; pintaDia();
         const inp=document.getElementById('fechaLibre'); if(inp) inp.value=e.f;

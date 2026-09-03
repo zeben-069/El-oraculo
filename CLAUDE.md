@@ -51,6 +51,9 @@ buscar-fotos.html             esa página ya con los 82 sitios dentro
 miradores.js                  arma la página de miradores, y mete los elegidos
 plantilla-miradores.html      su molde
 buscar-miradores.html         esa página, lista para abrir
+eventos.js                    arma la página de pegar fiestas, y mete las marcadas
+plantilla-eventos.html        su molde
+pegar-eventos.html            esa página, lista para abrir
 ```
 
 **`index.html` ya está partido.** Era una sola pieza de 1,1 MB con los datos,
@@ -527,6 +530,31 @@ restaurante está mal ubicado, tiene razón: vive allí.
   guion tiene que guardarse el `fetch` de verdad ANTES de cargar `banco.js`,
   que lo sustituye por un tapón que siempre falla. Si una foto trae crédito,
   la ficha lo cita al pie del plan: la licencia lo exige.
+- **Las fiestas entran pegando texto, no buscándolas.** Zeben tiene un aviso
+  semanal que le llega con la agenda cultural de la isla. Encontrar la
+  información ya está resuelto; lo que faltaba era el puente. `node eventos.js
+  pegar` escribe `pegar-eventos.html`: se pega el correo, trocea por fechas,
+  propone nombre, municipio y hora, y **él corrige y marca**. Nada entra sin
+  que alguien lo mire — en un correo, «Romería de Benijos» puede ser una
+  fiesta o la frase de un consejo gastronómico.
+  Dos cosas que salieron probándolo con un correo de verdad: el título
+  («3 al 9 de Septiembre») se colaba como si fuera un día, así que las líneas
+  con **rango** de fechas no valen de cabecera; y hay que recortar el arranque
+  de frase, que si no el nombre queda «Tendrá lugar la Bajada de San Carlos en
+  el municipio de Güímar» en vez de «Bajada de San Carlos».
+  Y la trampa buena: comparar solo la MISMA fecha no basta. La Romería de
+  Benijos ya estaba fichada el 7 de septiembre y el correo la daba el 13;
+  entraron las dos. Ahora se avisa —y el que mete la rechaza— cuando la misma
+  fiesta ya está a **menos de dos semanas**: se corrige la que hay, no se
+  añade otra.
+
+- **Los iconos de fiesta salen del nombre.** Etiquetar 148 fiestas a mano es
+  trabajo que no se hace nunca y se pudre al añadir más. `iconoFiesta()` mira
+  el nombre: 🐂 romería, ⛪ procesión, 🎶 verbena o música, 🧺 feria, 🎆 fuegos,
+  🤼 lucha, y 🪘 para las 41 que se quedan en fiesta a secas — que también está
+  bien: el icono tiene que decir algo, y si no lo sabe, mejor el genérico que
+  uno inventado.
+
 - **Miradores: no se pueden traer desde aquí.** Zeben pidió sacarlos de
   webtenerife o de datos.tenerife.es. Comprobado: la política de red del
   contenedor deniega **todo** lo de fuera (403 en el CONNECT), y la búsqueda

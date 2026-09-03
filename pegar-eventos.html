@@ -1,0 +1,245 @@
+<meta charset="utf-8"><title>Fiestas para Naira</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+ body{font-family:system-ui,sans-serif;background:#FBF5E9;color:#3E2B1C;margin:0;padding:16px 14px 110px}
+ h1{font:800 21px/1.2 Georgia,serif;margin:0 0 4px}
+ p.ayuda{margin:6px 0 12px;font-size:14px;line-height:1.5;color:#6B5238}
+ textarea{width:100%;box-sizing:border-box;min-height:170px;font:400 13px/1.5 ui-monospace,monospace;
+          padding:10px;border:1.5px solid #3E2B1C;border-radius:12px;background:#fff;color:#3E2B1C}
+ .barraSup{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 16px}
+ .barraSup button{font:600 14px system-ui;background:#2E5D4B;color:#FBF5E9;border:0;border-radius:10px;
+          padding:9px 14px;cursor:pointer}
+ .barraSup label{font-size:13px;color:#6B5238}
+ .barraSup input[type=number]{width:80px;font:400 14px system-ui;padding:6px 8px;
+          border:1.5px solid #C9B896;border-radius:8px}
+ .ev{background:#fff;border:1.5px solid #3E2B1C;border-radius:14px;padding:11px 12px;margin:0 0 10px;
+     box-shadow:2.5px 2.5px 0 #3E2B1C;display:flex;gap:10px;align-items:flex-start}
+ .ev.fuera{opacity:.45}
+ .ev.repe{border-color:#A93B2B;box-shadow:2.5px 2.5px 0 #A93B2B}
+ .ev>input[type=checkbox]{width:22px;height:22px;margin:4px 0 0;flex:none;cursor:pointer}
+ .campos{flex:1;display:flex;gap:8px;flex-wrap:wrap}
+ .campos label{font-size:11px;color:#6B5238;display:flex;flex-direction:column;gap:3px}
+ .campos input,.campos select{font:400 14px system-ui;padding:6px 8px;border:1.5px solid #C9B896;
+          border-radius:8px;background:#fff;color:#3E2B1C}
+ .campos .ancho{flex:1 1 100%}
+ .campos .ancho input{width:100%;box-sizing:border-box;font-weight:600}
+ .yaEsta{flex:1 1 100%;font-size:12px;color:#A93B2B;margin:2px 0 0}
+ .barra{position:fixed;left:0;right:0;bottom:0;background:#2E5D4B;color:#FBF5E9;padding:12px 14px;
+        display:flex;gap:12px;align-items:center;justify-content:space-between;font-size:14px}
+ .barra button{font:700 15px system-ui;background:#FBF5E9;color:#2E5D4B;border:0;border-radius:10px;
+        padding:10px 16px;cursor:pointer}
+ .barra button[disabled]{opacity:.5;cursor:default}
+ .nota{font-size:12px;color:#6B5238;margin:14px 0 0;line-height:1.5}
+</style>
+<h1>Fiestas para Naira</h1>
+<p class="ayuda">
+ Pegue aquí el correo de la agenda semanal, el programa de unas fiestas o lo que sea. Esto lo trocea y
+ le saca las líneas con fecha; usted <b>corrige lo que haga falta y marca las que valgan</b>. Lo que
+ salga mal se arregla escribiendo encima: el que decide es usted, esto solo adelanta trabajo. Las que
+ Naira ya tiene salen avisadas en rojo.
+</p>
+<textarea id="texto" placeholder="Pegue aquí el texto…"></textarea>
+<div class="barraSup">
+  <button id="trocear">Sacar las fiestas</button>
+  <label>Año: <input type="number" id="anno" min="2020" max="2100"></label>
+  <span id="estado" class="ayuda" style="margin:0"></span>
+</div>
+<div id="lista"></div>
+<p class="nota" id="pie"></p>
+<div class="barra">
+  <span id="cuenta">0 marcadas</span>
+  <button id="bajar" disabled>Descargar</button>
+</div>
+<script>
+/* ------------------------------------------------------------------
+   Convertir un correo en fichas de fiesta. El texto viene escrito para
+   que lo lea una persona, no una máquina: hay fechas de cabecera, líneas
+   sueltas, horas a veces sí y a veces no, y el municipio metido dentro de
+   la frase. Así que esto NO adivina y ya está: propone, y quien conoce la
+   isla corrige. Nada se baja sin que alguien lo haya mirado, que es la
+   regla de la casa: los datos de Naira no se inventan. ---------------- */
+const MUNIS = ["Adeje","Arafo","Arico","Arona","Buenavista del Norte","Candelaria","El Rosario","El Sauzal","El Tanque","Fasnia","Garachico","Granadilla de Abona","Guía de Isora","Güímar","Icod de los Vinos","La Guancha","La Matanza de Acentejo","La Orotava","La Victoria de Acentejo","Los Realejos","Los Silos","Puerto de la Cruz","San Cristóbal de La Laguna","San Juan de la Rambla","San Miguel de Abona","Santa Cruz de Tenerife","Santa Úrsula","Santiago del Teide","Tacoronte","Tegueste","Vilaflor de Chasna"];
+const YA    = [{"f":"2026-08-01","n":"Romería Chica y Baile Romero tras la bajada del Santo"},{"f":"2026-08-01","n":"47 Certamen de Bandas de Música"},{"f":"2026-08-04","n":"Peregrinación de San Bartolomé hacia El Pico y el cementerio"},{"f":"2026-08-05","n":"Lectura del Pregón de las Fiestas"},{"f":"2026-08-06","n":"Procesión de El Salvador y exhibición pirotécnica"},{"f":"2026-08-07","n":"Fiesta de las Tradiciones y elección de la Romera Mayor"},{"f":"2026-08-07","n":"Concierto «A orillas del mar» con la Banda Las Candelas y Ara Malikian"},{"f":"2026-08-08","n":"Baile de Magos de Garachico"},{"f":"2026-08-08","n":"Ofrenda de las Cañitas a San Roque y Baile de Magos"},{"f":"2026-08-08","n":"Concierto de Café Quijano y Escuela de Calor"},{"f":"2026-08-08","n":"Noche de Humor con Aarón Gómez"},{"f":"2026-08-08","n":"Pregón e inauguración de las Fiestas Patronales"},{"f":"2026-08-08","n":"Pregón de Fiestas y gala de elección de Romeras y Reinas"},{"f":"2026-08-14","n":"Caminata a Candelaria"},{"f":"2026-08-14","n":"Rito del Hallazgo de la Virgen y Noche de Parrandas"},{"f":"2026-08-15","n":"Bajada de Las Hayas"},{"f":"2026-08-15","n":"Romería de Charco del Pino"},{"f":"2026-08-15","n":"Recepción del Pendón de la Villa, procesión nocturna y fuegos"},{"f":"2026-08-15","n":"Solemne Eucaristía de la Patrona de Canarias y procesión con lluvia de voladores"},{"f":"2026-08-15","n":"Verbena de la Pamela"},{"f":"2026-08-15","n":"Nuestra Señora de la Luz en el Conjunto Histórico"},{"f":"2026-08-16","n":"Gran Romería de San Roque"},{"f":"2026-08-20","n":"Fiestas de San Bernardo y del Farol"},{"f":"2026-08-21","n":"Baile de Chiguergue"},{"f":"2026-08-23","n":"Papada Guanchera, Baile de Magos y orquestas"},{"f":"2026-08-28","n":"Romería de San Agustín"},{"f":"2026-08-29","n":"Romería de San Agustín"},{"f":"2026-08-29","n":"Romería de Los Abrigos"},{"f":"2026-08-29","n":"Procesión de San Bartolomé y exhibición pirotécnica"},{"f":"2026-08-30","n":"Entrada de los Corazones a la Plaza de Tejina"},{"f":"2026-08-31","n":"Romería de Los Abrigos"},{"f":"2026-08-31","n":"Romería de San Roque"},{"f":"2026-08-31","n":"Descuelgue de los Corazones"},{"f":"2026-09-01","n":"Entrada de las Parrandas de los Corazones y pique tradicional"},{"f":"2026-09-07","n":"Bajada de la Virgen del Socorro"},{"f":"2026-09-07","n":"Romería de Benijos"},{"f":"2026-09-07","n":"Bajada del Socorro"},{"f":"2026-09-08","n":"Subida de la Virgen del Socorro"},{"f":"2026-09-08","n":"Misa y procesión de la Virgen de La Luz con alfombras ceremoniales"},{"f":"2026-09-12","n":"Feria de artesanía de Pinolere"},{"f":"2026-09-14","n":"Fiesta del Santísimo Cristo"},{"f":"2026-09-14","n":"Fuegos del Cristo y Noche de las Pandorgas"},{"f":"2026-09-19","n":"Romería de San Miguel"},{"f":"2026-09-19","n":"Fiesta de la Vendimia"},{"f":"2026-09-20","n":"Romería de San Juan de la Rambla"},{"f":"2026-09-20","n":"Romería de Los Roques"},{"f":"2026-09-21","n":"Romería barquera de El Médano"},{"f":"2026-09-21","n":"Romería de San Miguel"},{"f":"2026-09-26","n":"Fiestas del Cristo"},{"f":"2026-09-29","n":"Misa patronal y procesión de San Miguel Arcángel"},{"f":"2026-10-18","n":"Romería de Adeje"},{"f":"2026-10-31","n":"Romería de Adeje"},{"f":"2026-11-29","n":"Fiestas de San Andrés — los tablones"},{"f":"2026-11-29","n":"Fiestas de San Andrés — cacharros"},{"f":"2026-11-29","n":"Arrastre de Las Tablas de San Andrés y descorche del vino nuevo"},{"f":"2026-11-30","n":"Continuación del arrastre de tablas, castañada y degustación de bodegas"},{"f":"2026-12-06","n":"San Nicolás: muestra de vinos locales y encendido navideño"},{"f":"2027-01-16","n":"San Antonio Abad"},{"f":"2027-01-20","n":"Fiestas de San Sebastián"},{"f":"2027-01-20","n":"San Sebastián: misa, bendición y baño tradicional de caballos en el mar"},{"f":"2027-02-02","n":"Virgen de Candelaria — patrona de Canarias"},{"f":"2027-02-06","n":"Nuestra Señora de Candelaria"},{"f":"2027-02-09","n":"Carnaval de Santa Cruz"},{"f":"2027-04-17","n":"La Milagrosa"},{"f":"2027-05-01","n":"Romería de San Marcos"},{"f":"2027-05-01","n":"Nuestra Señora del Carmen"},{"f":"2027-05-02","n":"Baile de Magos de las Fiestas de Mayo"},{"f":"2027-05-03","n":"Fiestas de la Cruz"},{"f":"2027-05-03","n":"Fiestas de la Cruz"},{"f":"2027-05-03","n":"Exhibición pirotécnica de las Cruces y Fuegos"},{"f":"2027-05-03","n":"Exposición e inspección de Cruces de Flores"},{"f":"2027-05-08","n":"San José Obrero"},{"f":"2027-05-15","n":"Romería de San Isidro Labrador"},{"f":"2027-05-27","n":"Corpus Christi — alfombras"},{"f":"2027-05-29","n":"Baile de Magos"},{"f":"2027-05-29","n":"San Felipe Neri"},{"f":"2027-06-12","n":"San Juan"},{"f":"2027-06-23","n":"Fiestas de San Juan"},{"f":"2027-06-23","n":"Noche de San Juan: hogueras en el litoral"},{"f":"2027-06-24","n":"Fiestas de San Juan"},{"f":"2027-06-24","n":"San Juan Bautista: procesión y fuegos artificiales"},{"f":"2027-06-29","n":"Fiestas de San Pedro"},{"f":"2027-06-29","n":"Misa y procesión de San Pedro Apóstol con Danza de las Cintas"},{"f":"2027-07-03","n":"San Juan y Nuestra Señora de la Paz"},{"f":"2027-07-03","n":"Pregón oficial de las Fiestas de San Benito Abad"},{"f":"2027-07-10","n":"Fiestas de San Benito Abad"},{"f":"2027-07-10","n":"San Pedro"},{"f":"2027-07-10","n":"Gran Baile de Magos de San Benito Abad"},{"f":"2027-07-16","n":"Virgen del Carmen — embarcación"},{"f":"2027-07-16","n":"Embarcación marítima de la Virgen del Carmen y fuegos"},{"f":"2027-07-17","n":"Romería de Los Blanquitos"},{"f":"2027-07-17","n":"Romería de Los Olivos"},{"f":"2027-07-17","n":"Baile de Magos"},{"f":"2027-07-17","n":"San José Obrero"},{"f":"2027-07-24","n":"Fiesta Canaria de Ravelo"},{"f":"2027-07-24","n":"Paseo Romero del Puertito"},{"f":"2027-07-24","n":"Pregón de las Fiestas e Izado de la Bandera"},{"f":"2027-07-25","n":"Fiesta de Santiago Apóstol y procesión"},{"f":"2027-07-30","n":"Marea Festival: concierto de Moise González"},{"f":"2027-07-30","n":"Pregón de las Fiestas y presentación de candidatas a Romera Mayor"},{"f":"2027-07-31","n":"Feria de Artesanía Patrona de Canarias"},{"f":"2027-07-31","n":"Baile de Taifas en El Carretón y repique tradicional de campanas"},{"f":"2027-07-31","n":"Pregón, teatro costumbrista y salida del Patrón con 24 truenas"},{"f":"2027-08-01","n":"Romería Chica y Baile Romero tras la bajada del Santo"},{"f":"2027-08-01","n":"47 Certamen de Bandas de Música"},{"f":"2027-08-04","n":"Peregrinación de San Bartolomé hacia El Pico y el cementerio"},{"f":"2027-08-05","n":"Lectura del Pregón de las Fiestas"},{"f":"2027-08-06","n":"Procesión de El Salvador y exhibición pirotécnica"},{"f":"2027-08-07","n":"Fiesta de las Tradiciones y elección de la Romera Mayor"},{"f":"2027-08-07","n":"Concierto «A orillas del mar» con la Banda Las Candelas y Ara Malikian"},{"f":"2027-08-08","n":"Ofrenda de las Cañitas a San Roque y Baile de Magos"},{"f":"2027-08-08","n":"Concierto de Café Quijano y Escuela de Calor"},{"f":"2027-08-08","n":"Noche de Humor con Aarón Gómez"},{"f":"2027-08-08","n":"Pregón e inauguración de las Fiestas Patronales"},{"f":"2027-08-08","n":"Pregón de Fiestas y gala de elección de Romeras y Reinas"},{"f":"2027-08-14","n":"Fiestas de la Virgen de Candelaria"},{"f":"2027-08-14","n":"Rito del Hallazgo de la Virgen y Noche de Parrandas"},{"f":"2027-08-15","n":"Recepción del Pendón de la Villa, procesión nocturna y fuegos"},{"f":"2027-08-15","n":"Solemne Eucaristía de la Patrona de Canarias y procesión con lluvia de voladores"},{"f":"2027-08-15","n":"Verbena de la Pamela"},{"f":"2027-08-15","n":"Nuestra Señora de la Luz en el Conjunto Histórico"},{"f":"2027-08-16","n":"Gran Romería de San Roque"},{"f":"2027-08-20","n":"Fiestas de San Bernardo y del Farol"},{"f":"2027-08-23","n":"Papada Guanchera, Baile de Magos y orquestas"},{"f":"2027-08-28","n":"Romería de San Agustín"},{"f":"2027-08-31","n":"Romería de Los Abrigos"},{"f":"2027-08-31","n":"Romería de San Roque"},{"f":"2027-09-07","n":"Bajada de la Virgen del Socorro"},{"f":"2027-09-07","n":"Romería de Benijos"},{"f":"2027-09-07","n":"Bajada del Socorro"},{"f":"2027-09-08","n":"Subida de la Virgen del Socorro"},{"f":"2027-09-08","n":"Misa y procesión de la Virgen de La Luz con alfombras ceremoniales"},{"f":"2027-09-11","n":"Feria de artesanía de Pinolere"},{"f":"2027-09-14","n":"Fiesta del Santísimo Cristo"},{"f":"2027-09-14","n":"Fuegos del Cristo y Noche de las Pandorgas"},{"f":"2027-09-18","n":"Fiesta de la Vendimia"},{"f":"2027-09-20","n":"Romería de San Juan de la Rambla"},{"f":"2027-09-20","n":"Romería de Los Roques"},{"f":"2027-09-21","n":"Romería barquera de El Médano"},{"f":"2027-09-21","n":"Romería de San Miguel"},{"f":"2027-09-25","n":"Fiestas del Cristo"},{"f":"2027-09-29","n":"Misa patronal y procesión de San Miguel Arcángel"},{"f":"2027-10-30","n":"Romería de Adeje"},{"f":"2027-11-29","n":"Fiestas de San Andrés — los tablones"},{"f":"2027-11-29","n":"Fiestas de San Andrés — cacharros"},{"f":"2027-11-29","n":"Arrastre de Las Tablas de San Andrés y descorche del vino nuevo"},{"f":"2027-11-30","n":"Continuación del arrastre de tablas, castañada y degustación de bodegas"},{"f":"2027-12-06","n":"San Nicolás: muestra de vinos locales y encendido navideño"}];
+
+const MESES={enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,
+  septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12};
+/* «Jueves, 3 de Septiembre» / «Sábado, 12 de septiembre de 2026» / «3 de septiembre» */
+const RE_FECHA=new RegExp('(?:lunes|martes|mi[ée]rcoles|jueves|viernes|s[áa]bado|domingo)?[,\\s]*'+
+  '(\\d{1,2})\\s+de\\s+('+Object.keys(MESES).join('|')+')(?:\\s+de\\s+(\\d{4}))?','i');
+const RE_HORA=/\b(\d{1,2})[:.](\d{2})\s*(?:h(?:oras)?)?\b/;
+
+const $=(t,a,h)=>{const e=document.createElement(t);if(a)Object.assign(e,a);if(h)e.innerHTML=h;return e;};
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+  .replace(/[^a-z0-9]+/g,' ').trim();
+const dosD=n=>String(n).padStart(2,'0');
+
+/* Los alias: en un correo nadie escribe «San Cristóbal de La Laguna». */
+const ALIAS=[['San Cristóbal de La Laguna',/\bla laguna\b|\blaguna\b/i],
+             ['Santa Cruz de Tenerife',/\bsanta cruz\b|\bla capital\b/i],
+             ['Vilaflor de Chasna',/\bvilaflor\b/i],
+             ['Granadilla de Abona',/\bgranadilla\b/i],
+             ['Buenavista del Norte',/\bbuenavista\b/i],
+             ['San Miguel de Abona',/\bsan miguel\b/i],
+             ['Puerto de la Cruz',/\bpuerto de la cruz\b|\bel puerto\b/i]];
+function municipioDe(txt){
+  for(const [m,re] of ALIAS) if(re.test(txt)) return m;
+  /* los largos primero, que «Los Silos» no se coma «Silos» de otro */
+  const orden=MUNIS.slice().sort((a,b)=>b.length-a.length);
+  for(const m of orden) if(new RegExp('\\b'+m.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&')+'\\b','i').test(txt)) return m;
+  return '';
+}
+
+/* ¿Se parece a una que ya tenemos? Comparar solo la MISMA fecha no basta:
+   la Romería de Benijos ya estaba fichada el 7 de septiembre y el correo la
+   daba el 13. Entraron las dos y ahora hay dos romerías de Benijos el mismo
+   año. Así que se avisa también de las cercanas —hasta dos semanas— para que
+   se corrija la que hay en vez de añadir otra. */
+function parecido(a,b){
+  if(a===b) return true;
+  const pa=new Set(a.split(' ').filter(x=>x.length>3));
+  const pb=b.split(' ').filter(x=>x.length>3);
+  if(!pa.size||!pb.length) return false;
+  return pb.filter(x=>pa.has(x)).length/Math.max(pa.size,pb.length)>=0.6;
+}
+const dias=(a,b)=>Math.round(Math.abs(new Date(a+'T12:00:00')-new Date(b+'T12:00:00'))/864e5);
+function yaEsta(f,n){
+  const a=norm(n);
+  let mismaFecha=null, cerca=null;
+  YA.forEach(y=>{
+    if(!parecido(a,norm(y.n))) return;
+    if(y.f===f){ mismaFecha=y; return; }
+    const d=dias(y.f,f);
+    if(d<=14&&(!cerca||d<dias(cerca.f,f))) cerca=y;
+  });
+  if(mismaFecha) return {tipo:'misma', y:mismaFecha};
+  if(cerca) return {tipo:'cerca', y:cerca, d:dias(cerca.f,f)};
+  return null;
+}
+
+function trocear(txt,anno){
+  const lineas=txt.split(/\r?\n/).map(l=>l.replace(/^[\s​*\-–—•·>#]+/,'').trim()).filter(Boolean);
+  const out=[]; let fecha=null;
+  lineas.forEach(l=>{
+    /* «3 al 9 de Septiembre» es el título del correo, no un día: si la
+       línea trae un rango, no vale como cabecera de fecha */
+    if(/\d\s*(al|a|-|–)\s*\d{1,2}\s+de\s/i.test(l)) return;
+    const mf=l.match(RE_FECHA);
+    /* una línea corta que es SOLO una fecha es la cabecera del día */
+    const soloFecha=mf&&l.length<=mf[0].length+16;
+    if(mf){
+      const dia=+mf[1], mes=MESES[mf[2].toLowerCase()], y=mf[3]?+mf[3]:anno;
+      fecha=y+'-'+dosD(mes)+'-'+dosD(dia);
+      if(soloFecha) return;              /* era solo la cabecera */
+    }
+    if(!fecha) return;                   /* texto antes de la primera fecha */
+    if(l.length<8) return;
+    /* Gemini escribe «Categoría: la frase con el evento». Lo que sirve
+       de nombre es lo de después de los dos puntos. */
+    let nombre=l;
+    const dp=l.indexOf(':');
+    if(dp>2&&dp<42) nombre=l.slice(dp+1).trim()||l;
+    /* Quitar el arranque de frase: lo que sirve de nombre es «Bajada de San
+       Carlos», no «Tendrá lugar la Bajada de San Carlos en el municipio de
+       Güímar». Se recorta lo evidente y lo demás se escribe encima. */
+    nombre=nombre
+      .replace(/^(hoy|mañana)\s+/i,'')
+      .replace(/^(tendrá lugar|se celebrar[áa]|se celebra|da comienzo|comienza|arranca|contin[úu]an?|puedes disfrutar de|[úu]ltima oportunidad para (presenciar|ver)|(hoy\s+)?se inaugura)\s+/i,'')
+      .replace(/^(el|la|los|las|un|una)\s+/i,'')
+      .replace(/\s+en el municipio de\s+.*$/i,'')
+      .trim();
+    if(nombre) nombre=nombre[0].toUpperCase()+nombre.slice(1);
+    const mh=l.match(RE_HORA);
+    out.push({f:fecha, n:nombre.replace(/\s+/g,' ').slice(0,140),
+      m:municipioDe(l), h:mh?dosD(+mh[1])+':'+mh[2]:'',
+      linea:l});
+  });
+  return out;
+}
+
+const filas=[];
+const cuenta=()=>{const n=filas.filter(x=>x.chk.checked).length;
+  document.getElementById('cuenta').textContent=n+(n===1?' marcada':' marcadas');
+  document.getElementById('bajar').disabled=!n;};
+
+function pinta(e){
+  const caja=$('div',{className:'ev'});
+  const chk=$('input',{type:'checkbox'});
+  const c=$('div',{className:'campos'});
+
+  const ln=$('label',{className:'ancho'},'Qué es');
+  const nom=$('input',{type:'text',value:e.n});
+  ln.appendChild(nom);
+
+  const lf=$('label',null,'Cuándo');
+  const fec=$('input',{type:'date',value:e.f}); lf.appendChild(fec);
+
+  const lm=$('label',null,'Municipio');
+  const sel=$('select');
+  sel.appendChild($('option',{value:'',textContent:'— cuál —'}));
+  MUNIS.forEach(m=>sel.appendChild($('option',{value:m,textContent:m})));
+  sel.value=e.m||''; lm.appendChild(sel);
+
+  const lh=$('label',null,'Hora (si se sabe)');
+  const hor=$('input',{type:'time',value:e.h||''}); lh.appendChild(hor);
+
+  const lnota=$('label',{className:'ancho'},'Apunte (opcional)');
+  const nota=$('input',{type:'text',placeholder:'dónde es, o cualquier detalle'});
+  lnota.appendChild(nota);
+
+  const aviso=$('p',{className:'yaEsta'});
+  c.appendChild(ln); c.appendChild(lf); c.appendChild(lm); c.appendChild(lh);
+  c.appendChild(lnota); c.appendChild(aviso);
+  caja.appendChild(chk); caja.appendChild(c);
+
+  const fila={chk,nom,fec,sel,hor,nota};
+  const revisa=()=>{
+    caja.classList.toggle('fuera',!chk.checked);
+    const repe=yaEsta(fec.value,nom.value);
+    caja.classList.toggle('repe',!!repe);
+    aviso.textContent = !repe ? ''
+      : repe.tipo==='misma'
+        ? 'Naira ya tiene «'+repe.y.n+'» ese mismo día. Mírelo antes de marcarla.'
+        : 'OJO: Naira ya tiene «'+repe.y.n+'» el '+repe.y.f+', '+repe.d+' días de diferencia. '+
+          'Puede que sea la misma y esté con la fecha vieja: entonces hay que corregir aquella, no añadir esta.';
+    /* sin municipio no vale: el motor lo necesita para saber dónde cae */
+    sel.style.borderColor=(chk.checked&&!sel.value)?'#A93B2B':'';
+    cuenta();
+  };
+  [chk,nom,fec,sel,hor,nota].forEach(x=>{x.addEventListener('change',revisa);
+    x.addEventListener('input',revisa);});
+  filas.push(fila);
+  document.getElementById('lista').appendChild(caja);
+  revisa();
+}
+
+document.getElementById('anno').value=new Date().getFullYear();
+document.getElementById('trocear').onclick=()=>{
+  filas.length=0;
+  document.getElementById('lista').innerHTML='';
+  const evs=trocear(document.getElementById('texto').value,+document.getElementById('anno').value);
+  evs.forEach(pinta);
+  document.getElementById('estado').textContent=
+    evs.length?evs.length+' líneas con fecha. Corrija y marque las que valgan.'
+              :'No he encontrado ninguna fecha. ¿Pone los días («jueves, 3 de septiembre»)?';
+  document.getElementById('pie').textContent=
+    'Lo que no lleve municipio no se baja. Si una línea no es una fiesta, déjela sin marcar.';
+  cuenta();
+};
+
+document.getElementById('bajar').onclick=()=>{
+  const fuera=[];
+  const fiestas=filas.filter(f=>f.chk.checked).map(f=>{
+    if(!f.sel.value||!f.nom.value.trim()){ fuera.push(f.nom.value); return null; }
+    return {f:f.fec.value, n:f.nom.value.trim(), m:f.sel.value,
+            h:f.hor.value||null, no:f.nota.value.trim()||null};
+  }).filter(Boolean);
+  if(fuera.length) alert('Estas se quedan fuera por no tener municipio:\n· '+fuera.join('\n· '));
+  if(!fiestas.length) return;
+  const datos={generado:new Date().toISOString().slice(0,10),
+    fuente:'Agenda semanal, repasada a mano', fiestas};
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(datos,null,1)],{type:'application/json'}));
+  a.download='fiestas.json'; a.click();
+};
+cuenta();
+</script>
