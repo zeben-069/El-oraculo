@@ -1,0 +1,186 @@
+<meta charset="utf-8"><title>Subir fotos a Naira</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+ body{font-family:system-ui,sans-serif;background:#FBF5E9;color:#3E2B1C;margin:0;padding:16px 14px 110px}
+ h1{font:800 21px/1.2 Georgia,serif;margin:0 0 4px}
+ p.ayuda{margin:6px 0 14px;font-size:14px;line-height:1.5;color:#6B5238}
+ .soltar{border:2.5px dashed #2E5D4B;border-radius:16px;background:#fff;padding:22px 16px;text-align:center;
+         cursor:pointer;color:#2E5D4B;font:600 16px system-ui}
+ .soltar.encima{background:#EAF3ED}
+ .soltar small{display:block;margin-top:6px;font:400 13px system-ui;color:#6B5238}
+ input[type=file]{display:none}
+ .foto{background:#fff;border:1.5px solid #3E2B1C;border-radius:14px;padding:10px;margin:12px 0 0;
+       box-shadow:2.5px 2.5px 0 #3E2B1C;display:flex;gap:12px;align-items:flex-start}
+ .foto.lista{border-color:#2E5D4B;box-shadow:2.5px 2.5px 0 #2E5D4B}
+ .foto img{width:96px;height:96px;object-fit:cover;border-radius:10px;flex:none;background:#E8D9BE}
+ .campos{flex:1;min-width:0}
+ .campos select{width:100%;box-sizing:border-box;font:400 15px system-ui;padding:9px 8px;
+       border:1.5px solid #C9B896;border-radius:9px;background:#fff;color:#3E2B1C}
+ .campos select.falta{border-color:#A93B2B}
+ .campos .fich{font-size:11px;color:#6B5238;margin:6px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .campos .quitar{margin-top:8px;font:600 13px system-ui;background:none;border:0;color:#A93B2B;cursor:pointer;padding:0}
+ .barra{position:fixed;left:0;right:0;bottom:0;background:#2E5D4B;color:#FBF5E9;padding:12px 14px;
+        display:flex;gap:12px;align-items:center;justify-content:space-between;font-size:14px}
+ .barra button{font:700 15px system-ui;background:#FBF5E9;color:#2E5D4B;border:0;border-radius:10px;
+        padding:10px 16px;cursor:pointer}
+ .barra button[disabled]{opacity:.5;cursor:default}
+</style>
+<h1>Subir fotos a Naira</h1>
+<p class="ayuda">
+ Para las fotos que haga usted. Suelte aquí las que tenga —del móvil, de donde sea—, y en cada una
+ <b>elija de qué sitio es</b>. No hace falta renombrar nada ni recortarlas: eso lo hace la página.
+ Al final pulse <b>Descargar</b> y mándeme ese zip. Las fotos se achican a 240 px aquí mismo, así que
+ el zip pesa poco aunque suba veinte fotos del móvil.
+</p>
+<label class="soltar" id="zona">
+  Pulse aquí para elegir fotos
+  <small>o arrástrelas encima · también vale hacerlas con la cámara</small>
+  <input type="file" id="ficheros" accept="image/*" multiple>
+</label>
+<div id="lista"></div>
+<div class="barra">
+  <span id="cuenta">ninguna</span>
+  <button id="bajar" disabled>Descargar</button>
+</div>
+<script>
+/* ------------------------------------------------------------------
+   El puente para las fotos que hace Zeben. `fotos.js` empareja por el
+   NOMBRE del fichero, y del móvil salen como IMG_4821.jpg: renombrar diez
+   a mano en el teléfono es justo el tipo de fastidio que hace que esto no
+   se haga nunca. Aquí se elige el sitio de una lista y la página escribe
+   el nombre correcto.
+   Y de paso las achica: una foto de móvil son 4 MB y lo que hace falta son
+   240 px. Se recorta y se comprime aquí, no en el correo. ------------- */
+const SITIOS = /*SITIOS*/[];
+const elegidas=[];           /* {fichero, sitio, datos:Uint8Array} */
+
+const $=(t,a,h)=>{const e=document.createElement(t);if(a)Object.assign(e,a);if(h)e.innerHTML=h;return e;};
+const LADO=240;
+
+const cuenta=()=>{
+  const n=elegidas.filter(x=>x.sitio).length, sinSitio=elegidas.length-n;
+  document.getElementById('cuenta').textContent=
+    (elegidas.length?n+(n===1?' lista':' listas'):'ninguna')+
+    (sinSitio?'  ·  '+sinSitio+' sin sitio':'');
+  document.getElementById('bajar').disabled=!n;
+};
+
+/* Las fotos de móvil vienen giradas por EXIF: si se dibujan a pelo salen
+   tumbadas. createImageBitmap con imageOrientation lo endereza. */
+async function cuadrada(fichero){
+  let im;
+  try{ im=await createImageBitmap(fichero,{imageOrientation:'from-image'}); }
+  catch(e){ im=await new Promise((ok,mal)=>{ const i=new Image();
+      i.onload=()=>ok(i); i.onerror=mal; i.src=URL.createObjectURL(fichero); }); }
+  const w=im.width||im.naturalWidth, h=im.height||im.naturalHeight;
+  const lado=Math.min(w,h);
+  const cv=document.createElement('canvas'); cv.width=LADO; cv.height=LADO;
+  const x=cv.getContext('2d'); x.imageSmoothingQuality='high';
+  x.drawImage(im,(w-lado)/2,(h-lado)/2,lado,lado,0,0,LADO,LADO);
+  const url=cv.toDataURL('image/jpeg',0.82);
+  const bin=atob(url.split(',')[1]);
+  const u8=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) u8[i]=bin.charCodeAt(i);
+  return {url,u8};
+}
+
+function pinta(entrada){
+  const caja=$('div',{className:'foto'});
+  const img=$('img',{src:entrada.url,alt:''});
+  const c=$('div',{className:'campos'});
+  const sel=$('select');
+  sel.appendChild($('option',{value:'',textContent:'— ¿de qué sitio es? —'}));
+  /* agrupados por pueblo, que con cuarenta y tantos en una lista plana
+     no se encuentra nada */
+  const porPueblo={};
+  SITIOS.forEach(s=>{(porPueblo[s.m]=porPueblo[s.m]||[]).push(s);});
+  Object.keys(porPueblo).sort().forEach(m=>{
+    const g=$('optgroup',{label:m});
+    porPueblo[m].forEach(s=>g.appendChild($('option',{value:s.n,textContent:s.n})));
+    sel.appendChild(g);
+  });
+  const fich=$('p',{className:'fich'},entrada.fichero.name+' · '+
+    Math.round(entrada.fichero.size/1024)+' KB → '+Math.round(entrada.u8.length/1024)+' KB');
+  const quita=$('button',{className:'quitar',type:'button'},'quitar esta');
+
+  c.appendChild(sel); c.appendChild(fich); c.appendChild(quita);
+  caja.appendChild(img); caja.appendChild(c);
+  document.getElementById('lista').appendChild(caja);
+
+  sel.onchange=()=>{
+    /* dos fotos para el mismo sitio no puede ser: la segunda pisaría a la
+       primera dentro del zip */
+    if(sel.value&&elegidas.some(x=>x!==entrada&&x.sitio===sel.value)){
+      alert('Ya hay otra foto para «'+sel.value+'». Quite una de las dos.');
+      sel.value=''; }
+    entrada.sitio=sel.value||null;
+    caja.classList.toggle('lista',!!entrada.sitio);
+    sel.classList.toggle('falta',!entrada.sitio);
+    cuenta();
+  };
+  quita.onclick=()=>{
+    elegidas.splice(elegidas.indexOf(entrada),1);
+    caja.remove(); cuenta();
+  };
+  sel.classList.add('falta');
+}
+
+async function añade(ficheros){
+  for(const f of ficheros){
+    if(!/^image\//.test(f.type)) continue;
+    let r; try{ r=await cuadrada(f); }
+    catch(e){ alert('No he podido leer «'+f.name+'»: '+e.message); continue; }
+    const entrada={fichero:f, sitio:null, url:r.url, u8:r.u8};
+    elegidas.push(entrada);
+    pinta(entrada);
+  }
+  cuenta();
+}
+
+const zona=document.getElementById('zona'), input=document.getElementById('ficheros');
+input.onchange=()=>{ añade([...input.files]); input.value=''; };
+['dragenter','dragover'].forEach(e=>zona.addEventListener(e,ev=>{
+  ev.preventDefault(); zona.classList.add('encima'); }));
+['dragleave','drop'].forEach(e=>zona.addEventListener(e,ev=>{
+  ev.preventDefault(); zona.classList.remove('encima'); }));
+zona.addEventListener('drop',ev=>añade([...(ev.dataTransfer.files||[])]));
+
+/* ---- zip a mano, sin comprimir (un JPEG ya viene comprimido) ---- */
+const TABLA=(()=>{const t=new Uint32Array(256);
+  for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}return t;})();
+const crc32=u8=>{let c=0xFFFFFFFF;for(let i=0;i<u8.length;i++)c=TABLA[(c^u8[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0;};
+function zip(ficheros){
+  const enc=new TextEncoder(), trozos=[], central=[];
+  let off=0;
+  const u32=n=>new Uint8Array([n&255,(n>>8)&255,(n>>16)&255,(n>>>24)&255]);
+  const u16=n=>new Uint8Array([n&255,(n>>8)&255]);
+  ficheros.forEach(f=>{
+    const nom=enc.encode(f.nombre), c=crc32(f.datos), n=f.datos.length;
+    /* la bandera 0x800 dice que el nombre va en UTF-8: sin ella, «Casa del
+       Plátano.jpg» sale con los acentos rotos al descomprimir */
+    const cab=[enc.encode('PK\x03\x04'),u16(20),u16(0x800),u16(0),u16(0),u16(0),u32(c),u32(n),u32(n),u16(nom.length),u16(0),nom];
+    cab.forEach(x=>trozos.push(x)); trozos.push(f.datos);
+    central.push([enc.encode('PK\x01\x02'),u16(20),u16(20),u16(0x800),u16(0),u16(0),u16(0),u32(c),u32(n),u32(n),
+                  u16(nom.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(off),nom]);
+    off+=cab.reduce((a,x)=>a+x.length,0)+n;
+  });
+  const ini=off; let tam=0;
+  central.forEach(c=>{c.forEach(x=>{trozos.push(x);tam+=x.length;});});
+  [enc.encode('PK\x05\x06'),u16(0),u16(0),u16(ficheros.length),u16(ficheros.length),u32(tam),u32(ini),u16(0)]
+    .forEach(x=>trozos.push(x));
+  return new Blob(trozos,{type:'application/zip'});
+}
+
+document.getElementById('bajar').onclick=()=>{
+  const listas=elegidas.filter(x=>x.sitio);
+  if(!listas.length) return;
+  const ficheros=listas.map(x=>({nombre:x.sitio.replace(/[\/\\:]/g,' ')+'.jpg', datos:x.u8}));
+  /* Estas son suyas: no llevan crédito de nadie, y por eso no va creditos.json.
+     La ficha solo cita cuando la foto viene de fuera. */
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(zip(ficheros));
+  a.download='mis-fotos-naira.zip'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+};
+cuenta();
+</script>

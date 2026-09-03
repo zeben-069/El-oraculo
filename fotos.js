@@ -7,6 +7,7 @@
 
        node fotos.js                 la lista de qué fotografiar, por pueblo
        node fotos.js buscar          arma buscar-fotos.html para elegirlas a mano
+       node fotos.js subir           arma subir-fotos.html para las que hace él
        node fotos.js entrada/        mete las fotos de esa carpeta
 
    Al meterlas: recorta al cuadrado por el centro, deja 240 px, comprime,
@@ -94,6 +95,31 @@ function pagina(){
   console.log('Se abre en el navegador, se pulsan las fotos buenas y se baja el zip.');
 }
 
+/* La página para las fotos que hace él con el móvil. Aquí el problema no es
+   encontrarlas: es que `meter()` empareja por el NOMBRE del fichero y del
+   móvil salen como IMG_4821.jpg. Renombrar diez a mano en el teléfono es el
+   tipo de fastidio que hace que esto no se haga nunca. La página deja elegir
+   el sitio de una lista y escribe ella el nombre; de paso recorta y achica,
+   así que el zip pesa medio mega en vez de cuarenta. */
+function subir(){
+  const orden=ranking();
+  const falta=orden.map(([n,v])=>({l:LUGARES.find(x=>x.n===n)||{},n,v}))
+    .filter(x=>x.l.n&&!x.l.foto&&AEREO_MAL.test(x.l.tipo||''));
+  /* Aquí van TODOS los que faltan, salgan mucho o poco en los planes: si está
+     delante del sitio, lo lógico es que pueda subirla aunque salga en un plan
+     de cada mil. Se ordenan por pueblo, que es como se hacen las fotos. */
+  const sitios=falta.map(x=>({n:x.n,m:x.l.m,tipo:x.l.tipo,v:x.v}))
+    .sort((a,b)=>a.m.localeCompare(b.m,'es')||b.v-a.v);
+  const plantilla=fs.readFileSync('plantilla-subir.html','utf8');
+  const HUECO='/*SITIOS*'+'/[]';
+  if(plantilla.split(HUECO).length!==2) throw new Error('la plantilla no trae el hueco de la lista');
+  fs.writeFileSync('subir-fotos.html',plantilla.replace(HUECO,JSON.stringify(sitios)));
+  const pueblos=new Set(sitios.map(s=>s.m));
+  console.log('escrito subir-fotos.html con '+sitios.length+' sitios de '+pueblos.size+' pueblos.');
+  console.log('Se abre en el móvil o en el ordenador, se sueltan las fotos, se elige el sitio');
+  console.log('de cada una y se baja el zip. Ese zip lo come: node fotos.js esa-carpeta/');
+}
+
 async function meter(dir){
   const {chromium}=require('playwright');
   const ficheros=fs.readdirSync(dir).filter(f=>/\.(jpe?g|png|webp)$/i.test(f));
@@ -149,4 +175,5 @@ async function meter(dir){
 const arg=process.argv[2];
 if(!arg) lista();
 else if(arg==='buscar') pagina();
+else if(arg==='subir') subir();
 else meter(arg).catch(e=>{console.error(e.message);process.exit(1)});
