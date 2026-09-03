@@ -497,6 +497,11 @@ restaurante está mal ubicado, tiene razón: vive allí.
   para un museo es un tejado. Barrido de 744 planes: de 589 sitios del
   catálogo solo **198 salen alguna vez**, y de esos solo **82** tienen el
   aéreo inútil. Con **40 fotos** se arregla el 82% de esas paradas.
+  **Van 25 puestas**, elegidas por Zeben en Commons y todas con autor y
+  licencia: quedan 57, y de las 1.163 paradas del barrido donde el aéreo no
+  dice nada, **389 ya enseñan una foto de verdad (33%)**. Las 25 ocupan
+  476 KB en total, que es lo que pesan 240 px al 82% de calidad — el zip de
+  Netlify pasa de 1,6 a 2,0 MB.
   `fotos.js` sin argumentos escribe `fotos-pendientes.md` con la lista
   agrupada por pueblo; con una carpeta como argumento, mete las fotos:
   recorta al cuadrado, deja 240 px, comprime y añade el campo a la ficha.
