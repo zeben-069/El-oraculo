@@ -12,6 +12,65 @@
 // PARA COMPROBAR QUE FUNCIONA
 //   https://SU-SITIO.netlify.app/.netlify/functions/naira?probar=1
 
+// EL FRENO
+//   Esta función es una URL pública que gasta la clave de Zeben. Sin freno,
+//   cualquiera que mire el código del navegador puede apuntarle con lo que
+//   quiera —incluido su propio prompt— y usarla de ChatGPT gratis a su costa.
+//   Se le ponen tres cierres, de más fuerte a más flojo:
+//
+//   1. SOLO SIRVE PARA HACER PLANES. Antes se aceptaba el `system` que
+//      mandara el cliente, así que valía para cualquier cosa. Ahora tiene que
+//      ser el prompt de Naira (se comprueba por una frase que solo está ahí)
+//      y una sola pregunta. Lo peor que puede sacar alguien de aquí es un
+//      plan de un día en Tenerife.
+//   2. SOLO DESDE LA WEB. Se mira de dónde viene la llamada. Con curl se
+//      puede falsear, pero corta de raíz el "apunto mi herramienta ahí".
+//   3. UN LÍMITE POR IP Y UN TECHO AL DÍA. En memoria del contenedor: Netlify
+//      levanta y apaga instancias, así que no es un candado, es un freno. Para
+//      un candado de verdad haría falta un contador compartido (Netlify Blobs),
+//      y eso obliga a package.json, que es lo que aquí se quiso evitar.
+
+// Una frase del prompt de Naira que no está en ningún otro sitio. Si el
+// `system` que llega no la trae, no es Naira quien llama.
+var FIRMA = "Eres Naira, gu";
+
+// De dónde se acepta. Vacío = se acepta cualquiera (para probar en local).
+var CASA = /(^https?:\/\/localhost)|(^https?:\/\/127\.0\.0\.1)|(\.netlify\.app$)|(^https?:\/\/[^/]*naira)/i;
+
+// El contador vive en la memoria del contenedor. Si Netlify lo recicla, se
+// pone a cero: por eso es un freno y no un candado.
+var visitas = {};        // ip -> {n, desde}
+var hoyTotal = 0, hoyDia = "";
+var POR_IP_HORA = 20;    // un turista hace 3 o 4 planes en una tarde
+var TECHO_DIA = 600;     // si un día se pasa de aquí, algo raro está pasando
+
+function ipDe(event) {
+  var h = event.headers || {};
+  return (h["x-nf-client-connection-ip"] || h["client-ip"] ||
+          (h["x-forwarded-for"] || "").split(",")[0] || "sin-ip").trim();
+}
+
+function pasaElFreno(event) {
+  var ahora = Date.now();
+  var dia = new Date().toISOString().slice(0, 10);
+  if (dia !== hoyDia) { hoyDia = dia; hoyTotal = 0; }
+  if (hoyTotal >= TECHO_DIA) return "techo del día";
+
+  var ip = ipDe(event);
+  var v = visitas[ip];
+  if (!v || ahora - v.desde > 3600000) v = visitas[ip] = { n: 0, desde: ahora };
+  if (v.n >= POR_IP_HORA) return "demasiadas seguidas";
+
+  // limpieza, que el objeto no crezca sin fin en un contenedor de días
+  var claves = Object.keys(visitas);
+  if (claves.length > 5000) {
+    for (var i = 0; i < claves.length; i++)
+      if (ahora - visitas[claves[i]].desde > 3600000) delete visitas[claves[i]];
+  }
+  v.n++; hoyTotal++;
+  return null;
+}
+
 function buscarClave() {
   var env = process.env || {};
   var nombres = Object.keys(env);
@@ -35,7 +94,11 @@ exports.handler = async function (event) {
         funcion: "viva",
         formato: "clasico",
         claveEncontrada: !!k,
-        pista: k ? k.slice(0, 12) + "..." : "ninguna variable empieza por sk-ant-",
+        // Antes esto enseñaba doce caracteres de la clave. Son el prefijo y no
+        // el secreto, pero esta URL es pública y enseñar trozos de una clave
+        // en público es una costumbre que un día sale cara.
+        pista: k ? "empieza por sk-ant- y tiene " + k.length + " caracteres"
+                 : "ninguna variable empieza por sk-ant-",
         variablesVistas: Object.keys(process.env || {}).length
       }, null, 2)
     };
@@ -43,6 +106,24 @@ exports.handler = async function (event) {
 
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, headers: cabeceras, body: JSON.stringify({ error: "Solo POST" }) };
+  }
+
+  // 2 · de dónde viene
+  var h = event.headers || {};
+  var de = h.origin || h.referer || h.Origin || h.Referer || "";
+  if (de && !CASA.test(de)) {
+    console.warn("llamada desde fuera:", de.slice(0, 80));
+    return { statusCode: 403, headers: cabeceras, body: JSON.stringify({ error: "Desde ahí no" }) };
+  }
+
+  // 3 · cuántas van
+  var frenado = pasaElFreno(event);
+  if (frenado) {
+    console.warn("freno:", frenado, ipDe(event));
+    // 429 y no 500: el navegador ya sabe caer al relato local, así que el
+    // turista recibe su plan igual, narrado con plantillas.
+    return { statusCode: 429, headers: cabeceras,
+             body: JSON.stringify({ error: "Demasiadas peticiones", motivo: frenado }) };
   }
 
   var clave = buscarClave();
@@ -59,6 +140,21 @@ exports.handler = async function (event) {
 
   if (!cuerpo.system || !Array.isArray(cuerpo.messages)) {
     return { statusCode: 400, headers: cabeceras, body: JSON.stringify({ error: "Faltan system o messages" }) };
+  }
+
+  // 1 · esto solo hace planes de Naira, y nada más
+  // La firma se busca en el arranque, no exactamente en el carácter 0: el
+  // panel deja editar el prompt, y sería absurdo que retocar la primera línea
+  // dejara a Zeben fuera de su propia web con un 400 sin explicación.
+  if (String(cuerpo.system).slice(0, 500).indexOf(FIRMA) < 0) {
+    console.warn("system que no es el de Naira");
+    return { statusCode: 400, headers: cabeceras, body: JSON.stringify({ error: "Esto solo sirve para los planes de Naira" }) };
+  }
+  if (String(cuerpo.system).length > 40000) {
+    return { statusCode: 413, headers: cabeceras, body: JSON.stringify({ error: "Prompt demasiado largo" }) };
+  }
+  if (cuerpo.messages.length !== 1 || cuerpo.messages[0].role !== "user") {
+    return { statusCode: 400, headers: cabeceras, body: JSON.stringify({ error: "Una sola pregunta" }) };
   }
 
   if (JSON.stringify(cuerpo.messages).length > 60000) {

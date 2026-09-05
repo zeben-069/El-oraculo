@@ -642,6 +642,28 @@ restaurante está mal ubicado, tiene razón: vive allí.
   rehace en el navegador con las tipografías buenas.
 - Si algún día hay dominio propio, hay que cambiar la URL en **cuatro
   sitios** del `<head>`: canonical, og:url y las dos de imagen.
+- **El proxy tiene freno, y hacía falta.** `netlify/functions/naira.js` es una
+  URL pública que gasta la clave de Zeben. Aceptaba el `system` que le
+  mandaran, así que valía de ChatGPT gratis a su costa. Tres cierres, de más
+  fuerte a más flojo: **(1)** el `system` tiene que traer la firma del prompt
+  de Naira en sus primeros 500 caracteres y venir con **un solo** mensaje de
+  usuario —lo peor que se puede sacar de ahí es un plan de un día—; **(2)** se
+  mira el `origin`/`referer` y solo se acepta desde el sitio (con `curl` se
+  falsea, pero corta el «apunto mi herramienta ahí»); **(3)** 20 por IP y hora
+  y un techo de 600 al día, contados **en memoria del contenedor**: Netlify
+  recicla instancias, así que es un freno, no un candado. Un candado de verdad
+  pide un contador compartido (Netlify Blobs) y eso obliga a `package.json`,
+  que es justo lo que la función quiso evitar.
+  Lo que hace que esto sea aceptable: cuando el freno salta se devuelve **429**
+  y el navegador ya sabe caer al relato local, así que **el turista recibe su
+  plan igual**, narrado con plantillas y con su sello. Y las llamadas
+  bloqueadas **no llegan a la API**, o sea que no cuestan.
+  Ojo con la firma: se busca en los primeros 500 caracteres y no en el 0,
+  porque el panel deja editar el prompt y retocar la primera línea dejaría a
+  Zeben fuera de su propia web con un 400 sin explicación.
+  El `?probar=1` ya no enseña doce caracteres de la clave: son el prefijo y no
+  el secreto, pero esa URL es pública.
+
 - **Búsqueda web: decidido que NO, por ahora.** Rompería el sello de «todo
   sale del informe», que es lo que diferencia a Naira. Y nunca para
   alergias o celiaquía: ahí la respuesta correcta es el teléfono del sitio.
