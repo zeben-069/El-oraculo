@@ -203,6 +203,22 @@ Vilaflor—, que ahí no es una etiqueta ancha, es que no lo hay.
 mismo día, pero quien pide agua quiere agua: tras el charco de Bajamar
 quedaban excluidos Punta del Hidalgo y Jover por ser también charcos.
 
+**Los dos botones de arriba hacían lo mismo.** «Sorpréndame» y «¿Qué plan
+hacemos hoy?» acababan los dos en `pedirPlan()` con el reloj recortando: a las
+nueve menos veinte de la noche, el segundo daba un día de UNA parada y UN
+restaurante. Ahora `plan` es **el día entero** (`S.diaEntero`, que apaga el
+recorte por reloj) y, si es hoy y pasan de las cuatro, **salta a mañana y lo
+dice**; `sorprender()` se queda con lo que resta de hoy. Los rótulos lo dicen:
+«Un plan para el día entero» y «Sorpréndame — con el tiempo que queda».
+
+**Un filtro no puede dejar una sola opción de comer.** `filtrar()` solo abría
+la mano cuando el filtro dejaba **cero** de camino; dejando uno, se aplicaba
+entero. En Buenavista un jueves eso daba **un solo restaurante** habiendo diez
+abiertos a menos de 8 km de la parada, tres de ellos más cerca que el
+propuesto. Ahora el filtro tiene que dejar al menos **3** a menos de 6 km de
+alguna parada; si no, van los dos grupos, lo pedido delante. De 496 planes
+barridos, los que ofrecían una sola opción pasan de 21 a **cero**.
+
 **Ni el municipio ni la comida pedida pisan la cercanía.** El desvío a las
 paradas se calcula ANTES de filtrar. Un filtro (mismo municipio, pescado,
 canaria) solo se aplica si deja algo a menos de 6 km de alguna parada; si no,
