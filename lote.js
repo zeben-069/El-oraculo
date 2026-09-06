@@ -273,7 +273,9 @@ else{
         if(!a) return;
         conActos++; salen+=a.lista.length;
         a.lista.forEach(x=>{
-          const ficha=ACTOS.find(y=>y.n===x.nombre&&y.f===f);
+          /* ojo: un acto de madrugada se ofrece en el día ANTERIOR, así que
+             no se puede buscar por la fecha del plan */
+          const ficha=ACTOS.find(y=>y.n===x.nombre&&y.m===x.municipio);
           if(!ficha||!ficha.q) sinQ++;
           else if(ficha.q!==(ninos?'ninos':'noche')) mal++;
         });

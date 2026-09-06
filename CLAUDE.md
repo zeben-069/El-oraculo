@@ -307,8 +307,16 @@ dos pueblos, que deja pasar Tegueste con La Laguna (3,6) y Los Realejos con La
 Orotava (5,9). Para elegir cuáles caben mandan los del propio pueblo; para
 contarlos, manda la hora. Van en `actividades_de_la_fiesta` con su hora y
 su sitio: sin el sitio no se puede decir «date un saltito a la plaza», que es
-justo lo que hace útil el dato. Y la madrugada es el final del día, no el
-principio: los fuegos de la víspera son a las 00:00 y van los últimos.
+justo lo que hace útil el dato.
+
+**La madrugada es del día de antes.** Los Fuegos de la Víspera del Cristo son
+el 14 a las 00:00 y quien sale la noche del 13 es quien los ve. Así que un acto
+que empieza antes de las seis se ofrece en el plan del **día anterior** —y no en
+el suyo, donde ya habría pasado antes de que el turista se levante—, va el
+último de la lista y viaja con `de_madrugada` para que Naira diga «esta noche a
+las doce» y no «mañana». Zeben lo corrigió: hay fuegos las dos noches, la del 13
+—los de la víspera— y la del 14 —los del Risco, que son los grandes—, y con la
+ficha movida al 13 los de la víspera se los perdía todo el mundo.
 
 **Las heladerías no son sitio de almorzar.** Marcadas con `remate`. Se
 ofrecen al final, en `para_rematar_el_dia`, y ya no solo con niños: un helado
@@ -412,7 +420,7 @@ a la guagua sin coche.
 
 Y cierra con los **actos**: por cada día y municipio con programa cargado,
 un plan con niños y otro sin ellos —208 planes—. Lo que se vigila ahí no es la
-dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: 218
+dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: 217
 actos ofrecidos, **0 ofrecidos a quien no toca** y **0 sin clasificar
 ofrecidos**. Esos dos ceros son la prueba de toda la regla.
 
@@ -757,11 +765,12 @@ restaurante está mal ubicado, tiene razón: vive allí.
   «Noche de Humor y Magia» de las once de la noche, y `humor` marcaba como acto
   de noche el «Cross Humorístico» de las cuatro de la tarde. Ahora es
   `noche de humor|humorista`.
-  Y un desacuerdo de fecha, el único: los **Fuegos de la Víspera** del Cristo.
-  El artefacto los pone el 14 a las 00:00 y nosotros el 13 a las 00:00. Manda
-  la nuestra, y no por cabezonería: el motor trata la madrugada como el final
-  del día anterior —`hDia()` le suma 24 horas a lo que empieza antes de las
-  seis—, así que fichados el 14 no se los vería nadie que planee la noche del 13.
+  Hubo un desacuerdo de fecha —los **Fuegos de la Víspera** del Cristo: el
+  artefacto el 14 a las 00:00, nosotros el 13—, y lo resolvió Zeben: **manda el
+  artefacto**. Hay fuegos las dos noches y son distintos: los de la víspera
+  (madrugada del 14) y los del Risco (la noche del 14), que son los grandes.
+  La fecha del artefacto es la buena; lo que había que arreglar era el motor,
+  no el dato. Esa es la regla de la casa: quien vive allí tiene razón.
 
 - **Los iconos de fiesta salen del nombre.** Etiquetar 148 fiestas a mano es
   trabajo que no se hace nunca y se pudre al añadir más. `iconoFiesta()` mira

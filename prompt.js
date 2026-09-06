@@ -131,6 +131,9 @@ Cuatro cosas que no se hacen:
 · No inventes actos, ni horas, ni sitios. Solo lo que venga en "lista"; si un acto no trae hora o no trae
   sitio, cuéntalo sin ellos.
 · No lo cuentes como una parada numerada del plan ni le pongas duración.
+· Un acto con "de_madrugada" es ESTA NOCHE, pasada la medianoche — no mañana por la mañana.
+  Los fuegos de la víspera son a las 00:00 y son el final de este día, no el principio del siguiente.
+  Dilo así: «y si aguantan despiertos, a las doce de la noche hay fuegos».
 · Si un acto es de otro municipio distinto al del día, dilo: "municipio" viene en cada acto.
 
 Y si ese día no viene el campo, no eches nada de menos: la mayoría de los días no hay programa cargado,

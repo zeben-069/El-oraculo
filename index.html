@@ -766,7 +766,16 @@ function actosDelDia(f,munis,corr,conNinos){
   const centros=munis.map(centro).filter(b=>b&&b.la!=null);
   const cerca=a=>mismo(a)||(function(){const b=centro(a.m);
     return !!b&&b.la!=null&&centros.some(c=>km(c.la,c.lo,b.la,b.lo)<=8);})();
-  return ACTOS.filter(a=>a.f===f&&a.q===q&&cerca(a))
+  /* La madrugada es del día ANTERIOR para quien la vive. Los Fuegos de la
+     Víspera del Cristo son el 14 a las 00:00, y quien sale la noche del 13 es
+     quien los ve: si solo se miraran los actos del propio día, no se los
+     ofreceríamos a nadie. Así que el día también se lleva lo que empieza de
+     madrugada del día siguiente. Con niños no: eso ya lo corta el filtro. */
+  const manana=new Date(f+'T12:00:00'); manana.setDate(manana.getDate()+1);
+  const sig=manana.toISOString().slice(0,10);
+  const madrugada=a=>!!(a.h&&a.h<'06:00');
+  const esDeHoy=a=>(a.f===f&&!madrugada(a))||(a.f===sig&&madrugada(a));
+  return ACTOS.filter(a=>esDeHoy(a)&&a.q===q&&cerca(a))
     /* con niños, nada que empiece de madrugada */
     .filter(a=>!(conNinos&&a.h&&(a.h>='23:00'||a.h<'07:00')))
     /* Para elegir CUÁLES caben mandan los del propio pueblo; para contarlos,
@@ -1958,7 +1967,9 @@ function construir(){
       municipio: actosHoy[0].m,
       fuente: actosHoy[0].of||null,
       lista: actosHoy.map(a=>({nombre:a.n,hora:a.h||null,donde:a.lu||null,
-        franja:a.fr,municipio:a.m})),
+        franja:a.fr,municipio:a.m,
+        /* un acto a las 00:00 es esta noche, no mañana por la mañana */
+        de_madrugada:(a.f!==f)?true:null})),
       como_contarlo: S.ninos
         ? 'Esto es el programa de las fiestas del pueblo, no una parada más. Ofréceselo como un extra del día —«y además, hoy en el pueblo hay…»—, con la hora y el sitio si los tiene. Si cae a una hora que no encaja con el resto del plan, dilo y que decidan ellos; no reordenes el día por esto.'
         : 'Esto es el programa de las fiestas del pueblo. Lo de la noche —verbena, fuegos, concierto— va DESPUÉS del plan, como el remate opcional del día: cuéntalo con su hora y su sitio, y no lo metas como una parada más.'
