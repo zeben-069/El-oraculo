@@ -683,6 +683,14 @@ restaurante está mal ubicado, tiene razón: vive allí.
   la rama principal**, así que en una rama de trabajo no salta nunca (a mano sí,
   con «Run workflow»); y el cron va en UTC, o sea que `0 7 * * 1` son las ocho
   de la mañana en Canarias en verano y las siete en invierno.
+  Y hay un tercer camino, que es el que está funcionando de verdad: una
+  **tarea programada en la cuenta de Zeben** (Routine `trig_01Wwek7tVbHqH4pE`)
+  que cada lunes a las 7:00 UTC abre una sesión, se pone en la rama de trabajo,
+  ejecuta `node avisar-fiestas.js 21` y le manda el resumen al correo y al
+  móvil. Eso no depende de que el proyecto esté en la rama principal, que es
+  justo lo que bloqueaba al trabajo con horario. Si algún día se junta todo en
+  `main`, sobra una de las dos y hay que quitar la otra: dos correos iguales el
+  mismo lunes es peor que ninguno.
 
 - **El vigía de la agenda: avisa, no importa.** Zeben pidió que alguien mirase
   lagenda.org y le dijera si hay novedades en Tenerife. Desde aquí no se puede
