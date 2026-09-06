@@ -1,0 +1,70 @@
+# El aviso semanal: «búscate el programa, que ya llega».
+# ---------------------------------------------------------------------------
+# Las fiestas se repiten casi en las mismas fechas todos los años, pero el
+# programa de actos lo publica cada ayuntamiento unos días antes. Esto lo
+# recuerda solo: cada lunes cruza el calendario de fiestas (datos/eventos.js)
+# con los programas ya cargados (datos/actos.js) y, si viene alguna sin
+# programa, escribe en un asunto de GitHub. GitHub manda el correo — que era
+# justo lo que hacía falta: un aviso personal sin montar ningún servidor.
+#
+# Ojo: los trabajos con horario SOLO se ejecutan desde la rama principal del
+# repositorio. Mientras esto viva en una rama de trabajo no salta nunca.
+# El botón «Run workflow» de la pestaña Actions sí lo lanza a mano.
+name: Aviso de fiestas sin programa
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'      # los lunes a las 8 de la mañana en Canarias (verano)
+  workflow_dispatch:          # y a mano, desde la pestaña Actions
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  avisar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+
+      - name: Mirar qué fiestas vienen sin programa
+        id: mirar
+        run: |
+          node avisar-fiestas.js 21 --md > aviso.md || true
+          if [ -s aviso.md ]; then echo "hay=1" >> "$GITHUB_OUTPUT"; else echo "hay=0" >> "$GITHUB_OUTPUT"; fi
+          cat aviso.md
+
+      - name: Escribirlo en el asunto de siempre
+        if: steps.mirar.outputs.hay == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITULO="Fiestas que llegan sin programa cargado"
+          # Un solo asunto para siempre, no uno nuevo cada lunes: se actualiza
+          # el cuerpo y solo se comenta —que es lo que manda el correo— cuando
+          # la lista ha cambiado de verdad.
+          NUM=$(gh issue list --state open --search "$TITULO in:title" --json number,body --jq '.[0].number' || true)
+          if [ -z "$NUM" ] || [ "$NUM" = "null" ]; then
+            gh issue create --title "$TITULO" --body-file aviso.md
+            exit 0
+          fi
+          gh issue view "$NUM" --json body --jq .body > antes.md || true
+          if ! diff -q <(sed -e 's/[[:space:]]*$//' antes.md) <(sed -e 's/[[:space:]]*$//' aviso.md) >/dev/null 2>&1; then
+            gh issue edit "$NUM" --body-file aviso.md
+            gh issue comment "$NUM" --body-file aviso.md
+          else
+            echo "la lista es la misma que la semana pasada · no se avisa otra vez"
+          fi
+
+      - name: Cerrar el asunto si ya no falta ninguno
+        if: steps.mirar.outputs.hay == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITULO="Fiestas que llegan sin programa cargado"
+          NUM=$(gh issue list --state open --search "$TITULO in:title" --json number --jq '.[0].number' || true)
+          if [ -n "$NUM" ] && [ "$NUM" != "null" ]; then
+            gh issue close "$NUM" --comment "Ya no viene ninguna fiesta sin programa. Se reabre solo cuando vuelva a faltar alguna."
+          fi

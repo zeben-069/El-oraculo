@@ -418,6 +418,12 @@ button.accion{background:var(--malvasia);color:var(--picon);border:0;border-radi
   font-family:var(--cuerpo);font-size:14px;font-weight:700;cursor:pointer}
 button.accion.sec{background:transparent;color:#A9998A;border:1px solid #3A2E27}
 .nota{font-size:13px;color:#A9998A;margin:0 0 12px;max-width:70ch}
+/* La lista de programas que faltan: es la trastienda, no la web del turista. */
+ul.pendientes{list-style:none;margin:0 0 14px;padding:0}
+ul.pendientes li{border-left:2.5px solid var(--malvasia);padding:0 0 0 12px;margin-bottom:12px;
+  font-family:var(--mono);font-size:12px;line-height:1.6;color:#C8BCAE}
+ul.pendientes li b{color:#FBF5E9}
+ul.pendientes .nota{margin:0}
 .cerrar{background:transparent;border:0;color:#A9998A;font-size:26px;line-height:1;cursor:pointer;padding:0 4px}
 .cerrar:hover{color:#FBF5E9}
 .pie{margin-top:34px;padding-top:18px;border-top:1.5px dotted var(--arena);color:var(--tea-suave);font-size:13px}

@@ -55,6 +55,7 @@ miradores.js                  arma la página de miradores, y mete los elegidos
 plantilla-miradores.html      su molde
 buscar-miradores.html         esa página, lista para abrir
 eventos.js                    arma la página de pegar fiestas, y mete las marcadas
+avisar-fiestas.js             qué fiestas llegan sin programa cargado
 plantilla-eventos.html        su molde
 pegar-eventos.html            esa página, lista para abrir
 ```
@@ -403,8 +404,8 @@ de paradas «niños: Sí» con niños contra 24% en pareja, 61% de tipo divertid
 a la guagua sin coche.
 
 Y cierra con los **actos**: por cada día y municipio con programa cargado,
-un plan con niños y otro sin ellos —74 planes—. Lo que se vigila ahí no es la
-dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: 45
+un plan con niños y otro sin ellos —72 planes—. Lo que se vigila ahí no es la
+dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: 42
 actos ofrecidos, **0 ofrecidos a quien no toca** y **0 sin clasificar
 ofrecidos**. Esos dos ceros son la prueba de toda la regla.
 
@@ -661,6 +662,26 @@ restaurante está mal ubicado, tiene razón: vive allí.
   fichero y se avisa por pantalla. Puede ser un error de la web o puede que el
   ayuntamiento lleve el acto a otro pueblo de verdad; eso lo dice quien vive
   allí.
+
+- **El programa hay que ir a buscarlo, y eso se olvida.** Las fiestas se
+  repiten casi en las mismas fechas todos los años —por eso hay 148 fichas con
+  2026 y 2027—, pero el programa de actos lo cuelga cada ayuntamiento unos días
+  antes. Llega el Cristo, el programa está publicado, y Naira sigue con la
+  fiesta en una línea. `avisar-fiestas.js` cruza las dos cosas: qué viene en los
+  próximos días (`EVENTOS`) y de qué hay programa cargado (`ACTOS`), con un
+  margen de 12 días porque unas fiestas de pueblo duran tres semanas y el día
+  grande cae en medio. Lo que falte, lo canta. Sin red y sin API: es una resta
+  de fechas, así que no se pudre cuando una web cambie.
+  Sale por dos sitios. En la web, la pestaña **«Programas»** del panel —la
+  trastienda, no lo ve el turista—. Y por correo, con
+  `.github/workflows/aviso-fiestas.yml`: cada lunes ejecuta esto y escribe en
+  **un solo asunto** de GitHub, que se actualiza y **solo comenta cuando la
+  lista cambia** —comentar es lo que manda el correo, y un correo idéntico cada
+  lunes se deja de leer a la tercera semana—. Si no falta ninguno, cierra el
+  asunto. Ojo con dos cosas: los trabajos con horario **solo se ejecutan desde
+  la rama principal**, así que en una rama de trabajo no salta nunca (a mano sí,
+  con «Run workflow»); y el cron va en UTC, o sea que `0 7 * * 1` son las ocho
+  de la mañana en Canarias en verano y las siete en invierno.
 
 - **Los iconos de fiesta salen del nombre.** Etiquetar 148 fiestas a mano es
   trabajo que no se hace nunca y se pudre al añadir más. `iconoFiesta()` mira

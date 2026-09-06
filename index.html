@@ -180,6 +180,7 @@ if(typeof L==='undefined'){
     <button class="pes" role="tab" aria-selected="false" data-h="prompt">Prompt</button>
     <button class="pes" role="tab" aria-selected="false" data-h="audit">Detector</button>
     <button class="pes" role="tab" aria-selected="false" data-h="valora">Qué funciona</button>
+    <button class="pes" role="tab" aria-selected="false" data-h="programas">Programas</button>
   </div>
   <div class="hoja" data-hoja="razon" data-activa="1" id="hRazon">
     <p class="vacio">Pida un plan y aquí sale cada decisión con su regla.</p>
@@ -200,6 +201,11 @@ if(typeof L==='undefined'){
     <p class="nota">Lo que dice la gente de los planes. Se guarda solo en este navegador.</p>
     <div id="listaValora"></div>
     <div class="fila-bot"><button class="accion sec" id="btnBorrarVal">Borrar las valoraciones</button></div>
+  </div>
+  <div class="hoja" data-hoja="programas" id="hProgramas">
+    <p class="nota">Fiestas que llegan y de las que Naira todavía no tiene el programa.
+      Se busca en la web del ayuntamiento y se pega en <b>pegar-eventos.html</b>.</p>
+    <div id="listaProgramas"></div>
   </div>
   <div class="hoja" data-hoja="audit" id="hAudit">
     <p class="nota">Cada cifra de la respuesta se compara con el informe. Lo que no esté, se marca.</p>
@@ -3559,6 +3565,44 @@ function guardarValoracion(b,nota){
     return v.length;
   }catch(e){ return 0; }
 }
+
+/* Qué fiestas vienen sin su programa cargado.
+   ------------------------------------------------------------------
+   Las fiestas se repiten casi en las mismas fechas todos los años, pero el
+   programa de actos —la feria infantil, la verbena, los fuegos— lo publica
+   cada ayuntamiento unos días antes y hay que ir a buscarlo. Eso es lo que se
+   olvida: llega el Cristo, el ayuntamiento tiene el programa colgado, y Naira
+   sigue con la fiesta en una línea.
+   Esto no es para el turista: es el recordatorio de quien mantiene esto. Va
+   en el panel, que es la trastienda. El mismo cruce lo hace `avisar-fiestas.js`
+   una vez por semana y avisa por correo. */
+function programasPendientes(dias){
+  dias=dias||45;
+  if(typeof EVENTOS==='undefined') return '<p class="vacio">Sin calendario de fiestas.</p>';
+  const actos=(typeof ACTOS!=='undefined')?ACTOS:[];
+  const hoy=new Date(); hoy.setHours(12,0,0,0);
+  const faltan=f=>Math.round((new Date(f+'T12:00:00')-hoy)/864e5);
+  /* margen ancho a propósito: unas fiestas de pueblo duran tres semanas y el
+     día grande cae en medio, así que los actos de alrededor cuentan igual */
+  const tiene=e=>actos.some(a=>a.m===e.m&&Math.abs(faltan(a.f)-faltan(e.f))<=12);
+  const g={};
+  EVENTOS.filter(e=>{const d=faltan(e.f);return d>=0&&d<=dias;})
+    .filter(e=>!tiene(e)).sort((a,b)=>a.f<b.f?-1:1)
+    .forEach(e=>{ /* varias líneas son la misma fiesta: una por pueblo y semana */
+      const k=e.m+'·'+Math.floor(faltan(e.f)/7);
+      if(!g[k]) g[k]={m:e.m,f:e.f,d:faltan(e.f),n:e.n,gorda:false};
+      if(e.d||e.ma==='Muy alta') g[k].gorda=true;
+    });
+  const l=Object.values(g).sort((a,b)=>a.d-b.d);
+  const cargados=[...new Set(actos.map(a=>a.m))];
+  const pie='<p class="nota">Cargados ahora mismo: <b>'+actos.length+'</b> actos de '+
+    (cargados.length?cargados.join(', '):'ningún municipio')+'.</p>';
+  if(!l.length) return '<p class="vacio">De lo que viene en '+dias+' días, no falta ningún programa.</p>'+pie;
+  return '<ul class="pendientes">'+l.map(x=>'<li>'+(x.gorda?'★ ':'')+
+    '<b>'+x.m+'</b> · faltan '+x.d+' días ('+x.f+')<br><span class="nota">'+
+    x.n.slice(0,70)+'</span></li>').join('')+'</ul>'+pie;
+}
+
 function resumenValoraciones(){
   const v=leerValoraciones();
   if(!v.length) return '<p class="vacio">Todavía no hay ninguna valoración. Aparecen aquí según la gente vaya puntuando sus planes.</p>';
@@ -4382,6 +4426,8 @@ const panel=document.getElementById('panel'),btnPanel=document.getElementById('b
 btnPanel.onclick=()=>{
   const lv=document.getElementById('listaValora');
   if(lv) lv.innerHTML=resumenValoraciones();
+  const lp=document.getElementById("listaProgramas");
+  if(lp) lp.innerHTML=programasPendientes();
   const ab=panel.getAttribute('data-abierto')==='1';
   panel.setAttribute('data-abierto',ab?'0':'1');
   btnPanel.setAttribute('aria-expanded',String(!ab));
