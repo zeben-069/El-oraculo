@@ -511,6 +511,54 @@ const TIPOS={
      'Árbol / monumento natural':'Naturdenkmal','Área recreativa':'Rastplatz'}
 };
 const tipoTr=t=>{ if(!t) return t; const m=TIPOS[S.idioma]; return (m&&m[t])||t; };
+/* Qué CLASE de acto es, en el idioma del turista.
+   ------------------------------------------------------------------
+   Los actos vienen escritos como los publica el ayuntamiento: «1.º Domingo de
+   Feria Infantil», «Gran Verbena con Pepe Benavente». Eso no se traduce —es el
+   nombre del acto, y es lo que el turista va a ver escrito en el cartel del
+   pueblo—, pero un inglés no tiene por qué saber qué es una verbena.
+   Con la clave de la API traduce el modelo, que lo hace mejor. Esto es para
+   el relato local, el que se cuenta sin API: se deja el nombre tal cual y se
+   le pone al lado, entre paréntesis, de qué va. Igual que `horarioTr()`, esto
+   no reescribe el dato: lo acompaña.
+   Y verbena, romería y guachinche se quedan en español a propósito: no hay
+   traducción buena y son palabras que le van a hacer falta. */
+const ACTOS_TR=[
+  [/feria infantil/i,                {en:"children's fair",     de:'Kinderjahrmarkt'}],
+  [/cine (al aire libre|de verano|en la calle)/i,{en:'open-air cinema',de:'Freiluftkino'}],
+  [/castillos? (hinchables?|de agua)|colchoneta|hinchable/i,{en:'bouncy castles',de:'Hüpfburgen'}],
+  [/fiesta (del agua|de la espuma)|espuma/i,{en:'water and foam party',de:'Wasser- und Schaumparty'}],
+  [/pinta ?caras/i,                  {en:'face painting',       de:'Kinderschminken'}],
+  [/talleres? infantil/i,            {en:"children's workshops",de:'Kinderworkshops'}],
+  [/espect[áa]culo familiar|para toda la familia/i,{en:'family show',de:'Familienshow'}],
+  [/cabalgata/i,                     {en:'float parade',        de:'Festumzug'}],
+  [/pasacalle/i,                     {en:'street parade',       de:'Straßenumzug'}],
+  [/romer[íi]a/i,                    {en:'romería — the ox-cart pilgrimage',de:'Romería — die Wallfahrt mit Ochsenkarren'}],
+  [/verbena/i,                       {en:'verbena — the open-air dance',de:'Verbena — der Tanzabend im Freien'}],
+  [/fuegos|pirotecni/i,              {en:'fireworks',           de:'Feuerwerk'}],
+  [/noche de humor|humorista/i,      {en:'comedy night',        de:'Comedy-Abend'}],
+  [/drag/i,                          {en:'drag show',           de:'Drag-Show'}],
+  [/concierto/i,                     {en:'concert',             de:'Konzert'}],
+  [/festival/i,                      {en:'festival',            de:'Festival'}],
+  [/\bgala\b/i,                      {en:'gala',                de:'Gala'}],
+  [/procesi[óo]n/i,                  {en:'procession',          de:'Prozession'}],
+  [/misa|eucarist/i,                 {en:'mass',                de:'Messe'}],
+  [/baile|tardeo|\bdj\b|orquesta/i,  {en:'dancing',             de:'Tanz'}]
+];
+const sinTildes=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+function actoTr(n){
+  if(S.idioma==='es') return '';
+  for(const [re,t] of ACTOS_TR){
+    if(!re.test(n||'')) continue;
+    const et=t[S.idioma]||'';
+    /* «Verbena (verbena — the open-air dance)» es una tontería: si el acto se
+       llama justo así, la aclaración no aclara nada. */
+    if(sinTildes(n)===sinTildes(et.split(/[ —-]/)[0])) return '';
+    return et;
+  }
+  return '';
+}
+
 /* El lema de cada municipio va en las tres lenguas dentro de la propia ficha */
 const lemaTr=e=>!e?'':(S.idioma==='en'?(e.lema_en||e.lema):S.idioma==='de'?(e.lema_de||e.lema):e.lema)||'';
 /* El horario es texto libre y viene en español («L-J 13:00-18:00 · V y S hasta
@@ -1961,11 +2009,21 @@ function construir(){
        aire libre; con dos adultos, la verbena y los fuegos. Lo que no se supo
        clasificar no viaja: nos callamos antes que colocarle un torneo de
        dominó a una familia diciendo que es para ellos. */
-    actividades_de_la_fiesta: actosHoy.length?{
+    actividades_de_la_fiesta: actosHoy.length?(function(){
+      const cuenta={}; actosHoy.forEach(a=>cuenta[a.m]=(cuenta[a.m]||0)+1);
+      const jefe=Object.keys(cuenta).sort((a,b)=>cuenta[b]-cuenta[a])[0];
+      const mandan=actosHoy.find(a=>a.m===jefe);
+      return {
       para: S.ninos?'una familia con niños':'dos adultos',
-      de_las_fiestas: actosHoy[0].fi||null,
-      municipio: actosHoy[0].m,
-      fuente: actosHoy[0].of||null,
+      /* Un día puede llevar actos de dos pueblos —quien duerme en Tegueste ve
+         los del Cristo de La Laguna—, así que la cabecera es el pueblo que más
+         pone, no el que casualmente empieza más temprano. */
+      /* y solo se nombra LA fiesta si todos los actos son de la misma: en La
+         Laguna coinciden el Cristo y San Mateo de Punta del Hidalgo, y decir
+         una de las dos como si fuera todo es contar mal. */
+      de_las_fiestas: actosHoy.every(a=>a.fi===mandan.fi)?(mandan.fi||null):null,
+      municipio: mandan.m,
+      fuente: mandan.of||null,
       lista: actosHoy.map(a=>({nombre:a.n,hora:a.h||null,donde:a.lu||null,
         franja:a.fr,municipio:a.m,
         /* un acto a las 00:00 es esta noche, no mañana por la mañana */
@@ -1973,7 +2031,8 @@ function construir(){
       como_contarlo: S.ninos
         ? 'Esto es el programa de las fiestas del pueblo, no una parada más. Ofréceselo como un extra del día —«y además, hoy en el pueblo hay…»—, con la hora y el sitio si los tiene. Si cae a una hora que no encaja con el resto del plan, dilo y que decidan ellos; no reordenes el día por esto.'
         : 'Esto es el programa de las fiestas del pueblo. Lo de la noche —verbena, fuegos, concierto— va DESPUÉS del plan, como el remate opcional del día: cuéntalo con su hora y su sitio, y no lo metas como una parada más.'
-    }:null,
+      };
+    })():null,
     paradas: paradas.map(p=>({nombre:p.n,tipo:p.tipo||null,servicios:p.serv||null,accesible:p.acc||null,fuente_oficial:p.of||null,franja:p.fr,duracion_min:p.dur,cuando_no:p.no||null,reserva_obligatoria:p.res_texto||p.res||null,
       permiso_max_personas:p.res_max||null,
       permiso_dias_antelacion:p.res_dias||null,tarifa:p.tarifa||null,
@@ -2774,7 +2833,7 @@ const N={
   mananaEv:(n,h)=>' Y a mediodía, al lío: '+n+h+'.',
   noHay:(t)=>'De '+t+' por aquí cerca no tengo nada abierto ahora mismo, así que les digo lo que sí hay.\n',
   actos:(m,f)=>'Y otra cosa, que hoy '+m+' está de fiestas'+(f?' —'+f+'—':'')+': hay cosas del programa que les van a encajar.',
-  actoLin:(n,h,d)=>'· '+n+(h?', a las '+h:'')+(d?', en '+d:'')+'.',
+  actoLin:(n,h,d,k,m)=>'· '+n+(h?', a las '+h:'')+(d?', en '+d:'')+(m?' ('+m+')':'')+'.',
   regalo:(n,d)=>'Y de regalo le digo una cosa: de camino le queda '+n+', '+
     (d<0.5?'sin apenas desviarse':'a '+String(d).replace('.',',')+' km de desvío')+'. '+
     'Se para un momento, se sacan dos fotos y se sigue.',
@@ -2845,7 +2904,7 @@ const N={
   mananaEv:(n,h)=>' And at midday, straight to '+n+h+'.',
   noHay:(t)=>'There is no '+t+' open near here right now, so let me tell you what there is.\n',
   actos:(m,f)=>'One more thing: '+m+' is in fiestas today'+(f?' —'+f+'—':'')+', and the programme has something that fits you.',
-  actoLin:(n,h,d)=>'· '+n+(h?', at '+h:'')+(d?', at '+d:'')+'.',
+  actoLin:(n,h,d,k,m)=>'· '+n+(k?' ('+k+')':'')+(h?', at '+h:'')+(d?', at '+d:'')+(m?' — '+m:'')+'.',
   regalo:(n,d)=>'And here is a little gift: '+n+' is right on your way'+
     (d<0.5?'':', only '+d+' km off the route')+'. '+
     'You stop for a moment, take a couple of photos and carry on.',
@@ -2916,7 +2975,7 @@ const N={
   mananaEv:(n,h)=>' Und mittags direkt zu '+n+h+'.',
   noHay:(t)=>'In der Nähe hat gerade nichts mit '+t+' offen, deshalb sage ich Ihnen, was es gibt.\n',
   actos:(m,f)=>'Und noch etwas: in '+m+' ist heute Fiesta'+(f?' —'+f+'—':'')+', und im Programm steht etwas Passendes für Sie.',
-  actoLin:(n,h,d)=>'· '+n+(h?', um '+h:'')+(d?', '+d:'')+'.',
+  actoLin:(n,h,d,k,m)=>'· '+n+(k?' ('+k+')':'')+(h?', um '+h:'')+(d?', '+d:'')+(m?' — '+m:'')+'.',
   regalo:(n,d)=>'Und als kleines Geschenk: '+n+' liegt direkt auf dem Weg'+
     (d<0.5?'':', nur '+String(d).replace('.',',')+' km Umweg')+'. '+
     'Kurz anhalten, zwei Fotos, weiter geht es.',
@@ -3149,7 +3208,8 @@ function narrarLocal(b){
   if(b.actividades_de_la_fiesta&&F.actos){
     const a=b.actividades_de_la_fiesta;
     t.push(F.actos(a.municipio,a.de_las_fiestas)+'\n'+'\n'+
-      a.lista.map(x=>F.actoLin(x.nombre,x.hora,x.donde)).join('\n'));
+      a.lista.map(x=>F.actoLin(x.nombre,x.hora,x.donde,actoTr(x.nombre),
+        x.municipio!==a.municipio?x.municipio:null)).join('\n'));
   }
 
   const abajo=(b.avisos||[]).filter(a=>arriba.indexOf(a)<0);

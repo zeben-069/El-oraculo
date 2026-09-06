@@ -318,6 +318,28 @@ las doce» y no «mañana». Zeben lo corrigió: hay fuegos las dos noches, la d
 —los de la víspera— y la del 14 —los del Risco, que son los grandes—, y con la
 ficha movida al 13 los de la víspera se los perdía todo el mundo.
 
+**Las fiestas también hablan tres idiomas, pero el nombre no se traduce.** Un
+acto se llama «1.º Domingo de Feria Infantil» porque así lo publica el
+ayuntamiento, y así es como el turista lo va a ver escrito en el cartel de la
+plaza: traducirle el nombre sería dejarlo sin poder reconocerlo. Lo que se hace
+es acompañarlo. Con clave de API lo traduce el modelo, y el prompt le dice cómo:
+traducir **lo que describe** el acto, no tocar los nombres propios —la Plaza del
+Cristo es la Plaza del Cristo en los tres idiomas—, y dejar en español
+**verbena, romería y guachinche** explicándolas media frase, que no tienen
+traducción buena y son las palabras que va a necesitar.
+Sin clave, el relato local hace lo mismo con una tabla cerrada, `actoTr()`: deja
+el nombre y le pone al lado de qué va —«1.º Domingo de Feria Infantil
+(children's fair)»—, igual que `horarioTr()` toca solo las palabras del horario.
+No aclara cuando no hace falta: «Verbena» a secas no se anota «(verbena — the
+open-air dance)», que eso no aclara nada.
+Y dos cosas de la cabecera, que se vieron probándolo en inglés: el pueblo que
+sale es **el que más actos pone**, no el del acto más temprano —quien duerme en
+La Laguna veía «Tegueste is in fiestas» por una verbena de las cinco—, y los
+actos de otro pueblo se marcan con el suyo al lado. Y la fiesta solo se nombra
+si **todos** los actos son de la misma: en La Laguna coinciden el Cristo y San
+Mateo de Punta del Hidalgo, y decir una de las dos como si fuera todo es contar
+mal.
+
 **Las heladerías no son sitio de almorzar.** Marcadas con `remate`. Se
 ofrecen al final, en `para_rematar_el_dia`, y ya no solo con niños: un helado
 de camino al coche vale igual para dos adultos. Se buscan a 2,5 km de la
