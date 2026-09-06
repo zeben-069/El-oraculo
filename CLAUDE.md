@@ -56,6 +56,7 @@ plantilla-miradores.html      su molde
 buscar-miradores.html         esa página, lista para abrir
 eventos.js                    arma la página de pegar fiestas, y mete las marcadas
 avisar-fiestas.js             qué fiestas llegan sin programa cargado
+vigilar-agenda.js             mira si hay novedades en lagenda.org
 plantilla-eventos.html        su molde
 pegar-eventos.html            esa página, lista para abrir
 ```
@@ -682,6 +683,40 @@ restaurante está mal ubicado, tiene razón: vive allí.
   la rama principal**, así que en una rama de trabajo no salta nunca (a mano sí,
   con «Run workflow»); y el cron va en UTC, o sea que `0 7 * * 1` son las ocho
   de la mañana en Canarias en verano y las siete en invierno.
+
+- **El vigía de la agenda: avisa, no importa.** Zeben pidió que alguien mirase
+  lagenda.org y le dijera si hay novedades en Tenerife. Desde aquí no se puede
+  —403 en el CONNECT, como con las fotos y los miradores—, pero la misma
+  máquina de GitHub que manda el aviso de las fiestas sí tiene red. Lo hace
+  ella, los lunes: `vigilar-agenda.js` lee las **tres páginas de zona de
+  Tenerife** —norte, sur y metropolitano, que son las suyas y por eso son el
+  filtro de isla— y saca los enlaces de `/programacion/`.
+  La clave es de dónde saca cada cosa. **El identificador es el número del
+  final de la URL**, que es lo único estable: los títulos y el diseño cambian,
+  el id no. **Y el título sale del propio enlace, no del texto del `<a>`**:
+  probado contra la página de verdad que guardó Zeben, la mitad de los enlaces
+  son una foto sin texto y uno de los que sí tenían texto era el
+  «info@lagenda.org» del pie. El trocito de URL
+  —`fiestas-de-el-socorro-2026-tegueste-septiembre`— siempre está y siempre
+  dice lo que es.
+  Lo que huele a fiesta de pueblo va marcado con ⭐ y primero. Ojo con ese
+  filtro: llevaba `san-` y `santa-` y marcaba como fiesta el «Distrito Joven
+  Santa Cruz», que es un ciclo de conciertos —los nombres de pueblo salen en
+  media isla—. Las de San Miguel se cazan igual por el «fiesta» del nombre.
+  Tres cosas más, todas por la misma razón: **es la web de otro y esto solo
+  avisa**. Son tres peticiones a la semana, con pausa entre ellas y una
+  identificación honrada en el `user-agent`. Nada entra solo en el catálogo:
+  el correo dice DÓNDE mirar y el programa se sigue pegando a mano. Y si un
+  lunes no se puede leer la web, **se dice** —callarse parecería que no hay
+  novedades cuando lo que pasa es que ya no nos dejan entrar—, pero como el
+  aviso solo comenta cuando el texto cambia, eso se dice una vez y no cada
+  lunes.
+  La memoria de lo ya visto **no es un fichero**: viaja dentro del propio
+  asunto de GitHub, en un comentario oculto (`<!-- vistos: 43577,… -->`). Así
+  la nota y su memoria son la misma cosa y el robot no tiene que escribir en
+  el repositorio. Y la primera vez se ejecuta con `--sembrar`, que apunta lo
+  que hay ese día y calla: sin eso, el primer correo serían los cien eventos
+  colgados y un correo así no se lee.
 
 - **Los iconos de fiesta salen del nombre.** Etiquetar 148 fiestas a mano es
   trabajo que no se hace nunca y se pudre al añadir más. `iconoFiesta()` mira

@@ -1,0 +1,76 @@
+# El vigía de la agenda cultural.
+# ---------------------------------------------------------------------------
+# Una vez por semana mira las tres páginas de zona de Tenerife en lagenda.org
+# y avisa de lo que haya salido nuevo. Es la web de otro: son tres peticiones
+# a la semana, con una identificación honrada y con pausa entre ellas.
+#
+# Y no mete nada solo. El aviso dice DÓNDE mirar; el programa se sigue pegando
+# a mano en pegar-eventos.html, que es la regla de la casa: lo que viene de
+# fuera lo mira una persona antes de entrar.
+#
+# La memoria de lo ya visto vive dentro del propio asunto de GitHub, en un
+# comentario oculto. Así no hace falta que el robot escriba en el repositorio.
+#
+# Ojo: los trabajos con horario SOLO se ejecutan desde la rama principal.
+name: Vigilar lagenda.org
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'      # los lunes, un poco después del aviso de fiestas
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  vigilar:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TITULO: Novedades en lagenda.org
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+
+      - name: Buscar el asunto de siempre
+        id: asunto
+        run: |
+          NUM=$(gh issue list --state open --search "$TITULO in:title" --json number --jq '.[0].number' || true)
+          [ "$NUM" = "null" ] && NUM=""
+          echo "num=$NUM" >> "$GITHUB_OUTPUT"
+          if [ -n "$NUM" ]; then
+            gh issue view "$NUM" --json body --jq .body > antes.md
+            # la memoria: los ids ya vistos, guardados en un comentario oculto
+            VISTOS=$(grep -o 'vistos:[0-9, ]*' antes.md | head -1 | tr -cd '0-9,')
+            echo "vistos=$VISTOS" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: La primera vez, solo apuntar lo que ya hay
+        if: steps.asunto.outputs.num == ''
+        run: |
+          node vigilar-agenda.js --sembrar > aviso.md
+          # si el primer barrido no lee nada, no se crea el asunto con la
+          # memoria vacía: se calla y el lunes que viene se intenta otra vez
+          if [ ! -s aviso.md ]; then echo "no he podido leer la web · lo dejo para la semana que viene"; exit 0; fi
+          gh issue create --title "$TITULO" --body-file aviso.md
+
+      - name: Las demás semanas, contar solo lo nuevo
+        if: steps.asunto.outputs.num != ''
+        run: |
+          node vigilar-agenda.js --vistos "${{ steps.asunto.outputs.vistos }}" > aviso.md
+          if [ ! -s aviso.md ]; then
+            echo "nada nuevo esta semana · no se avisa"; exit 0
+          fi
+          # Comentar es lo que manda el correo. Si el texto es el mismo de la
+          # semana pasada —el caso de «no he podido leer la web», que si no
+          # llegaría cada lunes—, se actualiza el cuerpo y se calla.
+          sed -e 's/<!-- vistos:.*-->//' antes.md | sed -e 's/[[:space:]]*$//' > a.txt
+          sed -e 's/<!-- vistos:.*-->//' aviso.md | sed -e 's/[[:space:]]*$//' > b.txt
+          gh issue edit "${{ steps.asunto.outputs.num }}" --body-file aviso.md
+          if diff -q a.txt b.txt >/dev/null 2>&1; then
+            echo "el mismo texto que la semana pasada · no se comenta"
+          else
+            gh issue comment "${{ steps.asunto.outputs.num }}" --body-file aviso.md
+          fi
