@@ -37,11 +37,21 @@
  le saca las líneas con fecha; usted <b>corrige lo que haga falta y marca las que valgan</b>. Lo que
  salga mal se arregla escribiendo encima: el que decide es usted, esto solo adelanta trabajo. Las que
  Naira ya tiene salen avisadas en rojo.
+ <br><b>Y diga arriba qué es lo que ha pegado.</b> La agenda semanal trae fiestas sueltas de varios
+ pueblos y cada una entra como una fiesta. El programa de unas fiestas trae cuarenta actos del mismo
+ pueblo —feria infantil, verbena, fuegos— y esos no son cuarenta fiestas: cuelgan de la que ya hay, y
+ Naira los usa para decirle a una familia con niños dónde está la feria y a dos adultos dónde la verbena.
 </p>
 <textarea id="texto" placeholder="Pegue aquí el texto…"></textarea>
 <div class="barraSup">
   <button id="trocear">Sacar las fiestas</button>
   <label>Año: <input type="number" id="anno" min="2020" max="2100"></label>
+  <label>Esto es: <select id="tipo">
+    <option value="fiestas">fiestas sueltas de la agenda</option>
+    <option value="actos">el programa de UNAS fiestas</option>
+  </select></label>
+  <label id="cajaFiesta" hidden>De las fiestas de: <input type="text" id="nomFiesta"
+    placeholder="Fiestas del Cristo" size="26"></label>
   <span id="estado" class="ayuda" style="margin:0"></span>
 </div>
 <div id="lista"></div>
@@ -156,6 +166,10 @@ function trocear(txt,anno){
   return out;
 }
 
+/* Dos cosas muy distintas se pegan aquí: la agenda semanal, que trae fiestas
+   sueltas de varios pueblos, y el programa de UNAS fiestas, que trae cuarenta
+   actos del mismo pueblo. Lo segundo no puede entrar como cuarenta fiestas.  */
+const esActos=()=>document.getElementById("tipo").value==="actos";
 const filas=[];
 const cuenta=()=>{const n=filas.filter(x=>x.chk.checked).length;
   document.getElementById('cuenta').textContent=n+(n===1?' marcada':' marcadas');
@@ -194,7 +208,10 @@ function pinta(e){
   const fila={chk,nom,fec,sel,hor,nota};
   const revisa=()=>{
     caja.classList.toggle('fuera',!chk.checked);
-    const repe=yaEsta(fec.value,nom.value);
+    /* Dentro del programa de unas fiestas, repetir es lo normal: hay tres
+       domingos de feria infantil seguidos y los tres son de verdad. El aviso
+       de «esto ya está» solo tiene sentido con la agenda semanal. */
+    const repe=esActos()?null:yaEsta(fec.value,nom.value);
     caja.classList.toggle('repe',!!repe);
     aviso.textContent = !repe ? ''
       : repe.tipo==='misma'
@@ -205,6 +222,7 @@ function pinta(e){
     sel.style.borderColor=(chk.checked&&!sel.value)?'#A93B2B':'';
     cuenta();
   };
+  fila.revisa=revisa;
   [chk,nom,fec,sel,hor,nota].forEach(x=>{x.addEventListener('change',revisa);
     x.addEventListener('input',revisa);});
   filas.push(fila);
@@ -213,6 +231,10 @@ function pinta(e){
 }
 
 document.getElementById('anno').value=new Date().getFullYear();
+document.getElementById('tipo').onchange=()=>{
+  document.getElementById('cajaFiesta').hidden=!esActos();
+  filas.forEach(f=>f.revisa&&f.revisa());
+};
 document.getElementById('trocear').onclick=()=>{
   filas.length=0;
   document.getElementById('lista').innerHTML='';
@@ -235,11 +257,18 @@ document.getElementById('bajar').onclick=()=>{
   }).filter(Boolean);
   if(fuera.length) alert('Estas se quedan fuera por no tener municipio:\n· '+fuera.join('\n· '));
   if(!fiestas.length) return;
-  const datos={generado:new Date().toISOString().slice(0,10),
-    fuente:'Agenda semanal, repasada a mano', fiestas};
+  const actos=esActos();
+  const nombreFiesta=document.getElementById('nomFiesta').value.trim();
+  if(actos&&!nombreFiesta&&!confirm('No ha puesto el nombre de las fiestas. ¿Lo bajo igual?')) return;
+  /* El fichero dice de qué va, y así se mete solo donde toca: una fiesta
+     suelta va a EVENTOS y el programa entero va a ACTOS, que si no serían
+     cuarenta fiestas en el mismo pueblo la misma semana. */
+  const datos={generado:new Date().toISOString().slice(0,10), tipo:actos?'actos':'fiestas',
+    fiesta:actos?(nombreFiesta||null):null,
+    fuente:actos?'Programa de fiestas, repasado a mano':'Agenda semanal, repasada a mano', fiestas};
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify(datos,null,1)],{type:'application/json'}));
-  a.download='fiestas.json'; a.click();
+  a.download=actos?'programa.json':'fiestas.json'; a.click();
 };
 cuenta();
 </script>

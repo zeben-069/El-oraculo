@@ -216,6 +216,7 @@ if(typeof L==='undefined'){
 <script src="datos/lugares.js"></script>
 <script src="datos/restaurantes.js"></script>
 <script src="datos/eventos.js"></script>
+<script src="datos/actos.js"></script>
 <script src="datos/bases.js"></script>
 <script src="datos/estampas.js"></script>
 <script src="datos/titsa-matriz.js"></script>
@@ -726,6 +727,37 @@ function puntuar(e){
   /* una fiesta con hora confirmada gana a una que solo tiene fecha */
   if(e.h)p+=2;
   return p;
+}
+
+/* Los actos del programa de unas fiestas, filtrados por quién viaja.
+   ------------------------------------------------------------------
+   Una fiesta de EVENTOS es una línea. Pero unas fiestas de pueblo duran tres
+   semanas y traen un programa de cuarenta actos, y ahí está lo que de verdad
+   le sirve al turista: el domingo hay feria infantil en la Plaza del Cristo y
+   el viernes hay verbena. Con niños interesa lo primero; a dos adultos, lo
+   segundo. Los actos van en ACTOS —no en EVENTOS, que serían cuarenta fiestas
+   en La Laguna la misma semana y la agenda quedaría inservible— y cada uno
+   trae en `q` a quién le sirve, sacado del nombre.
+
+   Lo que no se supo clasificar NO se ofrece: un torneo de dominó no es un
+   plan para una familia con niños solo porque caiga ese día. Es la misma
+   regla de siempre: si no lo sabemos, nos callamos.
+
+   Y solo salen los del día del plan y de la zona por donde pasa el día
+   —municipio de alguna parada, de la fiesta o de la cama—, que anunciarle
+   una verbena a 40 km no es un regalo, es un anuncio. */
+const hDia=h=>{const n=h?+String(h).slice(0,2)+ +String(h).slice(3,5)/60:99;return n<6?n+24:n;};
+function actosDelDia(f,munis,corr,conNinos){
+  if(typeof ACTOS==='undefined'||!ACTOS.length) return [];
+  const q=conNinos?'ninos':'noche';
+  const cerca=a=>munis.indexOf(a.m)>=0;
+  return ACTOS.filter(a=>a.f===f&&a.q===q&&(cerca(a)||a.c===corr))
+    /* con niños, nada que empiece de madrugada */
+    .filter(a=>!(conNinos&&a.h&&(a.h>='23:00'||a.h<'07:00')))
+    /* la madrugada es el final del día, no el principio: los fuegos de la
+       víspera son a las 00:00 y van los últimos, no los primeros */
+    .sort((a,b)=>(cerca(b)?1:0)-(cerca(a)?1:0)||hDia(a.h)-hDia(b.h))
+    .slice(0,4);
 }
 
 function construir(){
@@ -1741,6 +1773,21 @@ function construir(){
     });
   })();
 
+  /* Los actos del programa de unas fiestas, filtrados por quién viaja: con
+     niños salen la feria infantil y el cine al aire libre; siendo dos adultos,
+     la verbena y los fuegos. Se miran los municipios por los que pasa el día
+     —las paradas, la fiesta y la cama—, no la isla entera. */
+  const actosHoy=(function(){
+    const munis=[...new Set(paradas.map(p=>p.m).concat(ev?[ev.m]:[],[base.m]).filter(Boolean))];
+    return actosDelDia(f,munis,corr,!!S.ninos);
+  })();
+  if(actosHoy.length) paso('ok','el programa de las fiestas',
+    'Hay <span class="si">'+actosHoy.length+'</span> acto'+(actosHoy.length>1?'s':'')+
+    ' del programa por la zona del día que le sirve'+(actosHoy.length>1?'n':'')+' a '+
+    (S.ninos?'una familia con niños':'dos adultos')+': <span class="am">'+
+    actosHoy.map(a=>a.n.slice(0,38)+(a.h?' ('+a.h+')':'')).join(' · ')+
+    '</span>.<br>Los actos que no se supieron clasificar no se ofrecen a nadie.');
+
   const brief={
     fecha:f,dia_semana:DIAS[ds],alojamiento:base.et,coche:S.coche,personas:S.gente,
     /* El informe solo llevaba la fecha DEL PLAN, así que Naira no sabía si eso
@@ -1882,6 +1929,23 @@ function construir(){
       como_contarla: esFiestaDeTodoElDia(ev)
         ? 'Esto no es una cita a una hora: es que '+ev.m+' está de fiesta todo el día. No lo metas como una parada más ni le pongas hora inventada. Cuéntalo como el ambiente que se van a encontrar por la calle mientras hacen el resto del plan.'
         : 'Esto sí tiene hora: '+(ev.h||'sin confirmar')+'. Es un bloque fijo del día y el resto se ordena antes y después. No propongas nada que se solape.'}:null,
+    /* El programa de las fiestas, filtrado por quién viaja. No es una parada
+       del motor ni lleva coordenadas: es lo que está pasando en el pueblo ese
+       día y a esa gente le sirve. Con niños, la feria infantil y el cine al
+       aire libre; con dos adultos, la verbena y los fuegos. Lo que no se supo
+       clasificar no viaja: nos callamos antes que colocarle un torneo de
+       dominó a una familia diciendo que es para ellos. */
+    actividades_de_la_fiesta: actosHoy.length?{
+      para: S.ninos?'una familia con niños':'dos adultos',
+      de_las_fiestas: actosHoy[0].fi||null,
+      municipio: actosHoy[0].m,
+      fuente: actosHoy[0].of||null,
+      lista: actosHoy.map(a=>({nombre:a.n,hora:a.h||null,donde:a.lu||null,
+        franja:a.fr,municipio:a.m})),
+      como_contarlo: S.ninos
+        ? 'Esto es el programa de las fiestas del pueblo, no una parada más. Ofréceselo como un extra del día —«y además, hoy en el pueblo hay…»—, con la hora y el sitio si los tiene. Si cae a una hora que no encaja con el resto del plan, dilo y que decidan ellos; no reordenes el día por esto.'
+        : 'Esto es el programa de las fiestas del pueblo. Lo de la noche —verbena, fuegos, concierto— va DESPUÉS del plan, como el remate opcional del día: cuéntalo con su hora y su sitio, y no lo metas como una parada más.'
+    }:null,
     paradas: paradas.map(p=>({nombre:p.n,tipo:p.tipo||null,servicios:p.serv||null,accesible:p.acc||null,fuente_oficial:p.of||null,franja:p.fr,duracion_min:p.dur,cuando_no:p.no||null,reserva_obligatoria:p.res_texto||p.res||null,
       permiso_max_personas:p.res_max||null,
       permiso_dias_antelacion:p.res_dias||null,tarifa:p.tarifa||null,
@@ -2681,6 +2745,8 @@ const N={
   manana:(n,d)=>'Empiezan la mañana por '+n+', que con calma son cosa de '+d+' minutos.',
   mananaEv:(n,h)=>' Y a mediodía, al lío: '+n+h+'.',
   noHay:(t)=>'De '+t+' por aquí cerca no tengo nada abierto ahora mismo, así que les digo lo que sí hay.\n',
+  actos:(m,f)=>'Y otra cosa, que hoy '+m+' está de fiestas'+(f?' —'+f+'—':'')+': hay cosas del programa que les van a encajar.',
+  actoLin:(n,h,d)=>'· '+n+(h?', a las '+h:'')+(d?', en '+d:'')+'.',
   regalo:(n,d)=>'Y de regalo le digo una cosa: de camino le queda '+n+', '+
     (d<0.5?'sin apenas desviarse':'a '+String(d).replace('.',',')+' km de desvío')+'. '+
     'Se para un momento, se sacan dos fotos y se sigue.',
@@ -2750,6 +2816,8 @@ const N={
   manana:(n,d)=>'Start the morning at '+n+' — about '+d+' minutes taking it easy.',
   mananaEv:(n,h)=>' And at midday, straight to '+n+h+'.',
   noHay:(t)=>'There is no '+t+' open near here right now, so let me tell you what there is.\n',
+  actos:(m,f)=>'One more thing: '+m+' is in fiestas today'+(f?' —'+f+'—':'')+', and the programme has something that fits you.',
+  actoLin:(n,h,d)=>'· '+n+(h?', at '+h:'')+(d?', at '+d:'')+'.',
   regalo:(n,d)=>'And here is a little gift: '+n+' is right on your way'+
     (d<0.5?'':', only '+d+' km off the route')+'. '+
     'You stop for a moment, take a couple of photos and carry on.',
@@ -2819,6 +2887,8 @@ const N={
   manana:(n,d)=>'Beginnen Sie den Morgen bei '+n+' — in Ruhe etwa '+d+' Minuten.',
   mananaEv:(n,h)=>' Und mittags direkt zu '+n+h+'.',
   noHay:(t)=>'In der Nähe hat gerade nichts mit '+t+' offen, deshalb sage ich Ihnen, was es gibt.\n',
+  actos:(m,f)=>'Und noch etwas: in '+m+' ist heute Fiesta'+(f?' —'+f+'—':'')+', und im Programm steht etwas Passendes für Sie.',
+  actoLin:(n,h,d)=>'· '+n+(h?', um '+h:'')+(d?', '+d:'')+'.',
   regalo:(n,d)=>'Und als kleines Geschenk: '+n+' liegt direkt auf dem Weg'+
     (d<0.5?'':', nur '+String(d).replace('.',',')+' km Umweg')+'. '+
     'Kurz anhalten, zwei Fotos, weiter geht es.',
@@ -3045,6 +3115,14 @@ function narrarLocal(b){
   }
 
   if(b.evento_lejano && !cuentaLejosPrimero) contarLejano();
+
+  /* El programa de las fiestas: el narrador local también lo cuenta, que si
+     no, con clave de API se dice y sin ella no. */
+  if(b.actividades_de_la_fiesta&&F.actos){
+    const a=b.actividades_de_la_fiesta;
+    t.push(F.actos(a.municipio,a.de_las_fiestas)+'\n'+'\n'+
+      a.lista.map(x=>F.actoLin(x.nombre,x.hora,x.donde)).join('\n'));
+  }
 
   const abajo=(b.avisos||[]).filter(a=>arriba.indexOf(a)<0);
   if(abajo.length) t.push(F.antesSalir+'\n\n· '+abajo.join('\n· '));

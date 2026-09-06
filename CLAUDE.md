@@ -28,7 +28,7 @@ estilos.css                   el CSS (27 KB)
 prompt.js                     el prompt de Naira (18 KB)
 datos/lugares.js              LUGARES (328 KB)
 datos/restaurantes.js         REST (118 KB)
-datos/eventos.js              EVENTOS · datos/bases.js · datos/estampas.js
+datos/eventos.js              EVENTOS · datos/actos.js · datos/bases.js · datos/estampas.js
 datos/titsa-matriz.js         MATRIZ (338 KB) · datos/titsa-regreso.js · datos/ine.js
 manifest.webmanifest          para instalar en la pantalla de inicio
 icono.svg / icono-*.png
@@ -79,6 +79,9 @@ Dentro de `index.html`, como constantes:
 - `LUGARES` (589) — sitios que visitar. Solo 4 sin coordenadas.
 - `REST` (318) — restaurantes, incluidas 38 heladerías.
 - `EVENTOS` (148) — fiestas. **Sin coordenadas**, solo municipio y corredor.
+- `ACTOS` (75) — los actos del programa de unas fiestas: día, municipio,
+  hora, dónde es y `q` («ninos»/«noche»), que dice a quién le sirve. No son
+  fiestas: cuelgan de una que ya está en `EVENTOS` y no anclan el día.
 - `BASES` (31) — los municipios, con su centro y corredor.
 - `ESTAMPA` (31) — por municipio, la ruta de su foto (`f`) y su lema.
 
@@ -273,6 +276,32 @@ familias de toda la zona metropolitana»— viajaba al informe como
 `aviso_seguridad` y el modelo la leía como una advertencia. Ahora salen por
 `ojo_para_llegar`, `nota_del_sitio` y `el_relato_no_esta_probado`.
 
+**El programa de la fiesta se cuenta según con quién viajan.** Una fiesta de
+`EVENTOS` es una línea —«Fiesta del Santísimo Cristo, La Laguna, 14 de
+septiembre»—, pero unas fiestas de pueblo duran tres semanas y traen un
+programa de cuarenta actos, y ahí está lo que de verdad le sirve al turista:
+el domingo hay feria infantil en la Plaza del Cristo y el viernes hay verbena.
+Eso no cabe en `EVENTOS` —serían cuarenta fiestas en La Laguna la misma semana
+y la agenda de los próximos 21 días quedaría inservible—, así que los actos
+viven en `ACTOS`, colgando del día y del municipio, y **no compiten por ser el
+ancla del día**: no son una parada, son lo que está pasando en el pueblo.
+
+Cada acto trae en `q` a quién le sirve, sacado **del nombre** como los iconos
+de fiesta: con niños salen la feria infantil, el cine al aire libre y los
+castillos de agua; a dos adultos, la verbena, los fuegos y el concierto. Lo
+que no se supo clasificar **se queda sin `q` y no se le ofrece a nadie**: de
+72 actos de tres programas, la mitad —un torneo de dominó, una misa, una
+exposición de manualidades—. Es la regla de siempre: antes callarse que
+colocarle un torneo de dominó a una familia con niños diciendo que es para
+ellos.
+
+Solo salen los del día del plan y de la zona por donde pasa —municipio de
+alguna parada, de la fiesta o de la cama—, que anunciar una verbena a 40 km no
+es un regalo, es un anuncio. Van en `actividades_de_la_fiesta` con su hora y
+su sitio: sin el sitio no se puede decir «date un saltito a la plaza», que es
+justo lo que hace útil el dato. Y la madrugada es el final del día, no el
+principio: los fuegos de la víspera son a las 00:00 y van los últimos.
+
 **Las heladerías no son sitio de almorzar.** Marcadas con `remate`. Se
 ofrecen al final, en `para_rematar_el_dia`, y ya no solo con niños: un helado
 de camino al coche vale igual para dos adultos. Se buscan a 2,5 km de la
@@ -372,6 +401,12 @@ de paradas «niños: Sí» con niños contra 24% en pareja, 61% de tipo divertid
 1% de planes iguales entre pareja y niños, 54% iguales entre coche y guagua
 —esos son legítimos: sitios que ya están junto a una parada— y 229 m de media
 a la guagua sin coche.
+
+Y cierra con los **actos**: por cada día y municipio con programa cargado,
+un plan con niños y otro sin ellos —74 planes—. Lo que se vigila ahí no es la
+dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: 45
+actos ofrecidos, **0 ofrecidos a quien no toca** y **0 sin clasificar
+ofrecidos**. Esos dos ceros son la prueba de toda la regla.
 
 **Con navegador** — `probar-web.js` con Playwright recorre siete flujos en
 Chrome contra la web desplegada y captura los errores de consola.
@@ -610,6 +645,22 @@ restaurante está mal ubicado, tiene razón: vive allí.
   entraron las dos. Ahora se avisa —y el que mete la rechaza— cuando la misma
   fiesta ya está a **menos de dos semanas**: se corrige la que hay, no se
   añade otra.
+  Y ahora la página distingue **dos cosas que se pegan igual pero no son lo
+  mismo**: la agenda semanal, que trae fiestas sueltas de varios pueblos, y el
+  programa de UNAS fiestas, que trae cuarenta actos del mismo pueblo. Se elige
+  arriba, y el fichero que se baja lo dice (`tipo`), así que `node eventos.js
+  ese-fichero.json` lo lleva solo a `EVENTOS` o a `ACTOS`. Dos detalles que
+  salieron con los tres programas de verdad —El Tablado, el Cristo y La Luz—:
+  dentro de un programa **repetir es lo normal** (hay tres domingos de feria
+  infantil seguidos y los tres son de verdad), así que el aviso de «esto ya
+  está» se apaga en ese modo; y la web pega varios actos en la misma línea
+  («Fiesta del agua con castillos de agua.19:30 – Gala de la Reina Infantil»),
+  que se parten por la hora seguida de raya. Lo que no se toca solo: un acto
+  con **otro municipio** dentro del programa —el «Musical Las historias del
+  genio» venía como Santa Cruz en el programa de La Laguna— entra donde dice el
+  fichero y se avisa por pantalla. Puede ser un error de la web o puede que el
+  ayuntamiento lleve el acto a otro pueblo de verdad; eso lo dice quien vive
+  allí.
 
 - **Los iconos de fiesta salen del nombre.** Etiquetar 148 fiestas a mano es
   trabajo que no se hace nunca y se pudre al añadir más. `iconoFiesta()` mira

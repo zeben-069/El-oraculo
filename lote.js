@@ -246,3 +246,46 @@ console.log('  CON NIÑOS · marcados «niños: Sí»   : '+pc(kids.si,kids.para
 console.log('  CON NIÑOS · de tipo divertido      : '+pc(kids.divertidos,kids.paradas));
 console.log('  SIN COCHE · media a la guagua      : '+Math.round(guagua.suma/Math.max(1,guagua.con))+' m'+
             '   · paradas a más de 1,5 km: '+guagua.lejos);
+
+/* ============ ACTOS · el programa de las fiestas ============
+   Lo que hay que vigilar aquí no es la dispersión: es que a nadie se le
+   ofrezca un acto que no le toca. Con niños solo pueden salir los marcados
+   «ninos», con dos adultos solo los «noche», y lo que no se supo clasificar
+   no puede salir NUNCA. Se barre día a día cada programa cargado, desde el
+   propio municipio, con niños y sin ellos. */
+console.log('\n=== ACTOS · el programa de las fiestas ===');
+const ACTOS=(()=>{ try{ const t=require('fs').readFileSync('datos/actos.js','utf8');
+  return eval(t+';ACTOS'); }catch(e){ return []; } })();
+if(!ACTOS.length) console.log('  (no hay ningún programa cargado)');
+else{
+  const dias=[...new Set(ACTOS.map(a=>a.f))].sort();
+  let salen=0, mal=0, sinQ=0, conActos=0, pruebas=0;
+  dias.forEach(f=>{
+    [...new Set(ACTOS.filter(a=>a.f===f).map(a=>a.m))].forEach(muni=>{
+      [true,false].forEach(ninos=>{
+        pruebas++;
+        Object.assign(S,{base:muni,coche:true,gente:ninos?4:2,ninos:ninos,
+          anclaElegida:null,comida:null,apetece:null,ahora:null,saltoComida:0,
+          descartados:null,prefTipo:null,fecha:f,idioma:'es',forzarEvento:null,
+          fiestaTodoElDia:null,diaEntero:false,faltaNucleo:null});
+        let b; try{ b=construir().brief; }catch(e){ mal++; return; }
+        const a=b.actividades_de_la_fiesta;
+        if(!a) return;
+        conActos++; salen+=a.lista.length;
+        a.lista.forEach(x=>{
+          const ficha=ACTOS.find(y=>y.n===x.nombre&&y.f===f);
+          if(!ficha||!ficha.q) sinQ++;
+          else if(ficha.q!==(ninos?'ninos':'noche')) mal++;
+        });
+      });
+    });
+  });
+  console.log('  actos cargados            : '+ACTOS.length+
+    '   ('+ACTOS.filter(a=>a.q==='ninos').length+' para niños, '+
+    ACTOS.filter(a=>a.q==='noche').length+' de noche, '+
+    ACTOS.filter(a=>!a.q).length+' sin clasificar)');
+  console.log('  planes probados           : '+pruebas+'   ·  con algo del programa: '+conActos);
+  console.log('  actos ofrecidos           : '+salen);
+  console.log('  OFRECIDO A QUIEN NO TOCA  : '+mal);
+  console.log('  SIN CLASIFICAR y ofrecido : '+sinQ);
+}
