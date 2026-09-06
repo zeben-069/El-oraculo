@@ -197,8 +197,8 @@ function sacaLugar(n){
 /* Para quién es el acto, sacado del nombre. Primero se mira lo de niños:
    una «Gala de elección de la Reina Infantil» es una gala, sí, pero lo que
    manda ahí es el infantil. */
-const ACTO_NINOS=/infantil|para (los |l@s )?ni[ñn]os|familiar|para toda la familia|actividades? infantil|pinta ?caras|hinchable|colchoneta|castillo de agua|fiesta de la espuma|globoflexia|payaso|t[íi]teres|marionet|cuentacuentos|taller(es)? infantil|juegos (infantiles|tradicionales|populares)|cine (al aire libre|de verano|en la calle)|circo|cabalgata|mascota|parque acu[áa]tico|espuma|guiñol|magia/i;
-const ACTO_NOCHE=/verbena|megaverbena|orquesta|gran baile|baile (del|de|tardeo)|tardeo|\bdj\b|concierto|drag|humor|rock|festival|fuegos artificiales|fuegos del|fuegos de la|pirotecni|gala|noche de|cata de vinos|romer[íi]a|bailable|parranda/i;
+const ACTO_NINOS=/infantil|para (los |l@s )?ni[ñn]os|familiar|para toda la familia|actividades? infantil|pinta ?caras|hinchable|colchoneta|castillo de agua|fiesta de la espuma|globoflexia|payaso|t[íi]teres|marionet|cuentacuentos|taller(es)? infantil|juegos (infantiles|tradicionales|populares)|cine (al aire libre|de verano|en la calle)|circo|cabalgata|mascota|parque acu[áa]tico|espuma|gui[ñn]ol/i;
+const ACTO_NOCHE=/verbena|megaverbena|orquesta|gran baile|baile (del|de|tardeo)|tardeo|\bdj\b|concierto|drag|noche de humor|humorista|rock|festival|fuegos artificiales|fuegos del|fuegos de la|pirotecni|gala|noche de|cata de vinos|romer[íi]a|bailable|parranda/i;
 function clasificaActo(n){
   const t=String(n||'');
   if(ACTO_NINOS.test(t)) return 'ninos';
@@ -246,7 +246,11 @@ function meterActos(fichero,fiesta){
       if(lu) a.lu=lu;
       const q=clasificaActo(n);
       if(q) a.q=q;
-      if(nombreFiesta) a.fi=nombreFiesta;
+      /* Un fichero puede traer VARIOS programas a la vez —la agenda de una
+         isla entera trae los de quince pueblos—, así que cada fila puede decir
+         de qué fiestas es. Si no lo dice, manda el nombre del fichero. */
+      const fi=x.fiesta||nombreFiesta;
+      if(fi) a.fi=fi;
       a.of=datos.fuente||'Programa de fiestas, repasado a mano';
       nuevos.push(a);
     });
@@ -281,7 +285,76 @@ function meterActos(fichero,fiesta){
   console.log('   node lote.js');
 }
 
+function reclasificar(){
+  /* Las reglas de `q` van a seguir mejorando —cada programa nuevo enseña un
+     caso—, y los actos ya fichados se quedarían con la clasificación vieja.
+     Esto los repasa con las reglas de hoy y dice qué cambia. */
+  const F='datos/actos.js';
+  const txt=fs.readFileSync(F,'utf8');
+  const A=eval(txt+';ACTOS');
+  const cambios=[];
+  A.forEach(a=>{ const antes=a.q||null, ahora=clasificaActo(a.n);
+    if(antes!==ahora){ cambios.push({n:a.n,m:a.m,antes,ahora});
+      if(ahora) a.q=ahora; else delete a.q; } });
+  if(!cambios.length) return console.log('nada que cambiar: los '+A.length+' actos ya están con las reglas de hoy.');
+  const cab=txt.slice(0,txt.indexOf('const ACTOS='));
+  fs.writeFileSync(F,cab+'const ACTOS='+JSON.stringify(A,null,0).replace(/\},\{/g,'},\n{')+';\n');
+  console.log(cambios.length+' actos cambian de clasificación:');
+  cambios.forEach(c=>console.log('   '+String(c.antes||'—').padEnd(6)+'→ '+String(c.ahora||'—').padEnd(6)+' '+c.n.slice(0,58)));
+  const q={ninos:0,noche:0,sin:0}; A.forEach(a=>q[a.q||'sin']++);
+  console.log('\nQuedan: '+q.ninos+' para niños, '+q.noche+' de noche, '+q.sin+' sin clasificar.');
+}
+
+/* Actos repetidos: pasa en cuanto entran dos fuentes.
+   ------------------------------------------------------------------
+   El mismo acto contado por dos sitios no se llama igual: «Cine al aire libre:
+   Lilo y Stitch (2025)» y «Cine al aire libre: Lilo y Stitch», «Grabación del
+   programa En Otra Clave de RTVC» y «… (RTVC)». Mismo pueblo, mismo día, misma
+   hora: es el mismo acto, y ofrecerlo dos veces en el mismo plan queda fatal.
+
+   Se juntan, no se borra uno a ciegas: gana el que trae el sitio (`lu`), que es
+   lo que hace útil el dato, y lo que le falte se rellena con el otro.
+
+       node eventos.js duplicados         dice qué juntaría, sin tocar nada
+       node eventos.js duplicados hazlo   lo hace                            */
+function duplicados(hazlo){
+  const F='datos/actos.js';
+  const txt=fs.readFileSync(F,'utf8');
+  const A=eval(txt+';ACTOS');
+  /* mismo pueblo, mismo día, misma hora y el nombre que empieza igual: los
+     dos primeros son datos duros, el tercero es lo que cambia entre fuentes */
+  const clave=a=>a.m+'|'+a.f+'|'+(a.h||'');
+  const cab=n=>norm(n).slice(0,24);
+  const fuera=new Set(), juntados=[];
+  A.forEach((a,i)=>{
+    if(fuera.has(i)) return;
+    A.forEach((b,j)=>{
+      if(j<=i||fuera.has(j)) return;
+      if(clave(a)!==clave(b)) return;
+      if(cab(a.n)!==cab(b.n)) return;
+      /* gana el que trae el sitio; si empatan, el nombre más largo, que dice más */
+      const ganaA=(!!a.lu&&!b.lu)||(!!a.lu===!!b.lu&&a.n.length>=b.n.length);
+      const g=ganaA?a:b, p=ganaA?b:a;
+      Object.keys(p).forEach(k=>{ if(g[k]==null||g[k]==='') g[k]=p[k]; });
+      fuera.add(ganaA?j:i);
+      juntados.push({queda:g.n,cae:p.n,m:g.m,f:g.f,h:g.h||''});
+    });
+  });
+  console.log('=== ACTOS REPETIDOS ===');
+  if(!juntados.length) return console.log('ninguno: los '+A.length+' actos son distintos entre sí.');
+  juntados.forEach(x=>console.log('\n· '+x.m+' · '+x.f+' '+x.h+
+    '\n    queda: '+x.queda.slice(0,66)+'\n    cae:   '+x.cae.slice(0,66)));
+  const limpio=A.filter((a,i)=>!fuera.has(i));
+  console.log('\nactos antes: '+A.length+'  ·  se van: '+fuera.size+'  ·  quedan: '+limpio.length);
+  if(!hazlo) return console.log('\n(esto era el ensayo · «node eventos.js duplicados hazlo» para hacerlo)');
+  fs.writeFileSync(F,txt.slice(0,txt.indexOf('const ACTOS='))+'const ACTOS='+
+    JSON.stringify(limpio,null,0).replace(/\},\{/g,'},\n{')+';\n');
+  console.log('\nhecho. Pasa ahora: node lote.js');
+}
+
 const arg=process.argv[2];
 if(!arg||arg==='pegar') pagina();
 else if(arg==='actos') meterActos(process.argv[3],process.argv[4]);
+else if(arg==='reclasificar') reclasificar();
+else if(arg==='duplicados') duplicados(process.argv[3]==='hazlo');
 else meter(arg);

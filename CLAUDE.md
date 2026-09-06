@@ -81,7 +81,8 @@ Dentro de `index.html`, como constantes:
 - `LUGARES` (589) — sitios que visitar. Solo 4 sin coordenadas.
 - `REST` (318) — restaurantes, incluidas 38 heladerías.
 - `EVENTOS` (148) — fiestas. **Sin coordenadas**, solo municipio y corredor.
-- `ACTOS` (75) — los actos del programa de unas fiestas: día, municipio,
+- `ACTOS` (300) — los actos de 22 programas de fiestas de 15 municipios:
+  día, municipio,
   hora, dónde es y `q` («ninos»/«noche»), que dice a quién le sirve. No son
   fiestas: cuelgan de una que ya está en `EVENTOS` y no anclan el día.
 - `BASES` (31) — los municipios, con su centro y corredor.
@@ -299,7 +300,12 @@ ellos.
 
 Solo salen los del día del plan y de la zona por donde pasa —municipio de
 alguna parada, de la fiesta o de la cama—, que anunciar una verbena a 40 km no
-es un regalo, es un anuncio. Van en `actividades_de_la_fiesta` con su hora y
+es un regalo, es un anuncio. El «al lado» se mide en **kilómetros**, no por
+corredor: por corredor, quien duerme en Arona veía la romería de Los Abrigos, a
+10 km, solo porque las dos cosas son «Sur». Son 8 km entre los centros de los
+dos pueblos, que deja pasar Tegueste con La Laguna (3,6) y Los Realejos con La
+Orotava (5,9). Para elegir cuáles caben mandan los del propio pueblo; para
+contarlos, manda la hora. Van en `actividades_de_la_fiesta` con su hora y
 su sitio: sin el sitio no se puede decir «date un saltito a la plaza», que es
 justo lo que hace útil el dato. Y la madrugada es el final del día, no el
 principio: los fuegos de la víspera son a las 00:00 y van los últimos.
@@ -405,8 +411,8 @@ de paradas «niños: Sí» con niños contra 24% en pareja, 61% de tipo divertid
 a la guagua sin coche.
 
 Y cierra con los **actos**: por cada día y municipio con programa cargado,
-un plan con niños y otro sin ellos —72 planes—. Lo que se vigila ahí no es la
-dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: 42
+un plan con niños y otro sin ellos —208 planes—. Lo que se vigila ahí no es la
+dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: 218
 actos ofrecidos, **0 ofrecidos a quien no toca** y **0 sin clasificar
 ofrecidos**. Esos dos ceros son la prueba de toda la regla.
 
@@ -725,6 +731,37 @@ restaurante está mal ubicado, tiene razón: vive allí.
   el repositorio. Y la primera vez se ejecuta con `--sembrar`, que apunta lo
   que hay ese día y calla: sin eso, el primer correo serían los cien eventos
   colgados y un correo así no se lee.
+
+- **La cosecha grande vino de un artefacto de Cowork.** Zeben le pidió a Claude
+  en Cowork que le sacara los eventos de Tenerife y publicó un artefacto —«Fiestas
+  de Tenerife»— con **266 actos de 15 municipios y 21 programas**, cada uno con
+  municipio, fiesta, día, hora y sitio. Eso multiplica por cuatro lo que había.
+  Antes de meterlo se **cruzó contra los tres programas que él había pegado a
+  mano**: de los 56 actos suyos que caen dentro del rango del artefacto,
+  **coinciden todos** salvo diferencias de redacción («Concierto al Cristo de La
+  Laguna de Los Cantadores…» / «Concierto Los Cantadores…»). Ese cruce es lo que
+  permite fiarse: no es que el artefacto lo diga, es que donde se puede
+  comprobar, cuadra. Y encima trae el sitio de cada acto, que nosotros
+  sacábamos a duras penas del final del nombre.
+  De ahí salieron dos herramientas que van a hacer falta cada vez que entre otra
+  fuente:
+  · `node eventos.js duplicados` — el mismo acto contado por dos sitios no se
+    llama igual («Cine al aire libre: Lilo y Stitch (2025)» / «… Lilo y
+    Stitch»). Mismo pueblo, mismo día, misma hora y el nombre empezando igual:
+    es el mismo. Gana el que trae el sitio, y lo que le falte se rellena con el
+    otro. Sin argumentos hace el ensayo. Fueron **9**.
+  · `node eventos.js reclasificar` — las reglas de `q` van a seguir mejorando y
+    los actos ya fichados se quedarían con la clasificación vieja. Esto los
+    repasa con las reglas de hoy y dice qué cambia.
+  Dos reglas que se afinaron con estos datos: `magia` marcaba como infantil la
+  «Noche de Humor y Magia» de las once de la noche, y `humor` marcaba como acto
+  de noche el «Cross Humorístico» de las cuatro de la tarde. Ahora es
+  `noche de humor|humorista`.
+  Y un desacuerdo de fecha, el único: los **Fuegos de la Víspera** del Cristo.
+  El artefacto los pone el 14 a las 00:00 y nosotros el 13 a las 00:00. Manda
+  la nuestra, y no por cabezonería: el motor trata la madrugada como el final
+  del día anterior —`hDia()` le suma 24 horas a lo que empieza antes de las
+  seis—, así que fichados el 14 no se los vería nadie que planee la noche del 13.
 
 - **Los iconos de fiesta salen del nombre.** Etiquetar 148 fiestas a mano es
   trabajo que no se hace nunca y se pudre al añadir más. `iconoFiesta()` mira

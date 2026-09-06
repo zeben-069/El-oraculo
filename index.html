@@ -751,19 +751,30 @@ function puntuar(e){
 
    Y solo salen los del día del plan y de la zona por donde pasa el día
    —municipio de alguna parada, de la fiesta o de la cama—, que anunciarle
-   una verbena a 40 km no es un regalo, es un anuncio. */
+   una verbena a 40 km no es un regalo, es un anuncio. El «al lado» se mide
+   en KILÓMETROS y no por corredor, que es la regla de siempre de esta casa:
+   por corredor, quien duerme en Arona veía la romería de Los Abrigos, a diez
+   kilómetros, solo porque las dos cosas son «Sur». Ocho kilómetros entre los
+   centros de los dos pueblos: eso deja pasar Tegueste con La Laguna (3,6) y
+   Los Realejos con La Orotava (5,9), y corta Arona con Granadilla (10,3). */
 const hDia=h=>{const n=h?+String(h).slice(0,2)+ +String(h).slice(3,5)/60:99;return n<6?n+24:n;};
 function actosDelDia(f,munis,corr,conNinos){
   if(typeof ACTOS==='undefined'||!ACTOS.length) return [];
   const q=conNinos?'ninos':'noche';
-  const cerca=a=>munis.indexOf(a.m)>=0;
-  return ACTOS.filter(a=>a.f===f&&a.q===q&&(cerca(a)||a.c===corr))
+  const mismo=a=>munis.indexOf(a.m)>=0;
+  const centro=m=>{for(const k in BASES) if(BASES[k].m===m) return BASES[k]; return BASES[m]||null;};
+  const centros=munis.map(centro).filter(b=>b&&b.la!=null);
+  const cerca=a=>mismo(a)||(function(){const b=centro(a.m);
+    return !!b&&b.la!=null&&centros.some(c=>km(c.la,c.lo,b.la,b.lo)<=8);})();
+  return ACTOS.filter(a=>a.f===f&&a.q===q&&cerca(a))
     /* con niños, nada que empiece de madrugada */
     .filter(a=>!(conNinos&&a.h&&(a.h>='23:00'||a.h<'07:00')))
-    /* la madrugada es el final del día, no el principio: los fuegos de la
-       víspera son a las 00:00 y van los últimos, no los primeros */
-    .sort((a,b)=>(cerca(b)?1:0)-(cerca(a)?1:0)||hDia(a.h)-hDia(b.h))
-    .slice(0,4);
+    /* Para elegir CUÁLES caben mandan los del propio pueblo; para contarlos,
+       manda la hora. Y la madrugada es el final del día, no el principio: los
+       fuegos de la víspera son a las 00:00 y van los últimos. */
+    .sort((a,b)=>(mismo(b)?1:0)-(mismo(a)?1:0)||hDia(a.h)-hDia(b.h))
+    .slice(0,4)
+    .sort((a,b)=>hDia(a.h)-hDia(b.h));
 }
 
 function construir(){
