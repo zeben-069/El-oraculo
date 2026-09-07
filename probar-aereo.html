@@ -37,6 +37,58 @@
  abriéndola desde su carpeta: si aquí fallan y allí no, ya sabemos por dónde va.
 </p>
 
+<h2>0 · Lo que hay de verdad publicado</h2>
+<p class="ayuda">Esta página vive dentro del sitio, así que puede mirar los ficheros de Naira
+directamente. Aquí se ve qué versión está subida y si sus imágenes llegan.</p>
+<div id="dentro"></div>
+
+<h2>0 bis · La ficha, tal cual la dibuja Naira</h2>
+<p class="ayuda">Esto no es una imitación: es exactamente el mismo trozo de HTML que el motor pone en
+la ficha de la Playa de Las Teresitas, copiado letra por letra. Si aquí se ve la playa y en Naira no,
+el fallo no está en la imagen.</p>
+<div id="fichaReal" style="display:flex;gap:14px;align-items:center;background:#fff;border:1.5px solid #3E2B1C;
+     border-radius:14px;padding:12px;box-shadow:2.5px 2.5px 0 #3E2B1C;margin-bottom:11px">
+  <span class="foto conFondo" id="marcoDemo"
+    style="width:62px;height:62px;border-radius:11px;background-size:cover;background-position:center;
+           background-color:#E8D9BE;position:relative;display:grid;place-items:center;flex:none">
+    <span style="font-size:26px;filter:drop-shadow(0 1px 3px rgba(0,0,0,.45))">🍹</span>
+  </span>
+  <div><b>Playa de Las Teresitas</b><br><span class="ayuda" style="margin:0">Si el cuadro sale del color
+  de la arena, la ortofoto no llegó. Si sale la playa, llegó.</span></div>
+</div>
+<script>
+(function(){
+  const D=document.getElementById('dentro');
+  const $=(t,a,h)=>{const e=document.createElement(t);if(a)Object.assign(e,a);if(h)e.innerHTML=h;return e;};
+  const linea=(txt,bien)=>{const p=$('div',{className:'fila '+(bien?'ok':'mal')});
+    p.appendChild($('div',{className:'campos'},'<h3>'+txt+'</h3>')); D.appendChild(p); };
+
+  if(location.protocol==='file:'){
+    linea('Esto solo funciona abriendo la página <b>desde la web</b>, no desde su carpeta.',false);
+  }else{
+    /* el propio index.html: mismo sitio, así que se puede leer sin permiso de nadie */
+    fetch('index.html?v='+Date.now()).then(r=>r.text()).then(t=>{
+      linea('index.html publicado: <b>'+Math.round(t.length/1024)+' KB</b>', t.length>100000);
+      linea('¿Es la versión nueva? (lleva la sonda de la ortofoto): <b>'+
+        (t.includes('class=\"sonda\"')?'SÍ':'NO — está publicada una versión vieja')+'</b>',
+        t.includes('class=\"sonda\"'));
+      linea('¿Carga los actos de fiesta? <b>'+(t.includes('datos/actos.js')?'sí':'NO')+'</b>',
+        t.includes('datos/actos.js'));
+    }).catch(e=>linea('No he podido leer index.html: '+e.message,false));
+
+    /* las imágenes propias del sitio */
+    [['img/estampas/adeje.jpg','la estampa de un municipio'],
+     ['img/sitios/auditorio-de-tenerife.jpg','una foto de sitio'],
+     ['img/cartas/comida-tipica.jpg','un cartel de las preguntas']].forEach(([u,q])=>{
+      const i=new Image();
+      i.onload=()=>linea('Imagen propia («'+q+'»): <b>llega</b> · '+u,true);
+      i.onerror=()=>linea('Imagen propia («'+q+'»): <b>NO llega</b> · '+u,false);
+      i.src=u+'?v='+Date.now();
+     });
+  }
+})();
+</script>
+
 <h2>1 · La misma imagen, pedida de tres maneras</h2>
 <p class="ayuda">Las tres piden exactamente la misma foto. Lo único que cambia es cómo la pide el navegador.
 Esto es lo que de verdad me interesa.</p>
@@ -67,6 +119,9 @@ const $=(t,a,h)=>{const e=document.createElement(t);if(a)Object.assign(e,a);if(h
     : 'Está abriendo esta página <b>desde '+location.host+'</b>. Esta es la prueba buena: es exactamente '+
       'lo que hace Naira cuando le pide la foto a GRAFCAN.';
 })();
+
+/* El cuadro de arriba, con la MISMA url que pone el motor en la ficha. */
+document.getElementById('marcoDemo').style.backgroundImage='url('+GRAFCAN+')';
 
 /* ---- Bloque 1: la misma foto, pedida de tres formas ---- */
 const MODOS=[
