@@ -44,6 +44,7 @@ datos/senderos-anaga.js       7 caminos de Anaga (CARGADO PERO SIN USAR)
 datos/senderos-tenerife.js    225 itinerarios del Cabildo con desnivel
 datos/miradores.js            18 miradores de Santa Cruz
 empaquetar.js                 arma el zip que se suelta en Netlify Drop
+probar-aereo.html             prueba en casa qué ortofoto contesta
 fusionar.js                   junta sitios repetidos (ensayo sin tocar nada)
 fotos.js                      la lista de fotos que faltan, y las mete
 fotos-encargo.md              esa lista para encargársela a otro (con reglas)
@@ -585,6 +586,28 @@ restaurante está mal ubicado, tiene razón: vive allí.
   llevan el nombre del pueblo escrito dentro y al recortarlas salía medio
   rótulo («LA OROTA»). Playas, charcos y paisajes siguen con el aéreo, que
   ahí sí dice algo.
+- **La ortofoto viene de fuera, y lo de fuera se cae.** Zeben avisó de que en la
+  web no salía **ninguna** imagen. La vista aérea de cada ficha se le pide a
+  GRAFCAN (`idecan1.grafcan.es/ServicioWMS/OrtoExpress`), y si ese servicio no
+  contesta el hueco se quedaba en blanco: la ficha parecía rota. Dos cosas,
+  porque son dos problemas distintos.
+  **Que nunca haya un hueco vacío.** `marco()` mete ahora una **sonda**: una
+  imagen de un píxel con la MISMA url que el fondo —así que no cuesta otra
+  petición, el navegador la cachea— y con `onerror`. Si la ortofoto no llega,
+  `aereoFalla()` pone detrás la estampa del pueblo desenfocada, que es el mismo
+  telón que ya usaban los museos, y si el pueblo no tiene estampa quita el fondo
+  y manda el icono. Esto vale para cualquier caída futura, no solo para esta.
+  **Y averiguar por qué no contesta.** Desde el contenedor no se puede: el proxy
+  deniega GRAFCAN igual que Commons. Así que lo comprueba el navegador de casa,
+  como con las fotos y los miradores: `probar-aereo.html` pide la Playa de Las
+  Teresitas a **siete** direcciones distintas —la que hay puesta, la capa en
+  mayúsculas, WMS 1.3.0 con las coordenadas en los dos órdenes, el otro servidor
+  de GRAFCAN, y el PNOA del IGN por si hay que cambiar de fuente— y dice cuáles
+  traen imagen. Se abre, se mira cuál enseña de verdad la playa y se dice el
+  número. Ojo con el orden de las coordenadas: en WMS 1.1.1 el `BBOX` va en
+  lon,lat y en 1.3.0 con `EPSG:4326` va en lat,lon; equivocarse ahí devuelve una
+  imagen en blanco, no un error, que es lo que lo hace difícil de ver.
+
 - **Sitios repetidos: pasa, y duele de tres maneras.** Garachico tenía TRES
   fichas del mismo casco y La Laguna dos, porque cada fuente que se importó
   —Cabildo, Bienes de Interés Cultural, redacción propia— lo llamaba distinto:
