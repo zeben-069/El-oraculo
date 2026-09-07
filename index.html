@@ -2237,7 +2237,14 @@ function mapaDia(grupos,alto){
     const delDia=pts.filter(p=>p.clase!=='base');
     const enc=delDia.length?delDia:pts;
     if(enc.length===1) m.setView([enc[0].la,enc[0].lo],14);
-    else m.fitBounds(L.latLngBounds(enc.map(p=>[p.la,p.lo])).pad(0.22));
+    /* El margen no puede ser solo proporcional: con el día estirado de norte
+       a sur, el 22%% de arriba son kilómetros y el de abajo, veinte píxeles.
+       El restaurante caía justo en el filo, medio tapado por la línea de
+       atribución de Leaflet, y parecía que no estaba en el mapa. Ahora el
+       margen va también en PÍXELES, y por abajo un poco más, que es donde
+       está el rótulo. */
+    else m.fitBounds(L.latLngBounds(enc.map(p=>[p.la,p.lo])).pad(0.12),
+      {paddingTopLeft:[26,26],paddingBottomRight:[26,42]});
     /* si el mapa nace dentro de una burbuja que aún se está animando,
        hay que decirle que vuelva a medirse o sale a cuartos */
     setTimeout(()=>m.invalidateSize(),300);
@@ -3371,7 +3378,11 @@ async function pedirPlan(){
     if(t.parentNode) t.remove();
     const texto=narrarLocal(brief);
     const rev=revisar(texto,brief);
-    burbuja(texto,'naira','<span class="sello">'+tr('selloSinApi')+'</span>'
+    /* Ojo: aquí faltaba resaltar(). Los otros dos caminos —el bueno y el del
+       plantón de 30 segundos— sí lo llamaban, así que cuando la API fallaba
+       el plan salía plano del todo: ni un sitio en negrita, ni una hora, ni
+       un teléfono. Y es justo cuando peor pinta tiene que dar. */
+    burbuja(resaltar(texto,brief),'naira','<span class="sello">'+tr('selloSinApi')+'</span>'
       +dibujaRuta(brief)+bloqueMapas(brief,BASES[S.base]));
     pintarAudit(texto,rev);
     const motivo=(e&&e.message)?String(e.message):'motivo desconocido';

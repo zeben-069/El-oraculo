@@ -646,6 +646,27 @@ restaurante está mal ubicado, tiene razón: vive allí.
   tiene subdominios (`{s}`) ni mosaicos de doble densidad (`{r}`), así que la
   plantilla de la URL es más corta que la de antes.
 
+- **Cuando la API falla, el plan salía plano.** Zeben lo vio: «se ve muy plano,
+  con la misma fuente y sin colores». Y tenía razón, pero la causa era un
+  descuido de una línea: hay tres caminos para pintar el relato —el bueno, el
+  del plantón de 30 segundos y el del error de la API— y **el tercero no
+  llamaba a `resaltar()`**. Los otros dos sí. Así que justo cuando la API se
+  cae, que es cuando peor pinta tiene que dar, el plan salía sin un solo sitio
+  en negrita, sin una hora marcada y sin un teléfono. Se le puso el
+  `resaltar(texto,brief)` que le faltaba.
+  Y ojo al dato de fondo: que lo viera significa que **la web estaba narrando
+  en local**, o sea que la función de Netlify no contestaba. El sello del pie
+  lo dice —«Naira, sin conexión a la API»— y ahí es donde hay que mirar:
+  `…/.netlify/functions/naira?probar=1` responde si la clave está puesta.
+
+- **El restaurante estaba en el mapa, en el filo.** «En el mapa no salen los
+  restaurantes»: la chincheta estaba, pero pegada al borde de abajo y medio
+  tapada por la línea de atribución de Leaflet. El encuadre usaba solo margen
+  proporcional (`.pad(0.22)`), y con un día estirado de norte a sur ese 22% son
+  kilómetros arriba y veinte píxeles abajo. Ahora el margen va también en
+  **píxeles** —y por abajo un poco más, que es donde está el rótulo—:
+  `.pad(0.12)` con `paddingTopLeft:[26,26]` y `paddingBottomRight:[26,42]`.
+
 - **Sitios repetidos: pasa, y duele de tres maneras.** Garachico tenía TRES
   fichas del mismo casco y La Laguna dos, porque cada fuente que se importó
   —Cabildo, Bienes de Interés Cultural, redacción propia— lo llamaba distinto:
