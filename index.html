@@ -3287,7 +3287,7 @@ async function pedirVoz(brief){
   /* Se prueban las dos rutas: la bonita y la que Netlify crea siempre.
      Si la primera da 404 porque la redirección no está, la segunda funciona igual. */
   const RUTAS=['/.netlify/functions/naira','/api/naira'];
-  let r=null, ultimo=0;
+  let r=null, ultimo=0, porque='';
   try{
     for(const ruta of RUTAS){
       try{
@@ -3295,10 +3295,15 @@ async function pedirVoz(brief){
           body:JSON.stringify(cuerpo),signal:corte.signal});
         ultimo=t.status;
         if(t.ok){ r=t; break; }
+        /* El número solo no dice nada. La función explica SIEMPRE por qué
+           corta —«Demasiadas peticiones», «Desde ahí no»…—, así que se lee y
+           se cuenta: si no, el aviso de abajo es un 403 pelado y hay que
+           adivinar. */
+        try{ const d=await t.json(); if(d&&d.error) porque=d.error+(d.motivo?' ('+d.motivo+')':''); }catch(e){}
       }catch(e){ if(e.name==='AbortError') throw e; }
     }
   } finally { clearTimeout(reloj); }
-  if(!r) throw new Error('El servidor respondió '+ultimo+' en las dos rutas');
+  if(!r) throw new Error('El servidor respondió '+ultimo+(porque?' · '+porque:'')+' en las dos rutas');
   const data=await r.json();
   if(data.sinClave) throw new Error('sin clave configurada');
   if(data.error) throw new Error(data.error);

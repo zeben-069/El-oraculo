@@ -968,6 +968,19 @@ restaurante está mal ubicado, tiene razón: vive allí.
   El `?probar=1` ya no enseña doce caracteres de la clave: son el prefijo y no
   el secreto, pero esa URL es pública.
 
+- **El freno del proxy cortaba por el `referer`, y no lo decía.** Con la clave
+  puesta (`?probar=1` decía `claveEncontrada: true`) la web seguía narrando en
+  local. El cierre de «solo desde el sitio» comparaba la cabecera **entera**
+  contra `/\.netlify\.app$/`, y ahí está la trampa: el `origin` llega sin barra
+  —`https://x.netlify.app`, casa— pero el `referer` llega **con** ella y con la
+  página detrás —`https://x.netlify.app/index.html`, no casa—. En el navegador
+  que no manda `origin`, 403 y a plantillas. Ahora se compara solo el **host**,
+  con `new URL(...).host`. Probado con las cinco formas que llegan.
+  Y de paso, el aviso de abajo dejó de ser un número pelado: `pedirVoz()` lee el
+  cuerpo del error y cuenta el porqué que da la función —«Demasiadas
+  peticiones», «Desde ahí no»—, que si no hay que adivinar cuál de los tres
+  cierres saltó.
+
 - **Búsqueda web: decidido que NO, por ahora.** Rompería el sello de «todo
   sale del informe», que es lo que diferencia a Naira. Y nunca para
   alergias o celiaquía: ahí la respuesta correcta es el teléfono del sitio.

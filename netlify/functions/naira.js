@@ -35,7 +35,17 @@
 var FIRMA = "Eres Naira, gu";
 
 // De dónde se acepta. Vacío = se acepta cualquiera (para probar en local).
-var CASA = /(^https?:\/\/localhost)|(^https?:\/\/127\.0\.0\.1)|(\.netlify\.app$)|(^https?:\/\/[^/]*naira)/i;
+// OJO, esto tenía un fallo silencioso: se comparaba contra la cabecera entera,
+// y el `origin` llega sin barra («https://x.netlify.app») pero el `referer`
+// llega CON ella y con la página detrás («https://x.netlify.app/index.html»).
+// El ancla `$` de «.netlify.app$» solo casaba con el primero, así que en el
+// navegador que no manda `origin` la llamada se rechazaba con un 403 y la web
+// caía al relato local sin decir por qué. Ahora se compara solo el HOST.
+var CASA = /(^localhost(:|$))|(^127\.0\.0\.1(:|$))|(\.netlify\.app$)|(^netlify\.app$)|naira/i;
+function hostDe(cadena) {
+  if (!cadena) return "";
+  try { return new URL(cadena).host; } catch (e) { return String(cadena); }
+}
 
 // El contador vive en la memoria del contenedor. Si Netlify lo recicla, se
 // pone a cero: por eso es un freno y no un candado.
@@ -110,7 +120,7 @@ exports.handler = async function (event) {
 
   // 2 · de dónde viene
   var h = event.headers || {};
-  var de = h.origin || h.referer || h.Origin || h.Referer || "";
+  var de = hostDe(h.origin || h.referer || h.Origin || h.Referer || "");
   if (de && !CASA.test(de)) {
     console.warn("llamada desde fuera:", de.slice(0, 80));
     return { statusCode: 403, headers: cabeceras, body: JSON.stringify({ error: "Desde ahí no" }) };
