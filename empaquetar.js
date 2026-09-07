@@ -17,7 +17,11 @@ const sueltos=[...html.matchAll(/<script src="([^"]+)"/g)].map(m=>m[1])
 const LISTA=['index.html','manifest.webmanifest','netlify.toml',
   'icono.svg','icono-180.png','icono-192.png','icono-512.png',
   'netlify/functions/naira.js','netlify/functions/tiempo.js',
-  'img/naira-social.jpg']
+  'img/naira-social.jpg',
+  /* La página de diagnóstico va DENTRO del sitio a propósito: abrirla desde
+     el ordenador no prueba lo mismo que abrirla desde la web, que es donde
+     falla. No la ve ningún turista: hay que escribir su dirección a mano. */
+  'probar-aereo.html']
   .concat(sueltos)
   .concat(fs.readdirSync('img/estampas').map(f=>'img/estampas/'+f))
   .concat(fs.readdirSync('img/cartas').map(f=>'img/cartas/'+f))

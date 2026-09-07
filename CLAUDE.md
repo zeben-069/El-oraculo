@@ -603,10 +603,21 @@ restaurante está mal ubicado, tiene razón: vive allí.
   Teresitas a **siete** direcciones distintas —la que hay puesta, la capa en
   mayúsculas, WMS 1.3.0 con las coordenadas en los dos órdenes, el otro servidor
   de GRAFCAN, y el PNOA del IGN por si hay que cambiar de fuente— y dice cuáles
-  traen imagen. Se abre, se mira cuál enseña de verdad la playa y se dice el
-  número. Ojo con el orden de las coordenadas: en WMS 1.1.1 el `BBOX` va en
-  lon,lat y en 1.3.0 con `EPSG:4326` va en lat,lon; equivocarse ahí devuelve una
-  imagen en blanco, no un error, que es lo que lo hace difícil de ver.
+  traen imagen. Ojo con el orden de las coordenadas: en WMS 1.1.1 el `BBOX` va
+  en lon,lat y en 1.3.0 con `EPSG:4326` va en lat,lon; equivocarse ahí devuelve
+  una imagen en blanco, no un error, que es lo que lo hace difícil de ver.
+
+  **Y la primera respuesta descartó la hipótesis obvia.** Zeben abrió esa página
+  y le funcionaron seis de las siete: o sea que la dirección está bien y GRAFCAN
+  está vivo. Pero la abrió **desde su carpeta**, con `file://`, y ahí el
+  navegador no manda la cabecera `Referer`. Desde la web sí la manda, y muchos
+  servicios públicos cortan por ahí las peticiones que vienen de otro dominio.
+  Por eso la página pasó a ir **dentro del zip**: abrirla en
+  `…netlify.app/probar-aereo.html` es la única prueba que reproduce lo que hace
+  Naira. Y trae un bloque nuevo que pide la MISMA foto de tres formas —como
+  `<img>`, como `<img referrerpolicy="no-referrer">` y como fondo de CSS, que es
+  como la pide el motor—: si la segunda funciona y la primera no, el arreglo es
+  una línea. Descartado ya: no hay service worker ni CSP en el `<head>`.
 
 - **Sitios repetidos: pasa, y duele de tres maneras.** Garachico tenía TRES
   fichas del mismo casco y La Laguna dos, porque cada fuente que se importó

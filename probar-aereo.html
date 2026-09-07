@@ -1,47 +1,107 @@
-<meta charset="utf-8"><title>¿Qué ortofoto funciona?</title>
+<meta charset="utf-8"><title>¿Por qué no salen las ortofotos?</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
- body{font-family:system-ui,sans-serif;background:#FBF5E9;color:#3E2B1C;margin:0;padding:18px 14px 60px}
+ body{font-family:system-ui,sans-serif;background:#FBF5E9;color:#3E2B1C;margin:0;padding:18px 14px 40px}
  h1{font:800 22px/1.2 Georgia,serif;margin:0 0 6px}
- p.ayuda{margin:6px 0 16px;font-size:14.5px;line-height:1.55;color:#6B5238;max-width:64ch}
- .fila{background:#fff;border:1.5px solid #3E2B1C;border-radius:14px;padding:11px;margin:0 0 12px;
+ h2{font:700 17px system-ui;margin:26px 0 8px;padding-top:14px;border-top:2px solid #E8D9BE}
+ p.ayuda{margin:6px 0 14px;font-size:14.5px;line-height:1.55;color:#6B5238;max-width:64ch}
+ .donde{background:#2E5D4B;color:#FBF5E9;border-radius:12px;padding:11px 13px;font-size:14px;
+        line-height:1.5;margin:0 0 16px}
+ .donde b{color:#F2D492}
+ .fila{background:#fff;border:1.5px solid #3E2B1C;border-radius:14px;padding:11px;margin:0 0 11px;
        box-shadow:2.5px 2.5px 0 #3E2B1C;display:flex;gap:13px;align-items:flex-start}
  .fila.ok{border-color:#2E5D4B;box-shadow:2.5px 2.5px 0 #2E5D4B}
- .fila.mal{border-color:#A93B2B;box-shadow:2.5px 2.5px 0 #A93B2B;opacity:.75}
- .fila img{width:120px;height:120px;object-fit:cover;border-radius:10px;background:#E8D9BE;flex:none}
+ .fila.mal{border-color:#A93B2B;box-shadow:2.5px 2.5px 0 #A93B2B;opacity:.8}
+ .fila .cuadro{width:110px;height:110px;border-radius:10px;background:#E8D9BE;flex:none;
+       background-size:cover;background-position:center}
+ .fila img.cuadro{object-fit:cover}
  .campos{flex:1;min-width:0}
- .campos h2{margin:0 0 4px;font:700 16px system-ui}
+ .campos h3{margin:0 0 4px;font:700 15.5px system-ui}
  .estado{font:700 13px system-ui;margin:0 0 6px}
  .ok .estado{color:#2E5D4B} .mal .estado{color:#A93B2B}
  code{font-size:11px;color:#6B5238;word-break:break-all;display:block;line-height:1.45}
- .barra{position:sticky;bottom:0;background:#2E5D4B;color:#FBF5E9;padding:12px 14px;margin:18px -14px -60px;
-        font-size:15px;font-weight:600}
+ .barra{position:sticky;bottom:0;background:#2E5D4B;color:#FBF5E9;padding:13px 14px;margin:18px -14px -40px;
+        font-size:15px;font-weight:600;line-height:1.5}
 </style>
-<h1>¿Qué ortofoto funciona?</h1>
+<h1>¿Por qué no salen las ortofotos?</h1>
+
+<div class="donde" id="donde">…</div>
+
 <p class="ayuda">
- Las fichas de Naira enseñan una vista aérea del sitio pedida a GRAFCAN, y ahora mismo no sale ninguna.
- Desde donde yo trabajo no puedo comprobarlo —la red está cerrada—, así que lo comprueba su navegador,
- que sí tiene internet de verdad.
+ Las fichas de Naira enseñan una vista aérea del sitio pedida a GRAFCAN. Usted probó estas direcciones
+ <b>abriendo el fichero desde su ordenador</b> y funcionaban todas menos una — pero en la web no sale
+ ninguna. Eso quiere decir que la dirección está bien y que lo que falla es <b>algo del sitio</b>.
  <br><br>
- <b>Abra esta página y espere unos segundos.</b> Abajo le dirá cuál de las opciones ha traído la foto.
- La prueba es la <b>Playa de Las Teresitas</b>: si la opción funciona, debe verse la playa de arena
- clara con el monte detrás. Si sale una imagen en blanco o gris, esa tampoco vale.
- <br><br>
- Dígame el número de la que salga bien y la dejo puesta.
+ Por eso esta página va ahora <b>dentro</b> de Naira. Ábrala en
+ <code style="display:inline">…netlify.app/probar-aereo.html</code> y compare con lo que le salió
+ abriéndola desde su carpeta: si aquí fallan y allí no, ya sabemos por dónde va.
 </p>
+
+<h2>1 · La misma imagen, pedida de tres maneras</h2>
+<p class="ayuda">Las tres piden exactamente la misma foto. Lo único que cambia es cómo la pide el navegador.
+Esto es lo que de verdad me interesa.</p>
+<div id="modos"></div>
+
+<h2>2 · Las siete direcciones</h2>
+<p class="ayuda">Playa de Las Teresitas. Si la opción funciona debe verse la playa de arena clara con el
+monte detrás; una imagen en blanco o gris tampoco vale.</p>
 <div id="lista"></div>
+
 <div class="barra" id="resumen">Probando…</div>
 <script>
-/* Las Teresitas, que es inconfundible desde el aire. */
 const LA=28.5097, LO=-16.1847, R=0.0016, PX=240;
-const bbox11=[LO-R,LA-R,LO+R,LA+R].join(',');      /* WMS 1.1.1 y CRS:84 van en lon,lat */
-const bbox13=[LA-R,LO-R,LA+R,LO+R].join(',');      /* WMS 1.3.0 con EPSG:4326 va en lat,lon */
+const bbox11=[LO-R,LA-R,LO+R,LA+R].join(',');   /* WMS 1.1.1 y CRS:84: lon,lat */
+const bbox13=[LA-R,LO-R,LA+R,LO+R].join(',');   /* WMS 1.3.0 con EPSG:4326: lat,lon */
 const COMUN='&REQUEST=GetMap&STYLES=&FORMAT=image/jpeg&WIDTH='+PX+'&HEIGHT='+PX;
+const GRAFCAN='https://idecan1.grafcan.es/ServicioWMS/OrtoExpress?SERVICE=WMS&VERSION=1.1.1'+
+  '&LAYERS=ortoexpress&SRS=EPSG:4326&BBOX='+bbox11+COMUN;
 
+const $=(t,a,h)=>{const e=document.createElement(t);if(a)Object.assign(e,a);if(h)e.innerHTML=h;return e;};
+
+/* De dónde se está abriendo: no es lo mismo un fichero del ordenador que la web. */
+(function(){
+  const local=location.protocol==='file:';
+  document.getElementById('donde').innerHTML= local
+    ? 'Está abriendo esta página <b>desde su ordenador</b> (file://). Así el navegador no le dice a '+
+      'GRAFCAN de dónde viene la petición, y por eso aquí puede funcionar todo aunque en la web no.'
+    : 'Está abriendo esta página <b>desde '+location.host+'</b>. Esta es la prueba buena: es exactamente '+
+      'lo que hace Naira cuando le pide la foto a GRAFCAN.';
+})();
+
+/* ---- Bloque 1: la misma foto, pedida de tres formas ---- */
+const MODOS=[
+ {n:'Como imagen normal',
+  d:'Es lo que hace cualquier <img>. El navegador le cuenta a GRAFCAN desde qué web se pide.',
+  hacer:(caja,ok,mal)=>{const i=$('img',{className:'cuadro',alt:''});i.onload=ok;i.onerror=mal;i.src=GRAFCAN;caja.appendChild(i);}},
+ {n:'Como imagen, pero sin decir de dónde viene',
+  d:'Igual, con referrerpolicy="no-referrer". Si ESTA funciona y la de arriba no, el problema está '+
+    'resuelto: GRAFCAN no deja que se le pidan fotos desde otra web, y basta con dejar de decírselo.',
+  hacer:(caja,ok,mal)=>{const i=$('img',{className:'cuadro',alt:''});
+    i.referrerPolicy='no-referrer';i.onload=ok;i.onerror=mal;i.src=GRAFCAN;caja.appendChild(i);}},
+ {n:'Como fondo de CSS',
+  d:'Así es EXACTAMENTE como la pide Naira hoy. Aquí no hay aviso de error, así que hay que mirarlo: '+
+    'si se ve la playa, bien; si se queda del color de la arena, es que no llegó.',
+  hacer:(caja)=>{caja.appendChild($('div',{className:'cuadro',
+    style:'background-image:url('+GRAFCAN+')'}));}}
+];
+MODOS.forEach((m,i)=>{
+  const caja=$('div',{className:'fila'});
+  const c=$('div',{className:'campos'});
+  const est=$('p',{className:'estado',textContent:i===2?'mírelo usted: ¿se ve la playa?':'probando…'});
+  c.appendChild($('h3',null,(i+1)+' · '+m.n));
+  c.appendChild(est);
+  c.appendChild($('p',{className:'ayuda',style:'margin:0'},m.d));
+  m.hacer(caja,
+    ()=>{caja.classList.add('ok');est.textContent='✓ ha llegado';},
+    ()=>{caja.classList.add('mal');est.textContent='✗ no llega';});
+  caja.appendChild(c);
+  document.getElementById('modos').appendChild(caja);
+});
+
+/* ---- Bloque 2: las siete direcciones ---- */
 const OPCIONES=[
- {n:'La que hay puesta ahora — GRAFCAN OrtoExpress, WMS 1.1.1',
-  u:'https://idecan1.grafcan.es/ServicioWMS/OrtoExpress?SERVICE=WMS&VERSION=1.1.1&LAYERS=ortoexpress&SRS=EPSG:4326&BBOX='+bbox11+COMUN},
- {n:'Igual, pero con la capa escrita en mayúsculas',
+ {n:'La que hay puesta ahora — GRAFCAN OrtoExpress, WMS 1.1.1', u:GRAFCAN},
+ {n:'Igual, con la capa en mayúsculas',
   u:'https://idecan1.grafcan.es/ServicioWMS/OrtoExpress?SERVICE=WMS&VERSION=1.1.1&LAYERS=OrtoExpress&SRS=EPSG:4326&BBOX='+bbox11+COMUN},
  {n:'GRAFCAN con la versión moderna del protocolo (1.3.0)',
   u:'https://idecan1.grafcan.es/ServicioWMS/OrtoExpress?SERVICE=WMS&VERSION=1.3.0&LAYERS=ortoexpress&CRS=CRS:84&BBOX='+bbox11+COMUN},
@@ -49,34 +109,30 @@ const OPCIONES=[
   u:'https://idecan1.grafcan.es/ServicioWMS/OrtoExpress?SERVICE=WMS&VERSION=1.3.0&LAYERS=ortoexpress&CRS=EPSG:4326&BBOX='+bbox13+COMUN},
  {n:'GRAFCAN por el otro servidor (idecan2)',
   u:'https://idecan2.grafcan.es/ServicioWMS/OrtoExpress?SERVICE=WMS&VERSION=1.1.1&LAYERS=ortoexpress&SRS=EPSG:4326&BBOX='+bbox11+COMUN},
- {n:'PNOA del Instituto Geográfico Nacional (la ortofoto de toda España)',
+ {n:'PNOA del Instituto Geográfico Nacional',
   u:'https://www.ign.es/wms-inspire/pnoa-ma?SERVICE=WMS&VERSION=1.3.0&LAYERS=OI.OrthoimageCoverage&CRS=CRS:84&BBOX='+bbox11+COMUN},
  {n:'PNOA del IGN, protocolo antiguo',
   u:'https://www.ign.es/wms-inspire/pnoa-ma?SERVICE=WMS&VERSION=1.1.1&LAYERS=OI.OrthoimageCoverage&SRS=EPSG:4326&BBOX='+bbox11+COMUN}
 ];
-
-const $=(t,a,h)=>{const e=document.createElement(t);if(a)Object.assign(e,a);if(h)e.innerHTML=h;return e;};
 let buenas=[], hechas=0;
 OPCIONES.forEach((o,i)=>{
   const caja=$('div',{className:'fila'});
-  const img=$('img',{alt:''});
+  const img=$('img',{className:'cuadro',alt:''});
   const c=$('div',{className:'campos'});
-  const tit=$('h2',null,(i+1)+' · '+o.n);
   const est=$('p',{className:'estado',textContent:'probando…'});
-  const url=$('code',{textContent:o.u});
-  c.appendChild(tit); c.appendChild(est); c.appendChild(url);
+  c.appendChild($('h3',null,(i+1)+' · '+o.n));
+  c.appendChild(est);
+  c.appendChild($('code',{textContent:o.u}));
   caja.appendChild(img); caja.appendChild(c);
   document.getElementById('lista').appendChild(caja);
-  img.onload=()=>{ caja.classList.add('ok'); est.textContent='✓ ha traído imagen — mírela: ¿se ve la playa?';
-    buenas.push(i+1); fin(); };
-  img.onerror=()=>{ caja.classList.add('mal'); est.textContent='✗ no contesta'; fin(); };
+  img.onload=()=>{caja.classList.add('ok');est.textContent='✓ ha traído imagen — ¿se ve la playa?';buenas.push(i+1);fin();};
+  img.onerror=()=>{caja.classList.add('mal');est.textContent='✗ no contesta';fin();};
   img.src=o.u;
 });
 function fin(){
   if(++hechas<OPCIONES.length) return;
-  const r=document.getElementById('resumen');
-  r.textContent = buenas.length
-    ? 'Han traído imagen las opciones: '+buenas.join(', ')+'.  Mire cuál enseña de verdad la playa y dígame el número.'
-    : 'Ninguna ha traído imagen. Dígamelo tal cual: entonces el problema no es la dirección, es otra cosa.';
+  document.getElementById('resumen').textContent = buenas.length
+    ? 'Han traído imagen: '+buenas.join(', ')+'. Dígame también qué pasó en el bloque 1, que es el importante.'
+    : 'Ninguna ha traído imagen desde aquí. Si desde su carpeta sí funcionaban, ya está claro: GRAFCAN no deja pedirlas desde otra web.';
 }
 </script>
