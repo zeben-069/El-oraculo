@@ -46,6 +46,7 @@ datos/miradores.js            18 miradores de Santa Cruz
 empaquetar.js                 arma el zip que se suelta en Netlify Drop
 fusionar.js                   junta sitios repetidos (ensayo sin tocar nada)
 fotos.js                      la lista de fotos que faltan, y las mete
+fotos-encargo.md              esa lista para encargársela a otro (con reglas)
 fotos-buscar.js               busca candidatas en Commons (se ejecuta en su máquina)
 plantilla-buscar.html         el molde de la página de elegir fotos
 buscar-fotos.html             esa página con los sitios que faltan dentro
@@ -621,7 +622,15 @@ restaurante está mal ubicado, tiene razón: vive allí.
   476 KB en total, que es lo que pesan 240 px al 82% de calidad — el zip de
   Netlify pasa de 1,6 a 2,0 MB.
   `fotos.js` sin argumentos escribe `fotos-pendientes.md` con la lista
-  agrupada por pueblo; con una carpeta como argumento, mete las fotos:
+  agrupada por pueblo. `node fotos.js encargo` escribe **`fotos-encargo.md`**,
+  que es la misma lista pero para dársela a OTRO —Claude en Cowork, por
+  ejemplo—: lleva las coordenadas de cada sitio, el nombre exacto que tiene que
+  llevar el fichero, el formato del `creditos.json` y, sobre todo, las reglas.
+  Y esas reglas son el motivo de que exista el fichero: **la foto tiene que ser
+  real y de ese sitio exacto**, con autor y licencia, y si no se encuentra se
+  dice y se pasa a la siguiente. Una foto generada de un sitio que existe es
+  justo lo que este proyecto no hace: el turista va y no lo reconoce.
+  Con una carpeta como argumento, mete las fotos:
   recorta al cuadrado, deja 240 px, comprime y añade el campo a la ficha.
   Los ficheros se emparejan por el nombre sin acentos.
   `fotos-buscar.js` busca candidatas en Wikimedia Commons y guarda autor y

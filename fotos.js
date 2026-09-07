@@ -6,6 +6,8 @@
    falta 589 fotos: hacen falta pocas y bien elegidas.
 
        node fotos.js                 la lista de qué fotografiar, por pueblo
+       node fotos.js encargo         la misma lista, pero para OTRO: con las
+                                     coordenadas y las reglas de qué vale
        node fotos.js buscar          arma buscar-fotos.html para elegirlas a mano
        node fotos.js subir           arma subir-fotos.html para las que hace él
        node fotos.js entrada/        mete las fotos de esa carpeta
@@ -172,8 +174,82 @@ async function meter(dir){
   if(ambiguos.length) console.log('\nambiguos (afina el nombre):\n   '+ambiguos.join('\n   '));
 }
 
+
+/* El encargo, para dárselo a quien vaya a buscar las fotos.
+   ------------------------------------------------------------------
+   La lista corta (`fotos-pendientes.md`) es para Zeben, que se las hace él con
+   el móvil. Esta es distinta: es lo que hay que ponerle DELANTE a otro
+   ayudante —Claude en Cowork, por ejemplo— para que salga a buscarlas. Por eso
+   lleva lo que la lista corta no necesita: las coordenadas de cada sitio, el
+   nombre exacto que tiene que llevar el fichero, y sobre todo las reglas.
+   Esas reglas no son burocracia. Una foto inventada de un sitio real es
+   exactamente lo que este proyecto no hace. */
+function encargo(){
+  const orden=ranking();
+  const falta=orden.map(([n,v])=>({l:LUGARES.find(x=>x.n===n)||{},n,v}))
+    .filter(x=>x.l.n&&!x.l.foto);
+  const prio=falta.filter(x=>AEREO_MAL.test(x.l.tipo||''));
+  const L=[];
+  L.push('# Fotos que le faltan a Naira');
+  L.push('');
+  L.push('Naira es una guía de Tenerife. Cada parada enseña una foto; cuando no la hay,');
+  L.push('pone una ortofoto aérea. Para una playa se defiende, pero para un museo o una');
+  L.push('iglesia es un tejado visto desde arriba y no dice nada. Estos '+prio.length+' sitios son');
+  L.push('los que MÁS salen en los planes y peor se ven. Van ordenados por eso.');
+  L.push('');
+  L.push('## Las reglas, que aquí es lo que importa');
+  L.push('');
+  L.push('1. **Tiene que ser una foto real de ese sitio exacto.** Ni generada, ni de otro');
+  L.push('   sitio parecido, ni de otro pueblo. Una foto inventada de un sitio que existe');
+  L.push('   es lo peor que le puede pasar a esta guía: el turista va y no lo reconoce.');
+  L.push('2. **Con autor y licencia, o no vale.** Wikimedia Commons sirve. Sin crédito no');
+  L.push('   se puede publicar, así que una foto sin autor conocido se descarta entera.');
+  L.push('3. **Si no la encuentras, dilo y pasa a la siguiente.** No hay que rellenar la');
+  L.push('   lista. Aquí la regla de la casa es que antes callarse que inventar.');
+  L.push('4. Que se vea el sitio, no un cartel ni un folleto ni un plano.');
+  L.push('');
+  L.push('## Qué hay que entregar');
+  L.push('');
+  L.push('Un zip con:');
+  L.push('');
+  L.push('- una imagen por sitio, **llamada exactamente como la columna «fichero»**');
+  L.push('  (`Casa del Plátano.jpg`). Cuadrada o casi; se recorta y se achica luego.');
+  L.push('- un `creditos.json` así, con el nombre del sitio tal cual:');
+  L.push('');
+  L.push('```json');
+  L.push('{');
+  L.push('  "Casa del Plátano": {');
+  L.push('    "autor": "Nombre del autor",');
+  L.push('    "licencia": "CC BY-SA 4.0",');
+  L.push('    "fuente": "https://commons.wikimedia.org/wiki/File:..."');
+  L.push('  }');
+  L.push('}');
+  L.push('```');
+  L.push('');
+  L.push('Las coordenadas están para **comprobar que la foto es de ese sitio**, no para');
+  L.push('buscar por ellas: hay museos con el mismo nombre en dos pueblos.');
+  L.push('');
+  L.push('## Los sitios');
+  L.push('');
+  L.push('| # | sitio (= nombre del fichero) | pueblo | qué es | coordenadas | sale en |');
+  L.push('|---|---|---|---|---|---|');
+  prio.forEach((x,i)=>{
+    const co=(x.l.la!=null)?x.l.la.toFixed(5)+', '+x.l.lo.toFixed(5):'—';
+    L.push('| '+(i+1)+' | '+x.l.n+' | '+x.l.m+' | '+(x.l.tipo||'')+' | '+co+' | '+x.v+' planes |');
+  });
+  L.push('');
+  L.push('Total: '+prio.length+' sitios. Con los '+Math.min(20,prio.length)+' primeros ya se nota mucho.');
+  L.push('');
+  L.push('_Generado por `node fotos.js encargo`. Sitios sin foto que salen en algún plan: '+
+         falta.length+'; de esos, con el aéreo inútil: '+prio.length+'._');
+  fs.writeFileSync('fotos-encargo.md',L.join('\n')+'\n');
+  console.log('escrito fotos-encargo.md · '+prio.length+' sitios, con coordenadas y las reglas.');
+  console.log('Eso es lo que se le pasa a quien vaya a buscar las fotos.');
+}
+
 const arg=process.argv[2];
 if(!arg) lista();
+else if(arg==='encargo') encargo();
 else if(arg==='buscar') pagina();
 else if(arg==='subir') subir();
 else meter(arg).catch(e=>{console.error(e.message);process.exit(1)});
