@@ -2200,8 +2200,14 @@ function mapaDia(grupos,alto){
       return;
     }
     const m=L.map(id,{scrollWheelZoom:false,attributionControl:true});
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-      {maxZoom:19,attribution:'© OpenStreetMap · CARTO'}).addTo(m);
+    /* Los mosaicos eran de CARTO, y desde que exigen clave le estampan
+       «API KEY» en diagonal a quien no la lleva: el mapa del plan salía con
+       un cartel de aviso pintado por encima, en todos los planes. Los de
+       OpenStreetMap no piden clave; solo piden que se les cite, y ya se hace
+       aquí mismo y en el pie. Ojo: el servidor de OSM no tiene subdominios
+       ({s}) ni mosaicos de doble densidad ({r}). */
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {maxZoom:19,attribution:'© OpenStreetMap'}).addTo(m);
 
     const COLOR={ruta:'#A93B2B',comer:'#D99A2B',agua:'#2C6E7F',base:'#2E5D4B',sendero:'#3E2B1C'};
     const orden=pts.filter(p=>p.clase==='ruta'&&p.n!=null);
@@ -2771,8 +2777,13 @@ function iconoDe(tipo){
       pero es el sitio DE VERDAD y ya está licenciada como el resto del mapa.
    3. icono, si no hay coordenadas. */
 function miniAerea(la,lo,px){
-  px=px||120;
-  const r=0.0016;   /* unos 350 m de lado */
+  /* 240 px, no 120: el cuadro se ve a 80 px y en una pantalla de móvil eso
+     son 160 o 240 de verdad; a 120 salía borroso. Y el recuadro se abrió de
+     350 a 700 metros: tan cerrado no se entendía nada —cuatro píxeles de
+     tejado o de arena—, y lo que hace falta es ver DÓNDE está el sitio: la
+     playa con su bahía, el charco con su costa. */
+  px=px||240;
+  const r=0.0032;   /* unos 700 m de lado */
   return 'https://idecan1.grafcan.es/ServicioWMS/OrtoExpress?SERVICE=WMS&VERSION=1.1.1'+
     '&REQUEST=GetMap&LAYERS=ortoexpress&STYLES=&FORMAT=image/jpeg&SRS=EPSG:4326'+
     '&BBOX='+(lo-r)+','+(la-r)+','+(lo+r)+','+(la+r)+

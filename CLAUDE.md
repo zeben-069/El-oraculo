@@ -619,6 +619,33 @@ restaurante está mal ubicado, tiene razón: vive allí.
   como la pide el motor—: si la segunda funciona y la primera no, el arreglo es
   una línea. Descartado ya: no hay service worker ni CSP en el `<head>`.
 
+- **«Las imágenes no salen» era que no se veían.** Zeben dijo que en la web no
+  salía ninguna ortofoto. Se probó todo: GRAFCAN contesta, las siete direcciones
+  funcionan, las imágenes propias llegan, el CSS está bien. Lo que lo resolvió
+  fue que él **guardó la página en vivo** (`.mht`) y la mandó: Chromium abre esos
+  ficheros, así que se pudo renderizar aquí su página tal cual la veía él. Y
+  ahí estaban las ortofotos, cargadas y pintadas — **detrás del emoji**.
+  El cuadro medía 62 px, el icono ocupaba el centro con su sombra, y una vista
+  aérea de 350 metros a ese tamaño es una mancha marrón. No era un fallo: era
+  que no se leía. Ahora el cuadro mide 80 px, la ortofoto se pide a 240 px y
+  abarca 700 metros —lo que hace falta ver es DÓNDE está el sitio, la playa con
+  su bahía— y, **cuando hay una foto de verdad detrás, el icono se va a una
+  esquina**, pequeño y sobre un disco oscuro para que se lea igual encima de la
+  arena que del monteverde. Con el telón del pueblo no: ese es un dibujo de
+  fondo, no una foto del sitio, y ahí el icono sigue mandando en el centro.
+  La lección para la próxima: **cuando algo «no sale» en la web, pide el `.mht`
+  de la página**. Trae el DOM, el CSS y las imágenes tal como los recibió su
+  navegador, y se abre aquí con Playwright. Media hora de hipótesis se resuelve
+  en una captura.
+
+- **El mapa llevaba un cartel de «API KEY» pintado encima.** Salió en esa misma
+  captura, y no lo había visto nadie. Los mosaicos eran de CARTO, y desde que
+  exigen clave le estampan `API KEY` en diagonal a quien no la lleva. Se pasó a
+  los de OpenStreetMap, que no piden clave y solo piden que se les cite —cosa
+  que ya se hacía en la atribución y en el pie—. Ojo: el servidor de OSM no
+  tiene subdominios (`{s}`) ni mosaicos de doble densidad (`{r}`), así que la
+  plantilla de la URL es más corta que la de antes.
+
 - **Sitios repetidos: pasa, y duele de tres maneras.** Garachico tenía TRES
   fichas del mismo casco y La Laguna dos, porque cada fuente que se importó
   —Cabildo, Bienes de Interés Cultural, redacción propia— lo llamaba distinto:
