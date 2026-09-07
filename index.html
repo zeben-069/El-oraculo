@@ -3277,13 +3277,20 @@ async function pedirVoz(brief){
       +'\n\nIDIOMA DE ESTA CONVERSACIÓN\n'+(IDIOMAS[S.idioma]||IDIOMAS.es).voz,
     messages:[{role:'user',content:
       'Un turista te acaba de escribir: «¿Qué plan hacemos hoy?».\n\n'+
-      'INFORME (único material que puedes usar):\n'+JSON.stringify(brief,null,2)+
+      /* Sin sangría: son 2 KB menos de informe —un 25%— y al modelo le da
+         igual leerlo así. Menos que mandar es menos que esperar. */
+      'INFORME (único material que puedes usar):\n'+JSON.stringify(brief)+
       '\n\nEscribe la respuesta de Naira. Solo el mensaje, sin comillas ni preámbulo.'}]
   };
   /* Sin tiempo límite, si el servidor no contesta ni falla el chat se cuelga.
-     A los 12 segundos se corta y narra Naira en local. */
+     Pero 26 segundos era CORTO: el informe son unos 8.800 tokens de entrada y
+     hasta 1.800 de salida, y eso tarda entre veinte y treinta y cinco segundos.
+     Cortábamos a mitad de respuesta y Naira caía a plantillas sin que nada
+     estuviera roto — el aviso decía «signal is aborted without reason», que no
+     explica nada. Ahora se espera casi un minuto: si aun así no llega, el que
+     corta es el servidor y ESE sí dice por qué. */
   const corte=new AbortController();
-  const reloj=setTimeout(()=>corte.abort(),26000);
+  const reloj=setTimeout(()=>corte.abort(),55000);
   /* Se prueban las dos rutas: la bonita y la que Netlify crea siempre.
      Si la primera da 404 porque la redirección no está, la segunda funciona igual. */
   const RUTAS=['/.netlify/functions/naira','/api/naira'];
@@ -3357,6 +3364,8 @@ async function pedirPlan(){
   const t=document.createElement('div');t.className='escribiendo';t.innerHTML='<i></i><i></i><i></i>';
   hilo.appendChild(t);hilo.scrollTop=hilo.scrollHeight;
   let acabado=false;
+  /* La red de seguridad tiene que ir por DETRÁS del corte de la petición: si
+     salta antes, mata una respuesta que venía en camino. */
   const seguro=setTimeout(()=>{           /* red de seguridad por si algo se atasca */
     if(acabado) return;
     acabado=true;
@@ -3365,7 +3374,7 @@ async function pedirPlan(){
     burbuja(resaltar(texto,brief),'naira','<span class="sello">Naira, narrando en local</span>'
       +dibujaRuta(brief)+bloqueMapas(brief,BASES[S.base]));
     preguntarQueTal(brief);
-  },30000);
+  },62000);
   try{
     const texto=await pedirVoz(brief);
     if(acabado) return;

@@ -981,6 +981,22 @@ restaurante está mal ubicado, tiene razón: vive allí.
   peticiones», «Desde ahí no»—, que si no hay que adivinar cuál de los tres
   cierres saltó.
 
+- **Cortábamos la respuesta a los 26 segundos.** Con el freno ya arreglado, el
+  plan seguía saliendo con plantillas y el aviso decía «signal is aborted
+  without reason» — que no es un rechazo: es NUESTRO reloj. Medido: el informe
+  son unos **8.800 tokens de entrada** (23 KB de prompt y 8 de informe) y hasta
+  1.800 de salida, y eso tarda entre veinte y treinta y cinco segundos. El corte
+  estaba en 26, o sea justo en el filo: unas veces llegaba y otras no.
+  Ahora son 55 segundos, y la red de seguridad que narra en local pasó de 30 a
+  62 —tiene que ir por DETRÁS del corte, que si no mata una respuesta que venía
+  en camino—. De paso, el informe viaja **sin sangría**: 2 KB menos, un 25%, y
+  al modelo le da igual leerlo así.
+  Si aun así no llega, el siguiente sospechoso es el **límite de tiempo de las
+  funciones de Netlify**, que es de unos segundos y no se puede estirar sin
+  más. La solución de verdad para eso es **streaming**: el texto va llegando
+  según se escribe, no se agota ninguna espera y además el turista lo ve
+  aparecer en vez de mirar tres puntitos medio minuto.
+
 - **Búsqueda web: decidido que NO, por ahora.** Rompería el sello de «todo
   sale del informe», que es lo que diferencia a Naira. Y nunca para
   alergias o celiaquía: ahí la respuesta correcta es el teléfono del sitio.
