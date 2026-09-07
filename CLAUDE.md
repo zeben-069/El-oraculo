@@ -80,7 +80,7 @@ Dentro de `index.html`, como constantes:
 
 - `LUGARES` (589) — sitios que visitar. Solo 4 sin coordenadas.
 - `REST` (318) — restaurantes, incluidas 38 heladerías.
-- `EVENTOS` (148) — fiestas. **Sin coordenadas**, solo municipio y corredor.
+- `EVENTOS` (143) — fiestas. **Sin coordenadas**, solo municipio y corredor.
 - `ACTOS` (300) — los actos de 22 programas de fiestas de 15 municipios:
   día, municipio,
   hora, dónde es y `q` («ninos»/«noche»), que dice a quién le sirve. No son
@@ -793,6 +793,23 @@ restaurante está mal ubicado, tiene razón: vive allí.
   (madrugada del 14) y los del Risco (la noche del 14), que son los grandes.
   La fecha del artefacto es la buena; lo que había que arreglar era el motor,
   no el dato. Esa es la regla de la casa: quien vive allí tiene razón.
+
+- **La genérica sin hora y la buena con hora son la misma fiesta.** Zeben lo vio
+  en la web: «Bajada de la Virgen del Socorro» y «Bajada del Socorro», el mismo
+  día, en el mismo pueblo, una sin hora y otra a las 07:00. Vinieron de dos
+  fuentes: la guía general de los 31 municipios puso el titular y la ficha buena
+  llegó después con hora y sitio. **Manda la que tiene hora** —lo dijo él, y es
+  la regla: una fiesta con hora es un dato, y sin hora es un titular—, y en los
+  textos gana el más largo, que la genérica traía la buena descripción y la otra
+  un «En De San Pedro al caserío del Socorro» que ni está bien escrito.
+  `node eventos.js repetidas` las junta; sin argumentos hace el ensayo. Fueron
+  **5** de 148.
+  Lo que ese mismo repaso **no** decide: cuatro fiestas con el mismo nombre a uno
+  o dos días de distancia —la Romería de San Agustín de Arafo el 28 y el 29, la
+  de Los Abrigos el 29 y el 31, la de San Miguel el 19 y el 21, San Juan del
+  Puerto el 23 y el 24—. Ahí una de las dos fechas está mal y no hay forma de
+  saber cuál desde aquí: las canta y espera. La Romería de Benijos era otra de
+  esas y la resolvió él: **es el 13**, no el 7.
 
 - **Los iconos de fiesta salen del nombre.** Etiquetar 148 fiestas a mano es
   trabajo que no se hace nunca y se pudre al añadir más. `iconoFiesta()` mira

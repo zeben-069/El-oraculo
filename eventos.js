@@ -352,9 +352,79 @@ function duplicados(hazlo){
   console.log('\nhecho. Pasa ahora: node lote.js');
 }
 
+/* Fiestas repetidas: la genérica sin hora y la concreta con hora.
+   ------------------------------------------------------------------
+   Zeben lo vio en la web: «Bajada de la Virgen del Socorro» (sin hora) y
+   «Bajada del Socorro» (a las 07:00, y diciendo de dónde a dónde). Es la
+   misma, contada por dos fuentes: la guía general de fiestas de los 31
+   municipios puso la genérica, y la ficha buena vino después con hora y sitio.
+   Manda la que tiene hora — eso lo dijo él, y tiene razón: una fiesta con hora
+   es un dato, y sin hora es un titular.
+
+   Solo se juntan las del MISMO día y mismo pueblo cuyos nombres comparten las
+   palabras que importan. Las que están a uno o dos días con el mismo nombre NO
+   se tocan: ahí no hay forma de saber cuál es la fecha buena, y eso lo dice
+   quien vive allí.
+
+       node eventos.js repetidas         dice qué juntaría, sin tocar nada
+       node eventos.js repetidas hazlo   lo hace                            */
+function repetidas(hazlo){
+  const F='datos/eventos.js';
+  const txt=fs.readFileSync(F,'utf8');
+  const E=eval(txt+';EVENTOS');
+  const pal=s=>new Set(norm(s).split(' ').filter(w=>w.length>3));
+  const dias=(a,b)=>Math.round(Math.abs(new Date(a+'T12:00:00')-new Date(b+'T12:00:00'))/864e5);
+  const parecidos=(a,b)=>{ const A=pal(a.n),B=pal(b.n);
+    const c=[...A].filter(w=>B.has(w)).length, m=Math.min(A.size,B.size);
+    return !!m&&c/m>=0.5; };
+
+  const fuera=new Set(), juntadas=[], dudosas=[];
+  E.forEach((a,i)=>E.forEach((b,j)=>{
+    if(j<=i||fuera.has(i)||fuera.has(j)||a.m!==b.m||!parecidos(a,b)) return;
+    if(a.f===b.f){
+      /* misma fiesta el mismo día: manda la que trae hora */
+      if(!!a.h===!!b.h) return;                 /* las dos con hora son dos actos */
+      const g=a.h?a:b, p=a.h?b:a;
+      /* Lo que falta se rellena, y en los textos gana el más largo: la ficha
+         genérica traía «De las más antiguas de Canarias. Bajan la virgen desde
+         San Pedro hasta la ermita de la costa» y la buena, un «En De San Pedro
+         al caserío del Socorro» que ni está bien escrito. */
+      const LARGO=['no','d','ma'];
+      Object.keys(p).forEach(k=>{
+        if(g[k]==null||g[k]==='') { g[k]=p[k]; return; }
+        if(LARGO.includes(k)&&String(p[k]).length>String(g[k]).length) g[k]=p[k];
+      });
+      fuera.add(a.h?j:i);
+      juntadas.push({m:g.m,f:g.f,h:g.h,queda:g.n,cae:p.n});
+    }else if(dias(a.f,b.f)<=3&&norm(a.n)===norm(b.n)){
+      /* el mismo nombre en dos fechas: no se elige solo */
+      dudosas.push({m:a.m,n:a.n,f1:a.f,f2:b.f,d:dias(a.f,b.f)});
+    }
+  }));
+
+  console.log('=== LA GENÉRICA Y LA QUE TRAE HORA ===');
+  if(!juntadas.length) console.log('ninguna.');
+  juntadas.forEach(x=>console.log('\n· '+x.m+' · '+x.f+
+    '\n    queda: '+x.queda+'  ('+x.h+')'+'\n    cae:   '+x.cae+'  (sin hora)'));
+
+  console.log('\n=== MISMO NOMBRE, DOS FECHAS · ESTO NO LO DECIDO YO ===');
+  if(!dudosas.length) console.log('ninguna.');
+  dudosas.forEach(x=>console.log('   ⚠ '+x.m.padEnd(24)+x.n.slice(0,40).padEnd(42)+
+    x.f1+'  vs  '+x.f2+'   ('+x.d+' días)'));
+  if(dudosas.length) console.log('   → una de las dos fechas está mal. Lo sabe quien vive allí.');
+
+  console.log('\nfiestas antes: '+E.length+'  ·  se van: '+fuera.size+'  ·  quedan: '+(E.length-fuera.size));
+  if(!hazlo) return console.log('\n(esto era el ensayo · «node eventos.js repetidas hazlo» para hacerlo)');
+  const limpio=E.filter((e,i)=>!fuera.has(i));
+  fs.writeFileSync(F,txt.slice(0,txt.indexOf('const EVENTOS='))+'const EVENTOS='+
+    JSON.stringify(limpio,null,0).replace(/\},\{/g,'},\n{')+';\n');
+  console.log('\nhecho: '+limpio.length+' fiestas. Pasa ahora: node lote.js');
+}
+
 const arg=process.argv[2];
 if(!arg||arg==='pegar') pagina();
 else if(arg==='actos') meterActos(process.argv[3],process.argv[4]);
 else if(arg==='reclasificar') reclasificar();
 else if(arg==='duplicados') duplicados(process.argv[3]==='hazlo');
+else if(arg==='repetidas') repetidas(process.argv[3]==='hazlo');
 else meter(arg);
