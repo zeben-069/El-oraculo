@@ -311,6 +311,8 @@ a.mapa .foto{flex:0 0 auto;width:62px;height:62px;border-radius:11px;background-
   background-position:center;background-color:var(--arena);position:relative;
   display:grid;place-items:center;border:1.5px solid var(--arena)}
 a.mapa .foto .ico{font-size:26px;line-height:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,.45))}
+/* La sonda que comprueba si la ortofoto ha llegado: no se ve, solo avisa. */
+a.mapa .foto .sonda{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;border:0}
 /* El telón es el dibujo del pueblo, no una foto del sitio: se apaga un poco
    para que se lea como fondo y el icono siga mandando. */
 /* El telón es la estampa del pueblo desenfocada: se queda el color y el aire

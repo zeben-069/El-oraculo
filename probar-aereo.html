@@ -1,0 +1,82 @@
+<meta charset="utf-8"><title>¿Qué ortofoto funciona?</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+ body{font-family:system-ui,sans-serif;background:#FBF5E9;color:#3E2B1C;margin:0;padding:18px 14px 60px}
+ h1{font:800 22px/1.2 Georgia,serif;margin:0 0 6px}
+ p.ayuda{margin:6px 0 16px;font-size:14.5px;line-height:1.55;color:#6B5238;max-width:64ch}
+ .fila{background:#fff;border:1.5px solid #3E2B1C;border-radius:14px;padding:11px;margin:0 0 12px;
+       box-shadow:2.5px 2.5px 0 #3E2B1C;display:flex;gap:13px;align-items:flex-start}
+ .fila.ok{border-color:#2E5D4B;box-shadow:2.5px 2.5px 0 #2E5D4B}
+ .fila.mal{border-color:#A93B2B;box-shadow:2.5px 2.5px 0 #A93B2B;opacity:.75}
+ .fila img{width:120px;height:120px;object-fit:cover;border-radius:10px;background:#E8D9BE;flex:none}
+ .campos{flex:1;min-width:0}
+ .campos h2{margin:0 0 4px;font:700 16px system-ui}
+ .estado{font:700 13px system-ui;margin:0 0 6px}
+ .ok .estado{color:#2E5D4B} .mal .estado{color:#A93B2B}
+ code{font-size:11px;color:#6B5238;word-break:break-all;display:block;line-height:1.45}
+ .barra{position:sticky;bottom:0;background:#2E5D4B;color:#FBF5E9;padding:12px 14px;margin:18px -14px -60px;
+        font-size:15px;font-weight:600}
+</style>
+<h1>¿Qué ortofoto funciona?</h1>
+<p class="ayuda">
+ Las fichas de Naira enseñan una vista aérea del sitio pedida a GRAFCAN, y ahora mismo no sale ninguna.
+ Desde donde yo trabajo no puedo comprobarlo —la red está cerrada—, así que lo comprueba su navegador,
+ que sí tiene internet de verdad.
+ <br><br>
+ <b>Abra esta página y espere unos segundos.</b> Abajo le dirá cuál de las opciones ha traído la foto.
+ La prueba es la <b>Playa de Las Teresitas</b>: si la opción funciona, debe verse la playa de arena
+ clara con el monte detrás. Si sale una imagen en blanco o gris, esa tampoco vale.
+ <br><br>
+ Dígame el número de la que salga bien y la dejo puesta.
+</p>
+<div id="lista"></div>
+<div class="barra" id="resumen">Probando…</div>
+<script>
+/* Las Teresitas, que es inconfundible desde el aire. */
+const LA=28.5097, LO=-16.1847, R=0.0016, PX=240;
+const bbox11=[LO-R,LA-R,LO+R,LA+R].join(',');      /* WMS 1.1.1 y CRS:84 van en lon,lat */
+const bbox13=[LA-R,LO-R,LA+R,LO+R].join(',');      /* WMS 1.3.0 con EPSG:4326 va en lat,lon */
+const COMUN='&REQUEST=GetMap&STYLES=&FORMAT=image/jpeg&WIDTH='+PX+'&HEIGHT='+PX;
+
+const OPCIONES=[
+ {n:'La que hay puesta ahora — GRAFCAN OrtoExpress, WMS 1.1.1',
+  u:'https://idecan1.grafcan.es/ServicioWMS/OrtoExpress?SERVICE=WMS&VERSION=1.1.1&LAYERS=ortoexpress&SRS=EPSG:4326&BBOX='+bbox11+COMUN},
+ {n:'Igual, pero con la capa escrita en mayúsculas',
+  u:'https://idecan1.grafcan.es/ServicioWMS/OrtoExpress?SERVICE=WMS&VERSION=1.1.1&LAYERS=OrtoExpress&SRS=EPSG:4326&BBOX='+bbox11+COMUN},
+ {n:'GRAFCAN con la versión moderna del protocolo (1.3.0)',
+  u:'https://idecan1.grafcan.es/ServicioWMS/OrtoExpress?SERVICE=WMS&VERSION=1.3.0&LAYERS=ortoexpress&CRS=CRS:84&BBOX='+bbox11+COMUN},
+ {n:'GRAFCAN 1.3.0 con las coordenadas al revés',
+  u:'https://idecan1.grafcan.es/ServicioWMS/OrtoExpress?SERVICE=WMS&VERSION=1.3.0&LAYERS=ortoexpress&CRS=EPSG:4326&BBOX='+bbox13+COMUN},
+ {n:'GRAFCAN por el otro servidor (idecan2)',
+  u:'https://idecan2.grafcan.es/ServicioWMS/OrtoExpress?SERVICE=WMS&VERSION=1.1.1&LAYERS=ortoexpress&SRS=EPSG:4326&BBOX='+bbox11+COMUN},
+ {n:'PNOA del Instituto Geográfico Nacional (la ortofoto de toda España)',
+  u:'https://www.ign.es/wms-inspire/pnoa-ma?SERVICE=WMS&VERSION=1.3.0&LAYERS=OI.OrthoimageCoverage&CRS=CRS:84&BBOX='+bbox11+COMUN},
+ {n:'PNOA del IGN, protocolo antiguo',
+  u:'https://www.ign.es/wms-inspire/pnoa-ma?SERVICE=WMS&VERSION=1.1.1&LAYERS=OI.OrthoimageCoverage&SRS=EPSG:4326&BBOX='+bbox11+COMUN}
+];
+
+const $=(t,a,h)=>{const e=document.createElement(t);if(a)Object.assign(e,a);if(h)e.innerHTML=h;return e;};
+let buenas=[], hechas=0;
+OPCIONES.forEach((o,i)=>{
+  const caja=$('div',{className:'fila'});
+  const img=$('img',{alt:''});
+  const c=$('div',{className:'campos'});
+  const tit=$('h2',null,(i+1)+' · '+o.n);
+  const est=$('p',{className:'estado',textContent:'probando…'});
+  const url=$('code',{textContent:o.u});
+  c.appendChild(tit); c.appendChild(est); c.appendChild(url);
+  caja.appendChild(img); caja.appendChild(c);
+  document.getElementById('lista').appendChild(caja);
+  img.onload=()=>{ caja.classList.add('ok'); est.textContent='✓ ha traído imagen — mírela: ¿se ve la playa?';
+    buenas.push(i+1); fin(); };
+  img.onerror=()=>{ caja.classList.add('mal'); est.textContent='✗ no contesta'; fin(); };
+  img.src=o.u;
+});
+function fin(){
+  if(++hechas<OPCIONES.length) return;
+  const r=document.getElementById('resumen');
+  r.textContent = buenas.length
+    ? 'Han traído imagen las opciones: '+buenas.join(', ')+'.  Mire cuál enseña de verdad la playa y dígame el número.'
+    : 'Ninguna ha traído imagen. Dígamelo tal cual: entonces el problema no es la dirección, es otra cosa.';
+}
+</script>

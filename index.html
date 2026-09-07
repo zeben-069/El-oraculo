@@ -2781,6 +2781,16 @@ function miniAerea(la,lo,px){
 /* Tipos donde la ortofoto aérea no cuenta nada: de un museo, una iglesia o
    un casco solo se ve el tejado. Son 203 fichas del catálogo. */
 const AEREO_INUTIL=/Museo|Iglesia|Casco|Edificio|Escultura|Mercado|Bodega|Quesería|Castillo|Patrimonio|Plaza|Caserío|Transporte|Faro/;
+/* La ortofoto no ha llegado: se pone la estampa del pueblo desenfocada, que
+   es el mismo telón que ya usan los museos y las iglesias. Si el pueblo no
+   tiene estampa, se quita el fondo y manda el icono. Nunca un hueco vacío. */
+function aereoFalla(img){
+  const caja=img.parentNode; if(!caja) return;
+  const t=img.getAttribute("data-telon");
+  if(t){ caja.style.backgroundImage="url("+t+")"; caja.classList.add("telon"); }
+  else { caja.style.backgroundImage=""; caja.classList.remove("conFondo"); }
+  img.remove();
+}
 function marco(item,tipo,orden){
   const ico=iconoDe(tipo);
   /* El icono va SIEMPRE. Detrás va, por este orden: la foto del sitio si la
@@ -2789,13 +2799,21 @@ function marco(item,tipo,orden){
      y si no, la ortofoto aérea, que para una playa o un charco sí vale. */
   const est = (item&&!item.foto&&AEREO_INUTIL.test(tipo||(item&&item.tipo)||'')&&item.m&&ESTAMPA[item.m])
               ? ESTAMPA[item.m].f : null;
+  const aereo = (item&&!item.foto&&!est&&item.la!=null) ? miniAerea(item.la,item.lo) : null;
   const fondo = (item&&item.foto) ? 'background-image:url('+item.foto+')'
               : est                ? 'background-image:url('+est+')'
-              : (item&&item.la)   ? 'background-image:url('+miniAerea(item.la,item.lo)+')'
+              : aereo              ? 'background-image:url('+aereo+')'
               : '';
   const clase='foto'+(fondo?' conFondo':'')+(est?' telon':'');
+  /* La ortofoto viene de FUERA, y lo de fuera se cae. Si GRAFCAN no contesta,
+     el hueco se quedaba en blanco y la ficha parecía rota. Esta sonda —una
+     imagen de un píxel con la MISMA url, así que no cuesta otra petición—
+     avisa cuando falla y entonces se pone detrás la estampa del pueblo. */
+  const respaldo = (aereo&&item.m&&typeof ESTAMPA!=='undefined'&&ESTAMPA[item.m]) ? ESTAMPA[item.m].f : null;
+  const sonda = aereo ? '<img class="sonda" alt="" src="'+aereo+'"'+
+      (respaldo?' data-telon="'+respaldo+'"':'')+' onerror="aereoFalla(this)">' : '';
   return '<span class="'+clase+'" style="'+fondo+'">'+
-    '<span class="ico">'+ico+'</span>'+
+    '<span class="ico">'+ico+'</span>'+sonda+
     (orden?'<b class="orden">'+orden+'</b>':'')+'</span>';
 }
 function tarjeta(icono,titulo,url,sub,alerta,item,tipo,orden){
