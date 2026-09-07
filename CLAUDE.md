@@ -80,7 +80,7 @@ Dentro de `index.html`, como constantes:
 
 - `LUGARES` (589) — sitios que visitar. Solo 4 sin coordenadas.
 - `REST` (318) — restaurantes, incluidas 38 heladerías.
-- `EVENTOS` (143) — fiestas. **Sin coordenadas**, solo municipio y corredor.
+- `EVENTOS` (139) — fiestas. **Sin coordenadas**, solo municipio y corredor.
 - `ACTOS` (300) — los actos de 22 programas de fiestas de 15 municipios:
   día, municipio,
   hora, dónde es y `q` («ninos»/«noche»), que dice a quién le sirve. No son
@@ -804,12 +804,25 @@ restaurante está mal ubicado, tiene razón: vive allí.
   un «En De San Pedro al caserío del Socorro» que ni está bien escrito.
   `node eventos.js repetidas` las junta; sin argumentos hace el ensayo. Fueron
   **5** de 148.
-  Lo que ese mismo repaso **no** decide: cuatro fiestas con el mismo nombre a uno
-  o dos días de distancia —la Romería de San Agustín de Arafo el 28 y el 29, la
-  de Los Abrigos el 29 y el 31, la de San Miguel el 19 y el 21, San Juan del
-  Puerto el 23 y el 24—. Ahí una de las dos fechas está mal y no hay forma de
-  saber cuál desde aquí: las canta y espera. La Romería de Benijos era otra de
-  esas y la resolvió él: **es el 13**, no el 7.
+  Lo que ese mismo repaso **no** decide: la misma fiesta con el mismo nombre en
+  dos fechas. Ahí una de las dos está mal y no hay forma de saber cuál desde
+  aquí, así que las canta y espera. Fueron cinco y las resolvió Zeben todas, y
+  fíjate en que **en dos de ellas no valía ninguna de las dos fechas**: elegir
+  «la más probable» habría acertado tres de cinco.
+
+  | fiesta | había | es |
+  |---|---|---|
+  | Romería de Benijos, La Orotava | 7 sept | **13 sept** |
+  | Romería de San Agustín, Arafo | 28 y 29 ago | **29 ago** |
+  | Romería de Los Abrigos, Granadilla | 29 y 31 ago | **6 sept** |
+  | Romería de San Miguel | 19 y 21 sept | **26 sept** |
+  | Fiestas de San Juan, Puerto de la Cruz | 23 y 24 jun | **23 jun**, la víspera |
+
+  Y las de 2027 de esas romerías salieron copiando las fechas malas de 2026.
+  Como además **se mueven de año en año** —«fue el 29 porque cayó ese día», dice
+  él—, no se les pone una fecha inventada: se quedan donde están y se marcan en
+  la nota como aproximadas, que es lo que ya hacían once fichas del calendario
+  municipal. Naira entonces avisa de que el ayuntamiento la publica poco antes.
 
 - **Los iconos de fiesta salen del nombre.** Etiquetar 148 fiestas a mano es
   trabajo que no se hace nunca y se pudre al añadir más. `iconoFiesta()` mira
