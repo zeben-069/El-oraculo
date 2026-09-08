@@ -144,6 +144,7 @@ if(typeof L==='undefined'){
        lo que Naira tiene y no está en otro lado. El <input> sigue ahí, oculto:
        es quien guarda el valor y quien avisa al motor, así que nada de lo que
        ya funcionaba se entera del cambio. -->
+  <p class="calTit" id="calTit"></p>
   <div class="barra" id="barra">
     <button class="btnCal" id="btnCal" aria-expanded="false" aria-controls="calendario">
       <span class="cn" id="calNum">1</span>
@@ -316,7 +317,7 @@ const T={
      plantillas:m=>'Naira ha narrado con plantillas porque la API no contestó. Motivo: '+m+'. El motor y el plan son exactamente los mismos: solo cambia quién pone las palabras.',
      escapadaNo:'No he podido armar la escapada entera. Pruebe con un día suelto.',
      rutaNo:'Ahora mismo no tengo la ruta histórica cargada.',
-     evento:'evento',eventos:'eventos',sinEventos:'sin eventos',calAnt:'Mes anterior',calSig:'Mes siguiente',
+     evento:'evento',eventos:'eventos',sinEventos:'sin eventos',calAnt:'Mes anterior',calSig:'Mes siguiente',calTit:'¿Qué día quiere disfrutar de Tenerife?',sManana:'Buenos días',sTarde:'Buenas tardes',sNoche:'Buenas noches',calPista:'Los días con fiesta van marcados',
      verPanel:'Ver cómo se armó ▲',cerrarPanel:'Cerrar el detalle ▼',
      lema:'Su día en Tenerife, contado como se cuenta aquí',etDia:'Día',
      fuentes:'Cartografía y fototeca: <code>GRAFCAN — IDECanarias</code>. Horarios de guagua: <code>GTFS de TITSA</code>. Lugares e itinerarios: <code>datos.tenerife.es</code>. Naira no inventa horarios: lo que no sabe, lo dice.',
@@ -334,7 +335,7 @@ const T={
      listo_s:'Perfecto. Sin coche también se hacen cosas buenas, solo hay que atar la vuelta. ¿Por dónde tiramos?',
      plan:'Un plan para el día entero',sitio:'Quiero ver un sitio concreto',
      ahora:'Estoy por aquí ahora, ¿qué hago?',cambiar:'Cambiar el día o el alojamiento',
-     hola:'Soy <b>Naira</b>, su guía por aquí. ',compartir:'Compartir este plan',otro_muni:'Ese no es, cambiar de municipio',
+     hola:'Soy <b>Naira</b>, de aquí de toda la vida. Le monto el día como se lo montaría a un primo que viene de fuera: sin colas tontas y comiendo bien. ',compartir:'Compartir este plan',otro_muni:'Ese no es, cambiar de municipio',
      sorpresa:'Sorpréndame — con el tiempo que queda',
      planManana:'Para hoy ya se nos fue el día, así que se lo armo entero para mañana. Si quiere algo para lo que queda de hoy, dígame «Sorpréndame».',escapada:'🗓 Un fin de semana o varios días',escribeAqui:'Pregúnteme lo que quiera del plan…',noPuedoHablar:'Ahora mismo no puedo responderle por escrito. Use los botones de abajo, que el plan está completo igual.',cuantosDias:'¿Cuántos días me monto? Empiezo por la fecha que tiene elegida.',dia:'Día',escapadaCab:n=>'Va, les armo '+n+' días seguidos. Un día por zona, sin repetir sitio ni sitio de comer, y con lo de más trote en el medio, que el primer día se llega cansado.',dos_dias:'Dos días',tres_dias:'Tres días (fin de semana)',cuatro_dias:'Cuatro días',calEscapada:'🗓 Guardar los días en mi calendario',otroDia:'Volver al menú',copiado:'Copiado. Ya lo puede pegar donde quiera.',calendario:'🗓 Guardar el día en mi calendario',ubiCartel:'Para un plan más a su medida, dígame dónde están ahora',ubiCartelBtn:'Usar mi ubicación',queTal:'¿Y qué tal les fue el día?',val3:'De lujo',val2:'Bien',val1:'Regular',valNo:'Ahora no',gracias3:'¡Agüita, qué alegría! Me lo apunto para saber qué funciona.',gracias2:'Me alegro. Me lo apunto igual, que así voy afinando.',gracias1:'Pues lo siento. Me lo apunto, que es como aprendo a no repetirlo.',imgCompartir:'📸 Compartir el plan como imagen',imgBajada:'Imagen descargada. Ya la puede mandar por donde quiera.',ubi:'Usar mi ubicación',ubiNo:'Prefiero decirlo yo',ubiPido:'Para esto me viene bien saber dónde están. ¿Miro su ubicación o me lo dicen ustedes?',ubiBuscando:'Un momentito, que miro dónde están…',ubiHecho:m=>'Los ubico en '+m+'. ¿Voy con eso?',ubiSi:'Sí, estamos ahí',ubiOtro:'No, elijo yo el sitio',ubiFallo:'No he podido ver dónde están, no pasa nada. Dígamelo usted.',ubiLejos:'Los ubico fuera de Tenerife, así que mejor me lo dicen ustedes.',ajustar:'Ajustar el plan a lo mío',
      copiado:'Copiado. Ya se lo puede mandar a quien quiera.',
@@ -381,7 +382,7 @@ const T={
      plantillas:m=>'Naira narrated this from templates because the API did not answer. Reason: '+m+'. The engine and the plan are exactly the same: only who puts the words changes.',
      escapadaNo:'I could not put the whole trip together. Try a single day.',
      rutaNo:'I do not have the historic route loaded right now.',
-     evento:'event',eventos:'events',sinEventos:'no events',calAnt:'Previous month',calSig:'Next month',
+     evento:'event',eventos:'events',sinEventos:'no events',calAnt:'Previous month',calSig:'Next month',calTit:'Which day would you like to enjoy Tenerife?',sManana:'Good morning',sTarde:'Good afternoon',sNoche:'Good evening',calPista:'Days with a fiesta are marked',
      verPanel:'See how it was built ▲',cerrarPanel:'Close the details ▼',
      lema:'Your day in Tenerife, told the way we tell it here',etDia:'Day',
      fuentes:'Maps and photo library: <code>GRAFCAN — IDECanarias</code>. Bus timetables: <code>GTFS from TITSA</code>. Places and routes: <code>datos.tenerife.es</code>. Naira never invents opening hours: what she does not know, she says so.',
@@ -399,7 +400,7 @@ const T={
      listo_s:'No car is fine, we just need to sort the way back. Where shall we start?',
      plan:'A plan for a whole day',sitio:'I want to see somewhere specific',
      ahora:'I am out already — what now?',cambiar:'Change the day or where I am staying',
-     hola:'I am <b>Naira</b>, your guide here. ',compartir:'Share this plan',otro_muni:'Wrong one — change town',
+     hola:'I am <b>Naira</b>, born and raised here. I will plan your day the way I would for a cousin coming to visit: no silly queues and eating well. ',compartir:'Share this plan',otro_muni:'Wrong one — change town',
      sorpresa:'Surprise me — with the time that is left',
      planManana:'Today is nearly gone, so I will build you a full day for tomorrow. If you want something for what is left of today, use «Surprise me».',escapada:'🗓 A weekend or several days',escribeAqui:'Ask me anything about the plan…',noPuedoHablar:'I cannot reply in writing right now. Use the buttons below, the plan is complete anyway.',cuantosDias:'How many days shall I plan? I start from the date you picked.',dia:'Day',escapadaCab:n=>'Right, '+n+' days in a row. One area per day, no repeated places or restaurants, and the toughest day in the middle, because you arrive tired on the first.',dos_dias:'Two days',tres_dias:'Three days (weekend)',cuatro_dias:'Four days',calEscapada:'🗓 Save the days to my calendar',otroDia:'Back to menu',copiado:'Copied. Paste it wherever you like.',calendario:'🗓 Save the day to my calendar',ubiCartel:'For a plan that fits you better, let me know where you are',ubiCartelBtn:'Use my location',queTal:'And how was the day?',val3:'Brilliant',val2:'Good',val1:'So-so',valNo:'Not now',gracias3:'Delighted to hear it. I am noting it down so I know what works.',gracias2:'Glad to hear it. I am noting it down all the same.',gracias1:'Sorry to hear that. I am noting it down, that is how I learn.',imgCompartir:'📸 Share the plan as an image',imgBajada:'Image downloaded. Send it wherever you like.',ubi:'Use my location',ubiNo:'I will tell you',ubiPido:'For this it helps to know where you are. Shall I check your location, or will you tell me?',ubiBuscando:'One moment, checking where you are…',ubiHecho:m=>'I place you in '+m+'. Shall I go with that?',ubiSi:'Yes, that is where we are',ubiOtro:'No, let me choose',ubiFallo:'I could not read your location, no problem. Just tell me.',ubiLejos:'You seem to be outside Tenerife, so better if you tell me.',ajustar:'Tune it to us',
      copiado:'Copied. Send it to whoever you like.',
@@ -446,7 +447,7 @@ const T={
      plantillas:m=>'Naira hat mit Vorlagen erzählt, weil die API nicht geantwortet hat. Grund: '+m+'. Motor und Plan sind genau dieselben: es ändert sich nur, wer die Worte setzt.',
      escapadaNo:'Ich konnte die ganze Reise nicht zusammenstellen. Versuchen Sie es mit einem einzelnen Tag.',
      rutaNo:'Die historische Route ist gerade nicht geladen.',
-     evento:'Veranstaltung',eventos:'Veranstaltungen',sinEventos:'keine Veranstaltungen',calAnt:'Voriger Monat',calSig:'Nächster Monat',
+     evento:'Veranstaltung',eventos:'Veranstaltungen',sinEventos:'keine Veranstaltungen',calAnt:'Voriger Monat',calSig:'Nächster Monat',calTit:'An welchem Tag wollen Sie Teneriffa genießen?',sManana:'Guten Morgen',sTarde:'Guten Tag',sNoche:'Guten Abend',calPista:'Tage mit Fiesta sind markiert',
      verPanel:'Wie es gebaut wurde ▲',cerrarPanel:'Details schließen ▼',
      lema:'Ihr Tag auf Teneriffa, erzählt wie man es hier erzählt',etDia:'Tag',
      fuentes:'Karten und Fotothek: <code>GRAFCAN — IDECanarias</code>. Busfahrpläne: <code>GTFS von TITSA</code>. Orte und Routen: <code>datos.tenerife.es</code>. Naira erfindet keine Öffnungszeiten: was sie nicht weiß, sagt sie.',
@@ -464,7 +465,7 @@ const T={
      listo_s:'Ohne Auto geht auch viel, wir müssen nur den Rückweg klären. Womit fangen wir an?',
      plan:'Ein Plan für einen ganzen Tag',sitio:'Ich möchte einen bestimmten Ort sehen',
      ahora:'Ich bin schon unterwegs — was jetzt?',cambiar:'Tag oder Unterkunft ändern',
-     hola:'Ich bin <b>Naira</b>, Ihre Führerin hier. ',compartir:'Diesen Plan teilen',otro_muni:'Falsch — Ort ändern',
+     hola:'Ich bin <b>Naira</b>, hier geboren und aufgewachsen. Ich plane Ihren Tag so, wie ich ihn für einen Cousin aus dem Ausland planen würde: ohne sinnlose Warteschlangen und mit gutem Essen. ',compartir:'Diesen Plan teilen',otro_muni:'Falsch — Ort ändern',
      sorpresa:'Überraschen Sie mich — mit der Zeit, die bleibt',
      planManana:'Heute ist fast vorbei, deshalb baue ich Ihnen einen ganzen Tag für morgen. Für den Rest von heute nehmen Sie «Überraschen Sie mich».',escapada:'🗓 Ein Wochenende oder mehrere Tage',escribeAqui:'Fragen Sie mich alles zum Plan…',noPuedoHablar:'Ich kann gerade nicht schriftlich antworten. Nutzen Sie die Schaltflächen unten.',cuantosDias:'Wie viele Tage soll ich planen? Ich beginne mit dem gewählten Datum.',dia:'Tag',escapadaCab:n=>'Gut, '+n+' Tage am Stück. Ein Gebiet pro Tag, keine Wiederholungen, und der anstrengendste Tag in der Mitte, denn am ersten Tag kommt man müde an.',dos_dias:'Zwei Tage',tres_dias:'Drei Tage (Wochenende)',cuatro_dias:'Vier Tage',calEscapada:'🗓 Tage im Kalender speichern',otroDia:'Zurück zum Menü',copiado:'Kopiert.',calendario:'🗓 Tag im Kalender speichern',ubiCartel:'Für einen passenderen Plan: sagen Sie mir, wo Sie sind',ubiCartelBtn:'Standort verwenden',queTal:'Und wie war der Tag?',val3:'Großartig',val2:'Gut',val1:'Geht so',valNo:'Jetzt nicht',gracias3:'Das freut mich sehr. Ich notiere es mir, so weiß ich, was funktioniert.',gracias2:'Freut mich. Ich notiere es mir trotzdem.',gracias1:'Das tut mir leid. Ich notiere es mir, so lerne ich dazu.',imgCompartir:'📸 Plan als Bild teilen',imgBajada:'Bild heruntergeladen. Schicken Sie es, wohin Sie möchten.',ubi:'Meinen Standort verwenden',ubiNo:'Ich sage es Ihnen',ubiPido:'Dafür ist es gut zu wissen, wo Sie sind. Soll ich den Standort prüfen, oder sagen Sie es mir?',ubiBuscando:'Einen Moment, ich schaue, wo Sie sind…',ubiHecho:m=>'Ich verorte Sie in '+m+'. Passt das?',ubiSi:'Ja, da sind wir',ubiOtro:'Nein, ich wähle selbst',ubiFallo:'Ich konnte den Standort nicht lesen, kein Problem. Sagen Sie es mir einfach.',ubiLejos:'Sie scheinen außerhalb Teneriffas zu sein, sagen Sie es mir lieber.',ajustar:'Plan anpassen',
      copiado:'Kopiert. Schicken Sie ihn, wem Sie möchten.',
@@ -3900,7 +3901,7 @@ async function arranque(){
   /* «Buenas noches» ya es el saludo: encadenarle «¡Buenas!» sonaba a robot
      saludando dos veces. Si hay saludo por la hora, se usa ese; si no, el
      suelto. */
-  await naira((saludoHora?saludoHora+'. ':tr('holaSolo'))+tr('hola')+tr('donde'),260);
+  await naira((saludoHora?tr(saludoHora)+'. ':tr('holaSolo'))+tr('hola')+tr('donde'),260);
   const todos=Object.entries(BASES).sort((a,b)=>a[1].et.localeCompare(b[1].et,'es'));
   paso('ok','alojamiento','Los <span class="am">'+todos.length+'</span> municipios, cada uno con su estampa. Se elige por la imagen, no por una lista.');
   cuadriculaMunicipios(todos,k=>{S.base=k;pCoche()});
@@ -4571,6 +4572,7 @@ const inpF=document.getElementById('fechaLibre'), etDia=document.getElementById(
 function pintaFijos(){
   const lema=document.getElementById('lemaCab'); if(lema) lema.textContent=tr('lema');
   const et=document.getElementById('etDiaTit');  if(et) et.textContent=tr('etDia');
+  const ct=document.getElementById('calTit');    if(ct) ct.textContent=tr('calTit');
   const pie=document.getElementById('pieFuentes');
   if(pie) pie.innerHTML=tr('fuentes');
   if(typeof btnPanel!=='undefined'&&btnPanel)
@@ -4630,7 +4632,7 @@ function pintaCalendario(){
        '<span class="nd">'+d+'</span>'+
        (evs.length?'<span class="fi">'+iconoFiesta(evs[0].n)+'</span>':'')+'</button>';
   }
-  h+='</div>';
+  h+='</div><p class="calPista">'+tr('calPista')+'</p>';
 
   /* lo que hay el día elegido: es para lo que existe el calendario */
   const hoyEvs=fiestasDe(S.fecha);
@@ -4691,6 +4693,7 @@ inpF.addEventListener('change',e=>{ S.fecha=e.target.value; pintaDia(); if(S.bas
 (function(){
   const bot=document.getElementById('btnCal');
   if(bot) bot.onclick=()=>abreCalendario();
+  const ct=document.getElementById('calTit'); if(ct) ct.textContent=tr('calTit');
 })();
 pintaDia();
 /* El interruptor de fichas culturales se retiró: ahora todo lo que tiene
@@ -4723,13 +4726,13 @@ document.getElementById('btnCerrar').onclick=()=>{
 /* ── La luz del día: la cabecera y la paleta cambian según la hora ── */
 const LUZ={
   amanecer:{cielo:'#F7D9B0',teide:'#7A5236',lomas:'#4E7F58',lomas2:'#5C9166',mar:'#4E93A8',
-            astro:'#F2A24C',cx:120,cy:58,r:19,nieve:'#FDF3E4',estrellas:0,nubes:'#FFF3E2',et:'Buenos días'},
+            astro:'#F2A24C',cx:120,cy:58,r:19,nieve:'#FDF3E4',estrellas:0,nubes:'#FFF3E2',et:'sManana'},
   dia:      {cielo:'#BFE3F2',teide:'#6B4A32',lomas:'#3E7A54',lomas2:'#4C8B60',mar:'#3D8FB0',
             astro:'#F5C542',cx:512,cy:42,r:21,nieve:'#FDFBF5',estrellas:0,nubes:'#FDFBF5',et:''},
   atardecer:{cielo:'#F6C68E',teide:'#5E3B2A',lomas:'#3C6B4C',lomas2:'#467953',mar:'#8A6A72',
-            astro:'#E8622F',cx:534,cy:120,r:26,nieve:'#F8DCC4',estrellas:0,nubes:'#F2B98E',et:'Buenas tardes'},
+            astro:'#E8622F',cx:534,cy:120,r:26,nieve:'#F8DCC4',estrellas:0,nubes:'#F2B98E',et:'sTarde'},
   noche:    {cielo:'#1E2340',teide:'#241C33',lomas:'#1E3A2C',lomas2:'#24422F',mar:'#1B2E4A',
-            astro:'#EDE6DC',cx:508,cy:38,r:15,nieve:'#B9AFD6',estrellas:1,nubes:'#2A3050',et:'Buenas noches'}
+            astro:'#EDE6DC',cx:508,cy:38,r:15,nieve:'#B9AFD6',estrellas:1,nubes:'#2A3050',et:'sNoche'}
 };
 function luzAhora(){
   const h=new Date().getHours();
@@ -4749,6 +4752,10 @@ function pintaLuz(){
   const a=g('astro');
   if(a){a.setAttribute('fill',L.astro);a.setAttribute('cx',L.cx);a.setAttribute('cy',L.cy);a.setAttribute('r',L.r);}
   const n=g('nubes'); if(n) n.setAttribute('fill',L.nubes);
+  /* Devuelve la CLAVE del saludo, no el texto: «Buenas tardes» estaba escrito
+     a pelo en español y era LO PRIMERO que leía un inglés o un alemán. Con la
+     clave, el saludo se traduce en el momento de decirlo y sigue bien aunque
+     cambien de idioma a mitad. */
   return L.et;
 }
 const saludoHora=pintaLuz();

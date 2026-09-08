@@ -362,6 +362,23 @@ grande, que es por donde se entra. **No reescribe nada**: solo respeta lo que ya
 venía escrito, así que vale igual para el texto del modelo que para el del
 narrador local.
 
+**El calendario tenía que DECIR para qué está.** Zeben, mirándolo: «no da la
+sensación de que uno venga a preparar sus vacaciones». Y tenía razón: una
+rejilla bonita sin rótulo es un trasto. Encima va la pregunta —«¿Qué día quiere
+disfrutar de Tenerife?»— y dentro, una línea que explica los iconos. Ojo con el
+rótulo: en cursiva serif chocaba con el lema, que es lo mismo justo encima; va
+recto y con aire por delante para que se lean como dos cosas distintas.
+
+**La entrada era correcta y fría.** «Soy Naira, su guía por aquí» no dice nada
+que no diga el logo. Ahora dice a qué juega: «de aquí de toda la vida; le monto
+el día como se lo montaría a un primo que viene de fuera: sin colas tontas y
+comiendo bien». Es la voz que ya manda el prompt, pero en el primer segundo.
+Y ahí salió un fallo de los que escuecen: **«Buenas tardes» estaba escrito a
+pelo en español** dentro de la tabla de la luz del día, así que era LO PRIMERO
+que leía un inglés o un alemán. `pintaLuz()` devuelve ahora la **clave**
+(`sManana`/`sTarde`/`sNoche`) y no el texto: se traduce al decirlo, y sigue
+bien aunque cambien de idioma a mitad de la conversación.
+
 **El calendario es donde se asoman las fiestas.** Era un `<input type="date">`:
 el cuadrito gris del navegador, el único sitio donde esto parecía un formulario.
 Y detrás había 139 fiestas y 300 actos que el turista no podía ver si no

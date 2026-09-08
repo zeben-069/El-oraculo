@@ -57,6 +57,14 @@ button.idi:hover{background:var(--cal-hueso)}
 button.idi[aria-pressed="true"]{background:var(--tea);color:var(--cal);font-weight:700}
 button.idi:focus-visible{outline:2.5px solid var(--malvasia);outline-offset:-3px}
 .barra .et{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--tea-suave)}
+/* El rótulo que enmarca la fecha. Sin él, el calendario es un trasto bonito:
+   nadie sabe para qué está ahí. Con él, es lo primero que te preguntan al
+   entrar en una agencia. */
+.calTit{margin:20px auto 9px;font:700 16.5px/1.35 var(--disp);color:var(--tea);max-width:24ch}
+.calPista{margin:9px 0 0;font-family:var(--mono);font-size:10px;line-height:1.5;
+  color:var(--tea-suave);text-align:center;letter-spacing:.02em}
+body[data-luz="noche"] .calTit{color:var(--tea)}
+
 /* ── EL CALENDARIO ──────────────────────────────────────────────────
    El botón: el día en grande, el mes y el día de la semana al lado. Si ese
    día hay fiesta, se marca — es lo primero que el turista tiene que ver. */
