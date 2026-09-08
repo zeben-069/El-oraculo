@@ -139,10 +139,20 @@ if(typeof L==='undefined'){
     <h1>Nair<em>a</em></h1>
     <p class="lema" id="lemaCab">Su día en Tenerife, contado como se cuenta aquí</p>
   </div>
-  <div class="barra" id="barra"><span class="et" id="etDiaTit">Día</span>
-    <input type="date" id="fechaLibre" min="2026-08-01" max="2027-12-31">
-    <span class="et" id="etDia"></span>
+  <!-- La fecha era el cuadrito que trae el navegador: el único sitio de Naira
+       donde esto parecía un formulario. Y es la puerta de las fiestas, que es
+       lo que Naira tiene y no está en otro lado. El <input> sigue ahí, oculto:
+       es quien guarda el valor y quien avisa al motor, así que nada de lo que
+       ya funcionaba se entera del cambio. -->
+  <div class="barra" id="barra">
+    <button class="btnCal" id="btnCal" aria-expanded="false" aria-controls="calendario">
+      <span class="cn" id="calNum">1</span>
+      <span class="cx"><b id="calMes"></b><i class="et" id="etDia"></i></span>
+      <span class="cf">▾</span>
+    </button>
+    <input type="date" id="fechaLibre" min="2026-08-01" max="2027-12-31" hidden>
   </div>
+  <div class="calendario" id="calendario" hidden></div>
   <div class="idiomas" id="idiomas"></div>
 </header>
 
@@ -306,7 +316,7 @@ const T={
      plantillas:m=>'Naira ha narrado con plantillas porque la API no contestó. Motivo: '+m+'. El motor y el plan son exactamente los mismos: solo cambia quién pone las palabras.',
      escapadaNo:'No he podido armar la escapada entera. Pruebe con un día suelto.',
      rutaNo:'Ahora mismo no tengo la ruta histórica cargada.',
-     evento:'evento',eventos:'eventos',sinEventos:'sin eventos',
+     evento:'evento',eventos:'eventos',sinEventos:'sin eventos',calAnt:'Mes anterior',calSig:'Mes siguiente',
      verPanel:'Ver cómo se armó ▲',cerrarPanel:'Cerrar el detalle ▼',
      lema:'Su día en Tenerife, contado como se cuenta aquí',etDia:'Día',
      fuentes:'Cartografía y fototeca: <code>GRAFCAN — IDECanarias</code>. Horarios de guagua: <code>GTFS de TITSA</code>. Lugares e itinerarios: <code>datos.tenerife.es</code>. Naira no inventa horarios: lo que no sabe, lo dice.',
@@ -371,7 +381,7 @@ const T={
      plantillas:m=>'Naira narrated this from templates because the API did not answer. Reason: '+m+'. The engine and the plan are exactly the same: only who puts the words changes.',
      escapadaNo:'I could not put the whole trip together. Try a single day.',
      rutaNo:'I do not have the historic route loaded right now.',
-     evento:'event',eventos:'events',sinEventos:'no events',
+     evento:'event',eventos:'events',sinEventos:'no events',calAnt:'Previous month',calSig:'Next month',
      verPanel:'See how it was built ▲',cerrarPanel:'Close the details ▼',
      lema:'Your day in Tenerife, told the way we tell it here',etDia:'Day',
      fuentes:'Maps and photo library: <code>GRAFCAN — IDECanarias</code>. Bus timetables: <code>GTFS from TITSA</code>. Places and routes: <code>datos.tenerife.es</code>. Naira never invents opening hours: what she does not know, she says so.',
@@ -436,7 +446,7 @@ const T={
      plantillas:m=>'Naira hat mit Vorlagen erzählt, weil die API nicht geantwortet hat. Grund: '+m+'. Motor und Plan sind genau dieselben: es ändert sich nur, wer die Worte setzt.',
      escapadaNo:'Ich konnte die ganze Reise nicht zusammenstellen. Versuchen Sie es mit einem einzelnen Tag.',
      rutaNo:'Die historische Route ist gerade nicht geladen.',
-     evento:'Veranstaltung',eventos:'Veranstaltungen',sinEventos:'keine Veranstaltungen',
+     evento:'Veranstaltung',eventos:'Veranstaltungen',sinEventos:'keine Veranstaltungen',calAnt:'Voriger Monat',calSig:'Nächster Monat',
      verPanel:'Wie es gebaut wurde ▲',cerrarPanel:'Details schließen ▼',
      lema:'Ihr Tag auf Teneriffa, erzählt wie man es hier erzählt',etDia:'Tag',
      fuentes:'Karten und Fotothek: <code>GRAFCAN — IDECanarias</code>. Busfahrpläne: <code>GTFS von TITSA</code>. Orte und Routen: <code>datos.tenerife.es</code>. Naira erfindet keine Öffnungszeiten: was sie nicht weiß, sagt sie.',
@@ -657,7 +667,36 @@ function resaltar(txt,b){
     h=h.replace(/\b(CERRADA|CERRADO|CLOSED|GESCHLOSSEN|PELIGROSA|PELIGROSO|DANGEROUS|GEF[ÄA]HRLICH|RESERVA OBLIGATORIA|BOOKING REQUIRED|USO PROHIBIDO)\b/g,
                 '<mark class="ojo">$&</mark>');
   }catch(e){}
-  return h;
+  return ritmo(h);
+}
+/* EL RITMO DEL RELATO
+   ------------------------------------------------------------------
+   El plan son tres mil caracteres y llegaban de una tirada, todos del mismo
+   tamaño, apoyados solo en `white-space:pre-wrap`. El ojo no tiene dónde
+   agarrarse: antes de leer una palabra ya has visto un muro. Y no se arregla
+   con colorines, se arregla con aire.
+   Lo que hace esto es lo único que se puede hacer sin tocar el texto: los
+   bloques separados por una línea en blanco pasan a ser párrafos de verdad, y
+   las líneas que empiezan por «·» pasan a ser una lista con su sangría. La
+   primera frase va un punto más grande, que es por donde se entra.
+   No reescribe nada ni decide nada: solo respeta lo que ya venía escrito. */
+function ritmo(h){
+  const bloques=String(h).split(/\n{2,}/).map(b=>b.trim()).filter(Boolean);
+  if(bloques.length<2) return '<div class="relato">'+h+'</div>';
+  const lineas=bl=>bl.split('\n');
+  let primero=true;
+  const partes=bloques.map(bl=>{
+    if(/^[·•]\s/.test(bl)){
+      /* una lista: cada «·» abre un punto, y lo que va debajo sangrado es
+         parte del mismo —el teléfono del restaurante, su horario— */
+      const items=bl.split(/\n(?=[·•]\s)/).map(x=>x.replace(/^[·•]\s*/,'').trim());
+      return '<ul class="pl">'+items.map(x=>'<li>'+x.split('\n').map(y=>y.trim()).join('<br>')+'</li>').join('')+'</ul>';
+    }
+    const cl=primero?' class="entrada"':'';
+    primero=false;
+    return '<p'+cl+'>'+lineas(bl).join('<br>')+'</p>';
+  });
+  return '<div class="relato">'+partes.join('')+'</div>';
 }
 function burbuja(txt,quien,extra){
   const d=document.createElement('div');d.className='b '+quien;
@@ -4539,6 +4578,94 @@ function pintaFijos(){
       hRazon.closest('.panel').getAttribute('data-abierto')==='1')?tr('cerrarPanel'):tr('verPanel');
   pintaDia();
 }
+
+/* EL CALENDARIO DEL MES
+   ------------------------------------------------------------------
+   Antes esto era un <input type="date">: el cuadrito gris del navegador. Servía
+   para elegir un día, pero no CONTABA nada — y detrás hay 139 fiestas y 300
+   actos que el turista no tenía forma de ver si no acertaba la fecha a ciegas.
+   Así que el calendario no es un adorno: es donde se asoman las fiestas. Cada
+   día que tiene alguna sale con su icono, el mismo que usa la agenda, y debajo
+   se lee cuál es. Bonito porque dice algo, no al revés.
+   El <input> sigue existiendo, oculto: guarda el valor y dispara el `change`
+   que ya escuchaba el motor. Aquí solo se pinta y se pulsa.                  */
+let calMesVisto=null;                 /* el mes que se está mirando, no el elegido */
+
+function fiestasDe(iso){ return EVENTOS.filter(e=>e.f===iso); }
+function isoDe(a,m,d){ return a+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
+
+function pintaCalendario(){
+  const caja=document.getElementById('calendario'); if(!caja) return;
+  const LOCD={es:'es-ES',en:'en-GB',de:'de-DE'}[S.idioma]||'es-ES';
+  const min=inpF.getAttribute('min'), max=inpF.getAttribute('max');
+  const sel=new Date(S.fecha+'T12:00:00');
+  if(!calMesVisto) calMesVisto={a:sel.getFullYear(), m:sel.getMonth()};
+  const {a,m}=calMesVisto;
+  const primero=new Date(a,m,1), ultimo=new Date(a,m+1,0);
+  /* la semana empieza en lunes en los tres idiomas que hablamos */
+  const hueco=(primero.getDay()+6)%7;
+  const hoy=hoyISO();
+
+  const nomMes=primero.toLocaleDateString(LOCD,{month:'long',year:'numeric'});
+  const diasCortos=[];
+  for(let i=0;i<7;i++){ const d=new Date(2026,5,1+i);  /* 1 de junio de 2026 es lunes */
+    diasCortos.push(d.toLocaleDateString(LOCD,{weekday:'short'}).slice(0,2)); }
+
+  const antes=isoDe(a,m,1) > min, despues=isoDe(a,m,ultimo.getDate()) < max;
+  let h='<div class="calCab">'+
+    '<button class="calNav" data-mes="-1" aria-label="'+tr('calAnt')+'"'+(antes?'':' disabled')+'>‹</button>'+
+    '<b>'+nomMes.charAt(0).toUpperCase()+nomMes.slice(1)+'</b>'+
+    '<button class="calNav" data-mes="1" aria-label="'+tr('calSig')+'"'+(despues?'':' disabled')+'>›</button>'+
+    '</div><div class="calRej">';
+  diasCortos.forEach(d=>h+='<span class="calDs">'+d+'</span>');
+  for(let i=0;i<hueco;i++) h+='<span></span>';
+  for(let d=1;d<=ultimo.getDate();d++){
+    const iso=isoDe(a,m,d), evs=fiestasDe(iso);
+    const fuera=iso<min||iso>max;
+    const cl=['calD'];
+    if(iso===S.fecha) cl.push('sel');
+    if(iso===hoy) cl.push('hoy');
+    if(evs.length) cl.push('conFiesta');
+    h+='<button class="'+cl.join(' ')+'" data-dia="'+iso+'"'+(fuera?' disabled':'')+'>'+
+       '<span class="nd">'+d+'</span>'+
+       (evs.length?'<span class="fi">'+iconoFiesta(evs[0].n)+'</span>':'')+'</button>';
+  }
+  h+='</div>';
+
+  /* lo que hay el día elegido: es para lo que existe el calendario */
+  const hoyEvs=fiestasDe(S.fecha);
+  h+='<div class="calPie">';
+  if(hoyEvs.length){
+    h+=hoyEvs.slice(0,4).map(e=>'<div class="calEv"><span>'+iconoFiesta(e.n)+'</span>'+
+      '<div><b>'+e.n+'</b><i>'+e.m+(e.h?' · '+e.h:'')+'</i></div></div>').join('');
+    if(hoyEvs.length>4) h+='<p class="calNada">+'+(hoyEvs.length-4)+'</p>';
+  }else h+='<p class="calNada">'+tr('sinEventos')+'</p>';
+  h+='</div>';
+  caja.innerHTML=h;
+
+  caja.querySelectorAll('.calNav').forEach(b=>b.onclick=()=>{
+    const paso=+b.getAttribute('data-mes');
+    calMesVisto={a:a+Math.floor((m+paso)/12), m:((m+paso)%12+12)%12};
+    pintaCalendario();
+  });
+  caja.querySelectorAll('.calD').forEach(b=>b.onclick=()=>{
+    /* se escribe en el <input> y se avisa como si lo hubiera tocado una
+       persona: así el motor se entera por el mismo sitio de siempre */
+    inpF.value=b.getAttribute('data-dia');
+    inpF.dispatchEvent(new Event('change'));
+    pintaCalendario();
+  });
+}
+
+function abreCalendario(abrir){
+  const caja=document.getElementById('calendario'), bot=document.getElementById('btnCal');
+  if(!caja||!bot) return;
+  const ab=(abrir===undefined)?caja.hidden:abrir;
+  if(ab){ calMesVisto=null; pintaCalendario(); }
+  caja.hidden=!ab;
+  bot.setAttribute('aria-expanded',String(ab));
+}
+
 function pintaDia(){
   const d=diaSemana(S.fecha);
   const ev=EVENTOS.filter(e=>e.f===S.fecha);
@@ -4549,8 +4676,22 @@ function pintaDia(){
   catch(e){ diaTxt=DIAS[d]; }
   etDia.textContent=diaTxt+(ev.length?' · '+ev.length+' '+tr(ev.length>1?'eventos':'evento')
                                      :' · '+tr('sinEventos'));
+  /* el botón que abre el calendario: el número grande y el mes debajo */
+  const num=document.getElementById('calNum'), mes=document.getElementById('calMes');
+  const f=new Date(S.fecha+'T12:00:00');
+  if(num) num.textContent=f.getDate();
+  if(mes){ const nm=f.toLocaleDateString(LOCD,{month:'long'});
+    mes.textContent=nm.charAt(0).toUpperCase()+nm.slice(1); }
+  const bot=document.getElementById('btnCal');
+  if(bot) bot.classList.toggle('conFiesta',ev.length>0);
+  const caja=document.getElementById('calendario');
+  if(caja&&!caja.hidden) pintaCalendario();
 }
 inpF.addEventListener('change',e=>{ S.fecha=e.target.value; pintaDia(); if(S.base) otroDia(); });
+(function(){
+  const bot=document.getElementById('btnCal');
+  if(bot) bot.onclick=()=>abreCalendario();
+})();
 pintaDia();
 /* El interruptor de fichas culturales se retiró: ahora todo lo que tiene
    fuente del Cabildo se cuenta siempre, así que no hay nada que conmutar. */

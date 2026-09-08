@@ -352,6 +352,29 @@ acababa en La Esperanza se quedaba sin remate teniendo cuatro heladerías a
 
 ---
 
+**El relato tenía que respirar.** El plan son tres mil caracteres y llegaban de
+una tirada, todos del mismo tamaño, apoyados solo en `white-space:pre-wrap`.
+Zeben lo dijo mirando la pantalla: «se ve muy plano». Y no se arregla con
+colorines, se arregla con aire: `ritmo()` convierte los bloques separados por
+una línea en blanco en párrafos de verdad y las líneas que empiezan por «·» en
+una lista con su sangría y su separador. La primera frase va un punto más
+grande, que es por donde se entra. **No reescribe nada**: solo respeta lo que ya
+venía escrito, así que vale igual para el texto del modelo que para el del
+narrador local.
+
+**El calendario es donde se asoman las fiestas.** Era un `<input type="date">`:
+el cuadrito gris del navegador, el único sitio donde esto parecía un formulario.
+Y detrás había 139 fiestas y 300 actos que el turista no podía ver si no
+acertaba la fecha a ciegas. Ahora es una rejilla del mes donde **cada día con
+fiesta lleva su icono** —el mismo de `iconoFiesta()`— y debajo se lee cuál es,
+con su pueblo y su hora. Bonito porque dice algo.
+El `<input>` **sigue existiendo, oculto**: es quien guarda el valor y quien
+dispara el `change` que ya escuchaba el motor, así que pulsar un día del
+calendario entra por el mismo sitio de siempre y nada de lo que funcionaba se
+entera del cambio. Los nombres de mes y de día los escribe el navegador con
+`toLocaleDateString` en el idioma elegido; los de las fiestas **no se traducen**,
+que es la regla de siempre.
+
 ## Trampas conocidas
 
 **El ancla del turista pasa por un camino aparte.** Cuando eligen un sitio
