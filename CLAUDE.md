@@ -85,7 +85,7 @@ datos no obliga a tocar las pruebas. Y `fotos.js` escribe en
 
 Dentro de `index.html`, como constantes:
 
-- `LUGARES` (589) — sitios que visitar. Solo 4 sin coordenadas.
+- `LUGARES` (581) — sitios que visitar. Solo 4 sin coordenadas.
 - `REST` (318) — restaurantes, incluidas 38 heladerías.
 - `EVENTOS` (138) — fiestas. Municipio y corredor siempre; **127 fichas (87
   fiestas × sus años) llevan ya `la`/`lo`/`lu`**, colocadas por Zeben con
@@ -513,6 +513,32 @@ así que cada ficha se lleva `of:'OpenStreetMap (ODbL) · n12345'`.
 Después hay que **colocar la fiesta en él**: `node eventos.js sitios` los ofrece
 ya en el desplegable.
 
+**Unas coordenadas también se cruzan contra algo antes de meterlas.** Zeben las
+mandó a mano para los tres, y dos entraron y una no. El cruce es barato y lo
+dicen los propios datos: a qué distancia queda del casco, de la playa fichada
+más cercana y del restaurante más cercano.
+· *Charco del Pino* (28.106586, −16.591344) — a 1,9 km del casco, entre el
+  museo de Granadilla y San Miguel. Cuadra. **Dentro.**
+· *Los Blanquitos* (28.130086, −16.553764) — a 2,6 km del casco y a 1,9 del
+  Caserío de Las Vegas. Cuadra. **Dentro.**
+· *Los Abrigos* — venían **dos versiones del mismo punto y están a 16,8 km una
+  de otra**, así que una está mal por fuerza. Peor: las dos fallan. La náutica
+  (28° 06,470′ N, 16° 28,214′ W) cae a **0,2 km de la Playa de Tajao y de un
+  restaurante que se llama «Playa Tajao»** — o sea que apunta a Tajao, que está
+  en Arico. Y la decimal (28,03060, −16,61720) cae a **4,6 km al oeste de la
+  Playa El Confital/Playa del Horno**, que es la playa que tenemos fichada
+  **en** Los Abrigos, y más cerca de Los Colmenares, que es de San Miguel.
+  **Fuera, y se pregunta.** Para eso está `buscar-nucleos.html`: una consulta a
+  OpenStreetMap lo resuelve sin que nadie tenga que fiarse de un número.
+La lección: **un par de grados decimales no se puede leer**, así que hay que
+apoyarlo en algo que sí se lea — «queda a doscientos metros de un restaurante
+que se llama Playa Tajao» es una frase que delata el error sola.
+Con los dos metidos, la Romería de Charco del Pino y la de Los Blanquitos ya
+paran en su propio pueblo, y de paso el plan de Granadilla deja de quedarse en
+dos paradas. Lo que **no** se arregla es la comida: en esas medianías no hay ni
+un restaurante fichado —el más cercano está a 6 km—, así que la bandera
+COMIDA-LEJOS de Granadilla sigue ahí y ahora se sabe exactamente por qué.
+
 **Y ahí salió un fallo que llevaba escondido desde siempre: la nota de la fiesta
 que arma el día no llegaba al informe.** `evento_ancla` llevaba nombre,
 municipio, franja, hora y distinción, pero **no `no`** — y **113 de las 138
@@ -679,9 +705,9 @@ restaurantes, 76 mencionan días de cierre y **cero se contradicen**.
 
 `lote.js` es el que hay que pasar **después de tocar el motor**. Marca
 DISPERSO, SALTO, CIERRE-LEJOS, COMIDA-LEJOS, RECINTO, CURVAS-NOCHE.
-Referencia actual: dispersión mediana 4 km, cero banderas salvo 1 plan con la
-comida lejos (Granadilla, dentro del mismo municipio) y 3 días de 2 paradas
-(por la regla del sentido único). Eran 3 los de comida lejos, y no era escasez
+Referencia actual: dispersión mediana 4,3 km, cero banderas salvo 1 plan con la
+comida lejos (Granadilla) y **ningún** día de 2 paradas — eran 3, y el último se
+cerró al fichar Charco del Pino. Eran 3 los de comida lejos, y no era escasez
 de catálogo como se creía: era el filtro de municipio ganándole a la cercanía.
 
 Trae doce planes **con ancla**, que es el camino que la tabla no
@@ -714,9 +740,9 @@ fiestas a menos de 8 km y comprueba que salgan las dos. Referencia: 20 días,
 programa o por el aviso de la lejana, que los tres valen—, **0 casos de una
 fiesta de noche tapando a una de día** y 9 con sitios para cenar.
 Y cierra midiendo si colocar la fiesta sirve de algo: arma el día desde su
-propio pueblo con las coordenadas y sin ellas. Referencia: **87 fiestas con
-sitio, 36 días cambian (41%); de las 31 que están a más de 1 km del casco,
-cambian 24 (77%)**. Ojo con ese bloque: tiene que mutar el `EVENTOS` que
+propio pueblo con las coordenadas y sin ellas. Referencia: **89 fiestas con
+sitio, 37 días cambian (42%); de las 33 que están a más de 1 km del casco,
+cambian 25 (76%)**. Ojo con ese bloque: tiene que mutar el `EVENTOS` que
 **exporta `banco.js`**, no el que `lote.js` lee del fichero con `eval` — con la
 copia, quitarle las coordenadas no cambia nada y el porcentaje sale 0%, o sea
 que la prueba dice que la mejora no sirve.
