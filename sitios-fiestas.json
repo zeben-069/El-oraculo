@@ -1,0 +1,410 @@
+{
+ "tipo": "sitios",
+ "sitios": [
+  {
+   "n": "47 Certamen de Bandas de Música",
+   "m": "Arafo",
+   "lugar": "Casco histórico de Arafo"
+  },
+  {
+   "n": "Peregrinación de San Bartolomé hacia El Pico y el cementerio",
+   "m": "San Cristóbal de La Laguna",
+   "lugar": "Iglesia de San Bartolomé de Tejina"
+  },
+  {
+   "n": "Lectura del Pregón de las Fiestas",
+   "m": "Candelaria",
+   "lugar": "Basílica de Nuestra Señora de Candelaria"
+  },
+  {
+   "n": "Fiesta de las Tradiciones y elección de la Romera Mayor",
+   "m": "Garachico",
+   "lugar": "Convento de San Francisco"
+  },
+  {
+   "n": "Concierto «A orillas del mar» con la Banda Las Candelas y Ara Malikian",
+   "m": "Candelaria",
+   "lugar": "Casco histórico de Candelaria"
+  },
+  {
+   "n": "Baile de Magos de Garachico",
+   "m": "Garachico",
+   "lugar": "Convento de San Francisco"
+  },
+  {
+   "n": "Ofrenda de las Cañitas a San Roque y Baile de Magos",
+   "m": "Garachico",
+   "lugar": "Convento de San Francisco"
+  },
+  {
+   "n": "Concierto de Café Quijano y Escuela de Calor",
+   "m": "Candelaria",
+   "lugar": "Casco histórico de Candelaria"
+  },
+  {
+   "n": "Noche de Humor con Aarón Gómez",
+   "m": "Arafo",
+   "lugar": "Casco histórico de Arafo"
+  },
+  {
+   "n": "Pregón de Fiestas y gala de elección de Romeras y Reinas",
+   "m": "Vilaflor de Chasna",
+   "lugar": "Casco histórico de Vilaflor"
+  },
+  {
+   "n": "Caminata a Candelaria",
+   "m": "Candelaria",
+   "lugar": "Casco histórico de Candelaria"
+  },
+  {
+   "n": "Rito del Hallazgo de la Virgen y Noche de Parrandas",
+   "m": "Candelaria",
+   "lugar": "Casco histórico de Candelaria"
+  },
+  {
+   "n": "Solemne Eucaristía de la Patrona de Canarias y procesión con lluvia de voladores",
+   "m": "Candelaria",
+   "lugar": "Basílica de Nuestra Señora de Candelaria"
+  },
+  {
+   "n": "Verbena de la Pamela",
+   "m": "San Cristóbal de La Laguna",
+   "lugar": "Iglesia de San Bartolomé de Tejina"
+  },
+  {
+   "n": "Nuestra Señora de la Luz en el Conjunto Histórico",
+   "m": "Arico",
+   "lugar": "Conjunto Histórico de Arico el Nuevo"
+  },
+  {
+   "n": "Fiestas de San Bernardo y del Farol",
+   "m": "Santa Cruz de Tenerife",
+   "lugar": "Casco histórico de Santa Cruz"
+  },
+  {
+   "n": "Baile de Chiguergue",
+   "m": "Guía de Isora",
+   "lugar": "Chío - Área Recreativa de Chío (Los Arenales)"
+  },
+  {
+   "n": "Romería de San Agustín",
+   "m": "Arafo",
+   "lugar": "Casco histórico de Arafo"
+  },
+  {
+   "n": "Procesión de San Bartolomé y exhibición pirotécnica",
+   "m": "San Cristóbal de La Laguna",
+   "lugar": "Iglesia de San Bartolomé de Tejina"
+  },
+  {
+   "n": "Entrada de los Corazones a la Plaza de Tejina",
+   "m": "San Cristóbal de La Laguna",
+   "lugar": "Iglesia de San Bartolomé de Tejina"
+  },
+  {
+   "n": "Romería de San Roque",
+   "m": "Vilaflor de Chasna",
+   "lugar": "Ermita de San Roque"
+  },
+  {
+   "n": "Descuelgue de los Corazones",
+   "m": "San Cristóbal de La Laguna",
+   "lugar": "Iglesia de San Bartolomé de Tejina"
+  },
+  {
+   "n": "Entrada de las Parrandas de los Corazones y pique tradicional",
+   "m": "San Cristóbal de La Laguna",
+   "lugar": "Iglesia de San Bartolomé de Tejina"
+  },
+  {
+   "n": "Bajada del Socorro",
+   "m": "Güímar",
+   "lugar": "Ermita del Socorro"
+  },
+  {
+   "n": "Subida de la Virgen del Socorro",
+   "m": "Güímar",
+   "lugar": "Casco histórico de Güímar"
+  },
+  {
+   "n": "Misa y procesión de la Virgen de La Luz con alfombras ceremoniales",
+   "m": "Los Silos",
+   "lugar": "Iglesia Parroquial de Nuestra Señora de la Luz"
+  },
+  {
+   "n": "Feria de artesanía de Pinolere",
+   "m": "La Orotava",
+   "lugar": "Museo y Parque Etnográfico de Pinolere"
+  },
+  {
+   "n": "Romería de Benijos",
+   "m": "La Orotava",
+   "lugar": "Conexión Orilla del Monte - Pista de Benijos"
+  },
+  {
+   "n": "Fiesta del Santísimo Cristo",
+   "m": "San Cristóbal de La Laguna",
+   "lugar": "Santuario del Cristo de La Laguna"
+  },
+  {
+   "n": "Fiesta de la Vendimia",
+   "m": "Tacoronte",
+   "lugar": "Casco Histórico de Tacoronte"
+  },
+  {
+   "n": "Romería de San Juan de la Rambla",
+   "m": "San Juan de la Rambla",
+   "lugar": "Villa de San Juan de la Rambla"
+  },
+  {
+   "n": "Romería de Los Roques",
+   "m": "Fasnia",
+   "lugar": "Los Roques de Fasnia"
+  },
+  {
+   "n": "Romería barquera de El Médano",
+   "m": "Granadilla de Abona",
+   "lugar": "Playa de El Médano"
+  },
+  {
+   "n": "Romería de San Miguel",
+   "m": "San Miguel de Abona",
+   "lugar": "Castillo San Miguel (Aldea Blanca)"
+  },
+  {
+   "n": "Fiestas del Cristo",
+   "m": "Tacoronte",
+   "lugar": "Casco Histórico de Tacoronte"
+  },
+  {
+   "n": "Misa patronal y procesión de San Miguel Arcángel",
+   "m": "San Miguel de Abona",
+   "lugar": "San Miguel de Abona"
+  },
+  {
+   "n": "Romería de Adeje",
+   "m": "Adeje",
+   "lugar": "Casco histórico de Adeje"
+  },
+  {
+   "n": "Fiestas de San Andrés — los tablones",
+   "m": "Icod de los Vinos",
+   "lugar": "Casco histórico de Icod de los Vinos"
+  },
+  {
+   "n": "Fiestas de San Andrés — cacharros",
+   "m": "Puerto de la Cruz",
+   "lugar": "Plaza del Charco"
+  },
+  {
+   "n": "Arrastre de Las Tablas de San Andrés y descorche del vino nuevo",
+   "m": "Icod de los Vinos",
+   "lugar": "Casco histórico de Icod de los Vinos"
+  },
+  {
+   "n": "Continuación del arrastre de tablas, castañada y degustación de bodegas",
+   "m": "Icod de los Vinos",
+   "lugar": "Casco histórico de Icod de los Vinos"
+  },
+  {
+   "n": "San Nicolás: muestra de vinos locales y encendido navideño",
+   "m": "El Sauzal",
+   "lugar": "Casa del Vino"
+  },
+  {
+   "n": "San Antonio Abad",
+   "m": "Guía de Isora",
+   "lugar": "Chío - Área Recreativa de Chío (Los Arenales)"
+  },
+  {
+   "n": "San Sebastián: misa, bendición y baño tradicional de caballos en el mar",
+   "m": "Adeje",
+   "lugar": "Playa de La Enramada"
+  },
+  {
+   "n": "Virgen de Candelaria — patrona de Canarias",
+   "m": "Candelaria",
+   "lugar": "Basílica de Nuestra Señora de Candelaria"
+  },
+  {
+   "n": "Nuestra Señora de Candelaria",
+   "m": "Guía de Isora",
+   "lugar": "Playa de Pris de Alcalá"
+  },
+  {
+   "n": "La Milagrosa",
+   "m": "Guía de Isora",
+   "lugar": "Chío - Área Recreativa de Chío (Los Arenales)"
+  },
+  {
+   "n": "Romería de San Marcos",
+   "m": "Tegueste",
+   "lugar": "Iglesia de San Marcos"
+  },
+  {
+   "n": "Baile de Magos de las Fiestas de Mayo",
+   "m": "Santa Cruz de Tenerife",
+   "lugar": "Casco histórico de Santa Cruz"
+  },
+  {
+   "n": "Fiestas de la Cruz",
+   "m": "Santa Cruz de Tenerife",
+   "lugar": "Iglesia de la Concepción (Santa Cruz)"
+  },
+  {
+   "n": "Fiestas de la Cruz",
+   "m": "Los Realejos",
+   "lugar": "Conjunto Histórico El Realejo Alto"
+  },
+  {
+   "n": "Exhibición pirotécnica de las Cruces y Fuegos",
+   "m": "Los Realejos",
+   "lugar": "Conjunto Histórico El Realejo Alto"
+  },
+  {
+   "n": "Exposición e inspección de Cruces de Flores",
+   "m": "Santa Cruz de Tenerife",
+   "lugar": "Rambla de Santa Cruz"
+  },
+  {
+   "n": "San José Obrero",
+   "m": "Guía de Isora",
+   "lugar": "El Jaral - Guía de Isora"
+  },
+  {
+   "n": "Romería de San Isidro Labrador",
+   "m": "Guía de Isora",
+   "lugar": "Iglesia de Nuestra Señora de la Luz"
+  },
+  {
+   "n": "Corpus Christi — alfombras",
+   "m": "La Orotava",
+   "lugar": "Casco histórico de La Orotava"
+  },
+  {
+   "n": "Baile de Magos",
+   "m": "Adeje",
+   "lugar": "Casco histórico de Adeje"
+  },
+  {
+   "n": "San Felipe Neri",
+   "m": "Guía de Isora",
+   "lugar": "Caseríos de Chirche y Aripe"
+  },
+  {
+   "n": "San Juan",
+   "m": "Guía de Isora",
+   "lugar": "Playa de San Juan"
+  },
+  {
+   "n": "Fiestas de San Juan",
+   "m": "Puerto de la Cruz",
+   "lugar": "Playa de Martianez"
+  },
+  {
+   "n": "Noche de San Juan: hogueras en el litoral",
+   "m": "San Juan de la Rambla",
+   "lugar": "Charco de La Laja"
+  },
+  {
+   "n": "San Juan Bautista: procesión y fuegos artificiales",
+   "m": "Arico",
+   "lugar": "Villa de Arico"
+  },
+  {
+   "n": "Misa y procesión de San Pedro Apóstol con Danza de las Cintas",
+   "m": "Güímar",
+   "lugar": "Capilla de San Pedro Arriba"
+  },
+  {
+   "n": "San Juan y Nuestra Señora de la Paz",
+   "m": "Guía de Isora",
+   "lugar": "Chío - Área Recreativa de Chío (Los Arenales)"
+  },
+  {
+   "n": "Pregón oficial de las Fiestas de San Benito Abad",
+   "m": "San Cristóbal de La Laguna",
+   "lugar": "Iglesia Parroquial de San Benito Abad"
+  },
+  {
+   "n": "San Pedro",
+   "m": "Guía de Isora",
+   "lugar": "Caseríos de Chirche y Aripe"
+  },
+  {
+   "n": "Gran Baile de Magos de San Benito Abad",
+   "m": "San Cristóbal de La Laguna",
+   "lugar": "Iglesia de la Concepción (La Laguna)"
+  },
+  {
+   "n": "Virgen del Carmen — embarcación",
+   "m": "Puerto de la Cruz",
+   "lugar": "Ermita de San Telmo"
+  },
+  {
+   "n": "Embarcación marítima de la Virgen del Carmen y fuegos",
+   "m": "Santiago del Teide",
+   "lugar": "Santiago del Teide - Puerto Santiago"
+  },
+  {
+   "n": "Romería de Los Olivos",
+   "m": "Adeje",
+   "lugar": "Boca del Paso - La Quinta"
+  },
+  {
+   "n": "Baile de Magos",
+   "m": "Puerto de la Cruz",
+   "lugar": "Casco histórico de Puerto de la Cruz"
+  },
+  {
+   "n": "Fiesta Canaria de Ravelo",
+   "m": "El Sauzal",
+   "lugar": "Casa del Vino"
+  },
+  {
+   "n": "Paseo Romero del Puertito",
+   "m": "Güímar",
+   "lugar": "Playa de El Puertito"
+  },
+  {
+   "n": "Fiesta de Santiago Apóstol y procesión",
+   "m": "Santiago del Teide",
+   "lugar": "Iglesia de San Fernando Rey"
+  },
+  {
+   "n": "Marea Festival: concierto de Moise González",
+   "m": "Candelaria",
+   "lugar": "Playas de Punta Larga"
+  },
+  {
+   "n": "Pregón de las Fiestas y presentación de candidatas a Romera Mayor",
+   "m": "Arafo",
+   "lugar": "Casco histórico de Arafo"
+  },
+  {
+   "n": "Feria de Artesanía Patrona de Canarias",
+   "m": "Candelaria",
+   "lugar": "Casco histórico de Candelaria"
+  },
+  {
+   "n": "Baile de Taifas en El Carretón y repique tradicional de campanas",
+   "m": "Arafo",
+   "lugar": "Casco histórico de Arafo"
+  },
+  {
+   "n": "Pregón, teatro costumbrista y salida del Patrón con 24 truenas",
+   "m": "San Cristóbal de La Laguna",
+   "lugar": "Iglesia de San Bartolomé de Tejina"
+  },
+  {
+   "n": "Fiestas de la Virgen de Candelaria",
+   "m": "Candelaria",
+   "lugar": "Casco histórico de Candelaria"
+  },
+  {
+   "n": "Fuegos del Cristo y Noche de las Pandorgas",
+   "m": "San Cristóbal de La Laguna",
+   "lugar": "Santuario del Cristo de La Laguna"
+  }
+ ]
+}

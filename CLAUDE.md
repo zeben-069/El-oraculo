@@ -84,9 +84,10 @@ Dentro de `index.html`, como constantes:
 
 - `LUGARES` (589) — sitios que visitar. Solo 4 sin coordenadas.
 - `REST` (318) — restaurantes, incluidas 38 heladerías.
-- `EVENTOS` (138) — fiestas. Municipio y corredor siempre; **coordenadas solo
-  las que Zeben haya colocado** con `node eventos.js sitios`, y entonces mandan
-  ellas sobre el casco del pueblo.
+- `EVENTOS` (138) — fiestas. Municipio y corredor siempre; **118 fichas (81
+  fiestas × sus años) llevan ya `la`/`lo`/`lu`**, colocadas por Zeben con
+  `node eventos.js sitios`, y entonces mandan ellas sobre el casco del pueblo.
+  Quedan 13 sin colocar, en 6 municipios.
 - `ACTOS` (300) — los actos de 22 programas de fiestas de 15 municipios:
   día, municipio,
   hora, dónde es y `q` («ninos»/«noche»), que dice a quién le sirve. No son
@@ -412,6 +413,33 @@ en azul, con un botón, nunca preseleccionadas.
 Y se coloca por **nombre y municipio, no por fecha**: cada fiesta está fichada
 en 2026 y en 2027, así que marcarla una vez vale para las dos.
 
+**Zeben colocó 81 de las 94 en una sentada, y funciona.** Ninguna apuntaba a un
+sitio inexistente. De las 81, **32 caen a más de un kilómetro del casco**, y de
+esas **el 78% da un día distinto** al que daba antes. Las otras están en el
+casco y por eso no cambian nada, que es lo correcto. Cuatro ejemplos de lo que
+esto arregla:
+
+| fiesta | antes el día era | ahora |
+|---|---|---|
+| Entrada de los Corazones, Tejina (La Laguna) | el casco de La Laguna | Tegueste y Tejina, comiendo en la Tasca Los Corazones |
+| Bajada del Socorro (Güímar) | el casco de Güímar | el Camino del Socorro y El Puertito |
+| San Sebastián, baño de caballos (Adeje) | el casco de Adeje | la costa, Playa de Fañabé |
+| Romería barquera de El Médano | el museo de Granadilla | El Médano |
+
+De paso corrigió dos de mis corazonadas —la Bajada del Socorro es en la Ermita
+del Socorro, no en el camino, y la Feria de Pinolere es en el Museo Etnográfico,
+no en el caserío— y se quedó con las dos que yo daba por malas: la Romería de
+San Miguel en el Castillo de Aldea Blanca (1,7 km) y la de Benijos en la pista
+de Benijos (3,8 km). Manda él.
+Y salió un efecto de segundo orden que hay que entender antes de tocarlo: con
+coordenadas de verdad, **la Romería de San Miguel y la barquera de El Médano
+pasan de 4,6 km a 9,2**, porque antes se medían entre cascos y ahora entre el
+Castillo de Aldea Blanca y la playa. Se salen de los 8 km del «al lado», así
+que dejan de contarse juntas y la segunda pasa a `evento_lejano`. Eso es **más
+cierto, no menos**: son nueve kilómetros. Por eso `lote.js` cuenta los tres
+caminos —las otras fiestas, el programa y el aviso de la lejana—: lo que se
+vigila es que no se calle, no por dónde salga.
+
 **Y dónde cenar, que un día de fiesta no acaba con un helado.** También suyo: «y
 depende de la hora, ofrecer cenar por la zona». El informe solo llevaba el
 almuerzo, pero un día que acaba en una verbena a las nueve o en unos fuegos a
@@ -590,8 +618,16 @@ ofrecidos**. Esos dos ceros son la prueba de toda la regla.
 
 Y el último bloque, **otras fiestas y la cena**: barre los días que tienen dos
 fiestas a menos de 8 km y comprueba que salgan las dos. Referencia: 20 días,
-0 reventones, **20 cuentan la segunda (100%)**, **0 casos de una fiesta de noche
-tapando a una de día** y 9 con sitios para cenar.
+0 reventones, **20 cuentan la segunda (100%)** —por las otras fiestas, por el
+programa o por el aviso de la lejana, que los tres valen—, **0 casos de una
+fiesta de noche tapando a una de día** y 9 con sitios para cenar.
+Y cierra midiendo si colocar la fiesta sirve de algo: arma el día desde su
+propio pueblo con las coordenadas y sin ellas. Referencia: **81 fiestas con
+sitio, 36 días cambian (44%); de las 32 que están a más de 1 km del casco,
+cambian 25 (78%)**. Ojo con ese bloque: tiene que mutar el `EVENTOS` que
+**exporta `banco.js`**, no el que `lote.js` lee del fichero con `eval` — con la
+copia, quitarle las coordenadas no cambia nada y el porcentaje sale 0%, o sea
+que la prueba dice que la mejora no sirve.
 
 **Con navegador** — `probar-web.js` con Playwright recorre siete flujos en
 Chrome contra la web desplegada y captura los errores de consola.

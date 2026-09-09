@@ -1,5 +1,5 @@
 const c=require('./banco.js');
-const {construir,S,km,BASES,LUGARES,REST,minutosA}=c;
+const {construir,S,km,BASES,LUGARES,REST,minutosA,EVENTOS}=c;
 const casos=[
  ['Tegueste',true,false,'pareja',null],       ['Tegueste',false,true,'familia','agua'],
  ['Santa Cruz de Tenerife',true,false,'pareja',null], ['Santa Cruz de Tenerife',false,true,'familia',null],
@@ -322,9 +322,16 @@ console.log('\n=== OTRAS FIESTAS Y LA CENA ===');
     let b; try{ b=construir().brief; }catch(e){ revientan++; return; }
     const otras=b.otras_fiestas_de_hoy?b.otras_fiestas_de_hoy.lista.length:0;
     const actos=b.actividades_de_la_fiesta?b.actividades_de_la_fiesta.lista.length:0;
-    /* «salen las dos» = además del ancla se cuenta algo más de ese día,
-       sea por otras_fiestas_de_hoy o porque el programa ya lo trae */
-    if(otras||actos) salenLasDos++;
+    /* «salen las dos» = además del ancla se cuenta algo más de ese día, por
+       donde sea: las otras fiestas, el programa, o el aviso de la que queda
+       lejos. Los tres caminos valen; lo que no vale es callársela.
+       Ese tercero hace falta desde que las fiestas llevan su sitio: la
+       Romería de San Miguel y la barquera de El Médano están a 4,6 km
+       midiendo entre cascos, pero a 9,2 entre el Castillo de Aldea Blanca y
+       la playa de El Médano, que es donde son de verdad. Pasa de «al lado» a
+       «queda lejos», y eso es más cierto, no menos. */
+    const lejana=b.evento_lejano?1:0;
+    if(otras||actos||lejana) salenLasDos++;
     /* Una fiesta de noche SÍ puede ser el ancla cuando ese día no hay otra
        cosa: el 8 de agosto en Arafo lo único que hay es la Noche de Humor de
        las nueve y media. Lo que no puede pasar es que gane a una de día,
@@ -340,4 +347,37 @@ console.log('\n=== OTRAS FIESTAS Y LA CENA ===');
   console.log('  LA DE NOCHE TAPA A UNA DE DÍA: '+anclaDeNoche+'   (tiene que ser 0)');
   console.log('  con sitios para cenar        : '+conCena+
     '   (el resto son pueblos sin nada fichado abierto de noche a <3 km)');
+
+  /* ¿Sirve de algo colocar la fiesta? Se arma el día desde su propio pueblo
+     con las coordenadas puestas y sin ellas, y se cuenta cuántos cambian.
+     Si esto se acercara a cero, colocarlas no valdría el trabajo. */
+  /* Ojo: aquí manda EVENTOS —el array que usa el motor—, no el EV leído del
+     fichero. Con la copia, quitarle las coordenadas no cambiaba nada y el
+     porcentaje salía 0%: la prueba decía que la mejora no servía. */
+  const conSitio=EVENTOS.filter(e=>e.la!=null);
+  const dia=()=>{ let b; try{ b=construir().brief; }catch(e){ return 'X'; }
+    return (b.paradas||[]).map(p=>p.nombre).join('|')+'>'+(b.restaurante?b.restaurante.nombre:''); };
+  const arma=f=>{ Object.assign(S,{coche:true,gente:2,ninos:false,anclaElegida:null,comida:null,
+      apetece:null,ahora:null,saltoComida:0,descartados:null,prefTipo:null,idioma:'es',
+      forzarEvento:null,fiestaTodoElDia:null,diaEntero:true,faltaNucleo:null},f); return dia(); };
+  let cambian=0, probados=0, fuera=0, cambianFuera=0;
+  const vistas=new Set();
+  conSitio.forEach(e=>{
+    const k=e.m+'|'+e.n; if(vistas.has(k)) return; vistas.add(k);
+    const bm=Object.values(BASES).find(b=>b.m===e.m); if(!bm) return;
+    probados++;
+    /* la que cae EN el casco no tiene por qué cambiar nada: el día ya estaba
+       ahí. La prueba de verdad son las que están lejos del centro. */
+    const lejos=bm.la!=null&&km(bm.la,bm.lo,e.la,e.lo)>1;
+    if(lejos) fuera++;
+    const con=arma({base:e.m,fecha:e.f});
+    const la=e.la, lo=e.lo; delete e.la; delete e.lo;
+    const sin=arma({base:e.m,fecha:e.f});
+    e.la=la; e.lo=lo;
+    if(con!==sin){ cambian++; if(lejos) cambianFuera++; }
+  });
+  console.log('  fiestas con sitio propio     : '+probados+
+    '   ·  días que cambian: '+cambian+' ('+Math.round(100*cambian/Math.max(1,probados))+'%)');
+  console.log('  de esas, fuera del casco     : '+fuera+
+    '   ·  días que cambian: '+cambianFuera+' ('+Math.round(100*cambianFuera/Math.max(1,fuera))+'%)');
 }
