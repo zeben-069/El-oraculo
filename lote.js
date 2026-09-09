@@ -291,3 +291,53 @@ else{
   console.log('  OFRECIDO A QUIEN NO TOCA  : '+mal);
   console.log('  SIN CLASIFICAR y ofrecido : '+sinQ);
 }
+
+/* ── LAS OTRAS FIESTAS DEL DÍA Y LA CENA ────────────────────────────────
+   Zeben: «si hay fiesta en La Laguna y fiesta en Punta del Hidalgo deberíamos
+   poder poner las dos». Un ancla sigue habiendo una, pero las que quedan cerca
+   se cuentan en vez de tirarse, y si hay algo de noche se ofrece dónde cenar.
+   Lo que se vigila aquí: que en los días con dos fiestas a mano salgan las dos,
+   y que la fiesta que arma el día no sea nunca la de las once de la noche. */
+console.log('\n=== OTRAS FIESTAS Y LA CENA ===');
+{
+  const EV=(()=>{ try{ return eval(require('fs').readFileSync('datos/eventos.js','utf8')+';EVENTOS'); }
+                  catch(e){ return []; } })();
+  const cm=m=>{ for(const k in BASES) if(BASES[k].m===m) return BASES[k]; return null; };
+  const porDia={}; EV.forEach(e=>(porDia[e.f]=porDia[e.f]||[]).push(e));
+  /* solo los días que de verdad tienen dos fiestas a menos de 8 km */
+  const dobles=[];
+  Object.keys(porDia).sort().forEach(f=>{
+    const l=porDia[f]; if(l.length<2) return;
+    l.forEach(a=>l.forEach(b2=>{
+      if(a===b2) return; const x=cm(a.m), y=cm(b2.m); if(!x||!y) return;
+      if(km(x.la,x.lo,y.la,y.lo)<=8&&!dobles.some(d=>d.f===f&&d.m===a.m)) dobles.push({f,m:a.m});
+    }));
+  });
+  let salenLasDos=0, anclaDeNoche=0, conCena=0, revientan=0;
+  const esNoche=h=>/^\d{1,2}:\d{2}/.test(String(h||''))&&(h>='20:30'||h<'06:00');
+  dobles.forEach(({f,m})=>{
+    Object.assign(S,{base:m,coche:true,gente:2,ninos:false,anclaElegida:null,comida:null,
+      apetece:null,ahora:null,saltoComida:0,descartados:null,prefTipo:null,fecha:f,
+      idioma:'es',forzarEvento:null,fiestaTodoElDia:null,diaEntero:false,faltaNucleo:null});
+    let b; try{ b=construir().brief; }catch(e){ revientan++; return; }
+    const otras=b.otras_fiestas_de_hoy?b.otras_fiestas_de_hoy.lista.length:0;
+    const actos=b.actividades_de_la_fiesta?b.actividades_de_la_fiesta.lista.length:0;
+    /* «salen las dos» = además del ancla se cuenta algo más de ese día,
+       sea por otras_fiestas_de_hoy o porque el programa ya lo trae */
+    if(otras||actos) salenLasDos++;
+    /* Una fiesta de noche SÍ puede ser el ancla cuando ese día no hay otra
+       cosa: el 8 de agosto en Arafo lo único que hay es la Noche de Humor de
+       las nueve y media. Lo que no puede pasar es que gane a una de día,
+       que era lo del Cristo: los fuegos de las once tapaban la fiesta grande. */
+    if(b.evento_ancla&&esNoche(b.evento_ancla.hora)
+       &&porDia[f].some(e=>e.m===b.evento_ancla.municipio&&!esNoche(e.h))) anclaDeNoche++;
+    if(b.cenar_cerca_de_la_fiesta) conCena++;
+  });
+  console.log('  días con dos fiestas a <8 km : '+dobles.length);
+  console.log('  REVIENTAN                    : '+revientan);
+  console.log('  se cuenta la segunda         : '+salenLasDos+
+    '   ('+Math.round(100*salenLasDos/Math.max(1,dobles.length))+'%)');
+  console.log('  LA DE NOCHE TAPA A UNA DE DÍA: '+anclaDeNoche+'   (tiene que ser 0)');
+  console.log('  con sitios para cenar        : '+conCena+
+    '   (el resto son pueblos sin nada fichado abierto de noche a <3 km)');
+}

@@ -342,6 +342,51 @@ si **todos** los actos son de la misma: en La Laguna coinciden el Cristo y San
 Mateo de Punta del Hidalgo, y decir una de las dos como si fuera todo es contar
 mal.
 
+**Un ancla por día, pero las otras fiestas se cuentan.** Idea de Zeben: «si hay
+fiesta en La Laguna y fiesta en Punta del Hidalgo deberíamos poder poner las
+dos». El motor elegía una y las demás se perdían: como mucho una salía por
+`evento_lejano`, y solo cuando quedaba lejos. El día se sigue armando alrededor
+de UN sitio —esa regla no se toca—, pero las que pillan cerca van ahora en
+`otras_fiestas_de_hoy`, con su pueblo, su hora y sus kilómetros. El «cerca» se
+mide **en kilómetros entre los centros de los pueblos**, como con los actos y
+por la misma razón: por corredor, quien duerme en Arona vería la de Los Abrigos
+solo porque las dos cosas son «Sur». De 21 días con dos fiestas a menos de 8 km,
+los 21 cuentan ahora la segunda. Y si la que se había apartado por lejana
+resulta estar al lado —la Romería de San Miguel está a 4,6 km de la de El
+Médano— se recoloca aquí y deja de contarse como lejana.
+
+**La fiesta de las once de la noche no arma el día: lo remata.** Este era el
+fallo de debajo. El 14 de septiembre La Laguna tiene dos fichas, la Fiesta del
+Santísimo Cristo —dos semanas, sin hora— y los Fuegos del Cristo a las 23:00.
+`puntuar()` da +2 por tener hora confirmada, así que ganaban los fuegos y **la
+fiesta grande desaparecía entera del informe**: el día se armaba alrededor de un
+espectáculo de veinte minutos a las once. Ahora `esFiestaDeNoche()` —hora a
+partir de las 20:30, o antes de las seis— las manda al final del orden. Ojo:
+una fiesta de noche **sí** puede ser el ancla cuando ese día no hay otra cosa;
+el 8 de agosto en Arafo lo único que hay es la Noche de Humor de las nueve y
+media. Lo que no puede es tapar a una de día, y eso es lo que mide `lote.js`.
+
+**Y no se cuenta dos veces lo mismo.** Los Fuegos del Cristo están en `EVENTOS`
+(«Fuegos del Cristo y Noche de las Pandorgas», 23:00) y en `ACTOS` («Fuegos del
+Risco», 23:00): son la misma cosa por dos fuentes. Mismo pueblo y misma hora
+—el criterio de `node eventos.js duplicados`— y si el acto ya se ofrece, la
+fiesta no se repite. Fíjate en que esto se resuelve solo según con quién viajen:
+a dos adultos el acto pasa el filtro de `q` y lleva él la noticia; **con niños el
+acto se descarta y entonces sí sale la fiesta**, así que no se pierde por ningún
+lado.
+
+**Y dónde cenar, que un día de fiesta no acaba con un helado.** También suyo: «y
+depende de la hora, ofrecer cenar por la zona». El informe solo llevaba el
+almuerzo, pero un día que acaba en una verbena a las nueve o en unos fuegos a
+las once se cena cerca de la plaza y se baja andando. `cenar_cerca_de_la_fiesta`
+busca a **3 km del centro del pueblo** donde es la cosa —una plaza se va
+andando—, abiertos ESE día y con un horario escrito que llegue a las 20:30: son
+206 de los 318. El horario es texto libre, así que **no se afirma que abra**: se
+manda tal cual, con el teléfono, y el prompt manda decir que llamen si van
+justos. Sale en 10 de los 21 días con dos fiestas; los otros 11 son pueblos
+—Arafo, Vilaflor, La Guancha— sin nada fichado abierto de noche a esa distancia,
+y ahí no se ofrece nada antes que inventarlo.
+
 **Las heladerías no son sitio de almorzar.** Marcadas con `remate`. Se
 ofrecen al final, en `para_rematar_el_dia`, y ya no solo con niños: un helado
 de camino al coche vale igual para dos adultos. Se buscan a 2,5 km de la
@@ -505,6 +550,11 @@ un plan con niños y otro sin ellos —208 planes—. Lo que se vigila ahí no e
 dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: 217
 actos ofrecidos, **0 ofrecidos a quien no toca** y **0 sin clasificar
 ofrecidos**. Esos dos ceros son la prueba de toda la regla.
+
+Y el último bloque, **otras fiestas y la cena**: barre los días que tienen dos
+fiestas a menos de 8 km y comprueba que salgan las dos. Referencia: 21 días,
+0 reventones, **21 cuentan la segunda (100%)**, **0 casos de una fiesta de noche
+tapando a una de día** y 10 con sitios para cenar.
 
 **Con navegador** — `probar-web.js` con Playwright recorre siete flujos en
 Chrome contra la web desplegada y captura los errores de consola.

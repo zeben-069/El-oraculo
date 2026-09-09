@@ -36,5 +36,5 @@ global.setInterval=()=>0;
 global.clearInterval=noop;
 
 const ctx=new Function(code+`;
-  return {construir,S,LUGARES,REST,BASES,km,tr,minutosA,tipoTr,horarioTr,tipoDeDia,esFestivo};`)();
+  return {construir,S,LUGARES,REST,BASES,EVENTOS,ACTOS,km,tr,minutosA,tipoTr,horarioTr,tipoDeDia,esFestivo,narrarLocal};`)();
 module.exports=ctx;

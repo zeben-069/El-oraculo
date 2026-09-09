@@ -654,6 +654,7 @@ function resaltar(txt,b){
   (b.paradas||[]).forEach(p=>marca(p.nombre,'sitio'));
   if(b.evento_ancla) marca(b.evento_ancla.nombre,'fiesta');
   if(b.evento_lejano) marca(b.evento_lejano.nombre,'fiesta');
+  if(b.otras_fiestas_de_hoy) b.otras_fiestas_de_hoy.lista.forEach(e=>marca(e.nombre,'fiesta'));
   if(b.restaurante) marca(b.restaurante.nombre,'local');
   (b.otras_opciones_para_comer||[]).forEach(o=>marca(o.nombre,'local'));
   if(b.cerrar_tomando_algo) marca(b.cerrar_tomando_algo.nombre,'local');
@@ -878,7 +879,9 @@ function construir(){
   hRazon.innerHTML='';
   const f=S.fecha, ds=diaSemana(f), base=BASES[S.base];
   const R={bloqueado:false,avisos:[]};
-  const evs=EVENTOS.filter(e=>e.f===f).sort((a,b)=>puntuar(b)-puntuar(a));
+  /* Las de noche van al final: arman el remate, no el día. Ver esFiestaDeNoche. */
+  const evs=EVENTOS.filter(e=>e.f===f)
+    .sort((a,b)=>(esFiestaDeNoche(a)?1:0)-(esFiestaDeNoche(b)?1:0)||puntuar(b)-puntuar(a));
   let ev=null,corr,origen='motor';
   if(S.anclaElegida){
     const lugar=LUGARES.find(l=>l.n===S.anclaElegida);
@@ -1895,6 +1898,84 @@ function construir(){
     const munis=[...new Set(paradas.map(p=>p.m).concat(ev?[ev.m]:[],[base.m]).filter(Boolean))];
     return actosDelDia(f,munis,corr,!!S.ninos);
   })();
+  /* ── LAS OTRAS FIESTAS DEL DÍA ────────────────────────────────────────
+     Idea de Zeben: «si hay fiesta en La Laguna y fiesta en Punta del Hidalgo
+     deberíamos poder poner las dos». Hasta ahora el motor elegía UNA —regla 1,
+     un ancla por día— y las demás se perdían: como mucho una salía por
+     `evento_lejano`, y eso solo cuando quedaba lejos. Con las dos del Cristo
+     el 14 de septiembre se perdía la grande.
+     Un ancla sigue habiendo una: el día se arma alrededor de un sitio. Pero
+     las otras que pillan cerca SE CUENTAN, que es lo que hace quien vive aquí.
+     El «cerca» se mide en kilómetros entre los centros de los pueblos, como
+     con los actos y por la misma razón: por corredor, quien duerme en Arona
+     vería la de Los Abrigos solo porque las dos cosas son «Sur». */
+  const centroMuni=m=>{ for(const k in BASES) if(BASES[k].m===m) return BASES[k]; return BASES[m]||null; };
+  const otrasFiestas=(function(){
+    if(evs.length<2) return [];
+    const munis=[...new Set(paradas.map(p=>p.m).concat(ev?[ev.m]:[],[base.m]).filter(Boolean))];
+    const refs=munis.map(centroMuni).filter(b=>b&&b.la!=null);
+    const cerca=e=>munis.indexOf(e.m)>=0||(function(){const b=centroMuni(e.m);
+      return !!b&&b.la!=null&&refs.some(c=>km(c.la,c.lo,b.la,b.lo)<=8);})();
+    /* Y si la que se apartó por «queda lejos» resulta estar al lado, se
+       recoloca aquí: la Romería de San Miguel está a 4,6 km de la de El
+       Médano y contarla como lejana es contarla mal. Solo cuando hay ancla
+       —sin ancla, el relato entero se apoya en la lejana. */
+    const yaDicha=(eventoLejano&&!ev)?eventoLejano.nombre:null;
+    /* Y no se cuenta dos veces lo mismo. Los Fuegos del Cristo están en
+       EVENTOS («Fuegos del Cristo y Noche de las Pandorgas», 23:00) y en
+       ACTOS («Fuegos del Risco», 23:00): son la misma cosa contada por dos
+       fuentes. Mismo pueblo y misma hora es el mismo criterio que usa
+       `node eventos.js duplicados`. Si el acto ya se ofrece —y solo se
+       ofrece a quien le toca—, la fiesta no se repite aquí. */
+    const yaEnPrograma=e=>actosHoy.some(a=>a.m===e.m&&a.h&&e.h&&a.h===e.h);
+    return evs.filter(e=>e!==ev&&e.n!==yaDicha&&cerca(e)&&!yaEnPrograma(e))
+      .sort((a,b)=>hDia(a.h)-hDia(b.h)).slice(0,3);
+  })();
+  if(eventoLejano&&ev&&otrasFiestas.some(e=>e.n===eventoLejano.nombre)){
+    paso('ok','esa fiesta no queda lejos','<span class="si">'+eventoLejano.nombre+
+      '</span> se había apartado por lejana, pero está a un paso: pasa a contarse con las del día.');
+    eventoLejano=null;
+  }
+  if(otrasFiestas.length) paso('ok','y hoy hay más de una fiesta',
+    'Además de <span class="si">'+(ev?ev.n:'lo del día')+'</span>, por la zona hay <span class="am">'+
+    otrasFiestas.map(e=>e.n+(e.h?' ('+e.h+')':'')+' — '+e.m).join(' · ')+
+    '</span>.<br>El ancla sigue siendo una, pero estas se cuentan en vez de tirarlas.');
+
+  /* ── DÓNDE CENAR, SI HAY ALGO DE NOCHE ────────────────────────────────
+     También de Zeben: «y depende de la hora, ofrecer cenar por la zona».
+     El informe solo llevaba el almuerzo. Pero un día que acaba en una verbena
+     a las nueve o en unos fuegos a las once no se remata con un helado: se
+     cena cerca de la plaza y se baja andando. Se buscan a 3 km del centro del
+     pueblo donde es la cosa —una plaza se va andando—, abiertos ESE día y con
+     un horario escrito que llegue a las 20:30. Son 206 de los 318. */
+  const citaDeNoche=(function(){
+    const cand=[];
+    if(ev&&esFiestaDeNoche(ev)) cand.push({n:ev.n,h:ev.h,m:ev.m,lu:null});
+    otrasFiestas.filter(esFiestaDeNoche).forEach(e=>cand.push({n:e.n,h:e.h,m:e.m,lu:null}));
+    actosHoy.filter(a=>/^\d{1,2}:\d{2}/.test(String(a.h||''))&&(a.h>='20:00'||a.h<'06:00'))
+      .forEach(a=>cand.push({n:a.n,h:a.h,m:a.m,lu:a.lu||null}));
+    return cand.length?cand.sort((a,b)=>hDia(a.h)-hDia(b.h))[0]:null;
+  })();
+  const paraCenar=(function(){
+    if(!citaDeNoche) return null;
+    const c=centroMuni(citaDeNoche.m); if(!c||c.la==null) return null;
+    /* El horario es texto libre («L-J 13:00-18:00 y 20:00-23:30»), así que se
+       mira si alguna de las horas escritas cae de noche. No se afirma que
+       abra: se le pasa el horario TAL CUAL y el teléfono, que es el dato. */
+    const deNoche=r=>[...String(r.h||'').matchAll(/(\d{1,2}):(\d{2})/g)]
+      .map(x=>+x[1]+ +x[2]/60).some(h=>h>=20.5||h<=3);
+    const helado=r=>r.remate||/Heladería|Dulcería/i.test(r.tipo||'');
+    const lista=REST.filter(r=>r.la!=null&&r.ab[ds]&&!helado(r)&&deNoche(r)
+        &&!(rest&&r.n===rest.n)&&km(c.la,c.lo,r.la,r.lo)<=3)
+      .sort((a,b)=>km(c.la,c.lo,a.la,a.lo)-km(c.la,c.lo,b.la,b.lo));
+    return lista.length?{centro:c,sitios:lista.slice(0,3)}:null;
+  })();
+  if(citaDeNoche) paso(paraCenar?'ok':'avi','la cena, que hay algo de noche',
+    'A las <span class="am">'+(citaDeNoche.h||'?')+'</span> hay <span class="si">'+citaDeNoche.n+
+    '</span> en '+citaDeNoche.m+'. '+(paraCenar
+      ? 'Se ofrecen <span class="si">'+paraCenar.sitios.length+'</span> sitios de cenar a menos de 3 km del centro del pueblo, abiertos hoy y con horario de noche.'
+      : '<span class="no">No hay ninguno fichado</span> abierto hoy y con horario de noche a menos de 3 km: no se ofrece nada antes que inventarlo.'));
+
   if(actosHoy.length) paso('ok','el programa de las fiestas',
     'Hay <span class="si">'+actosHoy.length+'</span> acto'+(actosHoy.length>1?'s':'')+
     ' del programa por la zona del día que le sirve'+(actosHoy.length>1?'n':'')+' a '+
@@ -2043,6 +2124,42 @@ function construir(){
       como_contarla: esFiestaDeTodoElDia(ev)
         ? 'Esto no es una cita a una hora: es que '+ev.m+' está de fiesta todo el día. No lo metas como una parada más ni le pongas hora inventada. Cuéntalo como el ambiente que se van a encontrar por la calle mientras hacen el resto del plan.'
         : 'Esto sí tiene hora: '+(ev.h||'sin confirmar')+'. Es un bloque fijo del día y el resto se ordena antes y después. No propongas nada que se solape.'}:null,
+    /* LAS OTRAS FIESTAS DE HOY. Un ancla por día sigue siendo la regla —el
+       día se arma alrededor de un sitio—, pero cuando hay dos fiestas a mano
+       tirar una es contarlo mal: el 14 de septiembre en La Laguna están la
+       Fiesta del Santísimo Cristo y los Fuegos del Cristo, y son la misma
+       tarde y la misma noche del mismo turista. */
+    otras_fiestas_de_hoy: otrasFiestas.length?{
+      lista: otrasFiestas.map(e=>({nombre:e.n, municipio:e.m, hora:e.h||null,
+        hora_sin_confirmar:(!e.h&&e.sh)?true:false,
+        franja:e.fr||null, distincion:e.d||null,
+        del_calendario_anual:e.cal?true:false,
+        es_de_noche:esFiestaDeNoche(e),
+        lo_bueno:e.no||null,
+        a_cuantos_km:(function(){const a=centroMuni(ev?ev.m:base.m),b=centroMuni(e.m);
+          return (a&&b&&a.la!=null&&b.la!=null)?Math.round(km(a.la,a.lo,b.la,b.lo)):null;})()})),
+      como_contarlas:'Hoy hay más de una fiesta a mano y todas caben en el mismo día. '+
+        'La de arriba es la que arma el plan; estas son las otras, y se cuentan con su pueblo, '+
+        'su hora y a cuántos kilómetros quedan, para que elijan. Las que son de noche van DESPUÉS '+
+        'del plan, como el remate: unos fuegos a las once no son una parada de la tarde. '+
+        'No las amontones en una lista: hilas la que encaje y las demás las dejas dichas en una frase.'
+    }:null,
+    /* DÓNDE CENAR. Idea de Zeben: un día que acaba en la verbena o en los
+       fuegos no se remata con un helado, se cena cerca de la plaza. El horario
+       va TAL CUAL está fichado —es texto libre— y con el teléfono al lado: no
+       afirmamos que abra, damos el dato y que llamen. */
+    cenar_cerca_de_la_fiesta: paraCenar?{
+      por_lo_de:{nombre:citaDeNoche.n, hora:citaDeNoche.h||null,
+                 donde:citaDeNoche.lu||null, municipio:citaDeNoche.m},
+      sitios: paraCenar.sitios.map(r=>({nombre:r.n, municipio:r.m, tipo:r.tipo||null,
+        horario:r.h||null, telefono:r.tel||null, nota:r.nota||null,
+        a_cuantos_km:+km(paraCenar.centro.la,paraCenar.centro.lo,r.la,r.lo).toFixed(1)})),
+      como_contarlo:'Esto NO es el almuerzo —ese ya está más arriba—: es la cena, y va al final del '+
+        'relato, enganchada a lo que hay de noche. Una frase: dónde cenar cerca antes de bajar a la '+
+        'plaza. Da el horario tal y como viene escrito, traducido pero sin cambiar un número, y el '+
+        'teléfono. Y di que llamen si van justos de hora: el horario es el que tenemos fichado, no '+
+        'una reserva. Si viajan con niños y la cosa es a las once, dilo y que decidan ellos.'
+    }:null,
     /* El programa de las fiestas, filtrado por quién viaja. No es una parada
        del motor ni lleva coordenadas: es lo que está pasando en el pueblo ese
        día y a esa gente le sirve. Con niños, la feria infantil y el cine al
@@ -2910,6 +3027,11 @@ const N={
   noHay:(t)=>'De '+t+' por aquí cerca no tengo nada abierto ahora mismo, así que les digo lo que sí hay.\n',
   actos:(m,f)=>'Y otra cosa, que hoy '+m+' está de fiestas'+(f?' —'+f+'—':'')+': hay cosas del programa que les van a encajar.',
   actoLin:(n,h,d,k,m)=>'· '+n+(h?', a las '+h:'')+(d?', en '+d:'')+(m?' ('+m+')':'')+'.',
+  masFi:'Y por ahí cerca ese día hay más:',
+  masFiLin:(n,m,h,d)=>'· '+n+', en '+m+(h?', a las '+h:'')+(d?', a '+d+' km':'')+'.',
+  cenaCab:(n,h)=>'Para cenar antes de '+n+(h?', que es a las '+h:'')+', ahí mismo tienen:',
+  cenaLin:(n,t,ho,tel)=>'· '+n+(t?', '+t:'')+(ho?'. '+ho:'')+(tel?'. Tel. '+tel:'')+'.',
+  cenaOjo:'Ese horario es el que tengo apuntado, así que llamen si van justos.',
   regalo:(n,d)=>'Y de regalo le digo una cosa: de camino le queda '+n+', '+
     (d<0.5?'sin apenas desviarse':'a '+String(d).replace('.',',')+' km de desvío')+'. '+
     'Se para un momento, se sacan dos fotos y se sigue.',
@@ -2981,6 +3103,11 @@ const N={
   noHay:(t)=>'There is no '+t+' open near here right now, so let me tell you what there is.\n',
   actos:(m,f)=>'One more thing: '+m+' is in fiestas today'+(f?' —'+f+'—':'')+', and the programme has something that fits you.',
   actoLin:(n,h,d,k,m)=>'· '+n+(k?' ('+k+')':'')+(h?', at '+h:'')+(d?', at '+d:'')+(m?' — '+m:'')+'.',
+  masFi:'And there is more going on nearby that day:',
+  masFiLin:(n,m,h,d)=>'· '+n+', in '+m+(h?', at '+h:'')+(d?', '+d+' km away':'')+'.',
+  cenaCab:(n,h)=>'To have dinner before '+n+(h?', which starts at '+h:'')+', right there you have:',
+  cenaLin:(n,t,ho,tel)=>'· '+n+(t?', '+t:'')+(ho?'. '+ho:'')+(tel?'. Tel. '+tel:'')+'.',
+  cenaOjo:'Those are the opening hours I have on file, so call them if you are cutting it fine.',
   regalo:(n,d)=>'And here is a little gift: '+n+' is right on your way'+
     (d<0.5?'':', only '+d+' km off the route')+'. '+
     'You stop for a moment, take a couple of photos and carry on.',
@@ -3052,6 +3179,11 @@ const N={
   noHay:(t)=>'In der Nähe hat gerade nichts mit '+t+' offen, deshalb sage ich Ihnen, was es gibt.\n',
   actos:(m,f)=>'Und noch etwas: in '+m+' ist heute Fiesta'+(f?' —'+f+'—':'')+', und im Programm steht etwas Passendes für Sie.',
   actoLin:(n,h,d,k,m)=>'· '+n+(k?' ('+k+')':'')+(h?', um '+h:'')+(d?', '+d:'')+(m?' — '+m:'')+'.',
+  masFi:'Und in der Nähe ist an dem Tag noch mehr los:',
+  masFiLin:(n,m,h,d)=>'· '+n+', in '+m+(h?', um '+h:'')+(d?', '+d+' km entfernt':'')+'.',
+  cenaCab:(n,h)=>'Zum Abendessen vor '+n+(h?', das um '+h+' beginnt,':'')+' haben Sie gleich dort:',
+  cenaLin:(n,t,ho,tel)=>'· '+n+(t?', '+t:'')+(ho?'. '+ho:'')+(tel?'. Tel. '+tel:'')+'.',
+  cenaOjo:'Das sind die Öffnungszeiten, die ich notiert habe — rufen Sie an, wenn es knapp wird.',
   regalo:(n,d)=>'Und als kleines Geschenk: '+n+' liegt direkt auf dem Weg'+
     (d<0.5?'':', nur '+String(d).replace('.',',')+' km Umweg')+'. '+
     'Kurz anhalten, zwei Fotos, weiter geht es.',
@@ -3279,6 +3411,13 @@ function narrarLocal(b){
 
   if(b.evento_lejano && !cuentaLejosPrimero) contarLejano();
 
+  /* Las otras fiestas del día y dónde cenar: el narrador local también las
+     cuenta, que si no, con clave de API se dicen y sin ella no. */
+  if(b.otras_fiestas_de_hoy&&F.masFi){
+    t.push(F.masFi+'\n\n'+b.otras_fiestas_de_hoy.lista.map(e=>
+      F.masFiLin(e.nombre,e.municipio,e.hora,e.a_cuantos_km||null)).join('\n'));
+  }
+
   /* El programa de las fiestas: el narrador local también lo cuenta, que si
      no, con clave de API se dice y sin ella no. */
   if(b.actividades_de_la_fiesta&&F.actos){
@@ -3286,6 +3425,17 @@ function narrarLocal(b){
     t.push(F.actos(a.municipio,a.de_las_fiestas)+'\n'+'\n'+
       a.lista.map(x=>F.actoLin(x.nombre,x.hora,x.donde,actoTr(x.nombre),
         x.municipio!==a.municipio?x.municipio:null)).join('\n'));
+  }
+
+  /* La cena, cuando hay algo de noche. El horario es texto libre y se traduce
+     con horarioTr(), que toca SOLO las palabras y no cambia un número. */
+  if(b.cenar_cerca_de_la_fiesta&&F.cenaCab){
+    const c=b.cenar_cerca_de_la_fiesta;
+    t.push(F.cenaCab(c.por_lo_de.nombre,c.por_lo_de.hora)+'\n\n'+
+      /* el tipo del restaurante va tal cual, como en el resto del narrador: no
+         está en la tabla de los 32 tipos de sitio, que es la que traduce tipoTr */
+      c.sitios.map(r=>F.cenaLin(r.nombre,r.tipo,horarioTr(r.horario),r.telefono)).join('\n')+
+      '\n\n'+F.cenaOjo);
   }
 
   const abajo=(b.avisos||[]).filter(a=>arriba.indexOf(a)<0);
@@ -3949,6 +4099,17 @@ async function listo(){
    Se distinguen por si traen hora exacta o vienen marcadas del calendario. */
 function esFiestaDeTodoElDia(e){
   return !!(e.cal || e.sh || !e.h || /^(toda|todo)\b/i.test(String(e.h)));
+}
+/* Una fiesta que empieza a las once de la noche NO puede armar el día: es el
+   remate. Lo cazó Zeben mirando el 14 de septiembre — ese día La Laguna tiene
+   dos fichas, la Fiesta del Santísimo Cristo (dura dos semanas, sin hora) y
+   los Fuegos del Cristo (23:00). `puntuar()` da +2 por tener hora confirmada,
+   así que ganaban los fuegos y la fiesta grande DESAPARECÍA del informe: el
+   día se armaba alrededor de un espectáculo de veinte minutos a las once. */
+function esFiestaDeNoche(e){
+  const h=String(e&&e.h||'');
+  if(!/^\d{1,2}:\d{2}/.test(h)) return false;
+  return h>='20:30'||h<'06:00';
 }
 function elegirEvento(){
   const f=S.fecha, base=BASES[S.base];
