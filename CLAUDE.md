@@ -862,6 +862,31 @@ restaurante está mal ubicado, tiene razón: vive allí.
   «cambiar dónde comer» lo mantiene.
 - Pocos restaurantes abiertos en domingo en algunos municipios (Arona: 15
   en 18 km). Es escasez de catálogo.
+- **Y hay cuatro pueblos donde no se puede comer EN el pueblo.** Zeben lo
+  preguntó de golpe —«¿no tienes restaurantes en Granadilla?»— y sí los hay,
+  ocho, pero **los ocho están a 9–10 km del casco, todos en El Médano**, y tres
+  son heladerías. En el casco de Granadilla, cero. Medido sobre los 31
+  municipios, mirando sitios de comer (sin heladerías) a menos de 2 km del
+  centro urbano:
+
+  | municipio | de comer | a <2 km del casco | el más cercano |
+  |---|---|---|---|
+  | San Miguel de Abona | **0** | 0 | no hay ninguno en todo el término |
+  | Adeje | 5 | 0 | 3,8 km |
+  | Arona | 4 | 0 | 5,9 km |
+  | Granadilla de Abona | 5 | 0 | 9,0 km |
+  | Arico · Santiago del Teide · Fasnia | 13 / 6 / 4 | 1 | — |
+
+  Los otros 26 tienen de dos para arriba, y los grandes van sobrados: Santa Cruz
+  20, La Orotava 15, La Laguna 15. O sea que **no es el motor ni la lógica de la
+  comida: son cuatro huecos del catálogo**, y explican solos la bandera
+  COMIDA-LEJOS de Granadilla que llevamos arrastrando desde el principio.
+  El motor se defiende como puede y presta del vecino —en San Miguel manda a la
+  Finca Tres Roques, de Vilaflor, a 6,6 km; en Arona a El Dornajo, de Adeje—,
+  que es correcto pero no es lo mismo que comer en el pueblo de la fiesta.
+  **San Miguel de Abona es el caso serio: no tiene NI UN restaurante fichado**, y
+  ahí acaba de colocarse la Romería de San Miguel, que termina en la plaza de la
+  iglesia. Es el sitio por donde más se gana metiendo dos o tres fichas.
 - Las comarcas (`co`) usan el **nombre oficial del municipio**. Había seis
   pares duplicados —«Granadilla» y «Granadilla de Abona», «Buenavista» y
   «Buenavista del Norte», «Santa Cruz», «San Miguel», «La Laguna», «Vilaflor»—
