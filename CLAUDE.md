@@ -57,6 +57,8 @@ miradores.js                  arma la página de miradores, y mete los elegidos
 plantilla-miradores.html      su molde
 buscar-miradores.html         esa página, lista para abrir
 eventos.js                    arma la página de pegar fiestas, y mete las marcadas
+plantilla-sitios.html         el molde de la página de dónde es cada fiesta
+sitios-fiestas.html           esa página, lista para abrir
 avisar-fiestas.js             qué fiestas llegan sin programa cargado
 vigilar-agenda.js             mira si hay novedades en lagenda.org
 plantilla-eventos.html        su molde
@@ -82,7 +84,9 @@ Dentro de `index.html`, como constantes:
 
 - `LUGARES` (589) — sitios que visitar. Solo 4 sin coordenadas.
 - `REST` (318) — restaurantes, incluidas 38 heladerías.
-- `EVENTOS` (139) — fiestas. **Sin coordenadas**, solo municipio y corredor.
+- `EVENTOS` (138) — fiestas. Municipio y corredor siempre; **coordenadas solo
+  las que Zeben haya colocado** con `node eventos.js sitios`, y entonces mandan
+  ellas sobre el casco del pueblo.
 - `ACTOS` (300) — los actos de 22 programas de fiestas de 15 municipios:
   día, municipio,
   hora, dónde es y `q` («ninos»/«noche»), que dice a quién le sirve. No son
@@ -348,10 +352,12 @@ dos». El motor elegía una y las demás se perdían: como mucho una salía por
 `evento_lejano`, y solo cuando quedaba lejos. El día se sigue armando alrededor
 de UN sitio —esa regla no se toca—, pero las que pillan cerca van ahora en
 `otras_fiestas_de_hoy`, con su pueblo, su hora y sus kilómetros. El «cerca» se
-mide **en kilómetros entre los centros de los pueblos**, como con los actos y
-por la misma razón: por corredor, quien duerme en Arona vería la de Los Abrigos
-solo porque las dos cosas son «Sur». De 21 días con dos fiestas a menos de 8 km,
-los 21 cuentan ahora la segunda. Y si la que se había apartado por lejana
+mide **en kilómetros**, como con los actos y por la misma razón: por corredor,
+quien duerme en Arona vería la de Los Abrigos solo porque las dos cosas son
+«Sur». Y van **todas** las que quedan cerca, no las tres primeras —«si ya nos
+pegamos el curro de meter las fiestas de todos los pueblos, deberían aparecer
+todas»—; el día más cargado del calendario tiene seis. De 20 días con dos
+fiestas a menos de 8 km, los 20 cuentan ahora la segunda. Y si la que se había apartado por lejana
 resulta estar al lado —la Romería de San Miguel está a 4,6 km de la de El
 Médano— se recoloca aquí y deja de contarse como lejana.
 
@@ -366,14 +372,45 @@ una fiesta de noche **sí** puede ser el ancla cuando ese día no hay otra cosa;
 el 8 de agosto en Arafo lo único que hay es la Noche de Humor de las nueve y
 media. Lo que no puede es tapar a una de día, y eso es lo que mide `lote.js`.
 
-**Y no se cuenta dos veces lo mismo.** Los Fuegos del Cristo están en `EVENTOS`
+**Y no se cuenta dos veces lo mismo.** Los Fuegos del Cristo estaban en `EVENTOS`
 («Fuegos del Cristo y Noche de las Pandorgas», 23:00) y en `ACTOS` («Fuegos del
-Risco», 23:00): son la misma cosa por dos fuentes. Mismo pueblo y misma hora
-—el criterio de `node eventos.js duplicados`— y si el acto ya se ofrece, la
-fiesta no se repite. Fíjate en que esto se resuelve solo según con quién viajen:
-a dos adultos el acto pasa el filtro de `q` y lleva él la noticia; **con niños el
-acto se descarta y entonces sí sale la fiesta**, así que no se pierde por ningún
-lado.
+Risco», 23:00): la misma cosa por dos fuentes. Zeben decidió cuál manda —«deja
+los fuegos de los actos, que es lo que pone el programa de las fiestas»— y la
+ficha de `EVENTOS` se quitó con `node eventos.js en-el-programa`. El motor sigue
+llevando el cortafuegos por si entra otra fuente: mismo pueblo y misma hora —el
+criterio de `duplicados`— y si el acto ya se ofrece, la fiesta no se repite. Y
+se resuelve solo según con quién viajen: a dos adultos el acto pasa el filtro de
+`q` y lleva él la noticia; **con niños el acto se descarta y entonces sí sale la
+fiesta**, así que no se pierde por ningún lado.
+Ojo con esa herramienta: **lista y espera, no borra sola**, y por poco me la
+llevo por delante. El mismo barrido caza «Romería de Los Abrigos» contra
+«Romería Barquera de San Blasito» —mismo pueblo, mismo día, misma hora— y
+pueden ser lo mismo o dos actos seguidos de la misma romería; encima esa fecha
+la había corregido él a mano. Coincidir en pueblo, día y hora **no** quiere
+decir que sean lo mismo. Se borra la que se nombre, y en todos los años a la
+vez, que están fichadas dos veces.
+
+**Y una fiesta puede llevar SU sitio, no el casco del pueblo.** Zeben otra vez:
+«no es lo mismo las fiestas de La Jaca en Arico que la fiesta del pueblo de
+Arico; una es en la playa y la otra en el casco histórico, entonces se pueden
+crear cosas diferentes aunque sean en el mismo municipio». Y tenía razón: una
+fiesta de `EVENTOS` solo sabía su municipio, así que `focoEvento` cogía el
+centro urbano de `BASES` y **dos fiestas del mismo pueblo daban el mismo día**.
+Ahora, si la ficha trae `la`/`lo`, manda ese punto: el foco del día, los
+kilómetros de las otras fiestas y el radio de la cena salen de ahí.
+Lo que **no** se hace es adivinar las coordenadas del nombre. Probado sobre las
+138: salen 22 y **una de cada cinco cae mal** — «Romería de San Miguel» se iba
+al Castillo de San Miguel, que está en Aldea Blanca, y «Romería de Benijos» a un
+sendero. Una coordenada mala mueve el día entero. Así que la corazonada se
+enseña y decide quien vive allí: `node eventos.js sitios` escribe
+**`sitios-fiestas.html`**, con las 94 fiestas sin sitio agrupadas por pueblo y,
+en cada una, un desplegable con los sitios fichados de ese municipio ordenados
+por lo lejos que están del casco. El desplegable **empieza en «en el casco del
+pueblo»**, que es lo que hace hoy: lo que no toque se queda como está y no hay
+manera de empeorar nada dejándolo a medias. Las 12 corazonadas salen como pista
+en azul, con un botón, nunca preseleccionadas.
+Y se coloca por **nombre y municipio, no por fecha**: cada fiesta está fichada
+en 2026 y en 2027, así que marcarla una vez vale para las dos.
 
 **Y dónde cenar, que un día de fiesta no acaba con un helado.** También suyo: «y
 depende de la hora, ofrecer cenar por la zona». El informe solo llevaba el
@@ -552,9 +589,9 @@ actos ofrecidos, **0 ofrecidos a quien no toca** y **0 sin clasificar
 ofrecidos**. Esos dos ceros son la prueba de toda la regla.
 
 Y el último bloque, **otras fiestas y la cena**: barre los días que tienen dos
-fiestas a menos de 8 km y comprueba que salgan las dos. Referencia: 21 días,
-0 reventones, **21 cuentan la segunda (100%)**, **0 casos de una fiesta de noche
-tapando a una de día** y 10 con sitios para cenar.
+fiestas a menos de 8 km y comprueba que salgan las dos. Referencia: 20 días,
+0 reventones, **20 cuentan la segunda (100%)**, **0 casos de una fiesta de noche
+tapando a una de día** y 9 con sitios para cenar.
 
 **Con navegador** — `probar-web.js` con Playwright recorre siete flujos en
 Chrome contra la web desplegada y captura los errores de consola.

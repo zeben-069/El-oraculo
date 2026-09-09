@@ -981,7 +981,23 @@ function construir(){
      siendo el suyo, así que podía acabar en La Laguna. Se busca el centro
      geográfico de lo que hay catalogado en el municipio de la fiesta. */
   let focoEvento=null;
-  if(!foco && ev && ev.m){
+  /* Y si la fiesta trae SU sitio (`la`/`lo`), manda ese y no el casco. Lo dijo
+     Zeben: «no es lo mismo las fiestas de La Jaca en Arico que la fiesta del
+     pueblo de Arico; una es en la playa y la otra en el casco histórico».
+     Con el casco para las dos, dos fiestas del mismo municipio daban EL MISMO
+     DÍA. Las coordenadas no se adivinan del nombre —probado: de 139 fiestas
+     salían 22 y una de cada cinco caía mal, y «Romería de San Miguel» se iba
+     al Castillo de San Miguel, que es otro sitio—: las pone él con
+     `node eventos.js sitios`. */
+  if(!foco && ev && ev.la!=null){
+    focoEvento={m:ev.m,la:ev.la,lo:ev.lo};
+    const bm0=BASES[ev.m];
+    const d=(bm0&&bm0.la!=null)?km(bm0.la,bm0.lo,ev.la,ev.lo):null;
+    paso('ok','la fiesta trae su sitio','El día gira alrededor de <span class="si">'+
+      (ev.lu||ev.n)+'</span>'+(d!=null?', a '+d.toFixed(1)+' km del casco de '+ev.m:'')+
+      ', no del centro del pueblo.');
+  }
+  else if(!foco && ev && ev.m){
     /* Primero el centro urbano real, que lo tenemos fichado para los 31.
        El centroide de los sitios catalogados NO sirve: el término de Santa
        Cruz llega hasta Taganana y Chamorga, así que promediar sus 46 sitios
@@ -1910,11 +1926,13 @@ function construir(){
      con los actos y por la misma razón: por corredor, quien duerme en Arona
      vería la de Los Abrigos solo porque las dos cosas son «Sur». */
   const centroMuni=m=>{ for(const k in BASES) if(BASES[k].m===m) return BASES[k]; return BASES[m]||null; };
+  /* dónde cae una fiesta: su sitio si lo trae, y si no el centro de su pueblo */
+  const puntoFiesta=e=>(e&&e.la!=null)?{la:e.la,lo:e.lo}:centroMuni(e&&e.m);
   const otrasFiestas=(function(){
     if(evs.length<2) return [];
     const munis=[...new Set(paradas.map(p=>p.m).concat(ev?[ev.m]:[],[base.m]).filter(Boolean))];
     const refs=munis.map(centroMuni).filter(b=>b&&b.la!=null);
-    const cerca=e=>munis.indexOf(e.m)>=0||(function(){const b=centroMuni(e.m);
+    const cerca=e=>munis.indexOf(e.m)>=0||(function(){const b=puntoFiesta(e);
       return !!b&&b.la!=null&&refs.some(c=>km(c.la,c.lo,b.la,b.lo)<=8);})();
     /* Y si la que se apartó por «queda lejos» resulta estar al lado, se
        recoloca aquí: la Romería de San Miguel está a 4,6 km de la de El
@@ -1928,8 +1946,11 @@ function construir(){
        `node eventos.js duplicados`. Si el acto ya se ofrece —y solo se
        ofrece a quien le toca—, la fiesta no se repite aquí. */
     const yaEnPrograma=e=>actosHoy.some(a=>a.m===e.m&&a.h&&e.h&&a.h===e.h);
+    /* Y van TODAS las que quedan cerca, no las tres primeras. Zeben: «si ya
+       nos pegamos el curro de meter las fiestas de todos los pueblos, deberían
+       aparecer todas». El día más cargado del calendario tiene seis. */
     return evs.filter(e=>e!==ev&&e.n!==yaDicha&&cerca(e)&&!yaEnPrograma(e))
-      .sort((a,b)=>hDia(a.h)-hDia(b.h)).slice(0,3);
+      .sort((a,b)=>hDia(a.h)-hDia(b.h));
   })();
   if(eventoLejano&&ev&&otrasFiestas.some(e=>e.n===eventoLejano.nombre)){
     paso('ok','esa fiesta no queda lejos','<span class="si">'+eventoLejano.nombre+
@@ -1950,15 +1971,15 @@ function construir(){
      un horario escrito que llegue a las 20:30. Son 206 de los 318. */
   const citaDeNoche=(function(){
     const cand=[];
-    if(ev&&esFiestaDeNoche(ev)) cand.push({n:ev.n,h:ev.h,m:ev.m,lu:null});
-    otrasFiestas.filter(esFiestaDeNoche).forEach(e=>cand.push({n:e.n,h:e.h,m:e.m,lu:null}));
+    if(ev&&esFiestaDeNoche(ev)) cand.push({n:ev.n,h:ev.h,m:ev.m,lu:ev.lu||null,p:puntoFiesta(ev)});
+    otrasFiestas.filter(esFiestaDeNoche).forEach(e=>cand.push({n:e.n,h:e.h,m:e.m,lu:e.lu||null,p:puntoFiesta(e)}));
     actosHoy.filter(a=>/^\d{1,2}:\d{2}/.test(String(a.h||''))&&(a.h>='20:00'||a.h<'06:00'))
-      .forEach(a=>cand.push({n:a.n,h:a.h,m:a.m,lu:a.lu||null}));
+      .forEach(a=>cand.push({n:a.n,h:a.h,m:a.m,lu:a.lu||null,p:centroMuni(a.m)}));
     return cand.length?cand.sort((a,b)=>hDia(a.h)-hDia(b.h))[0]:null;
   })();
   const paraCenar=(function(){
     if(!citaDeNoche) return null;
-    const c=centroMuni(citaDeNoche.m); if(!c||c.la==null) return null;
+    const c=citaDeNoche.p; if(!c||c.la==null) return null;
     /* El horario es texto libre («L-J 13:00-18:00 y 20:00-23:30»), así que se
        mira si alguna de las horas escritas cae de noche. No se afirma que
        abra: se le pasa el horario TAL CUAL y el teléfono, que es el dato. */
@@ -2116,6 +2137,9 @@ function construir(){
     regreso:R.regreso,
     alternativas_si_quieren_cambiar: S.coche?alternativas:[],
     evento_ancla: ev?{nombre:ev.n,municipio:ev.m,franja:ev.fr,hora:ev.h||null,
+      /* dónde es exactamente, cuando se sabe: la romería de la playa y la
+         fiesta del casco son del mismo pueblo y son días distintos */
+      donde:ev.lu||null,
       hora_sin_confirmar:(!ev.h&&ev.sh)?true:false,fuente_programa:ev.of||null,del_calendario_anual:ev.cal?true:false,distincion:ev.d||null,
       /* Cruces, Carnaval o el Día de Canarias no son una parada a una hora:
          son el ambiente del pueblo entero desde por la mañana. El relato
@@ -2136,7 +2160,8 @@ function construir(){
         del_calendario_anual:e.cal?true:false,
         es_de_noche:esFiestaDeNoche(e),
         lo_bueno:e.no||null,
-        a_cuantos_km:(function(){const a=centroMuni(ev?ev.m:base.m),b=centroMuni(e.m);
+        donde:e.lu||null,
+        a_cuantos_km:(function(){const a=ev?puntoFiesta(ev):centroMuni(base.m),b=puntoFiesta(e);
           return (a&&b&&a.la!=null&&b.la!=null)?Math.round(km(a.la,a.lo,b.la,b.lo)):null;})()})),
       como_contarlas:'Hoy hay más de una fiesta a mano y todas caben en el mismo día. '+
         'La de arriba es la que arma el plan; estas son las otras, y se cuentan con su pueblo, '+

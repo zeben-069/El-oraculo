@@ -1,0 +1,96 @@
+<meta charset="utf-8"><title>Dónde es cada fiesta</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+ body{font-family:system-ui,sans-serif;background:#FBF5E9;color:#3E2B1C;margin:0;padding:16px 14px 110px}
+ h1{font:800 21px/1.2 Georgia,serif;margin:0 0 4px}
+ p.ayuda{margin:6px 0 14px;font-size:14px;line-height:1.55;color:#6B5238}
+ p.ayuda b{color:#3E2B1C}
+ h2{font:700 16px/1.2 Georgia,serif;margin:20px 0 8px;padding:0 0 5px;border-bottom:1.5px solid #C9B896}
+ h2 i{font:400 12px system-ui;color:#6B5238;font-style:normal}
+ .fi{background:#fff;border:1.5px solid #3E2B1C;border-radius:14px;padding:11px 12px;margin:0 0 9px;
+     box-shadow:2.5px 2.5px 0 #3E2B1C}
+ .fi.puesto{border-color:#2E5D4B;box-shadow:2.5px 2.5px 0 #2E5D4B;background:#F4FAF6}
+ .fi b{display:block;font:700 15.5px/1.3 Georgia,serif}
+ .meta{font-size:12px;color:#6B5238;margin:3px 0 0}
+ .pista{font-size:12.5px;color:#2C6E7F;margin:6px 0 0}
+ .pista button{font:600 12px system-ui;background:#2C6E7F;color:#fff;border:0;border-radius:7px;
+     padding:4px 9px;margin-left:6px;cursor:pointer}
+ select{font:400 14px system-ui;padding:7px 8px;border:1.5px solid #C9B896;border-radius:8px;
+     background:#fff;color:#3E2B1C;margin:8px 0 0;width:100%;max-width:520px}
+ .barra{position:fixed;left:0;right:0;bottom:0;background:#2E5D4B;color:#FBF5E9;padding:12px 14px;
+     display:flex;gap:12px;align-items:center;justify-content:space-between;font-size:14px}
+ .barra button{font:700 15px system-ui;background:#FBF5E9;color:#2E5D4B;border:0;border-radius:10px;
+     padding:10px 16px;cursor:pointer}
+ .barra button[disabled]{opacity:.5;cursor:default}
+</style>
+<h1>Dónde es cada fiesta</h1>
+<p class="ayuda">
+ Naira arma el día alrededor de la fiesta, pero de una fiesta solo sabe el <b>municipio</b>, así que
+ pone el día en el casco del pueblo. Y eso no siempre vale: <b>no es lo mismo una romería en la playa
+ que la fiesta del casco</b>, aunque las dos sean del mismo sitio. Si me dice dónde es cada una, el
+ plan cambia de verdad: playa por la mañana y fiesta por la tarde, o casco y museo.
+ <br><br>
+ <b>No hace falta hacerlas todas.</b> Lo que deje en «en el casco del pueblo» se queda como está ahora,
+ que es lo que ya funciona. Empiece por las que sabe que <b>no</b> son en el casco — esas son las que
+ cambian algo. Cuando se canse, pulse <b>Descargar</b> abajo y mándeme el fichero.
+ <br><br>
+ Donde ponga <span style="color:#2C6E7F">¿será…?</span> es una corazonada mía por el nombre: mírela
+ antes de darle, que se equivoca una de cada cinco veces.
+</p>
+<div id="lista"></div>
+<div class="barra">
+  <span id="cuenta">0 colocadas</span>
+  <button id="bajar" disabled>Descargar</button>
+</div>
+<script>
+/* Las fiestas y los sitios fichados de cada municipio los mete eventos.js.
+   Aquí no hay red: es una lista y un desplegable. */
+const FIESTAS=/*FIESTAS*/[];
+const SITIOS=/*SITIOS*/{};
+const puesto={};
+
+function pinta(){
+  const porMuni={};
+  FIESTAS.forEach(f=>{ (porMuni[f.m]=porMuni[f.m]||[]).push(f); });
+  const L=document.getElementById('lista');
+  L.innerHTML=Object.keys(porMuni).sort().map(m=>{
+    const sit=SITIOS[m]||[];
+    const ops='<option value="">en el casco del pueblo (como está ahora)</option>'+
+      sit.map(s=>'<option value="'+s.n.replace(/"/g,'&quot;')+'">'+s.n+
+        ' — '+s.t+', a '+s.d+' km del casco</option>').join('');
+    return '<h2>'+m+' <i>· '+porMuni[m].length+' fiesta'+(porMuni[m].length>1?'s':'')+
+      ', '+sit.length+' sitios fichados</i></h2>'+
+      porMuni[m].map(f=>'<div class="fi" data-id="'+f.id+'">'+
+        '<b>'+f.n+'</b>'+
+        '<p class="meta">'+f.f.split('-').reverse().join('/')+(f.h?' · '+f.h:'')+'</p>'+
+        (f.pista?'<p class="pista">¿será <b>'+f.pista+'</b>?<button data-pon="'+
+           f.pista.replace(/"/g,'&quot;')+'">ponerlo</button></p>':'')+
+        '<select>'+ops+'</select></div>').join('');
+  }).join('');
+  L.querySelectorAll('.fi').forEach(caja=>{
+    const id=caja.getAttribute('data-id'), sel=caja.querySelector('select');
+    sel.onchange=()=>{ if(sel.value) puesto[id]=sel.value; else delete puesto[id];
+      caja.classList.toggle('puesto',!!sel.value); cuenta(); };
+    const bot=caja.querySelector('button[data-pon]');
+    if(bot) bot.onclick=()=>{ sel.value=bot.getAttribute('data-pon'); sel.onchange(); };
+  });
+  cuenta();
+}
+function cuenta(){
+  const n=Object.keys(puesto).length;
+  document.getElementById('cuenta').textContent=n+' colocada'+(n===1?'':'s');
+  document.getElementById('bajar').disabled=!n;
+}
+document.getElementById('bajar').onclick=()=>{
+  /* Una fiesta está fichada dos veces, 2026 y 2027: se manda el NOMBRE y el
+     municipio, y eventos.js coloca las dos. Por eso no viaja la fecha. */
+  const vistos={}, sitios=[];
+  FIESTAS.forEach(f=>{ if(!puesto[f.id]) return;
+    const k=f.m+'|'+f.n; if(vistos[k]) return; vistos[k]=1;
+    sitios.push({n:f.n,m:f.m,lugar:puesto[f.id]}); });
+  const b=new Blob([JSON.stringify({tipo:'sitios',sitios:sitios},null,1)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download='sitios-fiestas.json'; a.click();
+};
+pinta();
+</script>

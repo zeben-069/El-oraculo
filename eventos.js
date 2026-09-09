@@ -11,6 +11,8 @@
        node eventos.js programa.json     lo mismo, pero si el fichero dice que
                                          es un programa se va solo a los ACTOS
        node eventos.js actos p.json "Fiestas del Cristo"   a la fuerza
+       node eventos.js en-el-programa   lo que está en las dos tablas (lista, no borra)
+       node eventos.js sitios           arma sitios-fiestas.html: dónde es cada fiesta
 
    La página trocea el texto y propone; quien decide es él. Nada entra sin
    que alguien lo haya mirado: en un correo, «Romería de Benijos» puede ser
@@ -74,6 +76,7 @@ function meter(fichero){
   /* La página ya dice de qué va lo que se pegó. Un programa de fiestas no
      entra como cuarenta fiestas: se va derecho a los actos. */
   if(datos.tipo==='actos') return meterActos(fichero,datos.fiesta||process.argv[3]);
+  if(datos.tipo==='sitios') return meterSitios(fichero);
   const lista=datos.fiestas||datos;
   if(!Array.isArray(lista)||!lista.length) return console.log('no hay fiestas en '+fichero);
 
@@ -421,10 +424,161 @@ function repetidas(hazlo){
   console.log('\nhecho: '+limpio.length+' fiestas. Pasa ahora: node lote.js');
 }
 
+/* ── LA MISMA COSA EN LAS DOS TABLAS ──────────────────────────────────
+   Los Fuegos del Cristo están en EVENTOS («Fuegos del Cristo y Noche de las
+   Pandorgas», 23:00) y en ACTOS («Fuegos del Risco», 23:00). Son la misma
+   cosa por dos fuentes, y lo decidió Zeben: **manda la de ACTOS**, que es lo
+   que pone el programa que cuelga el ayuntamiento.
+   Mismo municipio, mismo día y misma hora los encuentra — el criterio de
+   `duplicados`. Pero ESO NO BASTA PARA BORRAR, y por poco me lo llevo por
+   delante: el mismo barrido caza «Romería de Los Abrigos» contra «Romería
+   Barquera de San Blasito», que coinciden en pueblo, día y hora y pueden ser
+   la misma cosa o dos actos seguidos de la misma romería — y esa fecha la
+   había corregido él a mano. Así que esto CANTA Y ESPERA, como el repaso de
+   fechas: se listan, y se borra la que se nombre.
+       node eventos.js en-el-programa                    las lista
+       node eventos.js en-el-programa "Fuegos del Cristo y Noche de las Pandorgas"
+   El nombre se borra en TODOS los años que colisionen: las fiestas están
+   fichadas dos veces, 2026 y 2027. */
+function enElPrograma(quitar){
+  const F='datos/eventos.js', txt=fs.readFileSync(F,'utf8');
+  const E=eval(txt+';EVENTOS');
+  const A=(()=>{ try{ return eval(fs.readFileSync('datos/actos.js','utf8')+';ACTOS'); }
+                 catch(e){ return []; } })();
+  if(!A.length) return console.log('no hay ACTOS cargados: nada que cruzar.');
+  /* sin hora no se toca: una fiesta sin hora es un titular, no una cita, y
+     puede ser justo la fiesta grande de la que cuelga el acto */
+  const choques=[];
+  E.forEach((e,i)=>{
+    if(!e.h) return;
+    const a=A.find(x=>x.m===e.m&&x.f===e.f&&x.h===e.h);
+    if(a) choques.push({i,e,a});
+  });
+  if(!choques.length) return console.log('nada coincide en pueblo, día y hora entre EVENTOS y ACTOS.');
+  const nombres=[...new Set(choques.map(x=>x.e.n))];
+  if(!quitar){
+    nombres.forEach(n=>{
+      const suyos=choques.filter(x=>x.e.n===n);
+      console.log('· '+n);
+      suyos.forEach(x=>console.log('    '+x.e.f+' '+x.e.h+' '+x.e.m+
+        '   ↔ ACTOS: '+x.a.n+(x.a.lu?' ('+x.a.lu+')':'')));
+    });
+    console.log('\n'+choques.length+' coincidencia'+(choques.length>1?'s':'')+
+      ' de '+nombres.length+' fiesta'+(nombres.length>1?'s':'')+'.');
+    console.log('Coincidir en pueblo, día y hora NO quiere decir que sean lo mismo:');
+    console.log('puede ser un acto de esa misma fiesta. Lo dice quien vive allí.');
+    console.log('Para quitar una:  node eventos.js en-el-programa "el nombre exacto"');
+    return;
+  }
+  const fuera=new Set(choques.filter(x=>x.e.n===quitar).map(x=>x.i));
+  if(!fuera.size){
+    console.log('«'+quitar+'» no coincide con ningún acto. Las que sí:');
+    nombres.forEach(n=>console.log('  · '+n));
+    return;
+  }
+  choques.filter(x=>fuera.has(x.i)).forEach(x=>
+    console.log('se va: '+x.e.f+' '+x.e.n+' ('+x.e.m+') — lo cuenta «'+x.a.n+'»'));
+  const limpio=E.filter((e,i)=>!fuera.has(i));
+  fs.writeFileSync(F,txt.slice(0,txt.indexOf('const EVENTOS='))+'const EVENTOS='+
+    JSON.stringify(limpio,null,0).replace(/\},\{/g,'},\n{')+';\n');
+  console.log('\nhecho: de '+E.length+' a '+limpio.length+' fiestas. Pasa ahora: node lote.js');
+}
+
+/* ── DÓNDE ES CADA FIESTA ─────────────────────────────────────────────
+   Una fiesta de EVENTOS solo sabe su MUNICIPIO, así que el motor arma el día
+   en el casco del pueblo. Zeben: «no es lo mismo las fiestas de La Jaca en
+   Arico que la fiesta del pueblo de Arico; una es en la playa y la otra en el
+   casco histórico, entonces se pueden crear cosas diferentes aunque sean en
+   el mismo municipio». Con el casco para las dos, salía el mismo día.
+   Sacar el sitio del nombre a la brava NO vale: probado sobre las 138, salían
+   22 y una de cada cinco caía mal —«Romería de San Miguel» se iba al Castillo
+   de San Miguel, que está en Aldea Blanca, y «Romería de Benijos» a un
+   sendero—. Y una coordenada mala mueve el día entero. Así que la corazonada
+   se enseña y la decide él, como con los miradores.
+       node eventos.js sitios              arma sitios-fiestas.html
+       node eventos.js sitios-fiestas.json coloca las que haya marcado
+   Se colocan por NOMBRE y municipio, no por fecha: cada fiesta está fichada
+   dos veces (2026 y 2027) y así se hace la mitad del trabajo. */
+const LUGARES=c.LUGARES;
+const GENERICO=/^(gran(des)? )?(fiestas?|romer[ií]a|bajada|subida|procesi[óo]n|verbena|feria|baile|noche|d[ií]a|exaltaci[óo]n|caminata|ofrenda|rito|arrastre|exhibici[óo]n|exposici[óo]n|concierto|pregón|pregon|festival)\b[^a-záéíóúñ]*(de |del |de la |de los |de las |a |en |al )?/i;
+function corazonada(e){
+  const enMuni=LUGARES.filter(l=>l.m===e.m&&l.la!=null);
+  if(!enMuni.length) return null;
+  const cands=[e.n.replace(GENERICO,'').trim()];
+  /* «Nuestra Señora de la Luz en el Conjunto Histórico»: el sitio va detrás del «en» */
+  const m=e.n.match(/\ben (el |la |los |las )?([A-ZÁÉÍÓÚÑ][^,·—]{3,})$/);
+  if(m) cands.push(m[2]);
+  for(const cnd of cands){
+    const q=norm(cnd); if(q.length<4) continue;
+    const hit=enMuni.find(l=>norm(l.n)===q)
+           || enMuni.find(l=>norm(l.n).includes(q))
+           || enMuni.find(l=>q.includes(norm(l.n))&&norm(l.n).length>=5);
+    if(hit) return hit.n;
+  }
+  return null;
+}
+function paginaSitios(){
+  const km=c.km;
+  /* solo las que aún no tienen sitio: lo ya colocado no se vuelve a preguntar */
+  const pend=EVENTOS.filter(e=>e.la==null);
+  const vistas={}, fiestas=[];
+  pend.forEach((e,i)=>{
+    const k=e.m+'|'+e.n; if(vistas[k]) return; vistas[k]=1;   /* 2026 y 2027 son la misma */
+    fiestas.push({id:'f'+i,n:e.n,m:e.m,f:e.f,h:e.h||null,pista:corazonada(e)});
+  });
+  const sitios={};
+  [...new Set(fiestas.map(f=>f.m))].forEach(m=>{
+    const b=Object.values(BASES).find(x=>x.m===m);
+    sitios[m]=LUGARES.filter(l=>l.m===m&&l.la!=null)
+      .map(l=>({n:l.n,t:(l.tipo||'sitio').toLowerCase(),
+                d:(b&&b.la!=null)?+km(b.la,b.lo,l.la,l.lo).toFixed(1):0}))
+      .sort((x,y)=>x.d-y.d);
+  });
+  const plantilla=fs.readFileSync('plantilla-sitios.html','utf8');
+  const H_F='/*FIESTAS*'+'/[]', H_S='/*SITIOS*'+'/{}';
+  if(plantilla.split(H_F).length!==2||plantilla.split(H_S).length!==2)
+    throw new Error('la plantilla no trae los huecos');
+  fs.writeFileSync('sitios-fiestas.html',
+    plantilla.replace(H_F,JSON.stringify(fiestas)).replace(H_S,JSON.stringify(sitios)));
+  const conPista=fiestas.filter(f=>f.pista).length;
+  console.log('escrito sitios-fiestas.html');
+  console.log('   '+fiestas.length+' fiestas sin sitio (de '+EVENTOS.length+' fichas: 2026 y 2027 son la misma),');
+  console.log('   en '+Object.keys(sitios).length+' municipios, con '+conPista+' corazonadas por el nombre.');
+  console.log('Se abre en el navegador, se colocan las que NO son en el casco y se baja:');
+  console.log('   node eventos.js sitios-fiestas.json');
+}
+function meterSitios(fichero){
+  const datos=JSON.parse(fs.readFileSync(fichero,'utf8'));
+  const lista=datos.sitios||[];
+  if(!lista.length) return console.log('no hay sitios marcados en '+fichero);
+  const F='datos/eventos.js', txt=fs.readFileSync(F,'utf8');
+  const E=eval(txt+';EVENTOS');
+  let tocadas=0; const fuera=[];
+  lista.forEach(x=>{
+    const l=LUGARES.find(y=>y.n===x.lugar&&y.m===x.m&&y.la!=null);
+    if(!l){ fuera.push(x.n+' → no encuentro «'+x.lugar+'» en '+x.m); return; }
+    /* todas las fichas de esa fiesta en ese pueblo: 2026 y 2027 */
+    const suyas=E.filter(e=>e.n===x.n&&e.m===x.m);
+    if(!suyas.length){ fuera.push(x.n+' → ya no está en EVENTOS'); return; }
+    suyas.forEach(e=>{ e.la=l.la; e.lo=l.lo; e.lu=l.n; tocadas++; });
+    const b=Object.values(BASES).find(y=>y.m===x.m);
+    console.log('· '+x.n+' ('+x.m+') → '+l.n+
+      (b&&b.la!=null?', a '+c.km(b.la,b.lo,l.la,l.lo).toFixed(1)+' km del casco':'')+
+      '   ×'+suyas.length);
+  });
+  if(fuera.length){ console.log('\nno entran:'); fuera.forEach(x=>console.log('  · '+x)); }
+  if(!tocadas) return;
+  fs.writeFileSync(F,txt.slice(0,txt.indexOf('const EVENTOS='))+'const EVENTOS='+
+    JSON.stringify(E,null,0).replace(/\},\{/g,'},\n{')+';\n');
+  console.log('\nhecho: '+tocadas+' fichas con sitio propio. Pasa ahora: node lote.js');
+}
+
 const arg=process.argv[2];
 if(!arg||arg==='pegar') pagina();
 else if(arg==='actos') meterActos(process.argv[3],process.argv[4]);
 else if(arg==='reclasificar') reclasificar();
 else if(arg==='duplicados') duplicados(process.argv[3]==='hazlo');
 else if(arg==='repetidas') repetidas(process.argv[3]==='hazlo');
+else if(arg==='en-el-programa') enElPrograma(process.argv[3]);
+else if(arg==='sitios') paginaSitios();
 else meter(arg);

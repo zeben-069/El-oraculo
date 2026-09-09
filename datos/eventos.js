@@ -41,7 +41,6 @@ const EVENTOS=[{"f":"2026-08-01","n":"Romería Chica y Baile Romero tras la baja
 {"f":"2026-09-12","n":"Feria de artesanía de Pinolere","m":"La Orotava","c":"Norte","fr":"tarde","d":"Interés Turístico Nacional","cal":1,"no":"La feria de artesanía más importante de Canarias.","sh":"sin hora confirmada"},
 {"f":"2026-09-13","n":"Romería de Benijos","m":"La Orotava","c":"Norte","fr":"tarde","cal":1,"sh":"sin hora confirmada"},
 {"f":"2026-09-14","n":"Fiesta del Santísimo Cristo","m":"San Cristóbal de La Laguna","c":"Metropolitana","fr":"tarde","cal":1,"no":"Feria, fuegos y la exaltación del Cristo. Dura dos semanas.","sh":"sin hora confirmada"},
-{"f":"2026-09-14","n":"Fuegos del Cristo y Noche de las Pandorgas","m":"San Cristóbal de La Laguna","c":"Metropolitana","fr":"noche","h":"23:00","no":"En Plaza del Cristo.","of":"Guía de fiestas de los 31 municipios · fuentes municipales"},
 {"f":"2026-09-19","n":"Fiesta de la Vendimia","m":"Tacoronte","c":"Norte","fr":"tarde","cal":1,"no":"La pisa de la uva. Encaja con el plan de vino de Tacoronte-Acentejo.","sh":"sin hora confirmada"},
 {"f":"2026-09-20","n":"Romería de San Juan de la Rambla","m":"San Juan de la Rambla","c":"Norte","fr":"tarde","cal":1,"sh":"sin hora confirmada"},
 {"f":"2026-09-20","n":"Romería de Los Roques","m":"Fasnia","c":"Sur","fr":"tarde","cal":1,"sh":"sin hora confirmada"},
