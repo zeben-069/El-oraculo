@@ -2140,6 +2140,13 @@ function construir(){
       /* dónde es exactamente, cuando se sabe: la romería de la playa y la
          fiesta del casco son del mismo pueblo y son días distintos */
       donde:ev.lu||null,
+      /* Y su nota. Esto FALTABA: 113 de las 138 fiestas traen una y casi todas
+         dicen dónde es la cosa —«En Plaza Ramón Arocha», «En Basílica de
+         Candelaria»— o de qué va —«las carretas aquí son barcas engalanadas»—.
+         Las de las fiestas secundarias sí viajaban, por `otras_fiestas_de_hoy.
+         lo_bueno`; la de la que ARMA EL DÍA se quedaba en el dato y no llegaba
+         nunca. Justo la más importante. */
+      lo_bueno:ev.no||null,
       hora_sin_confirmar:(!ev.h&&ev.sh)?true:false,fuente_programa:ev.of||null,del_calendario_anual:ev.cal?true:false,distincion:ev.d||null,
       /* Cruces, Carnaval o el Día de Canarias no son una parada a una hora:
          son el ambiente del pueblo entero desde por la mañana. El relato
@@ -3299,6 +3306,10 @@ function narrarLocal(b){
     /* si no es en su municipio, se dice a cuánto queda: no es lo mismo aquí que a 50 min */
     if(b.minutos_en_coche_desde_alojamiento>25)
       c+=' Son unos '+b.minutos_en_coche_desde_alojamiento+' minutos desde donde están.';
+    /* La nota de la fiesta va en español y no se traduce aquí, igual que los
+       porqués del Cabildo: traducirla a plantilla sería reescribirla. Con
+       clave de API la traduce el modelo, que es quien sabe hacerlo. */
+    if(ev.lo_bueno&&S.idioma==='es') c+=' '+ev.lo_bueno;
     t.push(c+(ev.hora_sin_confirmar?F.horaNo:''));
   }else if(b.origen_del_ancla==='elegido por el turista'){
     t.push(F.alrededor);

@@ -414,8 +414,8 @@ Y se coloca por **nombre y municipio, no por fecha**: cada fiesta está fichada
 en 2026 y en 2027, así que marcarla una vez vale para las dos.
 
 **Zeben colocó 81 de las 94 en una sentada, y funciona.** Ninguna apuntaba a un
-sitio inexistente. De las 81, **32 caen a más de un kilómetro del casco**, y de
-esas **el 78% da un día distinto** al que daba antes. Las otras están en el
+sitio inexistente. De las 81, **31 caen a más de un kilómetro del casco**, y de
+esas **el 77% da un día distinto** al que daba antes. Las otras están en el
 casco y por eso no cambian nada, que es lo correcto. Cuatro ejemplos de lo que
 esto arregla:
 
@@ -428,9 +428,31 @@ esto arregla:
 
 De paso corrigió dos de mis corazonadas —la Bajada del Socorro es en la Ermita
 del Socorro, no en el camino, y la Feria de Pinolere es en el Museo Etnográfico,
-no en el caserío— y se quedó con las dos que yo daba por malas: la Romería de
-San Miguel en el Castillo de Aldea Blanca (1,7 km) y la de Benijos en la pista
-de Benijos (3,8 km). Manda él.
+no en el caserío—.
+
+**Y una romería tiene salida y llegada; el punto que vale es la LLEGADA.** Se
+vio con las dos que yo había dado por dudosas y él fue a mirar:
+· *Romería de San Miguel* — sale de la Cooperativa CASMI y baja por la TF-28 y
+  la TF-65 hasta la calle Antonio Alonso, junto a la plaza de la iglesia de San
+  Miguel Arcángel. O sea que el Castillo de Aldea Blanca **estaba mal**: se
+  cambió al casco. Ahí es donde acaba y donde está la gente a la hora buena.
+· *Romería barquera de El Médano* — sale de la iglesia después de la misa y
+  recorre el casco costero hasta la Playa Chica, donde embarcan a la Virgen.
+  La playa **estaba bien**, confirmada.
+Con un solo punto por fiesta, la regla es esa: **la llegada, no la salida**. En
+San Miguel son tres kilómetros de diferencia y el día se arma en el sitio
+equivocado si se coge la salida.
+
+**Y ahí salió un fallo que llevaba escondido desde siempre: la nota de la fiesta
+que arma el día no llegaba al informe.** `evento_ancla` llevaba nombre,
+municipio, franja, hora y distinción, pero **no `no`** — y **113 de las 138
+fiestas tienen nota**, casi todas diciendo dónde es la cosa («En Plaza Ramón
+Arocha», «En Basílica de Candelaria») o de qué va («las carretas aquí son barcas
+engalanadas, no carretas»). Lo retorcido: las notas de las fiestas
+**secundarias** sí viajaban, por `otras_fiestas_de_hoy.lo_bueno`; la de la que
+manda el día, no. Ahora va por `evento_ancla.lo_bueno`, está en el prompt y el
+narrador local también la cuenta —en español y sin traducir, como los porqués
+del Cabildo: traducirla a plantilla sería reescribirla.
 Y salió un efecto de segundo orden que hay que entender antes de tocarlo: con
 coordenadas de verdad, **la Romería de San Miguel y la barquera de El Médano
 pasan de 4,6 km a 9,2**, porque antes se medían entre cascos y ahora entre el
@@ -623,8 +645,8 @@ programa o por el aviso de la lejana, que los tres valen—, **0 casos de una
 fiesta de noche tapando a una de día** y 9 con sitios para cenar.
 Y cierra midiendo si colocar la fiesta sirve de algo: arma el día desde su
 propio pueblo con las coordenadas y sin ellas. Referencia: **81 fiestas con
-sitio, 36 días cambian (44%); de las 32 que están a más de 1 km del casco,
-cambian 25 (78%)**. Ojo con ese bloque: tiene que mutar el `EVENTOS` que
+sitio, 35 días cambian (43%); de las 31 que están a más de 1 km del casco,
+cambian 24 (77%)**. Ojo con ese bloque: tiene que mutar el `EVENTOS` que
 **exporta `banco.js`**, no el que `lote.js` lee del fichero con `eval` — con la
 copia, quitarle las coordenadas no cambia nada y el porcentaje sale 0%, o sea
 que la prueba dice que la mejora no sirve.
