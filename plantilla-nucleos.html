@@ -1,0 +1,175 @@
+<meta charset="utf-8"><title>Poner un pueblo en el mapa</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+ body{font-family:system-ui,sans-serif;background:#FBF5E9;color:#3E2B1C;margin:0;padding:16px 14px 110px}
+ h1{font:800 21px/1.2 Georgia,serif;margin:0 0 4px}
+ p.ayuda{margin:6px 0 14px;font-size:14px;line-height:1.55;color:#6B5238}
+ p.ayuda b{color:#3E2B1C}
+ .barraSup{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
+ .barraSup button{font:600 14px system-ui;background:#2E5D4B;color:#FBF5E9;border:0;border-radius:10px;
+   padding:9px 14px;cursor:pointer}
+ .barraSup button[disabled]{opacity:.5;cursor:default}
+ .barraSup input{font:400 14px system-ui;padding:8px 10px;border:1.5px solid #C9B896;border-radius:9px;
+   background:#fff;color:#3E2B1C;min-width:min(240px,60vw)}
+ h2{font:700 16px/1.2 Georgia,serif;margin:20px 0 8px;padding:0 0 5px;border-bottom:1.5px solid #C9B896}
+ .sitio{background:#fff;border:1.5px solid #3E2B1C;border-radius:14px;padding:11px 12px;margin:0 0 10px;
+   box-shadow:2.5px 2.5px 0 #3E2B1C}
+ .sitio.si{border-color:#2E5D4B;box-shadow:2.5px 2.5px 0 #2E5D4B;background:#F4FAF6}
+ .cab{display:flex;gap:10px;align-items:flex-start}
+ .cab label{flex:1;font:700 16px/1.3 Georgia,serif;cursor:pointer}
+ .cab input[type=checkbox]{width:22px;height:22px;margin:2px 0 0;flex:none;cursor:pointer}
+ .meta{font-size:12px;color:#6B5238;margin:3px 0 0}
+ .meta a{color:#2C6E7F}
+ .detalle{margin:10px 0 0;display:none;gap:8px;flex-wrap:wrap}
+ .sitio.si .detalle{display:flex}
+ .detalle label{font-size:12px;color:#6B5238;display:flex;flex-direction:column;gap:3px}
+ .detalle select,.detalle input[type=text]{font:400 14px system-ui;padding:6px 8px;border:1.5px solid #C9B896;
+   border-radius:8px;background:#fff;color:#3E2B1C}
+ .detalle input[type=text]{min-width:min(320px,100%)}
+ .ya{opacity:.55}
+ .ya .cab label::after{content:' · ya está en Naira';font:400 12px system-ui;color:#A93B2B}
+ .barra{position:fixed;left:0;right:0;bottom:0;background:#2E5D4B;color:#FBF5E9;padding:12px 14px;
+   display:flex;gap:12px;align-items:center;justify-content:space-between;font-size:14px}
+ .barra button{font:700 15px system-ui;background:#FBF5E9;color:#2E5D4B;border:0;border-radius:10px;
+   padding:10px 16px;cursor:pointer}
+ .barra button[disabled]{opacity:.5;cursor:default}
+ .aviso{background:#fff;border:1.5px dashed #A93B2B;color:#A93B2B;border-radius:12px;padding:12px;
+   font-size:14px;line-height:1.5;margin:0 0 10px}
+</style>
+<h1>Poner un pueblo en el mapa</h1>
+<p class="ayuda">
+ Hay fiestas que son en un <b>caserío o un barrio</b> que Naira no tiene fichado — Los Abrigos, Charco del
+ Pino, Los Blanquitos —, y entonces el plan se arma en el casco del municipio, que puede estar a nueve
+ kilómetros y monte arriba. Esta página le pregunta a <b>OpenStreetMap</b> dónde está cada uno.
+ Yo no puedo entrar en esas webs desde donde trabajo; su navegador sí.
+ <br><br>
+ Marque el que sea <b>el bueno</b> —a veces sale más de un punto con el mismo nombre—, diga de qué
+ <b>municipio</b> es y qué es: el casco de un pueblo o un caserío. Y si quiere, una línea de qué tiene.
+ Luego <b>Descargar</b> y me manda el fichero. Puede buscar otros escribiendo el nombre arriba.
+ <br><br>
+ <b>El municipio empieza vacío a propósito.</b> El más cercano se equivoca de lo lindo, así que sin
+ elegirlo la ficha no se baja.
+</p>
+<div class="barraSup">
+  <button id="pedir">Buscar estos pueblos</button>
+  <input id="otro" type="text" placeholder="…o escriba otro nombre y pulse Enter">
+  <span id="estado" class="meta"></span>
+</div>
+<div id="lista"></div>
+<div class="barra">
+  <span id="cuenta">0 marcados</span>
+  <button id="bajar" disabled>Descargar</button>
+</div>
+<script>
+/* Lo que mete nucleos.js: los nombres que faltan, los 31 municipios con su
+   centro, y lo que ya está fichado para no ofrecer repetidos. */
+const BUSCAR=/*BUSCAR*/[];
+const BASES=/*BASES*/{};
+const YA=/*YA*/[];
+const TIPOS=['Casco histórico','Caserío','Plaza','Playa','Patrimonio'];
+const API='https://overpass-api.de/api/interpreter';
+const marcados={}; let hallados=[];
+
+const km=(a,b,c,d)=>{const R=6371,r=x=>x*Math.PI/180;
+  const u=r(c-a),v=r(d-b),s=Math.sin(u/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(v/2)**2;
+  return 2*R*Math.asin(Math.sqrt(s));};
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+
+/* Un nombre por consulta y con pausa: es la web de otro y esto solo pregunta. */
+async function pregunta(nombre){
+  const q='[out:json][timeout:25];'+
+    'node["place"~"village|hamlet|suburb|neighbourhood|town|locality"]'+
+    '["name"~"'+nombre.replace(/"/g,'')+'",i](27.95,-16.95,28.62,-16.10);out 12;';
+  const r=await fetch(API,{method:'POST',body:q});
+  if(!r.ok) throw new Error('Overpass contestó '+r.status);
+  const j=await r.json();
+  return (j.elements||[]).map(e=>({id:e.id,n:e.tags&&e.tags.name||nombre,
+    place:e.tags&&e.tags.place||'', la:e.lat, lo:e.lon, busca:nombre}));
+}
+
+function pinta(){
+  const L=document.getElementById('lista');
+  if(!hallados.length){ L.innerHTML='<p class="aviso">Nada todavía. Pulse «Buscar estos pueblos».</p>'; return; }
+  const porBusca={};
+  hallados.forEach(h=>{ (porBusca[h.busca]=porBusca[h.busca]||[]).push(h); });
+  const opsM='<option value="">— elija el municipio —</option>'+
+    Object.keys(BASES).sort().map(m=>'<option>'+m+'</option>').join('');
+  const opsT=TIPOS.map(t=>'<option>'+t+'</option>').join('');
+  L.innerHTML=Object.keys(porBusca).map(b=>'<h2>'+b+'</h2>'+
+    porBusca[b].map(h=>{
+      const rep=YA.find(y=>norm(y.n)===norm(h.n)||km(y.la,y.lo,h.la,h.lo)<0.15);
+      /* a cuánto queda del casco más cercano: ayuda a ver si es el punto bueno */
+      let cerca=null;
+      Object.keys(BASES).forEach(m=>{const d=km(BASES[m].la,BASES[m].lo,h.la,h.lo);
+        if(!cerca||d<cerca.d) cerca={m:m,d:d};});
+      return '<div class="sitio'+(rep?' ya':'')+'" data-id="'+h.id+'">'+
+        '<div class="cab"><input type="checkbox"'+(rep?' disabled':'')+'>'+
+        '<label><b>'+h.n+'</b></label></div>'+
+        '<p class="meta">'+(h.place||'sin tipo')+' · '+h.la.toFixed(5)+', '+h.lo.toFixed(5)+
+        ' · a '+cerca.d.toFixed(1)+' km del casco de '+cerca.m+
+        ' · <a target="_blank" href="https://www.openstreetmap.org/node/'+h.id+'">verlo en el mapa</a>'+
+        (rep?' · ya está como «'+rep.n+'»':'')+'</p>'+
+        '<div class="detalle">'+
+          '<label>Municipio<select class="mu">'+opsM+'</select></label>'+
+          '<label>Qué es<select class="ti">'+opsT+'</select></label>'+
+          '<label>Una línea de qué tiene (opcional)<input class="no" type="text"></label>'+
+        '</div></div>';
+    }).join('')).join('');
+  L.querySelectorAll('.sitio').forEach(caja=>{
+    const id=+caja.getAttribute('data-id'), ch=caja.querySelector('input[type=checkbox]');
+    if(!ch||ch.disabled) return;
+    const rec=()=>{
+      const mu=caja.querySelector('.mu').value;
+      if(ch.checked&&mu) marcados[id]={h:hallados.find(x=>x.id===id),m:mu,
+        t:caja.querySelector('.ti').value, no:caja.querySelector('.no').value.trim()};
+      else delete marcados[id];
+      caja.classList.toggle('si',ch.checked); cuenta();
+    };
+    ch.onchange=rec;
+    caja.querySelectorAll('.mu,.ti,.no').forEach(x=>{x.onchange=rec;x.oninput=rec;});
+  });
+  cuenta();
+}
+function cuenta(){
+  const n=Object.keys(marcados).length;
+  document.getElementById('cuenta').textContent=n+' marcado'+(n===1?'':'s')+
+    (document.querySelectorAll('.sitio.si').length>n?' (a alguno le falta el municipio)':'');
+  document.getElementById('bajar').disabled=!n;
+}
+async function busca(nombres){
+  const est=document.getElementById('estado'), bot=document.getElementById('pedir');
+  bot.disabled=true;
+  /* Lo que no sale hay que DECIRLO al final, no en un mensaje que borra el
+     siguiente: si no, el que mira la página no se entera de que a «Las Hayas»
+     OpenStreetMap no le puso nombre y se queda esperando. */
+  const vacios=[], fallos=[];
+  for(let i=0;i<nombres.length;i++){
+    est.textContent='preguntando por «'+nombres[i]+'» ('+(i+1)+' de '+nombres.length+')…';
+    try{
+      const r=await pregunta(nombres[i]);
+      r.forEach(x=>{ if(!hallados.some(y=>y.id===x.id)) hallados.push(x); });
+      if(!r.length) vacios.push(nombres[i]);
+    }catch(e){ fallos.push(nombres[i]+' ('+e.message+')'); }
+    pinta();
+    if(i<nombres.length-1) await new Promise(s=>setTimeout(s,1200));
+  }
+  est.textContent=hallados.length+' puntos. Marque los buenos.'+
+    (vacios.length?'  ·  Sin nada en OpenStreetMap: '+vacios.join(', ')+'.':'')+
+    (fallos.length?'  ·  No se pudo preguntar por: '+fallos.join(', ')+'.':'');
+  bot.disabled=false;
+}
+document.getElementById('pedir').onclick=()=>busca(BUSCAR);
+document.getElementById('otro').onkeydown=e=>{
+  if(e.key!=='Enter'||!e.target.value.trim()) return;
+  const n=e.target.value.trim(); e.target.value=''; busca([n]);
+};
+document.getElementById('bajar').onclick=()=>{
+  const nucleos=Object.values(marcados).map(x=>({
+    nombre:x.h.n, municipio:x.m, tipo:x.t, la:x.h.la, lo:x.h.lo,
+    nota:x.no||null, fuente:'OpenStreetMap (ODbL) · n'+x.h.id}));
+  const b=new Blob([JSON.stringify({tipo:'nucleos',nucleos:nucleos},null,1)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download='nucleos.json'; a.click();
+};
+pinta();
+</script>

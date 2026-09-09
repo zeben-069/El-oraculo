@@ -56,6 +56,9 @@ subir-fotos.html              esa página, para las fotos que hace él
 miradores.js                  arma la página de miradores, y mete los elegidos
 plantilla-miradores.html      su molde
 buscar-miradores.html         esa página, lista para abrir
+nucleos.js                    arma la página de poner un caserío en el mapa
+plantilla-nucleos.html        su molde
+buscar-nucleos.html           esa página, lista para abrir
 eventos.js                    arma la página de pegar fiestas, y mete las marcadas
 plantilla-sitios.html         el molde de la página de dónde es cada fiesta
 sitios-fiestas.html           esa página, lista para abrir
@@ -470,7 +473,45 @@ distintos, y ninguno se arregla eligiendo mejor de la lista:
   Restaurante El Ancla, a 9 km, en la costa. Eso es la bandera COMIDA-LEJOS de
   siempre, pero aquí no es geografía: es que la fiesta está en un pueblo que no
   existe en el catálogo. **Arreglarlo es meter Los Abrigos en `LUGARES`, no
-  elegirle una playa de la lista que no es la suya.**
+  elegirle una playa de la lista que no es la suya.** Para eso está
+  **`nucleos.js`**, abajo.
+
+**Y para meter ese caserío hay un camino, `nucleos.js`.** Zeben contó los tres
+recorridos —dónde sale y dónde acaba cada romería—, y eso entró tal cual en la
+nota de las fichas, que no necesita coordenadas y ya es útil: Naira puede decir
+que la de Los Abrigos empieza con el desembarco de San Blasito en la playa de
+Agua Dulce y acaba en el muelle pesquero. Pero el PUNTO sigue faltando, y no se
+inventa. Se buscó por si estaba en algún dato de la casa: las paradas de TITSA
+solo se guardaron como nombre y metros desde cada ficha, no como coordenadas, y
+ninguna cae en esos tres pueblos. Así que se hace como los miradores y las
+fotos: lo pregunta el navegador de casa.
+    node nucleos.js buscar        arma buscar-nucleos.html
+    node nucleos.js nucleos.json  mete los que vengan marcados
+La página le pregunta a **Overpass** (OpenStreetMap) por nodos `place=village|
+hamlet|suburb|neighbourhood|town|locality` dentro del rectángulo de la isla.
+**Qué buscar sale solo de los datos**: el caserío está en el nombre de la
+fiesta, así que se toman las fiestas sin `la` y se les quita el genérico de
+delante. Ojo con ese recorte, que sin apretarlo salían «El Salvador y exhibición
+pirotécnica» y «e inauguración de las Fiestas Patronales»: un nombre de sitio
+tiene **forma** —de una a tres palabras, todas con mayúscula salvo los
+artículos— y con eso quedan Charco del Pino, Las Hayas, Los Abrigos, Los
+Blanquitos y un falso, «Papada Guanchera», que es inofensivo porque OSM no
+devuelve nada.
+Lo que la página **no** decide: cuál de los puntos es el bueno (de «Los Abrigos»
+pueden salir dos), de qué municipio es —el desplegable **empieza vacío** y sin
+elegirlo la ficha no se baja, como en la de miradores— y si es un casco o un
+caserío. Cada punto enseña **a cuántos km del casco más cercano está**, que es
+lo que deja ver de un vistazo cuál es el bueno, y un enlace al nodo en OSM.
+Y lo que no sale **se dice al final, no en un mensaje que borra el siguiente**:
+«Sin nada en OpenStreetMap: Las Hayas, Papada Guanchera». Sin eso, quien mira la
+página se queda esperando un resultado que no va a llegar.
+Al meterlos, el **corredor sale del vecino fichado más cercano**, no del
+municipio —la misma razón que con los miradores, y aquí más, que estos están en
+la punta del término—, y se descarta lo repetido por nombre o por estar a menos
+de 150 m. Van con `flex` puestos: un caserío vale a cualquier hora. OSM es ODbL,
+así que cada ficha se lleva `of:'OpenStreetMap (ODbL) · n12345'`.
+Después hay que **colocar la fiesta en él**: `node eventos.js sitios` los ofrece
+ya en el desplegable.
 
 **Y ahí salió un fallo que llevaba escondido desde siempre: la nota de la fiesta
 que arma el día no llegaba al informe.** `evento_ancla` llevaba nombre,
