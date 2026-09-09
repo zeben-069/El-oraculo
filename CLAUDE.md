@@ -392,6 +392,24 @@ entera del cambio. Los nombres de mes y de día los escribe el navegador con
 `toLocaleDateString` en el idioma elegido; los de las fiestas **no se traducen**,
 que es la regla de siempre.
 
+**Y el calendario tiene que ver TAMBIÉN los actos.** Zeben lo cazó: «el domingo
+hay fuegos en La Laguna y no salen en el calendario». `fiestasDe()` leía solo
+`EVENTOS`, así que los 300 `ACTOS` eran invisibles ahí: el domingo 13 de
+septiembre salía una romería de La Orotava teniendo La Laguna veinticuatro actos
+del Cristo. Ahora hay un `actosDe()` que aplica **la misma regla de madrugada
+que el motor** —un acto que empieza antes de las seis es de la noche del día de
+antes—, y por eso los Fuegos de la Víspera, fichados el 14 a las 00:00, salen en
+el 13, que es la noche en que se ven. El pie los agrupa por pueblo con
+`actosPorPueblo()`, mandando el que más pone —la misma regla de la cabecera del
+plan— y nombrando la fiesta solo si **todos** los actos del pueblo son de la
+misma: en La Laguna coinciden el Cristo y San Mateo de Punta del Hidalgo.
+Dos decisiones de pantalla. La lista va **entera**, en una caja que se desliza:
+recortarla a cinco dejaba fuera los fuegos de las doce, que es justo lo que se
+venía a mirar (hay días de **50 actos** de ocho municipios). Y en la rejilla, el
+día con fiesta lleva su icono y el que **solo** tiene programa lleva un punto:
+poniendo el icono en los dos, veinticuatro de treinta días de septiembre salían
+marcados igual y las fiestas de verdad se perdían entre los tambores.
+
 ## Trampas conocidas
 
 **El ancla del turista pasa por un camino aparte.** Cuando eligen un sitio
