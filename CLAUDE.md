@@ -84,7 +84,7 @@ Dentro de `index.html`, como constantes:
 
 - `LUGARES` (589) — sitios que visitar. Solo 4 sin coordenadas.
 - `REST` (318) — restaurantes, incluidas 38 heladerías.
-- `EVENTOS` (138) — fiestas. Municipio y corredor siempre; **118 fichas (81
+- `EVENTOS` (138) — fiestas. Municipio y corredor siempre; **127 fichas (87
   fiestas × sus años) llevan ya `la`/`lo`/`lu`**, colocadas por Zeben con
   `node eventos.js sitios`, y entonces mandan ellas sobre el casco del pueblo.
   Quedan 13 sin colocar, en 6 municipios.
@@ -443,6 +443,35 @@ Con un solo punto por fiesta, la regla es esa: **la llegada, no la salida**. En
 San Miguel son tres kilómetros de diferencia y el día se arma en el sitio
 equivocado si se coge la salida.
 
+**Las 7 que quedaron sin colocar no son un problema de colocarlas: es que el
+sitio no está en el catálogo.** Zeben le pasó a Claude en Cowork las 13 que
+faltaban y resolvió 6 —las tres romerías grandes de Garachico y su pregón van
+entre plazas del casco, el Carnaval ocupa el centro de Santa Cruz entero, y la
+Virgen del Carmen de Guía de Isora es en «Las Higueritas», calle del propio
+núcleo—. Las seis caen en el casco, así que **no mueven ningún día**: lo que
+ganan es que `evento_ancla.donde` deja de estar vacío y Naira puede decir dónde.
+Las 7 restantes se quedan, y el diagnóstico de Cowork es el bueno. Dos casos
+distintos, y ninguno se arregla eligiendo mejor de la lista:
+· **La Guancha y La Matanza no tienen NADA urbano fichado.** Comprobado sobre
+  los 31 municipios: son los dos únicos. La Guancha tiene 5 sitios (el Teide,
+  Altavista, Montaña Negra, Montaña Blanca y el Charco del Viento) y La Matanza
+  3 (dos senderos y una conexión). Sus fiestas son en la Plaza de la Iglesia y
+  en la calle Pedro González Yanes, que existen y no están en `LUGARES`. Como
+  el centro urbano sí está en `BASES`, **dejarlas sin colocar ya da el punto
+  correcto**: no se pierde nada. Lo que sí se nota es en el día: pidiendo
+  «museos y cascos» ahí, el motor tira de la regla de los 6 km y trae ARTlandya
+  y la Casa del Plátano de Icod, o Pinolere de La Orotava. Funciona, pero
+  porque presta del vecino.
+· **Las tres romerías de Granadilla** —Charco del Pino, Los Abrigos y Los
+  Blanquitos— son en caseríos costeros que tampoco están fichados, y ahí el
+  casco **sí** es el punto equivocado: Los Abrigos está a 9 km del casco de
+  Granadilla, monte arriba. Se ve en el plan del 6 de septiembre: el día se
+  arma con el Museo de Granadilla y el Caserío de Las Vegas, y a comer al
+  Restaurante El Ancla, a 9 km, en la costa. Eso es la bandera COMIDA-LEJOS de
+  siempre, pero aquí no es geografía: es que la fiesta está en un pueblo que no
+  existe en el catálogo. **Arreglarlo es meter Los Abrigos en `LUGARES`, no
+  elegirle una playa de la lista que no es la suya.**
+
 **Y ahí salió un fallo que llevaba escondido desde siempre: la nota de la fiesta
 que arma el día no llegaba al informe.** `evento_ancla` llevaba nombre,
 municipio, franja, hora y distinción, pero **no `no`** — y **113 de las 138
@@ -644,8 +673,8 @@ fiestas a menos de 8 km y comprueba que salgan las dos. Referencia: 20 días,
 programa o por el aviso de la lejana, que los tres valen—, **0 casos de una
 fiesta de noche tapando a una de día** y 9 con sitios para cenar.
 Y cierra midiendo si colocar la fiesta sirve de algo: arma el día desde su
-propio pueblo con las coordenadas y sin ellas. Referencia: **81 fiestas con
-sitio, 35 días cambian (43%); de las 31 que están a más de 1 km del casco,
+propio pueblo con las coordenadas y sin ellas. Referencia: **87 fiestas con
+sitio, 36 días cambian (41%); de las 31 que están a más de 1 km del casco,
 cambian 24 (77%)**. Ojo con ese bloque: tiene que mutar el `EVENTOS` que
 **exporta `banco.js`**, no el que `lote.js` lee del fichero con `eval` — con la
 copia, quitarle las coordenadas no cambia nada y el porcentaje sale 0%, o sea

@@ -1,0 +1,35 @@
+{
+ "tipo": "sitios",
+ "sitios": [
+  {
+   "n": "Romería Chica y Baile Romero tras la bajada del Santo",
+   "m": "Garachico",
+   "lugar": "Casco histórico de Garachico"
+  },
+  {
+   "n": "Recepción del Pendón de la Villa, procesión nocturna y fuegos",
+   "m": "Garachico",
+   "lugar": "Casco histórico de Garachico"
+  },
+  {
+   "n": "Gran Romería de San Roque",
+   "m": "Garachico",
+   "lugar": "Casco histórico de Garachico"
+  },
+  {
+   "n": "Carnaval de Santa Cruz",
+   "m": "Santa Cruz de Tenerife",
+   "lugar": "Casco histórico de Santa Cruz"
+  },
+  {
+   "n": "Nuestra Señora del Carmen",
+   "m": "Guía de Isora",
+   "lugar": "Conjunto Histórico de Guía de Isora"
+  },
+  {
+   "n": "Pregón de las Fiestas e Izado de la Bandera",
+   "m": "Garachico",
+   "lugar": "Casco histórico de Garachico"
+  }
+ ]
+}
