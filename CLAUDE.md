@@ -811,6 +811,33 @@ restaurante está mal ubicado, tiene razón: vive allí.
   `guagua_mas_cercana`, así que no se oculta, pero está sin decidir si debería
   descartarlas. Probé a penalizar el cierre y a acortar el radio sin coche: no
   mejoró nada medible y empeoraba esto, así que se quitó.
+- **¿Hay que fichar los caseríos de cada municipio?** Zeben lo preguntó al ver
+  lo de Los Abrigos: «entonces lo tendrías que hacer con Bajamar, Punta del
+  Hidalgo, San Andrés… ¿no?». Medido, y la respuesta es **no**: esos ya están
+  cubiertos, y no por una ficha de pueblo sino por sus propios sitios, que es
+  lo que el motor necesita.
+
+  | núcleo | sitios a <2 km | restaurantes a <2 km |
+  |---|---|---|
+  | Bajamar | 3 (sus piscinas a 0 km) | 7 |
+  | Punta del Hidalgo | 6 (la iglesia de San Mateo a 0,4) | 8 |
+  | San Andrés | 3 (el búnker, Las Teresitas) | 7 |
+  | **Los Abrigos** | **1, y es una playa que no es la suya (1,2 km)** | **0** (lo más cerca a 2,1) |
+  | **Charco del Pino** | **0** (lo más cerca a 2,9 km) | **0** (a 6,4 km) |
+  | **Los Blanquitos** | **1, el museo de Granadilla a 1,8 km** | **0** (a 6,9 km) |
+
+  Tegueste no entra: es municipio propio y tiene su centro en `BASES`.
+  Y el barrido de toda la isla lo confirma. **Los restaurantes marcan dónde hay
+  pueblo**: agrupando los 318 por cercanía (700 m) y mirando si hay algún
+  `LUGAR` a menos de 2 km, **solo UN grupo de dos o más se queda sin nada** —
+  dos guachinches de la medianía de Tegueste, con la iglesia de San Lázaro a
+  2,7 km. O sea que el catálogo cubre la isla mucho mejor de lo que parecía; el
+  hueco es **una esquina concreta**, la costa y las medianías de Granadilla.
+  Ojo con cómo se mide esto: la primera vez puse Bajamar de memoria y me salió
+  2,2 km al oeste de donde está, así que el catálogo parecía tener un agujero
+  que no tenía. **Las coordenadas de un núcleo se sacan de un dato, no de la
+  cabeza** — la ficha de sus piscinas, o de sus restaurantes.
+
 - **Cuando no hay foto, telón del pueblo.** Para 203 fichas (iglesias, cascos,
   museos, caseríos) la ortofoto aérea solo enseñaba un tejado. Ahora esas usan
   la estampa de su municipio **desenfocada** detrás del icono: se queda el
