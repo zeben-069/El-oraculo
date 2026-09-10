@@ -90,6 +90,9 @@ buscar-nucleos.html           esa página, lista para abrir
 eventos.js                    arma la página de pegar fiestas, y mete las marcadas
 plantilla-sitios.html         el molde de la página de dónde es cada fiesta
 sitios-fiestas.html           esa página, lista para abrir
+instagram.js                  el contenido de la semana para la cuenta de Naira
+plantilla-instagram.html      su molde
+instagram.html                esa página, lista para abrir
 avisar-fiestas.js             qué fiestas llegan sin programa cargado
 vigilar-agenda.js             mira si hay novedades en lagenda.org
 plantilla-eventos.html        su molde
@@ -996,7 +999,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | Registro de **locales de hostelería** (9.652 filas, con `latitud`/`longitud`) | 10 sep | **Este es el que se me pasó.** Ahora entra por `hosteleria.js`: 76 fichas nuevas y los cuatro pueblos sin donde comer, cerrados |
 | Los 16 ficheros de datos abiertos del Cabildo | 10 sep | Ver la tabla de abajo, uno por uno |
 | La extensión de Netlify | 10 sep | Con ella se ve el proyecto, los despliegues y las variables desde aquí. Confirmó que **la clave está puesta** y que **lo publicado era del 8 de septiembre**, una semana por detrás de la rama |
-| El Instagram de Naira | 9 sep | Suyo, hecho a mano. Todavía no toca nada del proyecto: la web no lo enlaza y la imagen de compartir (`img/naira-social.jpg`) sigue siendo la de siempre |
+| El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
 había usado todos los datos o solo la mitad. Medido fichero a fichero, cruzando
@@ -1566,6 +1569,46 @@ Lo que sigue **sin usar** de lo suyo, y por qué:
   más. La solución de verdad para eso es **streaming**: el texto va llegando
   según se escribe, no se agota ninguna espera y además el turista lo ve
   aparecer en vez de mirar tres puntitos medio minuto.
+
+- **El Instagram: el contenido sale de los datos, publicar lo hace él.**
+  Zeben abrió la cuenta y preguntó si se podía montar un agente que se la
+  administrara. Publicar solo se puede —Instagram lo permite con cuenta de
+  empresa, una app en Meta y un token—, pero eso es darle permiso de publicar a
+  un programa en su cuenta, y encima obliga a un papeleo que él no tiene por
+  qué hacer. Y lo que falta no es el botón de publicar: es **saber qué contar
+  cada semana**. Eso sí está en los datos.
+  `node instagram.js` (21 días por defecto) escribe **`instagram.html`**: un
+  post por fiesta y uno por pueblo-y-día con programa cargado, cada uno con su
+  foto, su texto en los tres idiomas, sus etiquetas y su crédito. Se copia y se
+  publica a mano. Lo que hace única a esta cuenta es lo mismo que hace única a
+  la web: **el calendario de los 31 municipios**, que no lo publica nadie más.
+  Las reglas de la casa, aquí también:
+  · **No se inventa nada.** El texto se arma con nombre, pueblo, día, hora,
+    sitio y la nota, y si no hay nota dice menos.
+  · **El nombre de la fiesta no se traduce**, que es como lo va a ver escrito
+    en el cartel de la plaza. Se traduce lo que ES. Y **verbena y romería se
+    quedan en español** con media frase que las explique.
+  · **La nota del catálogo solo va en español.** Está escrita a mano y en el
+    motor la traduce el modelo; aquí no hay modelo, y pasarla por una tabla
+    sería reescribirla. Así que se queda en español **y la página lo avisa**,
+    que si no el texto bueno se pierde sin que nadie se entere. Son 6 de 10
+    en las tres semanas de prueba.
+  · **La foto lleva su crédito**: de las 47, 33 son de Commons con autor y
+    licencia, y eso va en el pie del post.
+  Y la trampa que se vio a la primera, que es una vieja conocida un piso más
+  abajo: la primera versión elegía «el sitio de más peso del municipio» y a la
+  **Fiesta del Cristo de La Laguna le puso una foto de Chinamada**, que es un
+  caserío de Anaga. En un término que va del casco a Anaga y a Punta del
+  Hidalgo, «del mismo municipio» no quiere decir «de al lado» — lo mismo que
+  pasaba con el centroide de La Orotava. Ahora la foto se elige **por
+  kilómetros desde donde es la fiesta**, con techo de 8 km, y **a partir de 3
+  la página avisa** para que él decida. Con eso, el Cristo saca la Fundación
+  Cristino de Vera, a 200 metros.
+  La imagen se baja recortada a 1080 y cuadrada, **sin texto quemado dentro**:
+  el texto va en el pie, donde se puede leer, copiar y traducir. Un cartel con
+  las letras dentro no vale para tres idiomas.
+  Lo publicado se marca en la página y **el navegador lo recuerda**, así que
+  volver a abrirla no obliga a acordarse de por dónde iba.
 
 - **Búsqueda web: decidido que NO, por ahora.** Rompería el sello de «todo
   sale del informe», que es lo que diferencia a Naira. Y nunca para
