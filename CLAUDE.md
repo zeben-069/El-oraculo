@@ -20,6 +20,32 @@ Cuando él dice que algo está mal, está mal.
 
 Desplegado en Netlify: `https://leafy-cobbler-d24e23.netlify.app`
 
+**Y desde el 10 de septiembre se puede mirar desde aquí.** Zeben instaló la
+extensión de Netlify, y con ella se ve el proyecto, los despliegues y las
+variables de entorno sin salir de la sesión. Eso cierra una pregunta que
+llevaba semanas abierta —«¿está puesta la clave?»— y abre un camino que antes
+no había: **desplegar sin el zip**.
+Lo que se vio al asomarse la primera vez:
+· El sitio es `e84eebf4-6891-40d8-a3b8-ae1ba8b155c0`, del equipo
+  `69bdca29865a3ff4d7482763`, y las dos funciones están desplegadas.
+· **La clave SÍ está.** Hay dos variables, `AEMET_KEY` y `MIAPY_KEY`, las dos
+  marcadas como secretas. El nombre da igual: `buscarClave()` recorre TODAS las
+  variables y se queda con la que **empieza por `sk-ant-`**, así que se puede
+  llamar como sea. Eso descarta de una vez la hipótesis de la clave y deja el
+  reloj y el freno como únicos sospechosos de que la web narre en local.
+  Ojo con un detalle: `MIAPY_KEY` está **vacía en el contexto `dev`**. En
+  producción está puesta, así que no afecta al turista, pero si algún día se
+  prueba con `netlify dev` va a parecer que no hay clave.
+· **Lo publicado se queda viejo sin que se note.** El despliegue vivo era del
+  8 de septiembre y decía «Build from drop deployment»: o sea, el zip de
+  aquella tarde. Toda una semana de trabajo —el calendario con los actos, las
+  fiestas con su sitio, los 63 miradores, los 76 restaurantes, las paradas de
+  guagua— estaba en la rama y no en la web. **Mirar la fecha del despliegue es
+  ahora parte de dar algo por hecho.**
+Y lo que la extensión **no** arregla: desde el contenedor sigue sin poder
+llamarse a la web (403 en el proxy, como con GRAFCAN y Commons), así que
+`…/functions/naira?probar=1` hay que abrirlo desde casa.
+
 ## Estructura
 
 ```
@@ -969,6 +995,8 @@ vez que entre algo nuevo, se apunta aquí.**
 | Registro de **establecimientos** (13.678 filas, csv y json) + su diccionario | 10 sep | Solo la calle, sin coordenadas. De ahí salen **43 fichas con `pos_aprox`** |
 | Registro de **locales de hostelería** (9.652 filas, con `latitud`/`longitud`) | 10 sep | **Este es el que se me pasó.** Ahora entra por `hosteleria.js`: 76 fichas nuevas y los cuatro pueblos sin donde comer, cerrados |
 | Los 16 ficheros de datos abiertos del Cabildo | 10 sep | Ver la tabla de abajo, uno por uno |
+| La extensión de Netlify | 10 sep | Con ella se ve el proyecto, los despliegues y las variables desde aquí. Confirmó que **la clave está puesta** y que **lo publicado era del 8 de septiembre**, una semana por detrás de la rama |
+| El Instagram de Naira | 9 sep | Suyo, hecho a mano. Todavía no toca nada del proyecto: la web no lo enlaza y la imagen de compartir (`img/naira-social.jpg`) sigue siendo la de siempre |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
 había usado todos los datos o solo la mitad. Medido fichero a fichero, cruzando
