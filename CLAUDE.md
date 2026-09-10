@@ -854,7 +854,8 @@ de una parada, y el plan sin coche se separa más del plan con coche.
 Y cierra con los **actos**: por cada día y municipio con programa cargado,
 un plan con niños y otro sin ellos —380 planes—. Lo que se vigila ahí no es la
 dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: de los
-**648 actos cargados**, **421 ofrecidos**, **0 ofrecidos a quien no toca** y **0 sin clasificar
+**648 actos cargados** (93 niños, 184 noche, 371 que se callan a propósito),
+**480 ofrecidos**, **0 ofrecidos a quien no toca** y **0 sin clasificar
 ofrecidos**. Esos dos ceros son la prueba de toda la regla.
 
 Y el último bloque, **otras fiestas y la cena**: barre los días que tienen dos
@@ -1443,6 +1444,39 @@ Lo que sigue **sin usar** de lo suyo, y por qué:
   «Noche de Humor y Magia» de las once de la noche, y `humor` marcaba como acto
   de noche el «Cross Humorístico» de las cuatro de la tarde. Ahora es
   `noche de humor|humorista`.
+
+  **Y cuando el catálogo dobló, la clasificación se quedó corta.** Zeben lo cazó
+  con una pregunta de las buenas: «¿por qué solo ofreces 421 actos si hay 620?».
+  Los dos números no medían lo que parecía —el 421 es la SUMA de 380 planes de
+  prueba, no actos distintos (son 239), y el 620 es cuántos tienen el sitio
+  fichado, que es otro campo—, pero al comprobarlo salió algo de verdad: las
+  reglas de `q` se escribieron con 300 actos y con 648 se caían cosas que sí
+  valen —la Feria del Pescado, la Fiesta de la Cerveza, el Pasacalle de la
+  comparsa, la Zumba en la playa—.
+  Esas palabras **no dicen para quién es**: un pasacalle a las once de la mañana
+  es de niños y uno a las diez de la noche no. Así que decide la **hora**, que es
+  lo que eligió Zeben: antes de las 18:00 a niños, de ahí en adelante a dos
+  adultos. Son 31 actos más, de 246 a 277 clasificados y de 421 a 480 ofrecidos.
+  **Las dos vueltas que costó son la misma lección dos veces:**
+  · La primera versión buscaba `actuación` en cualquier parte del nombre y coló
+    «Misa cantada, recorrido procesional y actuación del Grupo Folklórico» como
+    acto para niños, y un «Almuerzo de convivencia con la actuación de…»
+    también. **La regla va anclada al principio**: importa lo que el acto ES, no
+    lo que menciona de pasada.
+  · Y al meter un guardián (`NO_ES_PARA_NADIE`: misas, torneos, plenos) lo puse
+    delante de TODO y se llevó **21 actos que ya estaban bien**: un «Gran Baile
+    de Fin de Fiestas con las orquestas Sabrosa, Guaracha… y entrega de trofeos»
+    dejaba de ofrecerse por el final de su nombre, y una «Procesión… y fuegos
+    artificiales» de las nueve también. El guardián va **solo delante de la regla
+    de la hora**: las reglas explícitas saben lo que dicen, y él solo está para
+    que la hora no se invente lo que no sabe.
+  **Lo que esto NO resuelve, y hay que saberlo:** `q` es **excluyente**
+  —`a.q===q` en `actosDelDia()`—, así que una feria de artesanía de las once de
+  la mañana deja de ofrecérsele a una pareja. Hoy no hay manera de decir «esto
+  vale para los dos». La lista de los 31 se le pasó en
+  `actos-reclasificados.md` para que corrija los que estén en la caja que no
+  toca; si hace falta un tercer valor, es una línea en `actosDelDia()` y otra en
+  la comprobación de `lote.js`.
   Hubo un desacuerdo de fecha —los **Fuegos de la Víspera** del Cristo: el
   artefacto el 14 a las 00:00, nosotros el 13—, y lo resolvió Zeben: **manda el
   artefacto**. Hay fuegos las dos noches y son distintos: los de la víspera
