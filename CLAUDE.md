@@ -47,6 +47,7 @@ empaquetar.js                 arma el zip que se suelta en Netlify Drop
 probar-aereo.html             prueba en casa qué ortofoto contesta
 fusionar.js                   junta sitios repetidos (ensayo sin tocar nada)
 hosteleria.js                 rellena con el registro del Cabildo donde falta comer
+guaguas.js                    le pone a cada ficha su parada de guagua
 fotos.js                      la lista de fotos que faltan, y las mete
 fotos-encargo.md              esa lista para encargársela a otro (con reglas)
 fotos-buscar.js               busca candidatas en Commons (se ejecuta en su máquina)
@@ -168,6 +169,14 @@ rivales cargaban con la penalización de la guagua. Se ofrecen aparte, en
 **Sin coche manda la guagua.** 3.872 paradas de TITSA cruzadas: cada ficha
 tiene `bus` en metros. Antes «sin coche» solo acortaba el radio y salía el
 mismo plan que con coche en cuatro de cuatro bases.
+Ese cruce se rehace con **`guaguas.js`**, y hay que rehacerlo cada vez que
+entren fichas nuevas: se hizo una vez a mano y no quedó herramienta, así que
+los 63 miradores, los caseríos y los 76 restaurantes del registro entraron
+**sin `bus`** — 215 fichas mudas para quien va en guagua. Comprobado antes de
+tocar nada: de los 542 sitios que ya lo tenían, **537 dan el mismo número
+recalculando (99%)**; los 5 que no salen de `fusionar.js`, que al juntar fichas
+repetidas se quedó a propósito con la parada más cercana de todo el grupo, y
+por eso la herramienta **nunca pisa un `bus` que ya esté puesto**.
 
 **Con niños gana lo divertido.** +9 a lo apto y divertido (playa, charco,
 piscina, parque, museo, jardín marcados «niños: Sí»), +3 a todo lo marcado
@@ -489,7 +498,11 @@ que la de Los Abrigos empieza con el desembarco de San Blasito en la playa de
 Agua Dulce y acaba en el muelle pesquero. Pero el PUNTO sigue faltando, y no se
 inventa. Se buscó por si estaba en algún dato de la casa: las paradas de TITSA
 solo se guardaron como nombre y metros desde cada ficha, no como coordenadas, y
-ninguna cae en esos tres pueblos. Así que se hace como los miradores y las
+ninguna cae en esos tres pueblos. (Ojo: eso era verdad de NUESTROS datos, no de
+la fuente. El fichero de paradas del Cabildo sí trae `latitud` y `longitud` de
+las 3.872, y ahora se lee con `guaguas.js`. Aun así la conclusión no cambia: una
+parada de guagua no es un caserío, y ninguna de esas tres romerías se ubica por
+ahí.) Así que se hace como los miradores y las
 fotos: lo pregunta el navegador de casa.
     node nucleos.js buscar        arma buscar-nucleos.html
     node nucleos.js nucleos.json  mete los que vengan marcados
@@ -782,9 +795,11 @@ estaban fichados.
 Y un bloque de **perfiles**: el mismo día en cuatro versiones (coche/guagua ×
 pareja/niños) desde las 31 bases. Referencia: 0 sitios no aptos con niños, 71%
 de paradas «niños: Sí» con niños contra 23% en pareja, 59% de tipo divertido,
-2% de planes iguales entre pareja y niños, 53% iguales entre coche y guagua
-—esos son legítimos: sitios que ya están junto a una parada— y 210 m de media
-a la guagua sin coche.
+2% de planes iguales entre pareja y niños, 47% iguales entre coche y guagua
+—esos son legítimos: sitios que ya están junto a una parada— y 213 m de media
+a la guagua sin coche. Ese 47% era 53% antes de `guaguas.js`: con las 215
+fichas mudas ya medidas, el motor puede descartar de verdad lo que queda lejos
+de una parada, y el plan sin coche se separa más del plan con coche.
 
 Y cierra con los **actos**: por cada día y municipio con programa cargado,
 un plan con niños y otro sin ellos —208 planes—. Lo que se vigila ahí no es la
@@ -931,6 +946,26 @@ vez que entre algo nuevo, se apunta aquí.**
 | Cinco fechas de romería corregidas | 7 sep | En dos de ellas **no valía ninguna de las dos que teníamos** |
 | Registro de **establecimientos** (13.678 filas, csv y json) + su diccionario | 10 sep | Solo la calle, sin coordenadas. De ahí salen **43 fichas con `pos_aprox`** |
 | Registro de **locales de hostelería** (9.652 filas, con `latitud`/`longitud`) | 10 sep | **Este es el que se me pasó.** Ahora entra por `hosteleria.js`: 76 fichas nuevas y los cuatro pueblos sin donde comer, cerrados |
+| Los 16 ficheros de datos abiertos del Cabildo | 10 sep | Ver la tabla de abajo, uno por uno |
+
+**Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
+había usado todos los datos o solo la mitad. Medido fichero a fichero, cruzando
+cada uno contra el catálogo:
+
+| fichero | qué trae | qué se ha hecho |
+|---|---|---|
+| `paradasdeguagua.csv` / `.geojson` | 3.872 paradas **con coordenada** | Se usó una vez para el campo `bus` y **no quedó herramienta**, así que 215 fichas nuevas se quedaron mudas. Cerrado con `guaguas.js`: quedan 4 sitios sin parada, los 4 que no tienen coordenada |
+| `itinerarios__titsa1.csv` | 225 itinerarios del Cabildo, columnas BIEN puestas | Es `datos/senderos-tenerife.js`. **112 están fichados en `LUGARES` y los 112 cuadran** al metro con este fichero |
+| `itinerarios.geojson` y `itinerarios.geojson_1` | los mismos 225, con el trazado (15 MB cada uno, y son el mismo fichero dos veces) | De aquí solo se sacan los datos, no el trazado: el mapa dibuja las paradas del día, no la línea del sendero. Y **traen las etiquetas corridas** —`itinerario_distancia` contiene la altura máxima—, que es la trampa que ya está apuntada arriba |
+| `diccionariodedatosdeitinerarios.json` | el esquema de esas columnas | Es lo que demuestra que el geojson las trae mal y el csv bien |
+| `puntosdeinteres.geojson` | 191 puntos con descripción | **179 ya están** (mismo nombre o a menos de 150 m). Los 12 de fuera son 8 árboles monumentales al borde de un sendero, una oficina de turismo, un lagar y un lomo |
+| `bic_inmuebles.geojson` | 199 Bienes de Interés Cultural | **141 ya están.** De los 58 restantes, 41 son zonas arqueológicas y sitios históricos sin acceso ni visita —no son sitios a los que se manda a un turista— |
+| `bic_inmuebles_entornos.geojson` | 125 polígonos | **No se usa y no hace falta**: es el perímetro de protección alrededor de cada BIC, no un sitio |
+| `equipamientos.geojson` | 101 equipamientos del monte | De los 37 visitables (áreas recreativas, miradores, centros de visitantes) **36 ya están**. El que falta es el Aula en la Naturaleza del Barranco de la Arena |
+| `actividadesenlanaturaleza.json` | 47 actividades, 23 con coordenada | **No se usa**: son permisos —acampada, barranquismo, escalada, estancia de grupos—, con aforo y solicitud previa. No es plan de un día para quien viene de vacaciones. Sus áreas recreativas ya están fichadas por otro lado |
+| `miradores.geojson.json` | los 18 miradores de Santa Cruz | Es `datos/miradores.js`, y arriba está medido por qué no aporta: 7 están dentro del Palmetum y 10 de los 11 restantes ya están en `LUGARES` |
+| `senderos_anaga.geojson.json` | 148 tramos **con el trazado de la línea** | `datos/senderos-anaga.js` sigue sin usarse, pero **la razón que había apuntada ya no vale**: decía que el csv no traía la geometría, y este geojson sí la trae. La razón buena es otra: hoy el mapa no dibuja el recorrido de un sendero, así que no hay dónde ponerla |
+| `establecimientos…csv` / `.json` + diccionario | los 13.678 sin coordenada | Los 43 restaurantes con `pos_aprox` |
 
 Lo que sigue **sin usar** de lo suyo, y por qué:
 · De los 9.652 locales del registro, los **5.587 que no son de comer** —bares,
@@ -942,6 +977,11 @@ Lo que sigue **sin usar** de lo suyo, y por qué:
   propio; se meterán el día que se vea un pueblo sin nada para rematar.
 · El aforo (`aforo_interior`, `aforo_terraza`) del otro registro. El aviso de
   aforo existe pero no lo usa nadie todavía.
+· Del Cabildo, lo que la tabla de arriba marca sin usar: los entornos de los
+  BIC, las actividades con permiso, el trazado de los senderos de Anaga y 12
+  puntos de interés —ocho de ellos árboles monumentales al borde de un camino—.
+  Ninguno se queda fuera por pereza: o ya está cubierto por otra ficha, o no es
+  un sitio al que se manda a un turista, o no hay dónde pintarlo.
 
 ## Pendiente
 
@@ -996,8 +1036,8 @@ Lo que sigue **sin usar** de lo suyo, y por qué:
 - Los nombres del registro que venían dados la vuelta ya están enderezados
   («Heladeria, la» → «La Heladería»; «El Tanque, Espacio Cultural» → «Espacio
   Cultural El Tanque»). Si se importa más registro, volverán a aparecer.
-- Sin coche salen paradas a 1,7–2,3 km de la parada de guagua (19 de 744
-  planes barridos, todas senderos y paisajes). El informe lo dice en
+- Sin coche salen paradas lejos de la guagua (6 de los 372 planes de perfil,
+  todas senderos y paisajes de monte; la media está en 213 m). El informe lo dice en
   `guagua_mas_cercana`, así que no se oculta, pero está sin decidir si debería
   descartarlas. Probé a penalizar el cierre y a acortar el radio sin coche: no
   mejoró nada medible y empeoraba esto, así que se quitó.
