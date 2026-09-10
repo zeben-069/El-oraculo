@@ -578,13 +578,17 @@ const lemaTr=e=>!e?'':(S.idioma==='en'?(e.lema_en||e.lema):S.idioma==='de'?(e.le
 const HORAS={
  en:{dias:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
      letras:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
-     pal:[[/todos los d[íi]as/gi,'every day'],[/hasta las/gi,'until'],[/hasta/gi,'until'],
+     /* La frase entera va primero: 119 fichas del registro no traen horario y
+        salen con este aviso; troceada por palabras quedaba medio inglesa. */
+     pal:[[/Horario sin confirmar: llamen antes/gi,'Opening hours not confirmed: call ahead'],
+          [/todos los d[íi]as/gi,'every day'],[/hasta las/gi,'until'],[/hasta/gi,'until'],
           [/cerrad[oa]s?/gi,'closed'],[/solo mediod[íi]a/gi,'lunchtime only'],[/s[óo]lo|solo/gi,'only'],
           [/mediod[íi]a/gi,'lunchtime'],[/noche/gi,'evening'],[/festivos/gi,'public holidays'],
           [/abre/gi,'opens'],[/tambi[ée]n/gi,'also'],[/\by\b/gi,'and']]},
  de:{dias:['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
      letras:['So','Mo','Di','Mi','Do','Fr','Sa'],
-     pal:[[/todos los d[íi]as/gi,'täglich'],[/hasta las/gi,'bis'],[/hasta/gi,'bis'],
+     pal:[[/Horario sin confirmar: llamen antes/gi,'Öffnungszeiten nicht bestätigt: bitte vorher anrufen'],
+          [/todos los d[íi]as/gi,'täglich'],[/hasta las/gi,'bis'],[/hasta/gi,'bis'],
           [/cerrad[oa]s?/gi,'geschlossen'],[/solo mediod[íi]a/gi,'nur mittags'],[/s[óo]lo|solo/gi,'nur'],
           [/mediod[íi]a/gi,'mittags'],[/noche/gi,'abends'],[/festivos/gi,'Feiertage'],
           [/abre/gi,'öffnet'],[/tambi[ée]n/gi,'auch'],[/\by\b/gi,'und']]}

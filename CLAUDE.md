@@ -46,6 +46,7 @@ datos/miradores.js            18 miradores de Santa Cruz
 empaquetar.js                 arma el zip que se suelta en Netlify Drop
 probar-aereo.html             prueba en casa qué ortofoto contesta
 fusionar.js                   junta sitios repetidos (ensayo sin tocar nada)
+hosteleria.js                 rellena con el registro del Cabildo donde falta comer
 fotos.js                      la lista de fotos que faltan, y las mete
 fotos-encargo.md              esa lista para encargársela a otro (con reglas)
 fotos-buscar.js               busca candidatas en Commons (se ejecuta en su máquina)
@@ -87,7 +88,9 @@ Dentro de `index.html`, como constantes:
 
 - `LUGARES` (644) — sitios que visitar. Solo 4 sin coordenadas. **88 son
   miradores**, y 41 llevan `pos_aprox` porque su coordenada es estimada.
-- `REST` (318) — restaurantes, incluidas 38 heladerías.
+- `REST` (394) — restaurantes, incluidas 38 heladerías. **128 salen del
+  registro del Cabildo** (`reg`): 43 del fichero que solo trae la calle, con
+  `pos_aprox`, y 76 del que trae coordenadas, metidos con `hosteleria.js`.
 - `EVENTOS` (138) — fiestas. Municipio y corredor siempre; **127 fichas (87
   fiestas × sus años) llevan ya `la`/`lo`/`lu`**, colocadas por Zeben con
   `node eventos.js sitios`, y entonces mandan ellas sobre el casco del pueblo.
@@ -541,6 +544,48 @@ paran en su propio pueblo, y de paso el plan de Granadilla deja de quedarse en
 dos paradas. Lo que **no** se arregla es la comida: en esas medianías no hay ni
 un restaurante fichado —el más cercano está a 6 km—, así que la bandera
 COMIDA-LEJOS de Granadilla sigue ahí y ahora se sabe exactamente por qué.
+(Eso se arregló después, con `hosteleria.js`: la comida sí estaba, en un
+fichero que yo no había abierto.)
+
+**Y donde no había donde comer, sí lo había: `hosteleria.js`.** Esto empieza
+con un enfado suyo, y el enfado era justo. El catálogo de comer son 318 fichas
+escritas a mano, con horario, nota y valoración, y tenía cuatro agujeros
+grandes —Granadilla, San Miguel, Adeje y Arona sin **ni uno** a menos de dos
+kilómetros de su casco—. Yo lo di por escasez de la isla y lo escribí aquí. No
+lo era: era que hay **dos** ficheros del registro del Cabildo y estaba mirando
+el que no trae coordenadas. El otro, «locales de hostelería y restauración»,
+trae 9.652 locales con `latitud`, `longitud` y teléfono, 4.065 de ellos de
+comer, y me lo había mandado él hacía rato.
+Lo que hace la herramienta, y sobre todo lo que **no** hace:
+· **No vuelca las 4.065.** Eso sería cambiar un catálogo escrito a mano por un
+  listín, y de paso triplicar lo que baja el navegador. Rellena solo donde
+  falta, y hasta un mínimo: mira los puntos donde el motor arma el día —los 31
+  cascos **y el sitio de cada fiesta**, que la Romería de Los Abrigos acaba en
+  el muelle, a nueve kilómetros del casco—, y si junto a uno no hay **4** sitios
+  de comer a 2 km, trae los más cercanos que haya a menos de 3. Fueron **76**.
+· **No se inventa el horario.** El registro dice que el local tiene licencia, no
+  a qué hora abre. Así que la ficha entra con el mismo aparejo que ya usaban las
+  43 del otro registro: `h` diciendo «Horario sin confirmar: llamen antes», el
+  teléfono, `ojo` con la calle y `reg`/`of` con la fuente. Y no hizo falta tocar
+  el motor para que no estorben: la lista de comer ordena por `nota_g` y estas
+  no tienen ninguna, así que **solo salen donde no hay una ficha buena cerca**,
+  que es justo para lo que se meten. Tampoco entran en la cena, que ahí sí se
+  exige un horario escrito que llegue a las 20:30.
+· **Un mismo local con tres licencias es uno.** «Sarras», «Tasca La Zurrapa» y
+  «Tasquita El Pimentón» están en Arico a veinte metros y comparten el
+  922 76 84 86: es una casa con tres papeles. El teléfono lo delata mejor que el
+  nombre. Y hay fichas que se llaman «Restaurante» a secas, que se tiran: no se
+  puede decirle a nadie «coman en Restaurante».
+· El municipio del registro se escribe distinto («San Miguel», «Güimar», «La
+  Laguna»), así que se compara sin acentos ni artículos contra los 31 que ya
+  existen, como con el padrón. Y el **corredor sale del vecino fichado más
+  cercano**, no del municipio, la misma regla que con los miradores.
+Resultado: **ningún municipio se queda sin donde comer junto a su casco**, y la
+bandera COMIDA-LEJOS pasa a **cero** en los tres barridos de `lote.js`.
+Lo que hay que saber para fiarse de esto: **7.600 de las 9.652 fichas tienen la
+última actualización entre 2015 y 2018**, así que alguna habrá cerrado. Por eso
+entran diciendo que se llame antes y por eso van detrás de las escritas a mano,
+nunca delante.
 
 **Y ahí salió un fallo que llevaba escondido desde siempre: la nota de la fiesta
 que arma el día no llegaba al informe.** `evento_ancla` llevaba nombre,
@@ -567,7 +612,8 @@ almuerzo, pero un día que acaba en una verbena a las nueve o en unos fuegos a
 las once se cena cerca de la plaza y se baja andando. `cenar_cerca_de_la_fiesta`
 busca a **3 km del centro del pueblo** donde es la cosa —una plaza se va
 andando—, abiertos ESE día y con un horario escrito que llegue a las 20:30: son
-206 de los 318. El horario es texto libre, así que **no se afirma que abra**: se
+206 de los 394 — las 76 del registro no entran aquí: sin horario escrito no se
+puede decir que abran de noche. El horario es texto libre, así que **no se afirma que abra**: se
 manda tal cual, con el teléfono, y el prompt manda decir que llamen si van
 justos. Sale en 10 de los 21 días con dos fiestas; los otros 11 son pueblos
 —Arafo, Vilaflor, La Guancha— sin nada fichado abierto de noche a esa distancia,
@@ -664,9 +710,16 @@ desnivel, todo corrido. `cabeceras-senderos.js` lee por posición.
 Reconstruir el nombre bonito da «Santa Cruz De Tenerife» y «GÜImar». Lo que
 funciona es comparar sin acentos ni artículos contra los que ya existen.
 
-**El registro de hostelería no trae coordenadas**, solo la calle. Lo que se
-añade desde ahí va con `pos_aprox`, y entonces el botón de mapa busca por
-nombre en vez de navegar a una chincheta inventada.
+**Hay DOS registros del Cabildo y no son el mismo.** Esto costó un agujero de
+catálogo entero. El de **establecimientos** (13.678 filas) trae la calle y NO
+trae coordenadas: lo que se añade desde ahí va con `pos_aprox`, y entonces el
+botón de mapa busca por nombre en vez de navegar a una chincheta inventada.
+El de **locales de hostelería y restauración** (9.652 filas) sí trae
+`latitud`, `longitud` y teléfono, y es el que llena los agujeros. Aquí escribí
+que «el registro no trae coordenadas» a secas, di por bueno que en San Miguel
+no había ni un restaurante, y lo que pasaba es que estaba mirando el fichero
+equivocado. **Cuando lleguen varios ficheros de la misma fuente, hay que abrir
+los dos y comparar las columnas antes de decidir qué se puede hacer con ellos.**
 
 **El mapa encuadra el DÍA, no la carretera hasta el día.** Durmiendo en
 Buenavista con el plan en Santa Úrsula, la cama queda a 39 km y estiraba el
@@ -703,15 +756,16 @@ la hora, así que una referencia con la fecha de hoy cambia sola con el paso de
 las horas. Ya pasó con el bloque de perfiles.
 
 `herramientas-horarios.js` cruza el texto del horario de cada restaurante con
-su array de días abiertos y canta las contradicciones. Referencia: de 318
+su array de días abiertos y canta las contradicciones. Referencia: de 394
 restaurantes, 76 mencionan días de cierre y **cero se contradicen**.
 
 `lote.js` es el que hay que pasar **después de tocar el motor**. Marca
 DISPERSO, SALTO, CIERRE-LEJOS, COMIDA-LEJOS, RECINTO, CURVAS-NOCHE.
-Referencia actual: dispersión mediana 4,3 km, cero banderas salvo 1 plan con la
-comida lejos (Granadilla) y **ningún** día de 2 paradas — eran 3, y el último se
-cerró al fichar Charco del Pino. Eran 3 los de comida lejos, y no era escasez
-de catálogo como se creía: era el filtro de municipio ganándole a la cercanía.
+Referencia actual: dispersión mediana 4,1 km, **cero banderas de todas** y
+**ningún** día de 2 paradas — eran 3, y el último se cerró al fichar Charco del
+Pino. La de comida lejos fueron 3, luego 1 y ahora 0: las dos primeras no eran
+escasez de catálogo, era el filtro de municipio ganándole a la cercanía; la
+última sí era catálogo, y se cerró con `hosteleria.js`.
 
 Trae doce planes **con ancla**, que es el camino que la tabla no
 pisa: el sitio lo elige el turista y `construir()` lo mete antes del bucle.
@@ -720,20 +774,21 @@ sitios no están escritos a mano —se sacan de los datos, el de más peso de
 cada municipio— así que la prueba no se pudre al cambiar el catálogo.
 
 Y cierra con la **escapada**: 4 días desde cada una de las 31 bases, 124 días.
-Referencia: 0 reventones, 0 días por encima de 25 km de dispersión (mediana 8,
-máximo 12,6) y 1 día con la comida a más de 8 km de toda parada — ese es en
-Granadilla, dentro del mismo municipio, que es geografía y no lógica.
+Referencia: 0 reventones, 0 días por encima de 25 km de dispersión (mediana
+4,5, máximo 12,3) y **0 días** con la comida a más de 8 km de toda parada — era
+1, en Granadilla, y no era geografía: era que los restaurantes del casco no
+estaban fichados.
 
 Y un bloque de **perfiles**: el mismo día en cuatro versiones (coche/guagua ×
-pareja/niños) desde las 31 bases. Referencia: 0 sitios no aptos con niños, 67%
-de paradas «niños: Sí» con niños contra 24% en pareja, 61% de tipo divertido,
-1% de planes iguales entre pareja y niños, 54% iguales entre coche y guagua
-—esos son legítimos: sitios que ya están junto a una parada— y 229 m de media
+pareja/niños) desde las 31 bases. Referencia: 0 sitios no aptos con niños, 71%
+de paradas «niños: Sí» con niños contra 23% en pareja, 59% de tipo divertido,
+2% de planes iguales entre pareja y niños, 53% iguales entre coche y guagua
+—esos son legítimos: sitios que ya están junto a una parada— y 210 m de media
 a la guagua sin coche.
 
 Y cierra con los **actos**: por cada día y municipio con programa cargado,
 un plan con niños y otro sin ellos —208 planes—. Lo que se vigila ahí no es la
-dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: 217
+dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: 221
 actos ofrecidos, **0 ofrecidos a quien no toca** y **0 sin clasificar
 ofrecidos**. Esos dos ceros son la prueba de toda la regla.
 
@@ -753,7 +808,7 @@ que la prueba dice que la mejora no sirve.
 Y el último, **el regalo de camino**: barre 124 planes con coche y cuenta en
 cuántos sale un mirador de camino a la primera parada. Referencia: **88
 miradores en el catálogo (41 con posición aproximada), 36% de los planes y
-1,3 km de desvío mediano**. Eran 25 miradores y el 12%, así que este número
+1,1 km de desvío mediano**. Eran 25 miradores y el 12%, así que este número
 mide sobre todo el catálogo, no el motor.
 
 **Con navegador** — `probar-web.js` con Playwright recorre siete flujos en
@@ -854,6 +909,40 @@ restaurante está mal ubicado, tiene razón: vive allí.
 
 ---
 
+## Lo que ha mandado Zeben, y qué se hizo con ello
+
+Esta lista existe porque él preguntó —«no sé de todo lo que te he mandado lo
+que has usado y lo que no»— y porque la pregunta estaba justificada: un fichero
+suyo se quedó cuatro días sin abrir y eso costó un agujero de catálogo. **Cada
+vez que entre algo nuevo, se apunta aquí.**
+
+| qué mandó | cuándo | qué se hizo |
+|---|---|---|
+| El proyecto entero en zip y su `CLAUDE.md` | 23 ago | La base de todo |
+| Capturas de la web (unas 15) | 24 ago – 7 sep | De ahí salieron el mapa con el cartel de «API KEY» encima, el relato plano, el restaurante en el filo del encuadre y el calendario sin rótulo |
+| `.mht` de la página en vivo (3) | 5 y 7 sep | La ortofoto detrás del emoji, que ninguna hipótesis había cazado. **Es la mejor herramienta que tenemos para «no se ve bien en la web»** |
+| Fotos de sitios, tres zips | 3 sep | **47 fichas con foto**: 33 de Commons con su crédito y 14 suyas |
+| Tres programas de fiestas pegados a mano | 5 sep | Los primeros `ACTOS` |
+| Artefacto «Fiestas de Tenerife» de Cowork | 5 sep | **300 actos** de 22 programas |
+| Artefacto «Miradores de Tenerife» de Cowork | 9 sep | **63 miradores nuevos** (88 en total); el regalo de camino pasó del 12% al 36% |
+| `sitios-fiestas.json`, dos tandas | 9 sep | **89 fiestas con su sitio propio**; 26 de las 33 que caen fuera del casco dan ahora un día distinto |
+| Los recorridos de cinco romerías, contados de memoria | 9 sep | La regla de «manda la LLEGADA, no la salida», y dos correcciones mías |
+| Coordenadas de tres caseríos de Granadilla | 9 sep | Charco del Pino y Los Blanquitos, fichados. Los de Los Abrigos no cuadraban y se apartaron |
+| Cinco fechas de romería corregidas | 7 sep | En dos de ellas **no valía ninguna de las dos que teníamos** |
+| Registro de **establecimientos** (13.678 filas, csv y json) + su diccionario | 10 sep | Solo la calle, sin coordenadas. De ahí salen **43 fichas con `pos_aprox`** |
+| Registro de **locales de hostelería** (9.652 filas, con `latitud`/`longitud`) | 10 sep | **Este es el que se me pasó.** Ahora entra por `hosteleria.js`: 76 fichas nuevas y los cuatro pueblos sin donde comer, cerrados |
+
+Lo que sigue **sin usar** de lo suyo, y por qué:
+· De los 9.652 locales del registro, los **5.587 que no son de comer** —bares,
+  cafeterías, discotecas, salones— y los de comer que caen donde ya hay catálogo
+  escrito a mano. No es descarte: es que meterlos todos cambiaría un catálogo
+  por un listín. Si algún día hace falta un desayuno o un sitio de copas, están
+  ahí y `hosteleria.js` sabe leerlos.
+· Las **75 heladerías** del registro. El remate del día ya sale del catálogo
+  propio; se meterán el día que se vea un pueblo sin nada para rematar.
+· El aforo (`aforo_interior`, `aforo_terraza`) del otro registro. El aviso de
+  aforo existe pero no lo usa nadie todavía.
+
 ## Pendiente
 
 - **Partir `index.html`** en varios ficheros.
@@ -871,31 +960,31 @@ restaurante está mal ubicado, tiene razón: vive allí.
   «cambiar dónde comer» lo mantiene.
 - Pocos restaurantes abiertos en domingo en algunos municipios (Arona: 15
   en 18 km). Es escasez de catálogo.
-- **Y hay cuatro pueblos donde no se puede comer EN el pueblo.** Zeben lo
-  preguntó de golpe —«¿no tienes restaurantes en Granadilla?»— y sí los hay,
-  ocho, pero **los ocho están a 9–10 km del casco, todos en El Médano**, y tres
-  son heladerías. En el casco de Granadilla, cero. Medido sobre los 31
-  municipios, mirando sitios de comer (sin heladerías) a menos de 2 km del
-  centro urbano:
+- **Los cuatro pueblos donde no se podía comer EN el pueblo: resuelto, y la
+  lección duele.** Zeben lo preguntó de golpe —«¿no tienes restaurantes en
+  Granadilla?»— y le contesté que sí, ocho, pero los ocho a 9–10 km del casco,
+  todos en El Médano. Medido sobre los 31 municipios, mirando sitios de comer
+  (sin heladerías) a menos de 2 km del centro urbano, salían cuatro con **cero**:
 
-  | municipio | de comer | a <2 km del casco | el más cercano |
-  |---|---|---|---|
-  | San Miguel de Abona | **0** | 0 | no hay ninguno en todo el término |
-  | Adeje | 5 | 0 | 3,8 km |
-  | Arona | 4 | 0 | 5,9 km |
-  | Granadilla de Abona | 5 | 0 | 9,0 km |
-  | Arico · Santiago del Teide · Fasnia | 13 / 6 / 4 | 1 | — |
+  | municipio | antes, a <2 km del casco | ahora |
+  |---|---|---|
+  | San Miguel de Abona | **0** (ninguno en todo el término) | 7 |
+  | Adeje | 0 | 6 |
+  | Arona | 0 | 4 |
+  | Granadilla de Abona | 0 | 8 |
 
-  Los otros 26 tienen de dos para arriba, y los grandes van sobrados: Santa Cruz
-  20, La Orotava 15, La Laguna 15. O sea que **no es el motor ni la lógica de la
-  comida: son cuatro huecos del catálogo**, y explican solos la bandera
-  COMIDA-LEJOS de Granadilla que llevamos arrastrando desde el principio.
-  El motor se defiende como puede y presta del vecino —en San Miguel manda a la
-  Finca Tres Roques, de Vilaflor, a 6,6 km; en Arona a El Dornajo, de Adeje—,
-  que es correcto pero no es lo mismo que comer en el pueblo de la fiesta.
-  **San Miguel de Abona es el caso serio: no tiene NI UN restaurante fichado**, y
-  ahí acaba de colocarse la Romería de San Miguel, que termina en la plaza de la
-  iglesia. Es el sitio por donde más se gana metiendo dos o tres fichas.
+  Escribí que eran «cuatro huecos del catálogo» y que San Miguel era el caso
+  serio porque «no tiene NI UN restaurante fichado». Lo segundo era verdad del
+  catálogo y **mentira de la isla**: el registro de locales del Cabildo trae 120
+  sitios de comer en San Miguel, 197 en Granadilla, 576 en Adeje y 812 en Arona,
+  **con coordenadas**, y ese fichero ya me lo había mandado él. Yo estaba
+  mirando el otro registro, el que solo trae la calle. Zeben se molestó con
+  razón: *«te mandé un montón de archivos con un montón de datos y no has
+  aprovechado»*.
+  Lo arregla **`hosteleria.js`**, abajo. Ahora **ningún municipio se queda a
+  cero** junto a su casco y la bandera COMIDA-LEJOS de `lote.js` está en **cero**
+  en los tres barridos, cuando llevaba desde el principio marcando Granadilla.
+
 - Las comarcas (`co`) usan el **nombre oficial del municipio**. Había seis
   pares duplicados —«Granadilla» y «Granadilla de Abona», «Buenavista» y
   «Buenavista del Norte», «Santa Cruz», «San Miguel», «La Laguna», «Vilaflor»—
