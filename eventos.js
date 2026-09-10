@@ -202,10 +202,46 @@ function sacaLugar(n){
    manda ahí es el infantil. */
 const ACTO_NINOS=/infantil|para (los |l@s )?ni[ñn]os|familiar|para toda la familia|actividades? infantil|pinta ?caras|hinchable|colchoneta|castillo de agua|fiesta de la espuma|globoflexia|payaso|t[íi]teres|marionet|cuentacuentos|taller(es)? infantil|juegos (infantiles|tradicionales|populares)|cine (al aire libre|de verano|en la calle)|circo|cabalgata|mascota|parque acu[áa]tico|espuma|gui[ñn]ol/i;
 const ACTO_NOCHE=/verbena|megaverbena|orquesta|gran baile|baile (del|de|tardeo)|tardeo|\bdj\b|concierto|drag|noche de humor|humorista|rock|festival|fuegos artificiales|fuegos del|fuegos de la|pirotecni|gala|noche de|cata de vinos|romer[íi]a|bailable|parranda/i;
-function clasificaActo(n){
+/* ── Y hay palabras que no dicen para quién es: lo dice la HORA ──
+   Las reglas de arriba se escribieron con 300 actos y ahora hay 648, y el
+   vocabulario nuevo trae cosas que valen para los dos: un pasacalle, una
+   feria, una actuación. Poner esas en una caja fija se equivoca seguro —el
+   «Pasacalle La Leyenda del Pirata Moreque» es a las once de la mañana y es
+   de niños; el de la comparsa Bella Mariana, a las cinco y media, también;
+   una fiesta de la cerveza a las nueve de la noche, no—. Así que decide la
+   hora, que es la misma regla que ya usa el motor para las franjas: **de día
+   a los niños, de noche a dos adultos**.
+   Ojo con lo que esto significa, porque el campo es EXCLUYENTE: lo que se
+   marca `ninos` no lo ven dos adultos y al revés. Una feria de las cinco de
+   la tarde deja de ofrecerse a una pareja. Por eso la lista de lo que cambia
+   se enseña entera y la corrige quien vive aquí. */
+const ACTO_SEGUN_HORA=/^(pasacalles?|feria (del|de la|de los|popular|de artesan|de animales)|fiesta (de la|del) (cerveza|agua|espuma|sombrero)|m[úu]sica en vivo|actuaci[óo]n (de|del)|domingo salser|actividades salseras|tenderete|[IVXL]* ?encuentro (de|anual) (habaneras|solistas|parranderos|tocadores)|zumba|sortija|yincana|gincana)/i;
+const CORTE_NOCHE='18:00';
+/* Y hay palabras que mandan por encima de la hora: si el acto es una misa, un
+   torneo o un pleno, da igual a qué hora sea. Esto está aquí porque la primera
+   versión de la regla no lo tenía y coló «Misa cantada, recorrido procesional
+   y actuación del Grupo Folklórico» como acto para niños, y un «Almuerzo de
+   convivencia con la actuación de…» también. El fallo era buscar «actuación»
+   en cualquier parte del nombre: ahora la regla va **anclada al principio**,
+   porque lo que importa es lo que el acto ES, no lo que menciona de pasada. */
+const NO_ES_PARA_NADIE=/eucarist|misa|rosario|procesi|solemne|novena|triduo|salve|ofrenda|vigilia|confesion|veneraci|bendici|repique|torneo|campeonato|partido|pleno|asamblea|presentaci[óo]n del libro|entrega de (trofeos|premios)|almuerzo de convivencia/i;
+
+function clasificaActo(n,h){
   const t=String(n||'');
+  /* El orden importa, y me costó dos vueltas. El guardián va SOLO delante de
+     la regla de la hora, no delante de todo: puesto arriba se llevaba por
+     delante 21 actos que ya estaban bien clasificados —«Gran Baile de Fin de
+     Fiestas con las orquestas Sabrosa, Guaracha… y entrega de trofeos» dejaba
+     de ofrecerse por el «entrega de trofeos» del final, y una «Procesión… y
+     fuegos artificiales» de las nueve de la noche también—. Las reglas
+     explícitas saben lo que dicen; el guardián solo está para que la hora no
+     se invente lo que no sabe. */
   if(ACTO_NINOS.test(t)) return 'ninos';
   if(ACTO_NOCHE.test(t)) return 'noche';
+  if(ACTO_SEGUN_HORA.test(t) && !NO_ES_PARA_NADIE.test(t)){
+    if(!h) return null;            /* sin hora no se puede decidir: se calla */
+    return (h>=CORTE_NOCHE||h<'06:00') ? 'noche' : 'ninos';
+  }
   return null;                     /* lo que no se sabe, no se ofrece */
 }
 
@@ -247,7 +283,7 @@ function meterActos(fichero,fiesta){
       if(t.h) a.h=t.h;
       const lu=s.lu||x.no||null;
       if(lu) a.lu=lu;
-      const q=clasificaActo(n);
+      const q=clasificaActo(n,t.h);
       if(q) a.q=q;
       /* Un fichero puede traer VARIOS programas a la vez —la agenda de una
          isla entera trae los de quince pueblos—, así que cada fila puede decir
@@ -296,7 +332,7 @@ function reclasificar(){
   const txt=fs.readFileSync(F,'utf8');
   const A=eval(txt+';ACTOS');
   const cambios=[];
-  A.forEach(a=>{ const antes=a.q||null, ahora=clasificaActo(a.n);
+  A.forEach(a=>{ const antes=a.q||null, ahora=clasificaActo(a.n,a.h);
     if(antes!==ahora){ cambios.push({n:a.n,m:a.m,antes,ahora});
       if(ahora) a.q=ahora; else delete a.q; } });
   if(!cambios.length) return console.log('nada que cambiar: los '+A.length+' actos ya están con las reglas de hoy.');
