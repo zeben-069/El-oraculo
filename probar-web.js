@@ -32,28 +32,37 @@ const URL = process.argv[2] || 'https://leafy-cobbler-d24e23.netlify.app';
 const CARPETA = './capturas';
 
 /* Cada guion es un recorrido: una lista de textos de botón a pulsar en orden.
-   Se busca el botón por su texto, que es como lo haría una persona. */
+   Se busca el botón por su texto, que es como lo haría una persona.
+
+   OJO: estos textos son los RÓTULOS DE VERDAD, sacados de `tr()`. Cuando las
+   preguntas pasaron a ser carteles con dibujo, «Sí, tenemos coche» se quedó en
+   «Con coche» y «Lo que haya bueno» desapareció — y esta prueba siguió
+   fallando siete de siete recorridos como si la web estuviera rota, cuando la
+   web estaba perfecta. Si vuelven a cambiar los rótulos, hay que cambiarlos
+   aquí: los de la interfaz salen todos de la tabla `T` de `index.html`. */
 const GUIONES = [
   { nombre: 'plan-basico-coche-pareja',
-    pasos: ['La Laguna', 'Sí, tenemos coche', 'Grupo, sin niños', '¿Qué plan hacemos hoy?',
-            'Un poco de todo', 'Lo que haya bueno'] },
+    pasos: ['La Laguna', 'Con coche', 'Grupo, sin niños', 'Un plan para el día entero',
+            'Un poco de todo', 'Un poco de todo'] },
   { nombre: 'con-ninos-playa',
-    pasos: ['Candelaria', 'Sí, tenemos coche', 'Familia con niños',
-            '¿Qué plan hacemos hoy?', 'Agua: playas y piscinas naturales', 'Lo que haya bueno'] },
+    pasos: ['Candelaria', 'Con coche', 'Familia con niños',
+            'Un plan para el día entero', 'Playas y charcos', 'Comida típica'] },
   { nombre: 'sin-coche',
-    pasos: ['Puerto de la Cruz', 'No, vamos en guagua', 'Grupo, sin niños',
-            '¿Qué plan hacemos hoy?', 'Un poco de todo', 'Lo que haya bueno'] },
+    pasos: ['Puerto de la Cruz', 'Sin coche, en guagua', 'Grupo, sin niños',
+            'Un plan para el día entero', 'Un poco de todo', 'Un poco de todo'] },
   { nombre: 'sorpresa',
-    pasos: ['Tegueste', 'Sí, tenemos coche', 'Familia con niños', '✨'] },
+    pasos: ['Tegueste', 'Con coche', 'Familia con niños',
+            'Sorpréndame — con el tiempo que queda'] },
   { nombre: 'ajustar-parada',
-    pasos: ['La Laguna', 'Sí, tenemos coche', 'Grupo, sin niños', '¿Qué plan hacemos hoy?',
-            'Un poco de todo', 'Lo que haya bueno', 'Esta no'] },
+    pasos: ['La Laguna', 'Con coche', 'Grupo, sin niños', 'Un plan para el día entero',
+            'Un poco de todo', 'Un poco de todo', 'Esta no'] },
   { nombre: 'mas-tranquilo',
-    pasos: ['Candelaria', 'Sí, tenemos coche', 'Familia con niños',
-            '¿Qué plan hacemos hoy?', 'Un poco de todo', 'Lo que haya bueno',
+    pasos: ['Candelaria', 'Con coche', 'Familia con niños',
+            'Un plan para el día entero', 'Un poco de todo', 'Un poco de todo',
             'Otra cosa más tranquila'] },
   { nombre: 'ingles',
-    pasos: ['EN', 'La Laguna', 'Yes, we have a car', 'Group, no children'] },
+    pasos: ['=EN', 'La Laguna', 'With a car', 'Group, no children',
+            'A plan for a whole day', 'A bit of everything', 'A bit of everything'] },
 ];
 
 async function main() {
@@ -84,15 +93,24 @@ async function main() {
       await pag.waitForTimeout(1200);
 
       for (const paso of guion.pasos) {
-        /* se busca cualquier botón cuyo texto contenga lo pedido */
-        const btn = pag.locator('button', { hasText: paso }).first();
+        /* Se busca cualquier botón cuyo texto CONTENGA lo pedido, que es como
+           mira una persona. Pero un rótulo de dos letras pilla de todo: «EN»,
+           el botón del idioma, encajaba también en «JUEVES · 12 EVENTOS», que
+           es el que abre el calendario — así que la prueba en inglés abría el
+           calendario y luego se quejaba de que no encontraba «With a car».
+           Por eso un paso que empiece por «=» se busca EXACTO. */
+        const exacto = paso.startsWith('=');
+        const busca = exacto ? paso.slice(1) : paso;
+        const btn = pag.locator('button', {
+          hasText: exacto ? new RegExp('^\\s*' + busca.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*$') : busca
+        }).first();
         try {
           await btn.waitFor({ state: 'visible', timeout: 9000 });
           await btn.click();
-          dados.push(paso);
+          dados.push(busca);
           await pag.waitForTimeout(1600);   /* Naira escribe con pausas */
         } catch (e) {
-          fallados.push(paso);
+          fallados.push(busca);
           break;   /* si un paso no aparece, el resto ya no tiene sentido */
         }
       }

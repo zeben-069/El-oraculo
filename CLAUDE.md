@@ -827,7 +827,29 @@ miradores en el catálogo (41 con posición aproximada), 36% de los planes y
 mide sobre todo el catálogo, no el motor.
 
 **Con navegador** — `probar-web.js` con Playwright recorre siete flujos en
-Chrome contra la web desplegada y captura los errores de consola.
+Chrome y captura los errores de consola. Sin argumentos va contra la web
+desplegada; con una URL detrás va contra lo que se le diga, y **eso es lo que
+hay que hacer para probar una rama**: se levanta un servidor de ficheros en el
+directorio y se le pasa `http://127.0.0.1:8787/index.html`. Contra la web
+desplegada se prueba el zip de la última vez, no lo que se acaba de tocar.
+Dos trampas de la propia prueba, las dos encontradas dándola por rota cuando
+la rota era ella:
+· **Los rótulos son los de `tr()`, y cambian.** Cuando las preguntas pasaron a
+  ser carteles con dibujo, «Sí, tenemos coche» se quedó en «Con coche» y «Lo
+  que haya bueno» desapareció. Los siete recorridos fallaban en el segundo
+  paso y parecía que la web no respondía.
+· **Un rótulo de dos letras pilla de todo.** Los botones se buscan por texto
+  contenido, así que «EN» —el del idioma— encajaba también en «JUEVES · 12
+  EVENTOS», que es el que abre el calendario: la prueba en inglés abría el
+  calendario y luego se quejaba de no encontrar «With a car». Un paso que
+  empieza por `=` se busca ahora **exacto**.
+Y desde el contenedor **siempre** va a haber errores de consola que no son de
+la web: el proxy corta Leaflet y las tipografías de Google por certificado, y
+las funciones de Netlify no existen en un servidor de ficheros. Lo que hay que
+mirar es que **no haya ningún error de JavaScript propio** — y que, con la API
+caída, el plan salga igual por el narrador local, que es la red de seguridad.
+Referencia: **7 de 7 recorridos completan todos sus pasos, 0 errores de
+JavaScript propios**, y el plan sale con sus fichas y su caja de texto.
 
 Y siempre, antes de dar nada por bueno:
 
