@@ -79,6 +79,16 @@ function meter(fichero){
       of:m.fuente||'OpenStreetMap (ODbL)'};
     /* la línea que escribe Zeben es un dato suyo, y va donde van las notas */
     if(m.nota) f.no=m.nota;
+    /* «vale a cualquier hora»: compite en todas las franjas */
+    if(m.flex) f.flex=true;
+    /* Una coordenada ESTIMADA por la descripción, sin GPS publicado, no puede
+       mandar a nadie a una chincheta inventada: con `pos_aprox` el botón del
+       mapa busca por nombre, que es lo mismo que se hace con los restaurantes
+       del registro de hostelería, que traen la calle y no el punto. */
+    if(m.pos_aprox) f.pos_aprox=true;
+    /* Un aviso de ACCESO no es un peligro: va con su etiqueta para que el
+       informe lo saque por `ojo_para_llegar` y no como aviso de seguridad. */
+    if(m.ojo){ f.seg=m.ojo; f.seg_tipo='acceso'; }
     /* la carretera dura no es un adorno: el motor le quita 20 puntos al
        atardecer para no mandar a nadie a bajar de noche por ahí */
     if(m.carretera_dura){ f.carretera='dura';
@@ -102,7 +112,11 @@ function meter(fichero){
   fs.writeFileSync(FICHERO,txt);
 
   console.log(nuevas.length+' miradores nuevos:');
-  nuevas.forEach(f=>console.log('   ✓ '+f.n.padEnd(42)+f.m+(f.carretera?'  · carretera dura':'')));
+  nuevas.forEach(f=>console.log('   ✓ '+f.n.slice(0,40).padEnd(42)+f.m.slice(0,24).padEnd(26)+
+    (f.carretera?'curvas ':'       ')+(f.pos_aprox?'· posición aprox.':'')));
+  const ap=nuevas.filter(f=>f.pos_aprox).length;
+  if(ap) console.log('\n   '+ap+' con posición aproximada: el botón del mapa busca por nombre,');
+  if(ap) console.log('   no navega a una chincheta inventada.');
   if(saltados.length){ console.log('\nfuera ('+saltados.length+'):');
     saltados.forEach(x=>console.log('   · '+x)); }
   console.log('\nComprueba ahora, en este orden:');

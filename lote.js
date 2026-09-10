@@ -381,3 +381,32 @@ console.log('\n=== OTRAS FIESTAS Y LA CENA ===');
   console.log('  de esas, fuera del casco     : '+fuera+
     '   ·  días que cambian: '+cambianFuera+' ('+Math.round(100*cambianFuera/Math.max(1,fuera))+'%)');
 }
+
+/* ── EL REGALO DE CAMINO ────────────────────────────────────────────────
+   Entre la cama y la primera parada suele quedar un mirador a un paso de la
+   carretera. Salía en el 12% de los planes y no era por la lógica: el techo
+   era el catálogo, que tenía 25 miradores en toda la isla. Con el artefacto
+   de Zeben son 88, así que esto mide si sirvió de algo. Ojo: se mide por
+   DESVÍO —lo que se alarga el viaje por pasar—, no en línea recta. */
+console.log('\n=== EL REGALO DE CAMINO ===');
+{
+  const mir=LUGARES.filter(l=>l.tipo==='Mirador');
+  let con=0, tot=0; const desv=[];
+  [...new Set(Object.values(BASES).map(b=>b.m))].forEach(base=>{
+    ['2026-10-05','2026-10-06','2026-10-07','2026-10-08'].forEach((fecha,i)=>{
+      Object.assign(S,{base,coche:true,gente:2,ninos:false,apetece:null,anclaElegida:null,
+        comida:null,ahora:null,saltoComida:i,descartados:null,prefTipo:null,fecha,
+        idioma:'es',forzarEvento:null,fiestaTodoElDia:null,diaEntero:true,faltaNucleo:null});
+      let b; try{ b=construir().brief; }catch(e){ return; }
+      tot++;
+      const r=b.de_camino_al_primer_sitio;
+      if(r){ con++; if(r.km_de_desvio!=null) desv.push(r.km_de_desvio); }
+    });
+  });
+  desv.sort((a,b)=>a-b);
+  console.log('  miradores en el catálogo : '+mir.length+
+    '   ('+mir.filter(x=>x.pos_aprox).length+' con posición aproximada)');
+  console.log('  planes barridos          : '+tot);
+  console.log('  con mirador de camino    : '+con+'   ('+Math.round(100*con/tot)+'%)');
+  console.log('  desvío mediano           : '+(desv.length?desv[Math.floor(desv.length/2)]+' km':'—'));
+}

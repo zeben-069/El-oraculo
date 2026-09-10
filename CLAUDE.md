@@ -85,7 +85,8 @@ datos no obliga a tocar las pruebas. Y `fotos.js` escribe en
 
 Dentro de `index.html`, como constantes:
 
-- `LUGARES` (581) — sitios que visitar. Solo 4 sin coordenadas.
+- `LUGARES` (644) — sitios que visitar. Solo 4 sin coordenadas. **88 son
+  miradores**, y 41 llevan `pos_aprox` porque su coordenada es estimada.
 - `REST` (318) — restaurantes, incluidas 38 heladerías.
 - `EVENTOS` (138) — fiestas. Municipio y corredor siempre; **127 fichas (87
   fiestas × sus años) llevan ya `la`/`lo`/`lu`**, colocadas por Zeben con
@@ -265,8 +266,10 @@ dos fotos y se ve media isla: no es una parada, es lo que suelta quien vive
 aquí. Va en `de_camino_al_primer_sitio`, medido por **desvío** —lo que se
 alarga el viaje por pasar— como los restaurantes, no en línea recta: hasta 3
 km, y solo con coche, que a quien va en guagua no puedes decirle que se baje a
-mitad de trayecto. Sale en el 12% de los planes, con 1,2 km de desvío mediano;
-el techo es el catálogo, que solo tiene **25 miradores**. El de vuelta ya
+mitad de trayecto. Salía en el 12% de los planes, con 1,2 km de desvío mediano, y
+el techo era el catálogo: **25 miradores** en toda la isla. Con los 63 del
+artefacto son **88**, y el regalo pasa al **36%** con el mismo desvío mediano
+(1,3 km). O sea que no era la lógica: era que no había de dónde sacarlos. El de vuelta ya
 existía: es una de las rotaciones del remate. Lo que cambió ahí es el tono, en
 el prompt: el de ida se cuenta como un regalo y el de vuelta como un secreto.
 
@@ -741,11 +744,17 @@ programa o por el aviso de la lejana, que los tres valen—, **0 casos de una
 fiesta de noche tapando a una de día** y 9 con sitios para cenar.
 Y cierra midiendo si colocar la fiesta sirve de algo: arma el día desde su
 propio pueblo con las coordenadas y sin ellas. Referencia: **89 fiestas con
-sitio, 37 días cambian (42%); de las 33 que están a más de 1 km del casco,
-cambian 25 (76%)**. Ojo con ese bloque: tiene que mutar el `EVENTOS` que
+sitio, 38 días cambian (43%); de las 33 que están a más de 1 km del casco,
+cambian 26 (79%)**. Ojo con ese bloque: tiene que mutar el `EVENTOS` que
 **exporta `banco.js`**, no el que `lote.js` lee del fichero con `eval` — con la
 copia, quitarle las coordenadas no cambia nada y el porcentaje sale 0%, o sea
 que la prueba dice que la mejora no sirve.
+
+Y el último, **el regalo de camino**: barre 124 planes con coche y cuenta en
+cuántos sale un mirador de camino a la primera parada. Referencia: **88
+miradores en el catálogo (41 con posición aproximada), 36% de los planes y
+1,3 km de desvío mediano**. Eran 25 miradores y el 12%, así que este número
+mide sobre todo el catálogo, no el motor.
 
 **Con navegador** — `probar-web.js` con Playwright recorre siete flujos en
 Chrome contra la web desplegada y captura los errores de consola.
@@ -1272,6 +1281,37 @@ restaurante está mal ubicado, tiene razón: vive allí.
   🤼 lucha, y 🪘 para las 41 que se quedan en fiesta a secas — que también está
   bien: el icono tiene que decir algo, y si no lo sabe, mejor el genérico que
   uno inventado.
+
+- **Los miradores los trajo otro artefacto de Cowork, y hubo que cribarlos.**
+  Zeben publicó «Miradores de Tenerife» con **92 fichas de 30 municipios**,
+  cada una con nombre, coordenadas, qué se ve, si la carretera es de curvas y
+  cuándo se disfruta mejor. De esas, 25 ya estaban y **1 era la misma que
+  teníamos** (Los Roques de Fasnia), así que quedaban 66.
+  Lo que obligó a mirarlas una a una: **44 de las 66 traen la coordenada
+  marcada como aproximada** —estimada por la descripción, sin GPS publicado—.
+  Eso no se puede meter a ciegas, pero tampoco hay que tirarlo: el catálogo ya
+  tiene el mecanismo, `pos_aprox`, el mismo que usan los restaurantes del
+  registro de hostelería que traen la calle y no el punto. Con él, **el botón
+  del mapa busca por nombre en vez de navegar a una chincheta inventada**.
+  Y el cruce, que es la regla de la casa: para cada uno, a qué distancia queda
+  del casco de su municipio y de qué otro casco cae más cerca. **Tres no
+  cuadran** y se quedaron fuera esperando:
+
+  | mirador | dice | pero cae a |
+  |---|---|---|
+  | La Escalona | Vilaflor de Chasna, a 8,5 km | 1,1 km del casco de Adeje |
+  | Mirador El Topete | La Guancha, a 5,0 km | 1,9 km del de Icod |
+  | Mirador de El Boquerón | La Laguna, a 5,0 km | 1,8 km del de Tegueste |
+
+  El filtro es a propósito estrecho: **solo aparta lo que además tiene la
+  coordenada estimada**, porque un término grande no es un error. La Orotava
+  llega a Las Cañadas —el Mirador de La Ruleta está a 21 km de su casco y es
+  suyo— y La Laguna llega a Anaga y a Punta del Hidalgo. Ocho más entran con
+  el municipio discutible y quedan apuntados por si él quiere corregirlos.
+  Del artefacto también salen dos cosas que el catálogo aprovecha: **la
+  carretera de curvas** (35 de los 63 la traen, y eso son −20 puntos al
+  atardecer) y **el aviso de acceso** (11), que entra como `seg_tipo:'acceso'`
+  y sale por `ojo_para_llegar`, no como aviso de seguridad.
 
 - **Miradores: no se pueden traer desde aquí.** Zeben pidió sacarlos de
   webtenerife o de datos.tenerife.es. Comprobado: la política de red del
