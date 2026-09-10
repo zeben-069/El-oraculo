@@ -125,7 +125,7 @@ Dentro de `index.html`, como constantes:
   fiestas × sus años) llevan ya `la`/`lo`/`lu`**, colocadas por Zeben con
   `node eventos.js sitios`, y entonces mandan ellas sobre el casco del pueblo.
   Quedan 13 sin colocar, en 6 municipios.
-- `ACTOS` (300) — los actos de 22 programas de fiestas de 15 municipios:
+- `ACTOS` (648) — los actos de 31 programas de fiestas de 16 municipios:
   día, municipio,
   hora, dónde es y `q` («ninos»/«noche»), que dice a quién le sirve. No son
   fiestas: cuelgan de una que ya está en `EVENTOS` y no anclan el día.
@@ -729,6 +729,27 @@ día con fiesta lleva su icono y el que **solo** tiene programa lleva un punto:
 poniendo el icono en los dos, veinticuatro de treinta días de septiembre salían
 marcados igual y las fiestas de verdad se perdían entre los tambores.
 
+**Y el calendario deja marcar la estancia entera.** Zeben: «estaría bien poder
+elegir varios días en el calendario del encabezado». El plan sigue siendo de
+**UN día** —esa regla no se toca, todo el motor cuelga de `S.fecha`—: el rango
+es para **mirar**. Quien tiene billete del 12 al 19 quiere ver de un vistazo
+qué cae en su estancia y luego elegir el día.
+El gesto es el de cualquier web de reservas, que es el que la gente ya conoce:
+se pulsa el primer día y luego el último. Pulsar antes del primero, o con la
+estancia ya cerrada, empieza otra vez — así no hay manera de quedarse en un
+estado del que no se sepa salir. Y **una pulsación sola sigue haciendo lo de
+siempre**: escribe en el `<input>` oculto y dispara el `change`, así que nada
+de lo que funcionaba se entera del cambio.
+El pie pasa entonces a contar un día por línea, **incluidos los vacíos**: que
+el martes no haya nada es una respuesta, y callarla haría pensar que falta por
+cargar. Cada línea se pulsa para armarle el plan a ese día.
+Dos topes, los dos por la misma razón —que la lista se lea—: la estancia se
+corta en **21 días**, que más que eso no es una estancia; y los pueblos con
+programa se recortan a **tres y un “+N”**, que un día cargado tiene programa en
+DOCE municipios de la isla y ponerlos todos deja una línea que nadie lee y que
+además no le sirve a quien está en uno solo. Mandan los que más actos ponen,
+que es la misma regla de la cabecera del plan.
+
 ## Trampas conocidas
 
 **El ancla del turista pasa por un camino aparte.** Cuando eligen un sitio
@@ -831,9 +852,9 @@ fichas mudas ya medidas, el motor puede descartar de verdad lo que queda lejos
 de una parada, y el plan sin coche se separa más del plan con coche.
 
 Y cierra con los **actos**: por cada día y municipio con programa cargado,
-un plan con niños y otro sin ellos —208 planes—. Lo que se vigila ahí no es la
-dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: 221
-actos ofrecidos, **0 ofrecidos a quien no toca** y **0 sin clasificar
+un plan con niños y otro sin ellos —380 planes—. Lo que se vigila ahí no es la
+dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: de los
+**648 actos cargados**, **421 ofrecidos**, **0 ofrecidos a quien no toca** y **0 sin clasificar
 ofrecidos**. Esos dos ceros son la prueba de toda la regla.
 
 Y el último bloque, **otras fiestas y la cena**: barre los días que tienen dos
@@ -999,6 +1020,8 @@ vez que entre algo nuevo, se apunta aquí.**
 | Registro de **locales de hostelería** (9.652 filas, con `latitud`/`longitud`) | 10 sep | **Este es el que se me pasó.** Ahora entra por `hosteleria.js`: 76 fichas nuevas y los cuatro pueblos sin donde comer, cerrados |
 | Los 16 ficheros de datos abiertos del Cabildo | 10 sep | Ver la tabla de abajo, uno por uno |
 | La extensión de Netlify | 10 sep | Con ella se ve el proyecto, los despliegues y las variables desde aquí. Confirmó que **la clave está puesta** y que **lo publicado era del 8 de septiembre**, una semana por detrás de la rama |
+| Segundo artefacto «Fiestas de Tenerife» de Cowork | 10 sep | **538 actos de 22 programas**, transcritos íntegros de lagenda. Cruzados contra los 300 que había: 182 coincidían. `ACTOS` pasa de 300 a **648** tras quitar 47 repetidos |
+| «Elegir varios días en el calendario» | 10 sep | El calendario deja marcar la estancia entera y cuenta día por día lo que cae. El plan sigue siendo de un día |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si

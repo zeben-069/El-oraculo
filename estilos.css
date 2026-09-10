@@ -105,6 +105,24 @@ body[data-luz="noche"] .calTit{color:var(--tea)}
 .calD.hoy{box-shadow:inset 0 0 0 1.5px var(--arena)}
 .calD.conFiesta .nd{font-weight:800;color:var(--cochinilla)}
 .calD.sel{background:var(--laurisilva);color:#F6F1E4}
+/* Los días de la estancia: un fondo tenue que deja ver el icono de la fiesta
+   y el punto del programa, que es lo que se viene a mirar. El primero y el
+   último se redondean por fuera, como en cualquier calendario de reservas. */
+.calD.enRango{background:var(--arena)}
+.calD.deRango{background:var(--laurisilva);color:#F6F1E4}
+.calD.deRango .nd,.calD.deRango.conFiesta .nd{color:#F6F1E4;font-weight:800}
+.calRD{display:block;width:100%;text-align:left;background:var(--cal-hueso);border:0;
+  border-left:2.5px solid var(--arena);border-radius:0 8px 8px 0;padding:6px 9px;
+  margin:0 0 4px;cursor:pointer;font:inherit;color:inherit}
+.calRD:hover{background:var(--arena)}
+.calRD.sel{border-left-color:var(--laurisilva);background:var(--arena)}
+.calRD b{display:block;font:700 13px/1.35 system-ui}
+.calRD i{display:block;font:400 12px/1.45 system-ui;font-style:normal;color:var(--tea-suave);margin-top:1px}
+.calRD i.pr{color:var(--laurisilva)}
+.calRD i.na{opacity:.5}
+.calQuita{font:600 11px system-ui;background:none;border:1.2px solid var(--arena);
+  border-radius:6px;color:var(--tea-suave);padding:2px 7px;margin-left:7px;cursor:pointer}
+.calQuita:hover{background:var(--arena)}
 .calD.sel .nd,.calD.sel.conFiesta .nd{color:#F6F1E4;font-weight:800}
 .calPie{margin:10px 0 0;padding:9px 0 0;border-top:1px dotted var(--arena)}
 .calEv{display:flex;gap:9px;align-items:flex-start;padding:4px 0}
