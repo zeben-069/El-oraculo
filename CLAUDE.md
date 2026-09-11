@@ -1075,12 +1075,17 @@ agujeros de los que solo se ven leyendo despacio:
 **Lo que NO se cerró, y hay que saberlo:** el `system` sigue viniendo del
 cliente —el panel deja editar el prompt, y eso es una función, no un descuido—.
 
-**Y el contador del freno: se está probando con Netlify Blobs.** Zeben: «monta
-el zip con el fichero dentro y lo probamos, no se va a perder nada, tengo los
-demás zips guardados». El problema es real y está medido: la cuenta vive en una
-variable, o sea en la memoria del contenedor, y Netlify levanta y apaga varios;
-encima ahora hay DOS funciones con su cuenta cada una. El techo de 600 al día
-son en realidad 600 por contenedor.
+**Y el contador del freno YA ES COMPARTIDO, con Netlify Blobs.** Funcionando en
+producción desde el 11 de septiembre a las 22:51: `?probar=1` devuelve
+`"freno": "blobs"`. Zeben: «monta el zip con el fichero dentro y lo probamos,
+no se va a perder nada, tengo los demás zips guardados». El problema era real y
+estaba medido: la cuenta vivía en una variable, o sea en la memoria del
+contenedor, y Netlify levanta y apaga varios; encima hay DOS funciones con su
+cuenta cada una. El techo de 600 al día eran en realidad 600 por contenedor.
+**Y la pregunta de fondo quedó contestada: `package.json` NO rompe el
+despliegue por zip.** Netlify hace build al soltarlo («Build from drop
+deployment»), instala él las dependencias y despliega las tres funciones. No
+hizo falta meter `node_modules` —27 MB, casi todo OpenTelemetry— en el zip.
 Netlify Blobs es un cajón que viene con el proyecto y deja apuntar la cuenta en
 un sitio que todos leen. Cómo está montado:
 · **Es opcional a propósito.** Se carga con `import()` dentro de un `try`: si el
@@ -1094,10 +1099,10 @@ un sitio que todos leen. Cómo está montado:
   contexto venía en el `event` y si venía en el entorno—. Esas pistas existen
   para no tener que preguntar dos veces: dicen QUÉ hay, nunca cuánto vale.
 
-**Y la primera prueba de verdad salió «memoria», por dos cosas encadenadas que
-conviene no volver a pisar.** El despliegue en sí fue bien —las tres funciones
-desplegadas, y la del streaming como función v2 de verdad—, o sea que
-`package.json` **no rompe el zip**. Lo que fallaba era el código:
+**La primera prueba salió «memoria», por dos cosas encadenadas que conviene no
+volver a pisar.** El despliegue en sí fue bien —las tres funciones desplegadas,
+y la del streaming como función v2 de verdad—, así que lo que fallaba era el
+código:
 · **En el formato clásico el acceso al cajón NO está en el entorno: viene
   dentro del `event`**, en `event.blobs`, y hay que engancharlo con
   `connectLambda(event)` antes de pedir la tienda. Sin eso, `getStore()`
@@ -1113,9 +1118,12 @@ primera simulación le pasaba al `event` el contexto ENTERO, y `connectLambda`
 quiere solo `{url, token}` en `event.blobs` y el id del sitio y del despliegue
 **en las cabeceras** (`x-nf-site-id`, `x-nf-deploy-id`). Con la forma mal, el
 fallo parecía del código. **La rota era la prueba**, otra vez.
-Probado ya con un cajón de mentira en local: 26 peticiones repartidas entre las
+Probado con un cajón de mentira en local —26 peticiones repartidas entre las
 dos funciones cortan a las 20 **contando las dos juntas**, que es justo lo que
-no pasaba antes.
+no pasaba antes— y confirmado en producción: la respuesta de `?probar=1` trae
+`contexto_en_el_event: true` y `contexto_en_el_entorno: false`, que es
+exactamente el cuadro del formato clásico y la prueba de que `connectLambda` era
+lo que faltaba.
 · Y de paso salió un fallo que solo se ve mirando lo que queda escrito en el
   cajón: **el contador del día se miraba ANTES que el de la IP**, así que las
   peticiones que el freno acababa de cortar seguían gastando cupo diario —26 en
@@ -1447,6 +1455,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Le monto el día alrededor de la fiesta infantil» | 11 sep | `loQueHayEseDia()`: antes de armar nada se enseñan las fiestas y los pueblos con programa que le sirven, y elige el turista. Antes el motor cogía la única fiesta de `EVENTOS` y los actos no podían anclar |
 | «Un icono 🎉 en vez del punto» + el rótulo de los pueblos | 11 sep | Hecho, con el 🎉 más flojo que el icono de la fiesta para que no se pierdan las de verdad |
 | Captura con los `**` a la vista | 11 sep | El markdown del modelo se convierte en negrita, y el prompt le dice que no lo use |
+| «Monta el zip con el fichero dentro y lo probamos» | 11 sep | El freno de la clave ya cuenta compartido con Netlify Blobs, y de paso quedó probado que `package.json` no rompe el despliegue por zip |
 | Artefacto «Auditoría de Naira» | 11 sep | Revisión técnica de la web desplegada: 4 fallos críticos, 7 altos y 11 fugas de idioma, todos comprobados y arreglados. El gordo: «la última guagua» era el búho de madrugada |
 | «Quita el compartir, pon iconos y un botón de eventos» | 11 sep | El de compartir llamaba a una función que no existe: fuera, y fuera también el respaldo que la llamaba. 🏖 y 🥾 en las preferencias, y el botón de montar el día alrededor de un evento en el menú y después del plan |
 | «Destaca el lugar del evento y que lleve a la localidad» | 11 sep | El calendario agrupa los actos por sitio, con la localidad en negrita y pulsable al mapa. De paso salieron los actos repetidos: 648 → 571 |
