@@ -78,6 +78,7 @@ img/estampas/*.jpg            las 31 fotos de municipio (una por ficha)
 img/cartas/*.jpg              los 10 carteles de las preguntas con dibujo
 img/zonas/*.jpg               las 6 franjas de las zonas de la isla
 netlify.toml
+package.json                  SOLO para que las funciones declaren @netlify/blobs
 robots.txt / sitemap.xml      para que Google vea los tres idiomas
 netlify/functions/naira.js    proxy a la API (guarda la clave)
 netlify/functions/naira-stream.mjs  el mismo, soltando el texto según llega
@@ -1072,10 +1073,33 @@ agujeros de los que solo se ven leyendo despacio:
 · Y `?probar=1` ya no dice la longitud de la clave ni cuántas variables de
   entorno hay: esa URL es pública y las dos cosas solo le sirven a quien tantee.
 **Lo que NO se cerró, y hay que saberlo:** el `system` sigue viniendo del
-cliente —el panel deja editar el prompt, y eso es una función, no un descuido—
-y el contador del freno sigue en memoria del contenedor. Un candado de verdad
-pide Netlify Blobs y eso obliga a `package.json`, que es justo lo que estas
-funciones llevan evitando desde el principio.
+cliente —el panel deja editar el prompt, y eso es una función, no un descuido—.
+
+**Y el contador del freno: se está probando con Netlify Blobs.** Zeben: «monta
+el zip con el fichero dentro y lo probamos, no se va a perder nada, tengo los
+demás zips guardados». El problema es real y está medido: la cuenta vive en una
+variable, o sea en la memoria del contenedor, y Netlify levanta y apaga varios;
+encima ahora hay DOS funciones con su cuenta cada una. El techo de 600 al día
+son en realidad 600 por contenedor.
+Netlify Blobs es un cajón que viene con el proyecto y deja apuntar la cuenta en
+un sitio que todos leen. Cómo está montado:
+· **Es opcional a propósito.** Se carga con `import()` dentro de un `try`: si el
+  paquete no está, o Netlify no da el contexto, se sigue con la memoria
+  exactamente como antes. Un freno que revienta es peor que un freno flojo,
+  porque deja al turista sin plan. Probado aquí en los dos casos.
+· **No es atómico.** Dos peticiones a la vez pueden leer el mismo número y
+  escribir el mismo+1. Para un freno da igual.
+· **La prueba la responde `?probar=1`**, que ahora dice `freno: blobs` o
+  `freno: memoria` y el porqué. Eso es lo que hay que mirar al soltar el zip.
+· **El zip va SIN `node_modules`** —27 MB, casi todo OpenTelemetry, que entra
+  de arrastre por `@netlify/otel`—, porque el despliegue por zip hace build
+  («Build from drop deployment») y ahí Netlify instala él las dependencias. Si
+  resulta que no, `?probar=1` dirá «Cannot find package» y entonces se mete la
+  carpeta y se prueba otra vez.
+· Lo que esto **cuesta**: `package.json` en la raíz, que es lo único que el
+  proyecto llevaba evitando desde el principio para que publicar fuese soltar
+  el zip y ya. Si el build rompiera el despliegue, se quita el fichero y todo
+  vuelve a estar como antes.
 
 **Y once fugas de idioma**, todas de fuera del diccionario —que está sano: las
 tres tablas cuadran y ninguna clave se llama sin existir—:

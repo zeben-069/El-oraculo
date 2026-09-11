@@ -105,6 +105,87 @@ function pasaElFreno(event) {
   return null;
 }
 
+// ── EL CONTADOR COMPARTIDO (Netlify Blobs) ──
+// El freno de aquí abajo lleva la cuenta en una variable, o sea EN LA MEMORIA
+// DEL CONTENEDOR. Netlify levanta y apaga varios contenedores según le llega
+// el tráfico, y cada uno empieza la cuenta de cero; encima ahora hay dos
+// funciones —esta y su gemela— con su cuenta cada una. O sea que el techo real
+// no son 600 al día: son 600 por cada contenedor que haya levantado. Por eso
+// siempre se ha dicho aquí que era un freno y no un candado.
+//
+// Netlify Blobs es un cajón de guardar cosas que viene con el proyecto: se
+// apunta la cuenta en un solo sitio y todos los contenedores leen la misma.
+// Eso lo convierte en candado de verdad.
+//
+// LO QUE HAY QUE SABER ANTES DE FIARSE:
+// · **Es opcional a propósito.** Se carga con `import()` dentro de un try: si
+//   el paquete no está, o Netlify no da el contexto, se sigue con la cuenta en
+//   memoria exactamente como antes. Un freno que revienta es peor que un freno
+//   flojo, porque deja al turista sin plan.
+// · **Obliga a `package.json`**, que es lo único que este proyecto llevaba
+//   evitando desde el principio para que publicar fuese soltar el zip y ya.
+//   Que eso siga funcionando es justo lo que hay que probar: se suelta el zip
+//   y se abre `?probar=1`, que dice si la cuenta va al cajón o a la memoria.
+// · **No es atómico.** Dos peticiones a la vez pueden leer el mismo número y
+//   escribir el mismo+1. Para un freno da igual; para un contador de dinero no
+//   valdría.
+let _tienda = null, _porQue = "sin probar";
+async function tienda() {
+  if (_tienda !== null) return _tienda;
+  try {
+    const mod = await import("@netlify/blobs");
+    _tienda = mod.getStore({ name: "naira-freno", consistency: "strong" });
+    _porQue = "va";
+  } catch (e) {
+    _tienda = false;
+    _porQue = "no se pudo cargar @netlify/blobs: " + ((e && e.message) || e);
+    console.warn("Blobs no disponible, se cuenta en memoria ·", _porQue);
+  }
+  return _tienda;
+}
+// Las claves llevan el día y la hora dentro, así que caducan solas: la de
+// ayer deja de leerse y no hay que limpiar nada.
+async function suma(t, clave, techo) {
+  let n = 0;
+  try { const v = await t.get(clave, { type: "json" }); n = (v && v.n) || 0; } catch (e) {}
+  if (n >= techo) return { pasa: false, n: n };
+  try { await t.setJSON(clave, { n: n + 1 }); } catch (e) {}
+  return { pasa: true, n: n + 1 };
+}
+async function frenoCompartido(ip) {
+  const t = await tienda();
+  if (!t) return null;                       // sin cajón: que decida la memoria
+  const ahora = new Date().toISOString();
+  const dia = ahora.slice(0, 10), hora = ahora.slice(0, 13);
+  try {
+    const d = await suma(t, "dia-" + dia, TECHO_DIA);
+    if (!d.pasa) return "techo del día";
+    const i = await suma(t, "ip-" + ip + "-" + hora, POR_IP_HORA);
+    if (!i.pasa) return "demasiadas seguidas";
+    return "";                               // cadena vacía = pasa, y ya contado
+  } catch (e) {
+    console.warn("fallo contando en Blobs:", e && e.message);
+    return null;                             // que lo resuelva la memoria
+  }
+}
+// Para `?probar=1`: ida y vuelta de verdad, que saber que el módulo carga no
+// es saber que el cajón escribe.
+async function pruebaDelCajon() {
+  const t = await tienda();
+  if (!t) return { almacen: "memoria", porque: _porQue };
+  try {
+    const k = "prueba-" + Date.now();
+    await t.setJSON(k, { ok: true });
+    const v = await t.get(k, { type: "json" });
+    try { await t.delete(k); } catch (e) {}
+    return v && v.ok
+      ? { almacen: "blobs", porque: "escribe y lee: el freno es compartido" }
+      : { almacen: "memoria", porque: "escribió pero no leyó lo mismo" };
+  } catch (e) {
+    return { almacen: "memoria", porque: "el cajón falló: " + ((e && e.message) || e) };
+  }
+}
+
 function buscarClave() {
   var env = process.env || {};
   var nombres = Object.keys(env);
@@ -121,12 +202,17 @@ exports.handler = async function (event) {
   var q = event.queryStringParameters || {};
   if (q.probar) {
     var k = buscarClave();
+    var cajon = await pruebaDelCajon();
     return {
       statusCode: 200,
       headers: cabeceras,
       body: JSON.stringify({
         funcion: "viva",
         formato: "clasico",
+        // Esto es lo que hay que mirar al soltar el zip con package.json
+        // dentro: si dice «blobs», el freno pasa a ser de verdad.
+        freno: cajon.almacen,
+        freno_porque: cajon.porque,
         claveEncontrada: !!k,
         // Antes esto enseñaba doce caracteres de la clave. Son el prefijo y no
         // el secreto, pero esta URL es pública y enseñar trozos de una clave
@@ -152,8 +238,10 @@ exports.handler = async function (event) {
     return { statusCode: 403, headers: cabeceras, body: JSON.stringify({ error: "Desde ahí no" }) };
   }
 
-  // 3 · cuántas van
-  var frenado = pasaElFreno(event);
+  // 3 · cuántas van. Primero el contador compartido; si no hay cajón, el de
+  // memoria de siempre. `""` quiere decir «pasa, y ya está contado allí».
+  var frenado = await frenoCompartido(ipDe(event));
+  if (frenado === null) frenado = pasaElFreno(event);
   if (frenado) {
     console.warn("freno:", frenado, ipDe(event));
     // 429 y no 500: el navegador ya sabe caer al relato local, así que el

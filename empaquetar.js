@@ -17,6 +17,16 @@ const sueltos=[...html.matchAll(/<script src="([^"]+)"/g)].map(m=>m[1])
 const LISTA=['index.html','manifest.webmanifest','netlify.toml',
   'icono.svg','icono-180.png','icono-192.png','icono-512.png',
   'netlify/functions/naira.js','netlify/functions/naira-stream.mjs','netlify/functions/tiempo.js',
+  /* `package.json` va SOLO para que las funciones puedan declarar
+     @netlify/blobs, que es lo que convierte el freno de la clave en un candado
+     de verdad. El resto del proyecto no lo necesita: la web son ficheros
+     sueltos sin empaquetador. Va sin `node_modules` a propósito —son 27 MB,
+     casi todo OpenTelemetry— porque el despliegue por zip de Netlify hace
+     build («Build from drop deployment») y ahí instala él las dependencias.
+     Si resulta que no lo hace, `?probar=1` lo dirá en una línea y entonces se
+     mete la carpeta. Pase lo que pase, la función sigue funcionando: el
+     contador cae a la memoria como antes. */
+  'package.json','package-lock.json',
   'img/naira-social.jpg',
   /* La página de diagnóstico va DENTRO del sitio a propósito: abrirla desde
      el ordenador no prueba lo mismo que abrirla desde la web, que es donde

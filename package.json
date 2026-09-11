@@ -1,0 +1,8 @@
+{
+  "name": "naira",
+  "private": true,
+  "description": "Guía turística de Tenerife. Este fichero existe SOLO para que las funciones de Netlify puedan usar Netlify Blobs: sin él no hay manera de declarar la dependencia. El resto del proyecto no lo necesita para nada — la web son ficheros sueltos que el navegador carga con <script>, sin empaquetador ni compilación.",
+  "dependencies": {
+    "@netlify/blobs": "^11.0.3"
+  }
+}
