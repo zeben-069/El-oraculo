@@ -40,6 +40,13 @@
   [headers.values]
     Content-Type = "application/manifest+json; charset=utf-8"
 
+# La página de diagnóstico de las ortofotos se publica a propósito, pero no
+# tiene por qué salir en Google: es una trastienda, no contenido.
+[[headers]]
+  for = "/probar-aereo.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
 # Iconos e imagen de compartir: no cambian casi nunca, que se cacheen.
 [[headers]]
   for = "/img/*"

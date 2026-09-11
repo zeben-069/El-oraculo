@@ -78,6 +78,7 @@ img/estampas/*.jpg            las 31 fotos de municipio (una por ficha)
 img/cartas/*.jpg              los 10 carteles de las preguntas con dibujo
 img/zonas/*.jpg               las 6 franjas de las zonas de la isla
 netlify.toml
+robots.txt / sitemap.xml      para que Google vea los tres idiomas
 netlify/functions/naira.js    proxy a la API (guarda la clave)
 netlify/functions/naira-stream.mjs  el mismo, soltando el texto según llega
 netlify/functions/tiempo.js   AEMET, dos saltos con reintentos
@@ -970,6 +971,147 @@ La conversión va **al final**, cuando ya están puestas las marcas: hacerlo
 antes metería etiquetas en medio de los nombres que se buscan. Y un asterisco
 suelto, sin pareja, se quita: en pantalla no significa nada.
 
+---
+
+## La auditoría del 11 de septiembre
+
+Zeben mandó un artefacto con una revisión técnica de la web desplegada: alguien
+la recorrió entera en un navegador, generó planes reales en ocho recorridos y
+en los tres idiomas, y midió `titsa-matriz.js` a mano. Cuatro fallos críticos,
+siete altos y once fugas de idioma. **Lo primero que se hizo fue comprobar cada
+uno contra el código**, que la web revisada era el zip desplegado y podía tener
+cosas ya arregladas; salieron todos ciertos.
+
+**El peor, y con diferencia: «la última guagua» era un búho de madrugada.**
+`MATRIZ` guarda UNA hora por par de municipios, la salida más tardía del día. Y
+en **427 de los 850 pares laborables** esa salida es después de medianoche,
+muchas entre las tres y las cinco y media. El motor la presentaba tal cual —«la
+última guagua sale a las 04:09»— y encima añadía «hay guaguas hasta de
+madrugada, así que la vuelta no aprieta». A alguien sin coche eso lo deja
+tirado de noche en Buenavista, que es literalmente lo que decía el informe.
+Aquí **no se puede inventar la hora buena**: el dato no está. `MATRIZ` trae un
+número por par y `titsa-regreso.js` —que sí tiene `ultima_antes_medianoche`—
+solo cubre dos corredores de origen, así que no sirve de sustituto. Lo que se
+arregla es **lo que se dice**:
+· Si la única salida es de madrugada, el informe **no la llama `ultima_salida`**:
+  la llama `guagua_de_madrugada` y añade `no_sabemos_la_ultima_de_la_tarde`. El
+  nombre del campo es la mitad del arreglo, porque el modelo leía «ultima» y
+  decía «la última».
+· Se fue el «la vuelta no aprieta» de los tres idiomas, y el aviso nuevo manda a
+  mirar el horario de esa línea o a contar con taxi.
+· **La raya está en la 01:30, y es un juicio, no un dato.** A medianoche no: una
+  guagua a las 00:51 es la última de la noche de verdad y se coge después de
+  cenar. Lo que engaña es el búho de las tres o las cuatro, porque detrás lleva
+  un agujero de seis horas. Con la raya ahí, **682 de los 2.548 pares** se
+  cuentan como búho. Si en su zona la noche llega más tarde, se mueve la
+  constante `BUHO` y ya.
+· **`duracion_min` era la del último viaje del día**, que es el más rápido que
+  hay: sin tráfico y con menos paradas. De ahí salían «9 minutos» de La Orotava
+  al Puerto. Se llama ahora `duracion_del_ultimo_viaje_min`, el prompt dice lo
+  que es, y **con el búho no se da**: unos minutos de madrugada animan a salir
+  tarde y no valen para el día.
+Y los dos avisos del regreso **se escribían en español a pelo** y se le
+enseñaban tal cual a un inglés y a un alemán. Van por `tr()`, igual que el
+sufijo « (de madrugada)».
+
+**«Merece la pena» pegado a una exclusión por peligro.** La coletilla de «no lo
+meto en el plan, pero ustedes deciden: aunque sea acercarse a verlo, merece la
+pena» se enganchaba igual a «son 522 metros de subida» que a «está clasificada
+como PELIGROSA en el registro oficial de zonas de baño». En el segundo caso es
+una invitación a ir a un sitio del que se acaba de avisar. Ahora el motivo
+viaja con su clase: `incomodidad` lleva la coletilla, `peligro` sale por
+`es_por_seguridad` y se cuenta sin invitar —«se lo digo para que lo sepan, no
+para que vayan»—. El prompt lo dice también.
+
+**Decía «hoy» cuando el plan era para mañana.** A partir de media tarde la web
+salta sola al día siguiente y lo anuncia bien; dos burbujas después el narrador
+soltaba «¡Chos, HOY hay Feria de Pinolere!». En la escapada de tres días el día
+2 y el día 3 también decían hoy. Y lo retorcido: **las claves `hoyEs` y
+`mananaEs` llevaban definidas en los tres idiomas desde el principio sin que
+las usara nadie**. Ahora hay un `cuandoEs(fecha)` que resuelve contra la fecha
+DEL PLAN, y si no es ni hoy ni mañana dice el día —«el sábado 26»—, con el
+nombre que escribe el navegador, sin tabla que cuadrar.
+
+**La carta «Senderos» podía no dar ni un sendero, y sin avisar.** El salvavidas
+—`S.faltaNucleo`— existía, pero solo se armaba dentro de `queApeteceEn()`, el
+camino de «prefiero elegir el sitio yo». Por el camino principal, `queApetece()`
+lo ponía a `null` y nadie lo volvía a mirar: Puerto de la Cruz + Senderos daba
+la Hijuela del Botánico y el Mirador de Humboldt sin decir palabra. Ahora la
+comprobación está **donde se cierran las paradas**, que es mejor sitio que la
+entrada: mide el resultado, no la intención, y por eso vale en los dos caminos.
+
+**Un museo cerrado como remate del día.** «Sorpréndame» a las 21:40 en Adeje
+cerraba en Absurdia, Mundo de Ilusiones, que cierra a las 21:30. Solo 39 de las
+644 fichas traen `hor`, pero son justo estas —museos, jardines, centros de
+visitantes—, así que `abiertoAl()` cruza la hora de cierre con la de llegada
+**solo cuando el reloj recorta el día**. Una playa no cierra y no se juzga.
+
+**Encabezado con la sección vacía debajo.** «Con lo que les queda de día, algo
+cerquita:» y a continuación nada, porque el reloj se había llevado todas las
+paradas. Se pintaba la cabecera sin mirar si había algo que colgar de ella.
+
+**El botón de compartir, el enlace roto y la página de pruebas.** El de
+compartir ya estaba arreglado (llamaba a una función que no existe). Quedaban
+dos: el panel decía «se pega en pegar-eventos.html» y esa página **no se
+publica** —es una herramienta que se abre desde la carpeta—, así que la
+instrucción llevaba a un 404; y `probar-aereo.html` sí está publicada, a
+propósito y documentado, pero ahora va con `X-Robots-Tag: noindex`. De paso
+entran `robots.txt` y `sitemap.xml` con los tres idiomas declarados como
+alternativas de la misma página.
+
+**La función que gasta la clave estaba más abierta de lo que parecía.** Dos
+agujeros de los que solo se ven leyendo despacio:
+· `if (de && !CASA.test(de))` — una petición **sin cabecera `Origin` ni
+  `Referer` no entraba en el `if` y pasaba entera**, que es exactamente lo que
+  manda un `curl` a pelo. O sea que el cierre no cortaba lo único que
+  pretendía cortar. Ahora la cabecera **se exige**.
+· `CASA` casaba con **cualquier host que contuviera la cadena `naira`** y con
+  **cualquier `*.netlify.app` del mundo**. Ahora es `esDeCasa()`: el sitio
+  exacto, sus previos de despliegue (`algo--leafy-cobbler…`), localhost y un
+  dominio propio que empiece por `naira.`. Probado con once casos.
+· Y `?probar=1` ya no dice la longitud de la clave ni cuántas variables de
+  entorno hay: esa URL es pública y las dos cosas solo le sirven a quien tantee.
+**Lo que NO se cerró, y hay que saberlo:** el `system` sigue viniendo del
+cliente —el panel deja editar el prompt, y eso es una función, no un descuido—
+y el contador del freno sigue en memoria del contenedor. Un candado de verdad
+pide Netlify Blobs y eso obliga a `package.json`, que es justo lo que estas
+funciones llevan evitando desde el principio.
+
+**Y once fugas de idioma**, todas de fuera del diccionario —que está sano: las
+tres tablas cuadran y ninguna clave se llama sin existir—:
+· «En Puerto de la Cruz, muy bien.» era **el segundo mensaje de la
+  conversación** y estaba escrito en español a pelo: un inglés leía «En Puerto
+  de la Cruz, muy bien. Do you have a car?».
+· `«muy a menudo, no hace falta mirar el horario»`, `«(de madrugada)»` y el
+  botón `«Abrir en Google Maps»` se construían en español antes de traducir.
+· `tipoTr()` no se llamaba en la tarjeta del plan: en inglés se leía «Árbol /
+  monumento natural · 40 min» teniendo la tabla completa a un paso.
+· Los textos se cortaban **a mitad de palabra y sin puntos suspensivos**
+  —«…que debían viajar desde e»—. Ahora `recorta()` corta por palabra entera.
+· Los errores técnicos viajaban en español dentro del aviso alemán: «Grund: El
+  servidor respondió 501 en las dos rutas».
+· **Tres claves duplicadas** en los tres idiomas —`otroDia`, `ajustar`,
+  `copiado`—: en un objeto literal gana la segunda, así que la primera era
+  texto muerto. Fuera.
+· `toLowerCase()` sobre nombres propios: «En isla baja (garachico, icod,
+  buenavista)».
+· Comillas españolas dentro del inglés y del alemán.
+· Y `<html lang="es">` **no cambiaba nunca**: se recorría la web entera en
+  inglés y el lector de pantalla seguía pronunciándola con fonética española.
+  Una línea. De paso, el idioma va ahora en la URL (`?lang=en`) y se lee al
+  arrancar, que es lo que permite mandar el enlace ya traducido por WhatsApp.
+
+**Y dos roces de uso que eran de una línea:** «bien con niños» y «NO para
+niños» se le enseñaban a quien viaja sin niños —tres charcos con el cartel de
+«NO para niños» en un plan de grupo—, y el prompt no decía nada de los
+decimales, así que salía «unas 0.8 horas» en vez de «unos 50 minutos».
+
+**Lo que la auditoría dejó sin arreglar a propósito**, porque no es un fallo
+sino una decisión pendiente: las horas de verdad en cada parada, el reloj de
+cuenta atrás de la última guagua, y lo de descartar las paradas lejos de la
+guagua sin coche —eso ya se probó y está apuntado abajo: no mejoraba nada
+medible y empeoraba otras cosas—.
+
 ## Trampas conocidas
 
 **El ancla del turista pasa por un camino aparte.** Cuando eligen un sitio
@@ -1251,6 +1393,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Le monto el día alrededor de la fiesta infantil» | 11 sep | `loQueHayEseDia()`: antes de armar nada se enseñan las fiestas y los pueblos con programa que le sirven, y elige el turista. Antes el motor cogía la única fiesta de `EVENTOS` y los actos no podían anclar |
 | «Un icono 🎉 en vez del punto» + el rótulo de los pueblos | 11 sep | Hecho, con el 🎉 más flojo que el icono de la fiesta para que no se pierdan las de verdad |
 | Captura con los `**` a la vista | 11 sep | El markdown del modelo se convierte en negrita, y el prompt le dice que no lo use |
+| Artefacto «Auditoría de Naira» | 11 sep | Revisión técnica de la web desplegada: 4 fallos críticos, 7 altos y 11 fugas de idioma, todos comprobados y arreglados. El gordo: «la última guagua» era el búho de madrugada |
 | «Quita el compartir, pon iconos y un botón de eventos» | 11 sep | El de compartir llamaba a una función que no existe: fuera, y fuera también el respaldo que la llamaba. 🏖 y 🥾 en las preferencias, y el botón de montar el día alrededor de un evento en el menú y después del plan |
 | «Destaca el lugar del evento y que lleve a la localidad» | 11 sep | El calendario agrupa los actos por sitio, con la localidad en negrita y pulsable al mapa. De paso salieron los actos repetidos: 648 → 571 |
 | «Elegir varios días en el calendario» | 10 sep | El calendario deja marcar la estancia entera y cuenta día por día lo que cae. El plan sigue siendo de un día |

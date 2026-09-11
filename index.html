@@ -214,8 +214,14 @@ if(typeof L==='undefined'){
     <div class="fila-bot"><button class="accion sec" id="btnBorrarVal">Borrar las valoraciones</button></div>
   </div>
   <div class="hoja" data-hoja="programas" id="hProgramas">
+    <!-- Decía «se pega en pegar-eventos.html» y esa página NO se publica: es
+         una herramienta de trabajo que arma `node eventos.js pegar` y se abre
+         desde la carpeta, no desde la web. En producción el turista —y Zeben—
+         leían una instrucción que llevaba a un 404. Se dice dónde está de
+         verdad. -->
     <p class="nota">Fiestas que llegan y de las que Naira todavía no tiene el programa.
-      Se busca en la web del ayuntamiento y se pega en <b>pegar-eventos.html</b>.</p>
+      Se busca en la web del ayuntamiento y se pega en la página de trabajo que
+      arma <b>node eventos.js pegar</b>, que se abre desde la carpeta del proyecto.</p>
     <div id="listaProgramas"></div>
   </div>
   <div class="hoja" data-hoja="audit" id="hAudit">
@@ -281,7 +287,7 @@ const T={
      tjDesde:'Desde',tjVuelta:'LA VUELTA',tjOjo:'OJO',tjFirma:'Naira · guía de Tenerife',tjDatos:'hecho con datos abiertos del Cabildo',tjUltima:'Última guagua a las',tjCambio:'cambio en',tjLinea:'línea',tjSubida:'de subida',tjCircular:'circular',tjVueltaCoche:'acaba lejos del inicio',tjPermiso:'CON PERMISO',tjMin:'min',
      catMuseos2:'Museos, cultura y cosas para los críos',catTodo:'Un poco de todo',
      meDaIgual:'Me da igual — que elija Naira',volverZonas:'Volver a las zonas',verMas:'Ver más…',cambMuni:'Cambiar de municipio',yMas:'Y más…',catNat:'Naturaleza: senderos y miradores',catAgua:'Agua: playas y piscinas naturales',catMuseos:'Museos, cultura y cosas para los días malos',
-     masTranquilo:'Otra cosa más tranquila',prefPlaya:'Prefiero playa o piscina',prefNat:'Prefiero naturaleza',cambComida:'Cambiar dónde comer',otroDia:'Otro sitio u otro día',mismoEstilo:'Otro sitio, el mismo estilo',comTipica:'Comida típica canaria',comPescado:'Pescado',comLoQueHaya:'Lo que haya bueno',ninguna:'Ninguna, quiero otro plan',volver:'Volver',ajustar:'Ajustar el plan',frMannana:'Por la mañana',frMediodia:'A mediodía, buscando dónde comer',frTarde:'Ya de tarde',frAtardecer:'Al caer el día',hayFiestas:'cosas ese día — armar el plan alrededor',hayFiesta:'cosa ese día — armar el plan alrededor',todoElDia:'todo el día',aquiMismo:'aquí mismo',min:'min',mejorVamos:'Mejor vamos a',
+     masTranquilo:'Otra cosa más tranquila',prefPlaya:'Prefiero playa o piscina',prefNat:'Prefiero naturaleza',cambComida:'Cambiar dónde comer',mismoEstilo:'Otro sitio, el mismo estilo',comTipica:'Comida típica canaria',comPescado:'Pescado',comLoQueHaya:'Lo que haya bueno',ninguna:'Ninguna, quiero otro plan',volver:'Volver',frMannana:'Por la mañana',frMediodia:'A mediodía, buscando dónde comer',frTarde:'Ya de tarde',frAtardecer:'Al caer el día',hayFiestas:'cosas ese día — armar el plan alrededor',hayFiesta:'cosa ese día — armar el plan alrededor',todoElDia:'todo el día',aquiMismo:'aquí mismo',min:'min',mejorVamos:'Mejor vamos a',
      donde:'¿Dónde se están quedando?',coche:'¿Llevan coche?',si_coche:'Sí, tenemos coche',
      no_coche:'No, vamos en guagua',como:'¿Cómo van? Lo pregunto por lo de los niños, que cambia bastante.',
      tDia:'¿Qué tipo de día?',tComida:'¿Y para comer?',
@@ -306,7 +312,7 @@ const T={
      frDeManana:'Por la mañana',frDeMediodia:'A mediodía',frDeTarde:'Por la tarde',frDeAtardecer:'Al caer el día',frDeNoche:'De noche',
      holaSolo:'¡Buenas! ',
      elijoYo:'Prefiero elegir el sitio yo',
-     agenda:'¿Qué evento hay hoy?',hoyEs:'hoy',mananaEs:'mañana',
+     agenda:'¿Qué evento hay hoy?',hoyEs:'hoy',mananaEs:'mañana',deMadrugada:'de madrugada',enMuniBien:(m)=>'En '+m+', muy bien.',abrirMapa:'Abrir en Google Maps',errServidor:(n)=>'el servidor respondió '+n,errSinClave:'no hay clave de API configurada',errCortado:'la respuesta se cortó a mitad',errVacio:'no llegó texto',frecMucha:'muy a menudo, no hace falta mirar el horario',frecMedia:'cada media hora aproximadamente',frecHora:'cada hora aproximadamente',frecPocas:(n)=>'unas '+n+' al día: conviene mirar el horario antes de salir',frecMuyPocas:(n)=>'solo '+n+' al día, así que hay que planificarla',avVueltaPronto:(d,b,h)=>'Ojo con la vuelta: la última guagua de '+d+' hacia '+b+' sale a las '+h+', o sea antes del atardecer. Si se quieren quedar, cuenten con taxi.',avVueltaBuho:(d,b,h,l)=>'Ojo con la vuelta: de '+d+' hacia '+b+' la única salida que tengo apuntada es la de madrugada, a las '+h+'. La última de la tarde no la sé, así que miren el horario de la línea '+l+' en titsa.com antes de subir, o cuenten con taxi.',
      fueraMapa:(k)=>'· fuera del mapa, a '+k+' km',
      qAgenda:(d,n)=>'Hay '+n+' '+(n===1?'cosa apuntada':'cosas apuntadas')+' en los próximos '+d+' días. ¿Le armo el día alrededor de alguna?',
      zSur:'Sur y suroeste',zCumbre:'Cumbre y Teide',
@@ -337,7 +343,7 @@ const T={
      ahora:'Estoy por aquí ahora, ¿qué hago?',cambiar:'Cambiar el día o el alojamiento',
      hola:'Soy <b>Naira</b>, de aquí de toda la vida. Le monto el día como se lo montaría a un primo que viene de fuera: sin colas tontas y comiendo bien. ',compartir:'Compartir este plan',otro_muni:'Ese no es, cambiar de municipio',
      sorpresa:'Sorpréndame — con el tiempo que queda',
-     planManana:'Para hoy ya se nos fue el día, así que se lo armo entero para mañana. Si quiere algo para lo que queda de hoy, dígame «Sorpréndame».',escapada:'🗓 Un fin de semana o varios días',escribeAqui:'Pregúnteme lo que quiera del plan…',noPuedoHablar:'Ahora mismo no puedo responderle por escrito. Use los botones de abajo, que el plan está completo igual.',cuantosDias:'¿Cuántos días me monto? Empiezo por la fecha que tiene elegida.',dia:'Día',escapadaCab:n=>'Va, les armo '+n+' días seguidos. Un día por zona, sin repetir sitio ni sitio de comer, y con lo de más trote en el medio, que el primer día se llega cansado.',dos_dias:'Dos días',tres_dias:'Tres días (fin de semana)',cuatro_dias:'Cuatro días',calEscapada:'🗓 Guardar los días en mi calendario',otroDia:'Volver al menú',copiado:'Copiado. Ya lo puede pegar donde quiera.',calendario:'🗓 Guardar el día en mi calendario',ubiCartel:'Para un plan más a su medida, dígame dónde están ahora',ubiCartelBtn:'Usar mi ubicación',queTal:'¿Y qué tal les fue el día?',val3:'De lujo',val2:'Bien',val1:'Regular',valNo:'Ahora no',gracias3:'¡Agüita, qué alegría! Me lo apunto para saber qué funciona.',gracias2:'Me alegro. Me lo apunto igual, que así voy afinando.',gracias1:'Pues lo siento. Me lo apunto, que es como aprendo a no repetirlo.',imgCompartir:'📸 Compartir el plan como imagen',imgBajada:'Imagen descargada. Ya la puede mandar por donde quiera.',ubi:'Usar mi ubicación',ubiNo:'Prefiero decirlo yo',ubiPido:'Para esto me viene bien saber dónde están. ¿Miro su ubicación o me lo dicen ustedes?',ubiBuscando:'Un momentito, que miro dónde están…',ubiHecho:m=>'Los ubico en '+m+'. ¿Voy con eso?',ubiSi:'Sí, estamos ahí',ubiOtro:'No, elijo yo el sitio',ubiFallo:'No he podido ver dónde están, no pasa nada. Dígamelo usted.',ubiLejos:'Los ubico fuera de Tenerife, así que mejor me lo dicen ustedes.',ajustar:'Ajustar el plan a lo mío',
+     planManana:'Para hoy ya se nos fue el día, así que se lo armo entero para mañana. Si quiere algo para lo que queda de hoy, dígame «Sorpréndame».',escapada:'🗓 Un fin de semana o varios días',escribeAqui:'Pregúnteme lo que quiera del plan…',noPuedoHablar:'Ahora mismo no puedo responderle por escrito. Use los botones de abajo, que el plan está completo igual.',cuantosDias:'¿Cuántos días me monto? Empiezo por la fecha que tiene elegida.',dia:'Día',escapadaCab:n=>'Va, les armo '+n+' días seguidos. Un día por zona, sin repetir sitio ni sitio de comer, y con lo de más trote en el medio, que el primer día se llega cansado.',dos_dias:'Dos días',tres_dias:'Tres días (fin de semana)',cuatro_dias:'Cuatro días',calEscapada:'🗓 Guardar los días en mi calendario',otroDia:'Volver al menú',calendario:'🗓 Guardar el día en mi calendario',ubiCartel:'Para un plan más a su medida, dígame dónde están ahora',ubiCartelBtn:'Usar mi ubicación',queTal:'¿Y qué tal les fue el día?',val3:'De lujo',val2:'Bien',val1:'Regular',valNo:'Ahora no',gracias3:'¡Agüita, qué alegría! Me lo apunto para saber qué funciona.',gracias2:'Me alegro. Me lo apunto igual, que así voy afinando.',gracias1:'Pues lo siento. Me lo apunto, que es como aprendo a no repetirlo.',imgCompartir:'📸 Compartir el plan como imagen',imgBajada:'Imagen descargada. Ya la puede mandar por donde quiera.',ubi:'Usar mi ubicación',ubiNo:'Prefiero decirlo yo',ubiPido:'Para esto me viene bien saber dónde están. ¿Miro su ubicación o me lo dicen ustedes?',ubiBuscando:'Un momentito, que miro dónde están…',ubiHecho:m=>'Los ubico en '+m+'. ¿Voy con eso?',ubiSi:'Sí, estamos ahí',ubiOtro:'No, elijo yo el sitio',ubiFallo:'No he podido ver dónde están, no pasa nada. Dígamelo usted.',ubiLejos:'Los ubico fuera de Tenerife, así que mejor me lo dicen ustedes.',ajustar:'Ajustar el plan a lo mío',
      copiado:'Copiado. Ya se lo puede mandar a quien quiera.',
      antes:'Así era esto en',pensando:'Naira está pensando…'},
  en:{rhTitulo:'🏛 The historic route of Santa Cruz',rhIntro:'Forty-six stops through the old town of Santa Cruz, from the council\u2019s official itinerary. It is walked in sections \u2014 you do not have to see it all at once.',rhTramo:'section',rhFicha:'Official sheet',rhVolver:'Back',rhHitos:'stops',rhTodos:'See the whole route',wkBuscar:'Search on Wikiloc',
@@ -346,7 +352,7 @@ const T={
      tjDesde:'From',tjVuelta:'GETTING BACK',tjOjo:'HEADS UP',tjFirma:'Naira · your guide to Tenerife',tjDatos:'built on open data from the Cabildo',tjUltima:'Last bus at',tjCambio:'change at',tjLinea:'line',tjSubida:'of climb',tjCircular:'loop',tjVueltaCoche:'ends far from the start',tjPermiso:'PERMIT NEEDED',tjMin:'min',
      catMuseos2:'Museums, culture and things for the kids',catTodo:'A bit of everything',
      meDaIgual:'I do not mind — Naira can choose',volverZonas:'Back to the areas',verMas:'See more…',cambMuni:'Change municipality',yMas:'And more…',catNat:'Nature: trails and viewpoints',catAgua:'Water: beaches and natural pools',catMuseos:'Museums, culture and things for bad-weather days',
-     masTranquilo:'Something quieter',prefPlaya:'I would rather have beach or pool',prefNat:'I would rather have nature',cambComida:'Change where we eat',otroDia:'Another place or another day',mismoEstilo:'Another place, same style',comTipica:'Traditional Canarian food',comPescado:'Fish',comLoQueHaya:'Whatever is good',ninguna:'None, I want a different plan',volver:'Back',ajustar:'Adjust the plan',frMannana:'In the morning',frMediodia:'Midday, looking for lunch',frTarde:'Already afternoon',frAtardecer:'As the day ends',hayFiestas:'things on that day — build the plan around one',hayFiesta:'thing on that day — build the plan around it',todoElDia:'all day',aquiMismo:'right here',min:'min',mejorVamos:'Better we go to',
+     masTranquilo:'Something quieter',prefPlaya:'I would rather have beach or pool',prefNat:'I would rather have nature',cambComida:'Change where we eat',mismoEstilo:'Another place, same style',comTipica:'Traditional Canarian food',comPescado:'Fish',comLoQueHaya:'Whatever is good',ninguna:'None, I want a different plan',volver:'Back',frMannana:'In the morning',frMediodia:'Midday, looking for lunch',frTarde:'Already afternoon',frAtardecer:'As the day ends',hayFiestas:'things on that day — build the plan around one',hayFiesta:'thing on that day — build the plan around it',todoElDia:'all day',aquiMismo:'right here',min:'min',mejorVamos:'Better we go to',
      donde:'Where are you staying?',coche:'Do you have a car?',si_coche:'Yes, we have a car',
      no_coche:'No, we use the bus',como:'Who is coming? Travelling with children changes a lot.',
      tDia:'What kind of day?',tComida:'And to eat?',
@@ -371,7 +377,7 @@ const T={
      frDeManana:'In the morning',frDeMediodia:'At midday',frDeTarde:'In the afternoon',frDeAtardecer:'As the day ends',frDeNoche:'At night',
      holaSolo:'Hello! ',
      elijoYo:'I would rather pick the place myself',
-     agenda:'What is on today?',hoyEs:'today',mananaEs:'tomorrow',
+     agenda:'What is on today?',hoyEs:'today',mananaEs:'tomorrow',deMadrugada:'after midnight',enMuniBien:(m)=>m+', very good.',abrirMapa:'Open in Google Maps',errServidor:(n)=>'the server answered '+n,errSinClave:'no API key configured',errCortado:'the answer was cut off',errVacio:'no text arrived',frecMucha:'very often, no need to check the timetable',frecMedia:'roughly every half hour',frecHora:'roughly every hour',frecPocas:(n)=>'about '+n+' a day: worth checking the timetable before you go',frecMuyPocas:(n)=>'only '+n+' a day, so it needs planning',avVueltaPronto:(d,b,h)=>'Careful with the way back: the last bus from '+d+' to '+b+' leaves at '+h+', before sunset. If you want to stay on, count on a taxi.',avVueltaBuho:(d,b,h,l)=>'Careful with the way back: from '+d+' to '+b+' the only departure I have is the night bus, at '+h+'. I do not know the last evening one, so check line '+l+' at titsa.com before you set off, or count on a taxi.',
      fueraMapa:(k)=>'· off the map, '+k+' km away',
      qAgenda:(d,n)=>'I have '+n+' '+(n===1?'thing':'things')+' on in the next '+d+' days. Shall I build the day around one of them?',
      zSur:'South and south-west',zCumbre:'The summit and Teide',
@@ -402,7 +408,7 @@ const T={
      ahora:'I am out already — what now?',cambiar:'Change the day or where I am staying',
      hola:'I am <b>Naira</b>, born and raised here. I will plan your day the way I would for a cousin coming to visit: no silly queues and eating well. ',compartir:'Share this plan',otro_muni:'Wrong one — change town',
      sorpresa:'Surprise me — with the time that is left',
-     planManana:'Today is nearly gone, so I will build you a full day for tomorrow. If you want something for what is left of today, use «Surprise me».',escapada:'🗓 A weekend or several days',escribeAqui:'Ask me anything about the plan…',noPuedoHablar:'I cannot reply in writing right now. Use the buttons below, the plan is complete anyway.',cuantosDias:'How many days shall I plan? I start from the date you picked.',dia:'Day',escapadaCab:n=>'Right, '+n+' days in a row. One area per day, no repeated places or restaurants, and the toughest day in the middle, because you arrive tired on the first.',dos_dias:'Two days',tres_dias:'Three days (weekend)',cuatro_dias:'Four days',calEscapada:'🗓 Save the days to my calendar',otroDia:'Back to menu',copiado:'Copied. Paste it wherever you like.',calendario:'🗓 Save the day to my calendar',ubiCartel:'For a plan that fits you better, let me know where you are',ubiCartelBtn:'Use my location',queTal:'And how was the day?',val3:'Brilliant',val2:'Good',val1:'So-so',valNo:'Not now',gracias3:'Delighted to hear it. I am noting it down so I know what works.',gracias2:'Glad to hear it. I am noting it down all the same.',gracias1:'Sorry to hear that. I am noting it down, that is how I learn.',imgCompartir:'📸 Share the plan as an image',imgBajada:'Image downloaded. Send it wherever you like.',ubi:'Use my location',ubiNo:'I will tell you',ubiPido:'For this it helps to know where you are. Shall I check your location, or will you tell me?',ubiBuscando:'One moment, checking where you are…',ubiHecho:m=>'I place you in '+m+'. Shall I go with that?',ubiSi:'Yes, that is where we are',ubiOtro:'No, let me choose',ubiFallo:'I could not read your location, no problem. Just tell me.',ubiLejos:'You seem to be outside Tenerife, so better if you tell me.',ajustar:'Tune it to us',
+     planManana:'Today is nearly gone, so I will build you a full day for tomorrow. If you want something for what is left of today, use \u201cSurprise me\u201d.',escapada:'🗓 A weekend or several days',escribeAqui:'Ask me anything about the plan…',noPuedoHablar:'I cannot reply in writing right now. Use the buttons below, the plan is complete anyway.',cuantosDias:'How many days shall I plan? I start from the date you picked.',dia:'Day',escapadaCab:n=>'Right, '+n+' days in a row. One area per day, no repeated places or restaurants, and the toughest day in the middle, because you arrive tired on the first.',dos_dias:'Two days',tres_dias:'Three days (weekend)',cuatro_dias:'Four days',calEscapada:'🗓 Save the days to my calendar',otroDia:'Back to menu',calendario:'🗓 Save the day to my calendar',ubiCartel:'For a plan that fits you better, let me know where you are',ubiCartelBtn:'Use my location',queTal:'And how was the day?',val3:'Brilliant',val2:'Good',val1:'So-so',valNo:'Not now',gracias3:'Delighted to hear it. I am noting it down so I know what works.',gracias2:'Glad to hear it. I am noting it down all the same.',gracias1:'Sorry to hear that. I am noting it down, that is how I learn.',imgCompartir:'📸 Share the plan as an image',imgBajada:'Image downloaded. Send it wherever you like.',ubi:'Use my location',ubiNo:'I will tell you',ubiPido:'For this it helps to know where you are. Shall I check your location, or will you tell me?',ubiBuscando:'One moment, checking where you are…',ubiHecho:m=>'I place you in '+m+'. Shall I go with that?',ubiSi:'Yes, that is where we are',ubiOtro:'No, let me choose',ubiFallo:'I could not read your location, no problem. Just tell me.',ubiLejos:'You seem to be outside Tenerife, so better if you tell me.',ajustar:'Tune it to us',
      copiado:'Copied. Send it to whoever you like.',
      antes:'This is what it looked like in',pensando:'Naira is thinking…'},
  de:{rhTitulo:'🏛 Der historische Rundgang von Santa Cruz',rhIntro:'Sechsundvierzig Stationen durch die Altstadt von Santa Cruz, aus der offiziellen Route der Stadt. Man geht sie abschnittsweise \u2014 nicht alles auf einmal.',rhTramo:'Abschnitt',rhFicha:'Offizielles Datenblatt',rhVolver:'Zur\u00fcck',rhHitos:'Stationen',rhTodos:'Ganze Route ansehen',wkBuscar:'Auf Wikiloc suchen',
@@ -411,7 +417,7 @@ const T={
      tjDesde:'Ab',tjVuelta:'DIE RÜCKFAHRT',tjOjo:'ACHTUNG',tjFirma:'Naira · Ihr Reiseführer für Teneriffa',tjDatos:'mit offenen Daten des Cabildo',tjUltima:'Letzter Bus um',tjCambio:'Umstieg in',tjLinea:'Linie',tjSubida:'Anstieg',tjCircular:'Rundweg',tjVueltaCoche:'endet weit vom Start',tjPermiso:'MIT GENEHMIGUNG',tjMin:'Min.',
      catMuseos2:'Museen, Kultur und etwas für die Kinder',catTodo:'Von allem etwas',
      meDaIgual:'Egal — Naira soll wählen',volverZonas:'Zurück zu den Gebieten',verMas:'Mehr sehen…',cambMuni:'Gemeinde wechseln',yMas:'Und mehr…',catNat:'Natur: Wanderwege und Aussichtspunkte',catAgua:'Wasser: Strände und Naturschwimmbecken',catMuseos:'Museen, Kultur und etwas für schlechte Tage',
-     masTranquilo:'Etwas Ruhigeres',prefPlaya:'Lieber Strand oder Pool',prefNat:'Lieber Natur',cambComida:'Woanders essen',otroDia:'Anderer Ort oder anderer Tag',mismoEstilo:'Anderer Ort, gleicher Stil',comTipica:'Kanarische Hausmannskost',comPescado:'Fisch',comLoQueHaya:'Was gerade gut ist',ninguna:'Keine, ich möchte einen anderen Plan',volver:'Zurück',ajustar:'Plan anpassen',frMannana:'Am Vormittag',frMediodia:'Mittags, auf der Suche nach dem Essen',frTarde:'Schon am Nachmittag',frAtardecer:'Wenn der Tag ausklingt',hayFiestas:'Sachen an dem Tag — den Plan darum herum bauen',hayFiesta:'Sache an dem Tag — den Plan darum herum bauen',todoElDia:'den ganzen Tag',aquiMismo:'gleich hier',min:'Min.',mejorVamos:'Besser wir fahren nach',
+     masTranquilo:'Etwas Ruhigeres',prefPlaya:'Lieber Strand oder Pool',prefNat:'Lieber Natur',cambComida:'Woanders essen',mismoEstilo:'Anderer Ort, gleicher Stil',comTipica:'Kanarische Hausmannskost',comPescado:'Fisch',comLoQueHaya:'Was gerade gut ist',ninguna:'Keine, ich möchte einen anderen Plan',volver:'Zurück',frMannana:'Am Vormittag',frMediodia:'Mittags, auf der Suche nach dem Essen',frTarde:'Schon am Nachmittag',frAtardecer:'Wenn der Tag ausklingt',hayFiestas:'Sachen an dem Tag — den Plan darum herum bauen',hayFiesta:'Sache an dem Tag — den Plan darum herum bauen',todoElDia:'den ganzen Tag',aquiMismo:'gleich hier',min:'Min.',mejorVamos:'Besser wir fahren nach',
      donde:'Wo wohnen Sie?',coche:'Haben Sie ein Auto?',si_coche:'Ja, wir haben ein Auto',
      no_coche:'Nein, wir fahren mit dem Bus',como:'Wer ist dabei? Mit Kindern ändert sich einiges.',
      tDia:'Was für ein Tag?',tComida:'Und zum Essen?',
@@ -436,7 +442,7 @@ const T={
      frDeManana:'Am Vormittag',frDeMediodia:'Mittags',frDeTarde:'Am Nachmittag',frDeAtardecer:'Zum Tagesausklang',frDeNoche:'Abends',
      holaSolo:'Hallo! ',
      elijoYo:'Ich wähle den Ort lieber selbst',
-     agenda:'Was ist heute los?',hoyEs:'heute',mananaEs:'morgen',
+     agenda:'Was ist heute los?',hoyEs:'heute',mananaEs:'morgen',deMadrugada:'nach Mitternacht',enMuniBien:(m)=>m+', sehr gut.',abrirMapa:'In Google Maps öffnen',errServidor:(n)=>'der Server antwortete '+n,errSinClave:'kein API-Schlüssel konfiguriert',errCortado:'die Antwort brach ab',errVacio:'es kam kein Text an',frecMucha:'sehr oft, Sie müssen nicht in den Fahrplan schauen',frecMedia:'etwa alle halbe Stunde',frecHora:'etwa stündlich',frecPocas:(n)=>'etwa '+n+' am Tag: schauen Sie vorher in den Fahrplan',frecMuyPocas:(n)=>'nur '+n+' am Tag, das muss man planen',avVueltaPronto:(d,b,h)=>'Achtung beim Rückweg: der letzte Bus von '+d+' nach '+b+' fährt um '+h+', also vor Sonnenuntergang. Wenn Sie länger bleiben wollen, rechnen Sie mit einem Taxi.',avVueltaBuho:(d,b,h,l)=>'Achtung beim Rückweg: von '+d+' nach '+b+' habe ich nur die Nachtfahrt um '+h+'. Die letzte Abfahrt am Abend kenne ich nicht: prüfen Sie Linie '+l+' auf titsa.com vor der Fahrt, oder rechnen Sie mit einem Taxi.',
      fueraMapa:(k)=>'· außerhalb der Karte, '+k+' km entfernt',
      qAgenda:(d,n)=>'Ich habe '+n+' '+(n===1?'Sache':'Sachen')+' in den nächsten '+d+' Tagen. Soll ich den Tag darum herum bauen?',
      zSur:'Süden und Südwesten',zCumbre:'Gipfel und Teide',
@@ -467,7 +473,7 @@ const T={
      ahora:'Ich bin schon unterwegs — was jetzt?',cambiar:'Tag oder Unterkunft ändern',
      hola:'Ich bin <b>Naira</b>, hier geboren und aufgewachsen. Ich plane Ihren Tag so, wie ich ihn für einen Cousin aus dem Ausland planen würde: ohne sinnlose Warteschlangen und mit gutem Essen. ',compartir:'Diesen Plan teilen',otro_muni:'Falsch — Ort ändern',
      sorpresa:'Überraschen Sie mich — mit der Zeit, die bleibt',
-     planManana:'Heute ist fast vorbei, deshalb baue ich Ihnen einen ganzen Tag für morgen. Für den Rest von heute nehmen Sie «Überraschen Sie mich».',escapada:'🗓 Ein Wochenende oder mehrere Tage',escribeAqui:'Fragen Sie mich alles zum Plan…',noPuedoHablar:'Ich kann gerade nicht schriftlich antworten. Nutzen Sie die Schaltflächen unten.',cuantosDias:'Wie viele Tage soll ich planen? Ich beginne mit dem gewählten Datum.',dia:'Tag',escapadaCab:n=>'Gut, '+n+' Tage am Stück. Ein Gebiet pro Tag, keine Wiederholungen, und der anstrengendste Tag in der Mitte, denn am ersten Tag kommt man müde an.',dos_dias:'Zwei Tage',tres_dias:'Drei Tage (Wochenende)',cuatro_dias:'Vier Tage',calEscapada:'🗓 Tage im Kalender speichern',otroDia:'Zurück zum Menü',copiado:'Kopiert.',calendario:'🗓 Tag im Kalender speichern',ubiCartel:'Für einen passenderen Plan: sagen Sie mir, wo Sie sind',ubiCartelBtn:'Standort verwenden',queTal:'Und wie war der Tag?',val3:'Großartig',val2:'Gut',val1:'Geht so',valNo:'Jetzt nicht',gracias3:'Das freut mich sehr. Ich notiere es mir, so weiß ich, was funktioniert.',gracias2:'Freut mich. Ich notiere es mir trotzdem.',gracias1:'Das tut mir leid. Ich notiere es mir, so lerne ich dazu.',imgCompartir:'📸 Plan als Bild teilen',imgBajada:'Bild heruntergeladen. Schicken Sie es, wohin Sie möchten.',ubi:'Meinen Standort verwenden',ubiNo:'Ich sage es Ihnen',ubiPido:'Dafür ist es gut zu wissen, wo Sie sind. Soll ich den Standort prüfen, oder sagen Sie es mir?',ubiBuscando:'Einen Moment, ich schaue, wo Sie sind…',ubiHecho:m=>'Ich verorte Sie in '+m+'. Passt das?',ubiSi:'Ja, da sind wir',ubiOtro:'Nein, ich wähle selbst',ubiFallo:'Ich konnte den Standort nicht lesen, kein Problem. Sagen Sie es mir einfach.',ubiLejos:'Sie scheinen außerhalb Teneriffas zu sein, sagen Sie es mir lieber.',ajustar:'Plan anpassen',
+     planManana:'Heute ist fast vorbei, deshalb baue ich Ihnen einen ganzen Tag für morgen. Für den Rest von heute nehmen Sie \u201eÜberraschen Sie mich\u201c.',escapada:'🗓 Ein Wochenende oder mehrere Tage',escribeAqui:'Fragen Sie mich alles zum Plan…',noPuedoHablar:'Ich kann gerade nicht schriftlich antworten. Nutzen Sie die Schaltflächen unten.',cuantosDias:'Wie viele Tage soll ich planen? Ich beginne mit dem gewählten Datum.',dia:'Tag',escapadaCab:n=>'Gut, '+n+' Tage am Stück. Ein Gebiet pro Tag, keine Wiederholungen, und der anstrengendste Tag in der Mitte, denn am ersten Tag kommt man müde an.',dos_dias:'Zwei Tage',tres_dias:'Drei Tage (Wochenende)',cuatro_dias:'Vier Tage',calEscapada:'🗓 Tage im Kalender speichern',otroDia:'Zurück zum Menü',calendario:'🗓 Tag im Kalender speichern',ubiCartel:'Für einen passenderen Plan: sagen Sie mir, wo Sie sind',ubiCartelBtn:'Standort verwenden',queTal:'Und wie war der Tag?',val3:'Großartig',val2:'Gut',val1:'Geht so',valNo:'Jetzt nicht',gracias3:'Das freut mich sehr. Ich notiere es mir, so weiß ich, was funktioniert.',gracias2:'Freut mich. Ich notiere es mir trotzdem.',gracias1:'Das tut mir leid. Ich notiere es mir, so lerne ich dazu.',imgCompartir:'📸 Plan als Bild teilen',imgBajada:'Bild heruntergeladen. Schicken Sie es, wohin Sie möchten.',ubi:'Meinen Standort verwenden',ubiNo:'Ich sage es Ihnen',ubiPido:'Dafür ist es gut zu wissen, wo Sie sind. Soll ich den Standort prüfen, oder sagen Sie es mir?',ubiBuscando:'Einen Moment, ich schaue, wo Sie sind…',ubiHecho:m=>'Ich verorte Sie in '+m+'. Passt das?',ubiSi:'Ja, da sind wir',ubiOtro:'Nein, ich wähle selbst',ubiFallo:'Ich konnte den Standort nicht lesen, kein Problem. Sagen Sie es mir einfach.',ubiLejos:'Sie scheinen außerhalb Teneriffas zu sein, sagen Sie es mir lieber.',ajustar:'Plan anpassen',
      copiado:'Kopiert. Schicken Sie ihn, wem Sie möchten.',
      antes:'So sah es hier aus im Jahr',pensando:'Naira überlegt…'}
 };
@@ -557,6 +563,16 @@ const ACTOS_TR=[
   [/baile|tardeo|\bdj\b|orquesta/i,  {en:'dancing',             de:'Tanz'}]
 ];
 const sinTildes=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+/* Cortar un texto por el carácter N deja cosas como «…que debían viajar desde
+   e» — a mitad de palabra y sin avisar de que sigue. Se corta por la última
+   palabra entera que quepa y se cierra con puntos suspensivos. */
+function recorta(t,n){
+  const x=String(t||'').trim();
+  if(x.length<=n) return x;
+  const corte=x.slice(0,n);
+  const esp=corte.lastIndexOf(' ');
+  return (esp>n*0.6?corte.slice(0,esp):corte).replace(/[\s,;:.·-]+$/,'')+'…';
+}
 function actoTr(n){
   if(S.idioma==='es') return '';
   for(const [re,t] of ACTOS_TR){
@@ -595,6 +611,44 @@ const HORAS={
 };
 const ES_DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const ES_LETRAS=['D','L','M','X','J','V','S'];
+/* Y las de tres letras, que se colaban enteras: «10:00-21:00 · vie y sáb hasta
+   las 22:00 · lun y mar cerrado» salía en inglés como «vie and sáb until 22:00
+   · lun and mar closed». `ES_DIAS` cubre el nombre entero y `ES_LETRAS` la
+   inicial suelta; en medio no había nada. */
+const ES_ABREV=['dom','lun','mar','mi[ée]','jue','vie','s[áa]b'];
+/* ── EL TIPO DE COCINA ──
+   Los 59 valores de `tipo` en REST se enseñaban en español dentro de un plan
+   en inglés: «De autor», «Alta cocina», «Canaria de siempre». Se traducen con
+   tabla cerrada, como los 32 tipos de sitio, y solo los que se repiten: los 30
+   que salen UNA vez —«Pollo a la brasa», «Pinchos de autor»— se quedan como
+   están antes que arriesgar una traducción rara palabra por palabra.
+   Y hay tres que NO se traducen a propósito, por la misma razón que verbena y
+   romería: tasca, guachinche y bodega son las palabras que el turista va a ver
+   escritas en la puerta. */
+const COCINAS={
+ en:{'Cocina canaria':'Canarian cooking','Restaurante':'Restaurant','Canaria':'Canarian',
+     'Heladería':'Ice cream shop','Pescado':'Fish','Parrilla':'Grill','Tapas':'Tapas',
+     'Italiana':'Italian','De autor':'Creative','Mediterránea':'Mediterranean',
+     'Canaria de siempre':'Traditional Canarian','Alta cocina':'Fine dining','Playa':'Beach',
+     'Pizzería':'Pizzeria','Marisco':'Seafood','Canaria de autor':'Creative Canarian',
+     'Casera canaria':'Canarian home cooking','Argentina':'Argentinian','Venezolana':'Venezuelan',
+     'Canaria creativa':'Creative Canarian','Casera':'Home cooking','Canaria barata':'Cheap and Canarian',
+     'Cubana':'Cuban','Internacional':'International','Fusión':'Fusion','Gastrobar':'Gastrobar'},
+ de:{'Cocina canaria':'Kanarische Küche','Restaurante':'Restaurant','Canaria':'Kanarisch',
+     'Heladería':'Eisdiele','Pescado':'Fisch','Parrilla':'Grill','Tapas':'Tapas',
+     'Italiana':'Italienisch','De autor':'Kreativküche','Mediterránea':'Mediterran',
+     'Canaria de siempre':'Kanarische Hausmannskost','Alta cocina':'Gehobene Küche','Playa':'Strand',
+     'Pizzería':'Pizzeria','Marisco':'Meeresfrüchte','Canaria de autor':'Kanarische Kreativküche',
+     'Casera canaria':'Kanarische Hausmannskost','Argentina':'Argentinisch','Venezolana':'Venezolanisch',
+     'Canaria creativa':'Kanarische Kreativküche','Casera':'Hausmannskost','Canaria barata':'Günstig und kanarisch',
+     'Cubana':'Kubanisch','Internacional':'International','Fusión':'Fusion','Gastrobar':'Gastrobar'}
+};
+function cocinaTr(t){
+  if(!t||S.idioma==='es') return t;
+  const M=COCINAS[S.idioma]; if(!M) return t;
+  return M[t]||t;
+}
+
 function horarioTr(h){
   if(!h||S.idioma==='es') return h;
   const M=HORAS[S.idioma]; if(!M) return h;
@@ -604,6 +658,11 @@ function horarioTr(h){
     const base=d.replace('miércoles','mi[ée]rcoles').replace('sábado','s[áa]bado');
     t=t.replace(new RegExp(base+'s\\b','gi'),M.dias[i]+'s');
     t=t.replace(new RegExp(base+'\\b','gi'),M.dias[i]);
+  });
+  /* después las de tres letras, antes que la inicial suelta: si se hiciera al
+     revés, la «V» de «vie» se cambiaría sola y dejaría «Frie». */
+  ES_ABREV.forEach((a,i)=>{
+    t=t.replace(new RegExp('(^|[\\s·\\-–(])'+a+'\\.?(?=[\\s·\\-–,)]|$)','gi'),'$1'+M.letras[i]);
   });
   /* luego las abreviaturas de una letra, solo cuando van sueltas */
   ES_LETRAS.forEach((L,i)=>{
@@ -1182,8 +1241,16 @@ function construir(){
     const antes=cand.length;
     const fuera=[];
     cand=cand.filter(l=>{
-      let razon=null;
-      if(l.ninos==='NO') razon=l.seg||'con los peques hay que tener cuidado';
+      /* ── Por qué se queda fuera, y de qué CLASE es el motivo ──
+         Lo cazó la auditoría del 11 de septiembre: la coletilla «ustedes
+         deciden, aunque sea acercarse a verlo merece la pena» se pegaba igual
+         a «son 522 metros de subida» que a «está clasificada como PELIGROSA en
+         el registro oficial de zonas de baño». En el segundo caso es una
+         invitación a ir a un sitio del que acabamos de decir que es peligroso.
+         Así que el motivo viaja con su clase: `incomodidad` —cuesta, dificultad,
+         reserva— lleva la coletilla; `peligro` se cuenta y punto. */
+      let razon=null, clase='incomodidad';
+      if(l.ninos==='NO'){ razon=l.seg||'con los peques hay que tener cuidado'; clase='peligro'; }
       /* La etiqueta `dif` del catálogo no es de fiar: hay seis senderos
          marcados «Baja» y aptos para niños con más de 400 m de subida
          (Barranco del Infierno, +522 m; Los Carrizales, +518 m…). Desde que
@@ -1193,9 +1260,9 @@ function construir(){
         razon='son '+l.sub+' metros de subida, mucha cuesta para los peques';
       else if(l.tipo==='Sendero'&&/alta/i.test(l.dif||'')) razon='es sendero de dificultad alta';
       else if(l.tipo==='Sendero'&&l.res) razon='necesita reserva previa';
-      else if(l.ninos==='Con cuidado'&&['Charco','Playa'].includes(l.tipo)&&l.seg) razon=l.seg;
+      else if(l.ninos==='Con cuidado'&&['Charco','Playa'].includes(l.tipo)&&l.seg){ razon=l.seg; clase='peligro'; }
       if(!razon) return true;
-      fuera.push({l,razon});
+      fuera.push({l,razon,clase});
       return false;
     });
     /* de los descartados, los que están cerca y son bonitos se cuentan igual */
@@ -1398,6 +1465,38 @@ function construir(){
   if(S.ahora)
     paso('ok','modo «estoy aquí ahora»','Son las <span class="am">'+S.ahora+'</span>: quedan '+
       franjas.join(', ')+'. No se planifica un día entero, se planifica lo que queda.');
+  /* ── A qué hora se llega a cada franja, cuando el plan es para HOY ──
+     Lo pidió la auditoría del 11 de septiembre con un caso feo: «Sorpréndame»
+     a las 21:40 en Adeje cerraba el día en Absurdia, Mundo de Ilusiones, que
+     cierra a las 21:30. La franja de atardecer no cruzaba el horario del sitio
+     con la hora real, así que ofrecía un museo cerrado y encima le pegaba la
+     coletilla de «miren la hora de cierre antes de ir».
+     Solo 39 de las 644 fichas traen `hor`, pero son justo estas: museos,
+     jardines, centros de visitantes. Donde no hay horario no se puede filtrar
+     y no se filtra — una playa no cierra. */
+  const HORA_FRANJA={'mañana':10*60,'mediodia':13*60,'tarde':16*60,'atardecer':19*60};
+  const esHoy = f===(new Date()).toISOString().slice(0,10);
+  const ahoraMin = esHoy ? (new Date().getHours()*60+new Date().getMinutes()) : null;
+  /* Se toma la hora MAYOR que aparezca en el texto del horario: «10:00-14:00 y
+     17:00-20:00» cierra a las 20:00, no a las 14:00. */
+  const cierraA=h=>{
+    const hh=String(h||'').match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/g);
+    if(!hh||!hh.length) return null;
+    return hh.reduce((mx,x)=>{const [a,b]=x.split(':').map(Number); return Math.max(mx,a*60+b);},0);
+  };
+  /* Media hora de margen para llegar: si cierra justo cuando uno saldría de
+     casa, no vale. */
+  const llegadaA=fr=>{
+    const nominal=HORA_FRANJA[fr]||12*60;
+    return (ahoraMin!=null&&(S.ahora||franjaReloj)) ? Math.max(nominal,ahoraMin+30) : nominal;
+  };
+  const abiertoAl=(x,fr)=>{
+    if(!x.hor) return true;                  /* sin horario fichado no se juzga */
+    if(!esHoy||!(S.ahora||franjaReloj)) return true;   /* solo cuando el reloj recorta */
+    const c=cierraA(x.hor);
+    return c==null || c>llegadaA(fr);
+  };
+
   franjas.forEach((fr,i)=>{
     if(ev&&ev.fr===fr){ techo=Math.min(techo,(anclaD||30)+5); return; }
     if(foco&&foco.fr===fr){ techo=Math.min(techo,dBase(foco)); return; }
@@ -1407,7 +1506,13 @@ function construir(){
        y la dispersión máxima era de 12,7 km. Compitiendo: 1 día de dos paradas
        y 9,6 km de máximo. Ojo, esto solo se sostiene con el peso de niños de
        más abajo: sin él, los senderos flex desplazaban a playas y museos. */
-    let pool=cand.filter(x=>(x.fr===fr||x.flex)&&!usados.has(x.n));
+    let pool=cand.filter(x=>(x.fr===fr||x.flex)&&!usados.has(x.n)&&abiertoAl(x,fr));
+    const cerrados=cand.filter(x=>(x.fr===fr||x.flex)&&!usados.has(x.n)&&!abiertoAl(x,fr));
+    if(cerrados.length)
+      paso('avi','a estas horas ya está cerrado',
+        'Fuera de la franja de <span class="am">'+fr+'</span>: <span class="no">'+cerrados.length+
+        '</span> sitio(s) que cierran antes de que llegarían — '+cerrados.slice(0,3).map(x=>x.n).join(', ')+
+        '. Ofrecer un museo cerrado es peor que no ofrecer nada.');
     /* Un día no tiene por qué acabar siempre en un mirador. Puede acabar
        en un paseo por el casco, en una plaza, en la orilla o en un jardín. */
     if(fr==='atardecer'){
@@ -1419,7 +1524,7 @@ function construir(){
       const CIERRES=['Mirador','Casco histórico','Plaza','Playa','Charco','Piscina',
                      'Jardín','Caserío','Mercado','Museo','Paseo'];
       const abanico=cand.filter(x=>!usados.has(x.n)&&CIERRES.includes(x.tipo)&&
-                                   (x.fr==='atardecer'||x.flex||x.fr==='tarde'));
+                                   (x.fr==='atardecer'||x.flex||x.fr==='tarde')&&abiertoAl(x,fr));
       if(abanico.length>=2) pool=abanico;
     }
     if(!pool.length) pool=cand.filter(x=>x.flex&&!usados.has(x.n));
@@ -1827,33 +1932,83 @@ function construir(){
       regreso={medio:'a pie o guagua urbana',nota:'Se quedan en el mismo municipio: la vuelta no es problema.'};
       paso('ok','regla 4 · el regreso','Todo el plan es dentro de <span class="si">'+base.m+'</span>. Sin problema de vuelta.');
     }else if(r){
-      const txt=m=>{const h=Math.floor(m/60),mi=m%60;return String(h%24).padStart(2,'0')+':'+String(mi).padStart(2,'0')+(h>=24?' (de madrugada)':'')};
+      /* ── LA HORA QUE SE DA NO ES «LA ÚLTIMA», ES LA QUE SE PUEDE PLANIFICAR ──
+         Esto es el fallo más gordo que ha tenido la web y lo cazó una auditoría
+         del 11 de septiembre. `MATRIZ` guarda UNA hora por par de municipios: la
+         salida más tardía del día. Y en **427 de los 850 pares laborables** esa
+         salida es **después de medianoche**, muchas entre las tres y las cinco
+         y media de la mañana. El motor la presentaba tal cual —«la última guagua
+         sale a las 04:09»— y encima añadía «hay guaguas hasta de madrugada, así
+         que la vuelta no aprieta». A alguien sin coche eso lo deja tirado.
+         Aquí no se puede inventar la hora buena: el dato no está. `MATRIZ` trae
+         un solo número por par y `titsa-regreso.js` —que sí tiene
+         `ultima_antes_medianoche`— solo cubre dos corredores de origen. Así que
+         lo que se arregla es **lo que se dice**: si la única salida que tenemos
+         es de madrugada, no se llama «la última guagua», se llama lo que es —una
+         guagua de madrugada— y **se dice que la de la tarde no la sabemos** y
+         que hay que mirar el horario de esa línea. Callarse el número sería
+         peor; darlo como si fuera el de la tarde es lo que estaba mal. */
+      /* ¿Dónde está la raya? A medianoche no: una guagua a las 00:51 es la
+         última de la noche de verdad y se puede coger después de cenar. Lo
+         que engaña es el BÚHO —el servicio de noche de las tres o las cuatro—,
+         porque detrás lleva un agujero: guaguas hasta las diez, nada en seis
+         horas, y luego esa. Quien lea «la última sale a las 04:09» y pierda la
+         de las diez se queda sentado hasta la madrugada.
+         La raya en la **01:30** es un juicio, no un dato: la fuente no dice
+         dónde está el hueco. Con ella, 9 de las 31 bases pasan a contarlo como
+         búho. Si Zeben ve que en su zona la noche llega más tarde, se mueve
+         aquí y ya. */
+      const BUHO=90+24*60;                 /* de la 01:30 en adelante, es búho */
+      const esBuho=r.ultima>=BUHO;
+      /* La hora, a secas. Antes se le pegaba « (de madrugada)» AQUÍ, escrito en
+         español, y viajaba así al inglés y al alemán: es una de las fugas de
+         idioma que cazó la auditoría. Ahora el sufijo va por `tr()` y solo
+         donde hace falta, que en una frase que ya dice «la de madrugada» el
+         paréntesis sobra. */
+      const txt=m=>{const h=Math.floor(m/60),mi=m%60;return String(h%24).padStart(2,'0')+':'+String(mi).padStart(2,'0')};
+      const txtLargo=m=>txt(m)+(m>=24*60?' ('+tr('deMadrugada')+')':'');
       regreso={medio:'guagua',fuente:'GTFS oficial de TITSA',tipo_dia:tipoDia,
-        desde:destMuni,hasta:base.m,ultima_salida:txt(r.ultima),
+        desde:destMuni,hasta:base.m,
+        /* el nombre del campo dice de qué hora se trata, que es la mitad del
+           arreglo: el modelo leía «ultima_salida» y decía «la última» */
+        ultima_salida:esBuho?null:txtLargo(r.ultima),
+        guagua_de_madrugada:esBuho?txt(r.ultima):null,
+        no_sabemos_la_ultima_de_la_tarde:esBuho||null,
+        como_contarlo_la_vuelta:esBuho
+          ? 'De este trayecto solo tenemos una salida y es DE MADRUGADA: no es la guagua de vuelta normal, es el servicio de noche. NO digas que es «la última guagua» ni que la vuelta no aprieta. Di la hora que es, di claro que la última de la tarde no la sabemos, y mándalos a mirar el horario de esa línea en titsa.com antes de ir.'
+          : 'Esta es la última salida del día para ese trayecto. Dila con su hora y su línea, dentro del plan.',
         linea:r.linea, con_trasbordo:r.tipo==='trasbordo', cambio_en:r.via||null,
         segunda_linea:r.linea2||null, espera_trasbordo_min:r.espera||null,
-        duracion_min:(r.llega?r.llega-r.ultima:null),
-        servicio_nocturno:r.ultima>=24*60+30, viajes_dia:r.viajes||null,
-        de_madrugada:r.ultima>=24*60,
+        /* `llega - ultima` es lo que tarda EL ÚLTIMO viaje del día, que es el
+           más rápido que hay: sin tráfico y con menos paradas. De ahí salían
+           «9 minutos» de La Orotava al Puerto. Con el búho no se da: unos
+           minutos de madrugada animan a salir tarde y no valen para el día. */
+        duracion_del_ultimo_viaje_min:(!esBuho&&r.llega)?r.llega-r.ultima:null,
+        viajes_dia:r.viajes||null,
         cuantas_al_dia:r.viajes||null,
-        con_que_frecuencia: r.viajes ? (r.viajes>=120?'muy a menudo, no hace falta mirar el horario'
-          : r.viajes>=60?'cada media hora aproximadamente'
-          : r.viajes>=25?'cada hora aproximadamente'
-          : r.viajes>=10?'unas '+r.viajes+' al día: conviene mirar el horario antes de salir'
-          : 'solo '+r.viajes+' al día, así que hay que planificarla') : null,
+        /* Estas cuatro frases se construían en español y viajaban tal cual al
+           relato en inglés y en alemán: «muy a menudo, no hace falta mirar el
+           horario» salía en medio de un plan traducido. Van por `tr()`. */
+        con_que_frecuencia: r.viajes ? (r.viajes>=120?tr('frecMucha')
+          : r.viajes>=60?tr('frecMedia')
+          : r.viajes>=25?tr('frecHora')
+          : r.viajes>=10?tr('frecPocas')(r.viajes)
+          : tr('frecMuyPocas')(r.viajes)) : null,
         horarios_exactos:'https://www.titsa.com/index.php/tus-viajes/horarios',
         linea_web: r.linea ? 'https://www.titsa.com/index.php/tus-viajes/horarios?linea='+r.linea : null};
       const det=r.tipo==='trasbordo'
         ? 'con cambio en <span class="am">'+r.via+'</span> (línea '+r.linea+' → '+r.linea2+', '+r.espera+' min de espera)'
         : 'directa en <span class="am">línea '+r.linea+'</span>'+(r.viajes?' ('+r.viajes+' al día)':'');
-      paso(r.ultima<19*60?'mal':'ok','regla 4 · el regreso, del GTFS de TITSA',
+      paso((r.ultima<19*60||esBuho)?'mal':'ok','regla 4 · el regreso, del GTFS de TITSA',
         '<span class="si">'+destMuni+'</span> → <span class="si">'+base.m+'</span>, día '+tipoDia+
-        '. Última a las <span class="am">'+txt(r.ultima)+'</span>, '+det+'.'+
-        (r.ultima>=24*60+30?'<br><span class="si">Servicio nocturno: la vuelta no aprieta.</span>':'')+
+        '. Única salida que tenemos: <span class="am">'+txtLargo(r.ultima)+'</span>, '+det+'.'+
+        (esBuho?'<br><span class="no">Es de MADRUGADA, o sea el servicio de noche. No vale como guagua de vuelta: '+
+                'la de la tarde no la tenemos y se dice.</span>':'')+
         (r.ultima<19*60?'<br><span class="no">Sale antes del atardecer. Va como primer aviso.</span>':''));
-      if(r.ultima<19*60)
-        R.avisos.unshift('Ojo con la vuelta: la última guagua de '+destMuni+' hacia '+base.m+
-          ' sale a las '+txt(r.ultima)+', o sea antes del atardecer. Si se quieren quedar, cuenten con taxi.');
+      /* Los avisos van por `tr()`: se escribían en español a pelo y se le
+         enseñaban tal cual a un inglés y a un alemán. */
+      if(r.ultima<19*60) R.avisos.unshift(tr('avVueltaPronto')(destMuni,base.m,txt(r.ultima)));
+      else if(esBuho)    R.avisos.unshift(tr('avVueltaBuho')(destMuni,base.m,txt(r.ultima),r.linea));
     }else{
       regreso={medio:'guagua',fuente:'GTFS oficial de TITSA',hay_combinacion:false,
         desde:destMuni,hasta:base.m,
@@ -2116,7 +2271,24 @@ function construir(){
     /* Ojo con el nombre: «no_hay_de_lo_que_pidieron» ya estaba cogido más
        abajo por la comida (faltaComida) y, siendo el mismo objeto, la última
        clave ganaba y esta se perdía entera sin dar error. */
-    no_hay_de_lo_que_pidieron_para_ver: S.faltaNucleo?{
+    /* ── Y el aviso vale también por el camino principal ──
+       El salvavidas existía desde hacía tiempo, pero solo se armaba dentro de
+       `queApeteceEn()`, que es el camino de «prefiero elegir el sitio yo». Por
+       el camino normal —zona, municipio, carta— `queApetece()` lo ponía a
+       `null` y nadie lo volvía a mirar. Lo cazó la auditoría: Puerto de la
+       Cruz + la carta de «Senderos» devolvía la Hijuela del Botánico y el
+       Mirador de Humboldt, ni un sendero, y no se avisaba de nada.
+       Ahora, si al terminar el día NINGUNA parada es de lo que prometía la
+       carta, se arma el aviso con lo que de verdad salió. Es mejor sitio para
+       comprobarlo que la entrada: mide el resultado, no la intención. */
+    no_hay_de_lo_que_pidieron_para_ver: (function(){
+      if(!S.faltaNucleo&&S.apetece&&NUCLEO_DIA[S.apetece]&&paradas.length){
+        const nuc=NUCLEO_DIA[S.apetece];
+        if(!paradas.some(p=>nuc.test(p.tipo||'')))
+          S.faltaNucleo={pedido:S.apetece, muni:(paradas[0].m||corr), enSuLugar:paradas[0].n};
+      }
+      return S.faltaNucleo;
+    })()?{
       pidieron: ({naturaleza:'senderos',playa:'playas o charcos',museos:'museos'})[S.faltaNucleo.pedido]||S.faltaNucleo.pedido,
       /* la clave sin traducir, para el relato de plantillas: «pidieron» va en
          español y colarlo dentro de una frase en inglés canta */
@@ -2153,6 +2325,8 @@ function construir(){
        Ahora llevan los datos y el enlace. */
     cerca_pero_con_ojo: paraMencionar.map(x=>({nombre:x.l.n,municipio:x.l.m,
       tipo:x.l.tipo,a_cuanto_km:Math.round(x.d),por_que:x.razon,
+      /* si es por seguridad, se cuenta sin invitar a ir */
+      es_por_seguridad:x.clase==='peligro'||null,
       lo_bueno:x.l.fx||x.l.no||null,
       largo_m:x.l.mts||null, subida_m:x.l.sub!=null?x.l.sub:null,
       matricula_oficial:x.l.mat||null,
@@ -2419,7 +2593,7 @@ function mapaDia(grupos,alto){
       el.innerHTML='<div class="avisoMapa"><b>'+tr('mapaNo')+'</b>'+
         '<span>'+tr('mapaNoTxt')+'</span>'+
         '<a href="https://www.google.com/maps/dir/?api=1&destination='+pts[0].la+','+pts[0].lo+
-        '" target="_blank" rel="noopener">Abrir en Google Maps ▸</a></div>';
+        '" target="_blank" rel="noopener">'+tr('abrirMapa')+' ▸</a></div>';
       return;
     }
     const m=L.map(id,{scrollWheelZoom:false,attributionControl:true});
@@ -2548,7 +2722,9 @@ function dibujarTarjeta(b,base){
           (p.vuelta_al_inicio_m ? ' · '+tr('tjVueltaCoche') : '')+
           (p.es_circular===true ? ' · '+tr('tjCircular') : '');
     }else{
-      sub=(p.tipo||'')+(p.duracion_min?' · '+p.duracion_min+' '+tr('tjMin'):'');
+      /* La tabla TIPOS está completa en los tres idiomas y aquí no se llamaba:
+         en inglés se leía «Árbol / monumento natural · 40 min». */
+      sub=(p.tipo?tipoTr(p.tipo):'')+(p.duracion_min?' · '+p.duracion_min+' '+tr('tjMin'):'');
     }
     P.push({fr:p.franja,n:p.nombre,s:sub,col:LAU,permiso:!!p.permiso_max_personas});
   });
@@ -2565,7 +2741,7 @@ function dibujarTarjeta(b,base){
      rota justo en los planes más completos. Ahora se mide el hueco real y
      se aprieta el paso si hace falta, sin bajar de lo legible. */
   const MARGEN = 40
-    + ((b.regreso&&b.regreso.ultima_salida)?140:0)
+    + ((b.regreso&&(b.regreso.ultima_salida||b.regreso.guagua_de_madrugada))?140:0)
     + ((b.avisos||[]).length?130:0)
     + (P.length>3?44:0);        /* el «y algo más», que también ocupa */
   const HUECO = (H-96) - y - MARGEN;
@@ -2621,14 +2797,14 @@ function dibujarTarjeta(b,base){
 
   /* la vuelta */
   const g=b.regreso;
-  if(g&&g.ultima_salida){
+  if(g&&(g.ultima_salida||g.guagua_de_madrugada)){
     x.fillStyle=ARE;
     if(x.roundRect){x.beginPath();x.roundRect(72,yy,W-144,116,22);x.fill();}
     else x.fillRect(72,yy,W-144,116);
     x.fillStyle=TEA;x.font='700 24px "Space Mono", monospace';
     x.fillText(tr('tjVuelta'),102,yy+42);
     x.font='600 31px Figtree, system-ui, sans-serif';
-    x.fillText(tr('tjUltima')+' '+g.ultima_salida+
+    x.fillText(tr('tjUltima')+' '+(g.ultima_salida||g.guagua_de_madrugada)+
       (g.con_trasbordo?', '+tr('tjCambio')+' '+g.cambio_en:', '+tr('tjLinea')+' '+g.linea),102,yy+85);
     yy+=140;
   }
@@ -2711,7 +2887,7 @@ function urlCalendario(b,base){
     ', '+b.cerrar_tomando_algo.municipio]);
   lineas.sort((a,c)=>a[0]-c[0]).forEach(x=>L.push('• '+x[1]));
   const g=b.regreso;
-  if(g&&g.ultima_salida) L.push('',tr('tjVuelta')+': '+tr('tjUltima').toLowerCase()+' '+g.ultima_salida+
+  if(g&&(g.ultima_salida||g.guagua_de_madrugada)) L.push('',tr('tjVuelta')+': '+tr('tjUltima').toLowerCase()+' '+(g.ultima_salida||g.guagua_de_madrugada)+
     (g.con_trasbordo?', cambio en '+g.cambio_en:', línea '+g.linea));
   if((b.avisos||[]).length){ L.push('','OJO:'); b.avisos.forEach(a=>L.push('• '+a)); }
   L.push('','Deje el sitio como lo encontró: la basura se baja, no se deja.');
@@ -2779,7 +2955,10 @@ function bloqueMapas(b,base){
   if(horaBaño) LUGARES.filter(l=>l.c===b.corredor&&!l.cerrado&&l.la&&
       ['Playa','Charco','Piscina'].includes(l.tipo)&&!yaAgua.has(l.n)).slice(0,3)
     .forEach(l=>agua.push({la:l.la,lo:l.lo,nombre:l.n,
-      sub:tipoTr(l.tipo)+(l.ninos==='Sí'?' · '+tr('bienNinos'):(l.ninos==='NO'?' · '+tr('noNinos'):''))}));
+      /* «bien con niños» y «NO para niños» solo le dicen algo a quien lleva
+         niños. En un plan de «grupo, sin niños» salían tres charcos con el
+         cartel de «NO para niños»: ruido, y encima alarmante. */
+      sub:tipoTr(l.tipo)+(S.ninos?(l.ninos==='Sí'?' · '+tr('bienNinos'):(l.ninos==='NO'?' · '+tr('noNinos'):'')):'')}));
 
   /* EL MAPA DEL DÍA, todo junto y con la ruta trazada */
   const mapa=mapaDia([
@@ -2859,9 +3038,9 @@ function dibujaRuta(b){
   (b.paradas||[]).forEach(p=>{
     const l=LUGARES.find(x=>x.n===p.nombre)||{};
     P.push({fr:p.franja,n:p.nombre,tipo:l.tipo||'',dur:p.duracion_min,
-      sub:(l.fx||p.cuando_no||l.no||'').slice(0,140),
+      sub:recorta(l.fx||p.cuando_no||l.no||'',140),
       chips:[l.tipo,p.duracion_min?p.duracion_min+' min':null,
-             l.ninos==='Sí'?tr('bienNinos'):null].filter(Boolean),
+             (S.ninos&&l.ninos==='Sí')?tr('bienNinos'):null].filter(Boolean),
       ojo:p.aviso_seguridad||p.reserva_obligatoria||null,
       clase:['Playa','Charco','Piscina'].includes(l.tipo)?'bano':''});
   });
@@ -2898,7 +3077,7 @@ function dibujaRuta(b){
       '<h4>'+p.n+'</h4>'+
       (p.sub?'<p>'+p.sub+'</p>':'')+
       p.chips.map(c=>'<span class="chip">'+c+'</span>').join('')+
-      (p.ojo?'<span class="chip ojo">'+String(p.ojo).slice(0,90)+'</span>':'')+
+      (p.ojo?'<span class="chip ojo">'+recorta(p.ojo,90)+'</span>':'')+
     '</div>').join('')+extra+'</div>';
 }
 
@@ -3073,18 +3252,41 @@ function tarjeta(icono,titulo,url,sub,alerta,item,tipo,orden){
    tiene que hablar los tres idiomas igual que el resto. La voz canaria
    no se traduce: en inglés y alemán Naira es una vecina que conoce el
    sitio, no un folleto, y los canarismos se mantienen explicados. */
+/* ── «Hoy» solo cuando de verdad es hoy ──
+   Lo cazó la auditoría del 11 de septiembre, y era de los que escuecen: a
+   partir de media tarde la web salta sola al día siguiente y lo anuncia bien
+   —«para hoy ya se nos fue el día, se lo armo entero para mañana»— y dos
+   burbujas después el narrador soltaba «¡Chos, HOY hay Feria de Pinolere!».
+   En la escapada de tres días era peor: el día 2 y el día 3 también decían
+   hoy. Y lo retorcido es que las claves `hoyEs` y `mananaEs` llevaban
+   definidas en los tres idiomas desde el principio **sin que nadie las usara**.
+   El adverbio sale ahora de la fecha DEL PLAN, no del reloj. Y si no es ni hoy
+   ni mañana, se dice el día: «el sábado 12», que es más útil que un «ese día».
+   El nombre del día lo escribe el navegador con `toLocaleDateString`, como en
+   el calendario, así que no hay tabla que cuadrar. */
+function cuandoEs(f){
+  if(!f) return tr('hoyEs');
+  const hoy=hoyISO();
+  if(f===hoy) return tr('hoyEs');
+  const d=new Date(hoy+'T12:00:00'); d.setDate(d.getDate()+1);
+  if(f===d.toISOString().slice(0,10)) return tr('mananaEs');
+  const LOCD={es:'es-ES',en:'en-GB',de:'de-DE'}[S.idioma]||'es-ES';
+  const t=new Date(f+'T12:00:00').toLocaleDateString(LOCD,{weekday:'long',day:'numeric'});
+  return (S.idioma==='es'?'el ':S.idioma==='en'?'on ':'am ')+t;
+}
 const N={
  es:{
   antesNada:'Antes de nada, que esto cambia el plan:',
   cerrada:(n,m)=>'Lo primero, que si no se llevan el disgusto allí mismo: '+n+' está CERRADA y no se puede entrar. '+m+'\nAsí que les monto el día por la zona con otra cosa.',
-  lejosCab:(n,m,d)=>'Antes que nada: hoy hay '+n+' en '+m+d+'. Desde donde están son unos ',
+  lejosCab:(n,m,d,c)=>'Antes que nada: '+c+' hay '+n+' en '+m+d+'. Desde donde están son unos ',
   lejosMin:' minutos de ida, y otros tantos de vuelta.',
   lejosGrande:'\nSi les tira, vayan, que es de las grandes del año. Pero es un día entero de viaje, así que les dejo también un plan por su zona, que por aquí se hacen cosas muy guapas sin pegarse ese trote.',
   lejosPeq:'\nSe lo digo por si les apetece, aunque el plan que les monto queda más cerca.',
-  chos:(n,m,d)=>'¡Chos, hoy hay '+n+' en '+m+d+'! Les pilla de suerte.',
+  chos:(n,m,d,c)=>'¡Chos, '+c+' hay '+n+' en '+m+d+'! Les pilla de suerte.',
   horaNo:'\nLa hora la publica el ayuntamiento unos días antes, así que mírenlo cuando se acerque.',
   alrededor:'Va, les monto el día alrededor de eso.',
   cercaHoy:'Con lo que les queda de día, mejor por aquí cerca:',
+  nadaYa:'A estas horas ya no me da para montarles nada en condiciones: lo que hay cerca está cerrado o queda lejos. Mañana tempranito sí, y les armo el día entero.',
   cercaHoy2:'Con lo que les queda de día, algo cerquita:',
   sinFiesta:'Hoy no hay ninguna fiesta cargada en la isla, así que no les vendo humo: les armo el día sobre el propio territorio.',
   sinFiestaCerca:'Aquí al lado no hay nada de fiestas, así que les armo el día sobre el propio territorio.',
@@ -3094,7 +3296,7 @@ const N={
   /* Con niños la lista viene elegida y se puede prometer; a dos adultos va el
      programa entero, así que se enseña y ya. Prometer que una misa cantada les
      va a encajar es exactamente lo que esta casa no hace. */
-  actos:(m,f,el)=>'Y otra cosa, que hoy '+m+' está de fiestas'+(f?' —'+f+'—':'')+
+  actos:(m,f,el,c)=>'Y otra cosa, que '+c+' '+m+' está de fiestas'+(f?' —'+f+'—':'')+
     (el?': hay cosas del programa que les van a encajar.':'. Esto es lo que pone el programa:'),
   actoLin:(n,h,d,k,m)=>'· '+n+(h?', a las '+h:'')+(d?', en '+d:'')+(m?' ('+m+')':'')+'.',
   masFi:'Y por ahí cerca ese día hay más:',
@@ -3142,13 +3344,16 @@ const N={
   vueltaTras:(v,l1,l2,e)=>', cambiando en '+v+' de la línea '+l1+' a la '+l2+', con '+e+' minutos de espera.',
   vueltaDir:(l)=>' en la línea '+l+', directa.',
   vueltaDur:(m)=>' Son '+m+' minutos de viaje.',
-  nocturno:'\nHay guaguas hasta de madrugada, así que la vuelta no aprieta.',muchas:' Pasan a menudo, así que no hay que estar pendiente del reloj.',frecuencia:f=>'\nPasan '+f+'.',verHorarios:'\nLos horarios exactos, en la web de TITSA: titsa.com',mismoPueblo:'Todo el plan queda en su municipio, así que hoy no hace falta guagua: se hace andando o con la urbana.',tiempoHoy:r=>'Hoy por ahí: '+r+'. (parte de AEMET)',
+  /* «la vuelta no aprieta» se fue: se decía con una salida de las cuatro de la
+     mañana y era justo lo contrario de la verdad. */
+  vueltaBuho:(h)=>'Ojo con la vuelta: de ese trayecto solo tengo apuntada la guagua de madrugada, la de las '+h+'. La última de la tarde no la sé, así que mírenla antes de subir',muchas:' Pasan a menudo, así que no hay que estar pendiente del reloj.',frecuencia:f=>'\nPasan '+f+'.',verHorarios:'\nLos horarios exactos, en la web de TITSA: titsa.com',mismoPueblo:'Todo el plan queda en su municipio, así que hoy no hace falta guagua: se hace andando o con la urbana.',tiempoHoy:r=>'Hoy por ahí: '+r+'. (parte de AEMET)',
   alternativas:(l)=>'Si les apetece cambiar algo, por ahí cerca tienen también '+l+'.',
   alLado1:'Y ahí al lado tienen algo que no le he metido al plan, pero que conviene que sepan:',
   alLado2:'Y ahí al lado tienen dos cosas que no le he metido al plan, pero que están y son bonitas:',
   aquiLado:'aquí al lado', parKm:'a un par de kilómetros', aUnos:d=>'a unos '+d+' km',
   noMeto:'\n  No lo meto en el plan porque ',
   deciden:' Ustedes deciden: aunque sea acercarse a verlo, merece la pena.',
+  decidenSeg:' Se lo digo para que lo sepan, no para que vayan.',
   antesSalir:'Un par de cosas antes de salir:',
   sinPorque:'De estos sitios todavía no tengo escrito el porqué, así que se lo dejo en la ruta y no le invento nada.',
   peligrosa:'está clasificado como peligroso en el registro oficial',cuida:["Y una cosita: lo que se sube, se baja. En estos sitios no hay papeleras y la basura se queda donde la dejen.", "Y ya que van: dejen el sitio como lo encontraron. Aquí la naturaleza se cuida entre todos.", "Un apunte de vecina: no se lleven piedras ni plantas, y la basura de vuelta en la mochila.", "Y por último: si van a un charco o a un sendero, todo lo que llevan tiene que volver con ustedes.", "Ah, y respeten los senderos marcados: fuera de ellos se pisa lo que tarda años en crecer."],
@@ -3157,21 +3362,22 @@ const N={
  en:{
   antesNada:'First things first, because this changes the plan:',
   cerrada:(n,m)=>'Before anything else, so you do not find out the hard way: '+n+' is CLOSED and you cannot go in. '+m+'\nSo I have built the day around something else nearby.',
-  lejosCab:(n,m,d)=>'One thing first: today there is '+n+' in '+m+d+'. From where you are that is about ',
+  lejosCab:(n,m,d,c)=>'One thing first: '+c+' there is '+n+' in '+m+d+'. From where you are that is about ',
   lejosMin:' minutes each way.',
   lejosGrande:'\nIf you fancy it, go — it is one of the big ones of the year. But it is a whole day of driving, so I am also leaving you a plan around here, because there are lovely things nearby without that trek.',
   lejosPeq:'\nI mention it in case it tempts you, though the plan I have made stays closer.',
-  chos:(n,m,d)=>'You are in luck today: there is '+n+' in '+m+d+'!',
+  chos:(n,m,d,c)=>'You are in luck: '+c+' there is '+n+' in '+m+d+'!',
   horaNo:'\nThe town hall publishes the timings a few days before, so check closer to the date.',
   alrededor:'Right, I will build the day around that.',
   cercaHoy:'With what is left of the day, better to stay close by:',
+  nadaYa:'At this hour I cannot put together anything decent for you: what is nearby is closed or too far. Tomorrow morning, yes, and I will plan you a whole day.',
   cercaHoy2:'With what is left of the day, something nearby:',
   sinFiesta:'There are no fiestas on the island today, so I will not sell you smoke: the day is built on the place itself.',
   sinFiestaCerca:'Nothing on around here today, so the day is built on the place itself.',
   manana:(n,d)=>'Start the morning at '+n+' — about '+d+' minutes taking it easy.',
   mananaEv:(n,h)=>' And at midday, straight to '+n+h+'.',
   noHay:(t)=>'There is no '+t+' open near here right now, so let me tell you what there is.\n',
-  actos:(m,f,el)=>'One more thing: '+m+' is in fiestas today'+(f?' —'+f+'—':'')+
+  actos:(m,f,el,c)=>'One more thing: '+m+' is in fiestas '+c+(f?' —'+f+'—':'')+
     (el?', and the programme has something that fits you.':'. Here is what the programme says:'),
   actoLin:(n,h,d,k,m)=>'· '+n+(k?' ('+k+')':'')+(h?', at '+h:'')+(d?', at '+d:'')+(m?' — '+m:'')+'.',
   masFi:'And there is more going on nearby that day:',
@@ -3219,13 +3425,14 @@ const N={
   vueltaTras:(v,l1,l2,e)=>', changing at '+v+' from line '+l1+' to '+l2+', with '+e+' minutes to wait.',
   vueltaDir:(l)=>' on line '+l+', direct.',
   vueltaDur:(m)=>' It is a '+m+' minute journey.',
-  nocturno:'\nThere are buses until the early hours, so getting back is not tight.',muchas:' They run often, so no need to watch the clock.',frecuencia:f=>'\nThey run '+f+'.',verHorarios:'\nExact timetables at titsa.com',mismoPueblo:'The whole plan stays in your town, so no bus needed today: it is walkable or a short local ride.',tiempoHoy:r=>'Today over there: '+r+'. (AEMET forecast)',
+  vueltaBuho:(h)=>'Careful with the way back: for that route the only departure I have is the night bus, at '+h+'. I do not know the last evening one, so check it before you set off',muchas:' They run often, so no need to watch the clock.',frecuencia:f=>'\nThey run '+f+'.',verHorarios:'\nExact timetables at titsa.com',mismoPueblo:'The whole plan stays in your town, so no bus needed today: it is walkable or a short local ride.',tiempoHoy:r=>'Today over there: '+r+'. (AEMET forecast)',
   alternativas:(l)=>'If you fancy changing something, nearby you also have '+l+'.',
   alLado1:'And right there you have something I have not put in the plan, but you should know about:',
   alLado2:'And right there you have two things I have not put in the plan, but they are there and they are beautiful:',
   aquiLado:'right here', parKm:'a couple of kilometres away', aUnos:d=>'about '+d+' km away',
   noMeto:'\n  I am not putting it in the plan because ',
   deciden:' You decide: even just going to look at it is worth it.',
+  decidenSeg:' I am telling you so you know, not so you go.',
   antesSalir:'A couple of things before you set off:',
   sinPorque:'I have not written up the story of these places yet, so I am leaving them on the route without making anything up.',
   peligrosa:'it is classified as dangerous in the official register',cuida:["One small thing: whatever you carry up, carry back down. There are no bins out there.", "And while you are at it: leave the place as you found it. Here we look after nature between all of us.", "A local note: do not take stones or plants, and bring your rubbish back in your bag.", "One last thing: at a rock pool or on a trail, everything you bring has to come back with you.", "And please stick to the marked paths: off them you tread on what takes years to grow."],
@@ -3234,21 +3441,22 @@ const N={
  de:{
   antesNada:'Zuerst das Wichtigste, denn es ändert den Plan:',
   cerrada:(n,m)=>'Vorweg, damit Sie es nicht vor Ort erfahren: '+n+' ist GESCHLOSSEN, der Zugang ist nicht erlaubt. '+m+'\nIch baue den Tag also um etwas anderes in der Gegend.',
-  lejosCab:(n,m,d)=>'Eines vorweg: heute ist '+n+' in '+m+d+'. Von Ihnen aus sind das etwa ',
+  lejosCab:(n,m,d,c)=>'Eines vorweg: '+c+' ist '+n+' in '+m+d+'. Von Ihnen aus sind das etwa ',
   lejosMin:' Minuten pro Strecke.',
   lejosGrande:'\nWenn Sie Lust haben, fahren Sie — es ist eines der großen Feste des Jahres. Aber es ist ein ganzer Tag unterwegs, deshalb lasse ich Ihnen auch einen Plan für Ihre Gegend da.',
   lejosPeq:'\nIch sage es nur, falls es Sie reizt; der Plan bleibt aber näher.',
-  chos:(n,m,d)=>'Sie haben Glück: heute ist '+n+' in '+m+d+'!',
+  chos:(n,m,d,c)=>'Sie haben Glück: '+c+' ist '+n+' in '+m+d+'!',
   horaNo:'\nDie Uhrzeiten veröffentlicht die Gemeinde erst kurz vorher, schauen Sie näher am Termin nach.',
   alrededor:'Gut, ich baue den Tag darum herum.',
   cercaHoy:'Für den Rest des Tages bleiben Sie besser in der Nähe:',
+  nadaYa:'Um diese Uhrzeit bekomme ich nichts Vernünftiges mehr zusammen: was in der Nähe ist, hat zu oder liegt zu weit weg. Morgen früh gerne, dann plane ich Ihnen einen ganzen Tag.',
   cercaHoy2:'Für den Rest des Tages etwas ganz in der Nähe:',
   sinFiesta:'Heute gibt es kein Fest auf der Insel, also erzähle ich Ihnen nichts vom Pferd: der Tag baut auf der Gegend selbst auf.',
   sinFiestaCerca:'Hier in der Nähe ist heute nichts los, also baue ich den Tag auf der Gegend selbst auf.',
   manana:(n,d)=>'Beginnen Sie den Morgen bei '+n+' — in Ruhe etwa '+d+' Minuten.',
   mananaEv:(n,h)=>' Und mittags direkt zu '+n+h+'.',
   noHay:(t)=>'In der Nähe hat gerade nichts mit '+t+' offen, deshalb sage ich Ihnen, was es gibt.\n',
-  actos:(m,f,el)=>'Und noch etwas: in '+m+' ist heute Fiesta'+(f?' —'+f+'—':'')+
+  actos:(m,f,el,c)=>'Und noch etwas: in '+m+' ist '+c+' Fiesta'+(f?' —'+f+'—':'')+
     (el?', und im Programm steht etwas Passendes für Sie.':'. Das steht im Programm:'),
   actoLin:(n,h,d,k,m)=>'· '+n+(k?' ('+k+')':'')+(h?', um '+h:'')+(d?', '+d:'')+(m?' — '+m:'')+'.',
   masFi:'Und in der Nähe ist an dem Tag noch mehr los:',
@@ -3296,13 +3504,14 @@ const N={
   vueltaTras:(v,l1,l2,e)=>', mit Umstieg in '+v+' von Linie '+l1+' auf '+l2+', '+e+' Minuten Wartezeit.',
   vueltaDir:(l)=>' mit Linie '+l+', direkt.',
   vueltaDur:(m)=>' Die Fahrt dauert '+m+' Minuten.',
-  nocturno:'\nEs fahren Busse bis in die frühen Morgenstunden, der Rückweg drängt also nicht.',muchas:' Sie fahren häufig, Sie müssen also nicht auf die Uhr schauen.',frecuencia:f=>'\nSie fahren '+f+'.',verHorarios:'\nGenaue Fahrpläne auf titsa.com',mismoPueblo:'Der ganze Plan bleibt in Ihrem Ort, heute brauchen Sie keinen Bus: alles zu Fuß oder mit dem Ortsbus.',tiempoHoy:r=>'Heute dort: '+r+'. (AEMET-Vorhersage)',
+  vueltaBuho:(h)=>'Achtung beim Rückweg: für diese Strecke habe ich nur die Nachtfahrt um '+h+'. Die letzte Abfahrt am Abend kenne ich nicht, prüfen Sie sie vor der Fahrt',muchas:' Sie fahren häufig, Sie müssen also nicht auf die Uhr schauen.',frecuencia:f=>'\nSie fahren '+f+'.',verHorarios:'\nGenaue Fahrpläne auf titsa.com',mismoPueblo:'Der ganze Plan bleibt in Ihrem Ort, heute brauchen Sie keinen Bus: alles zu Fuß oder mit dem Ortsbus.',tiempoHoy:r=>'Heute dort: '+r+'. (AEMET-Vorhersage)',
   alternativas:(l)=>'Wenn Sie etwas ändern möchten, in der Nähe gibt es auch '+l+'.',
   alLado1:'Und gleich nebenan gibt es etwas, das ich nicht in den Plan genommen habe, das Sie aber wissen sollten:',
   alLado2:'Und gleich nebenan gibt es zwei Dinge, die ich nicht in den Plan genommen habe, die es aber gibt und die schön sind:',
   aquiLado:'gleich nebenan', parKm:'ein paar Kilometer entfernt', aUnos:d=>'etwa '+d+' km entfernt',
   noMeto:'\n  Ich nehme es nicht in den Plan, weil ',
   deciden:' Sie entscheiden: schon nur hinzufahren und es anzusehen lohnt sich.',
+  decidenSeg:' Ich sage es Ihnen zur Information, nicht als Empfehlung.',
   antesSalir:'Zwei Dinge, bevor Sie losfahren:',
   sinPorque:'Zu diesen Orten habe ich die Geschichte noch nicht aufgeschrieben, also lasse ich sie auf der Route stehen und erfinde nichts.',
   peligrosa:'es im offiziellen Register als gefährlich eingestuft ist',cuida:["Eine Kleinigkeit: Was Sie hochtragen, tragen Sie auch wieder herunter. Dort oben gibt es keine Mülleimer.", "Und wenn Sie schon dort sind: Lassen Sie den Ort so zurück, wie Sie ihn vorgefunden haben.", "Ein Hinweis von hier: Nehmen Sie keine Steine oder Pflanzen mit, und den Müll wieder in den Rucksack.", "Und zuletzt: An einem Naturbecken oder auf einem Wanderweg muss alles wieder mit Ihnen zurück.", "Und bleiben Sie bitte auf den markierten Wegen: daneben tritt man nieder, was Jahre zum Wachsen braucht."],
@@ -3334,7 +3543,7 @@ function narrarLocal(b){
   const contarLejano=()=>{
     const e=b.evento_lejano;
     const d=e.distincion?', '+e.distincion:'';
-    let c=F.lejosCab(e.nombre,e.municipio,d)+e.minutos+F.lejosMin;
+    let c=F.lejosCab(e.nombre,e.municipio,d,cuandoEs(b.fecha))+e.minutos+F.lejosMin;
     c+=(e.es_el_grande||e.distincion)?F.lejosGrande:F.lejosPeq;
     t.push(c);
   };
@@ -3342,7 +3551,7 @@ function narrarLocal(b){
 
   if(ev){
     const d=ev.distincion?', '+ev.distincion:'';
-    let c=F.chos(ev.nombre,ev.municipio,d);
+    let c=F.chos(ev.nombre,ev.municipio,d,cuandoEs(b.fecha));
     /* si no es en su municipio, se dice a cuánto queda: no es lo mismo aquí que a 50 min */
     if(b.minutos_en_coche_desde_alojamiento>25)
       c+=' Son unos '+b.minutos_en_coche_desde_alojamiento+' minutos desde donde están.';
@@ -3353,6 +3562,13 @@ function narrarLocal(b){
     t.push(c+(ev.hora_sin_confirmar?F.horaNo:''));
   }else if(b.origen_del_ancla==='elegido por el turista'){
     t.push(F.alrededor);
+  }else if(!(b.paradas||[]).length){
+    /* Encabezado con la sección vacía debajo. Lo vio la auditoría en un
+       «Sorpréndame» de noche: «Con lo que les queda de día, algo cerquita:» y
+       a continuación nada, porque el reloj se había llevado todas las paradas.
+       Se pintaba la cabecera sin mirar si había algo que colgar de ella. Si no
+       hay paradas no se promete ninguna: se dice que a esta hora ya no da. */
+    t.push(F.nadaYa);
   }else if(b.evento_lejano){
     t.push(b.momento_del_dia?F.cercaHoy:F.sinFiestaCerca);
   }else{
@@ -3368,13 +3584,19 @@ function narrarLocal(b){
     const g0=b.regreso;
     if(g0.medio&&!g0.ultima_salida) t.push(F.mismoPueblo);
     else if(g0.hay_combinacion===false) t.push(F.vueltaNo(g0.taxi_orientativo?' ('+g0.taxi_orientativo+')':''));
-    else if(g0.ultima_salida){
-      let c=F.vuelta(g0.ultima_salida);
+    else if(g0.ultima_salida||g0.guagua_de_madrugada){
+      /* Con el búho NO se dice «la última guagua»: se dice que es la de
+         madrugada y que la de la tarde no la sabemos. Y ahí no va ni la
+         duración ni el «pasan a menudo», que las dos animan a salir tarde. */
+      let c=g0.guagua_de_madrugada
+        ? F.vueltaBuho(g0.guagua_de_madrugada)
+        : F.vuelta(g0.ultima_salida);
       c+=g0.con_trasbordo?F.vueltaTras(g0.cambio_en,g0.linea,g0.segunda_linea,g0.espera_trasbordo_min)
                          :F.vueltaDir(g0.linea);
-      if(g0.duracion_min) c+=F.vueltaDur(g0.duracion_min);
-      if(g0.con_que_frecuencia) c+=F.frecuencia(g0.con_que_frecuencia);
-      if(g0.de_madrugada) c+=F.nocturno;
+      if(!g0.guagua_de_madrugada){
+        if(g0.duracion_del_ultimo_viaje_min) c+=F.vueltaDur(g0.duracion_del_ultimo_viaje_min);
+        if(g0.con_que_frecuencia) c+=F.frecuencia(g0.con_que_frecuencia);
+      }
       c+=F.verHorarios;
       t.push(c);
     }
@@ -3423,7 +3645,7 @@ function narrarLocal(b){
       let o=F.otras;
       otras.forEach(x=>{
         o+='\n\n· '+x.nombre+(x.municipio&&x.municipio!==r.municipio?F.en+x.municipio:'')+'.';
-        if(x.tipo) o+=' '+x.tipo+'.';
+        if(x.tipo) o+=' '+cocinaTr(x.tipo)+'.';
         if(x.valoracion) o+=' '+x.valoracion+F.nota;
         if(x.horario) o+='\n  '+horarioTr(x.horario)+'.';
         if(x.telefono) o+=F.tel+x.telefono;
@@ -3456,7 +3678,7 @@ function narrarLocal(b){
   const ct=b.cerrar_tomando_algo;
   if(ct){
     let c=F.rematar(ct.nombre,ct.municipio);
-    c+=ct.tipo?F.esDe+ct.tipo.toLowerCase()+'.':'.';
+    c+=ct.tipo?F.esDe+cocinaTr(ct.tipo).toLowerCase()+'.':'.';
     if(ct.horario) c+=F.abre+horarioTr(ct.horario)+'.';
     if(ct.telefono) c+=F.tel+ct.telefono;
     t.push(c);
@@ -3480,7 +3702,9 @@ function narrarLocal(b){
         .replace(/^Clasificada como PELIGROSA en el registro oficial de zonas de baño/,F.peligrosa)
         .replace(/\s+/g,' ').trim();
       r=r.charAt(0).toLowerCase()+r.slice(1);
-      c+=F.noMeto+r+(/[.!]$/.test(r)?'':'.')+F.deciden;
+      /* La coletilla solo cuando el motivo es incomodidad. Con un peligro,
+         invitar a acercarse «que merece la pena» es lo contrario de avisar. */
+      c+=F.noMeto+r+(/[.!]$/.test(r)?'':'.')+(x.es_por_seguridad?F.decidenSeg:F.deciden);
     });
     t.push(c);
   }
@@ -3498,7 +3722,7 @@ function narrarLocal(b){
      no, con clave de API se dice y sin ella no. */
   if(b.actividades_de_la_fiesta&&F.actos){
     const a=b.actividades_de_la_fiesta;
-    t.push(F.actos(a.municipio,a.de_las_fiestas,a.elegido_para_ellos)+'\n'+'\n'+
+    t.push(F.actos(a.municipio,a.de_las_fiestas,a.elegido_para_ellos,cuandoEs(b.fecha))+'\n'+'\n'+
       a.lista.map(x=>F.actoLin(x.nombre,x.hora,x.donde,actoTr(x.nombre),
         x.municipio!==a.municipio?x.municipio:null)).join('\n'));
   }
@@ -3510,7 +3734,7 @@ function narrarLocal(b){
     t.push(F.cenaCab(c.por_lo_de.nombre,c.por_lo_de.hora)+'\n\n'+
       /* el tipo del restaurante va tal cual, como en el resto del narrador: no
          está en la tabla de los 32 tipos de sitio, que es la que traduce tipoTr */
-      c.sitios.map(r=>F.cenaLin(r.nombre,r.tipo,horarioTr(r.horario),r.telefono)).join('\n')+
+      c.sitios.map(r=>F.cenaLin(r.nombre,cocinaTr(r.tipo),horarioTr(r.horario),r.telefono)).join('\n')+
       '\n\n'+F.cenaOjo);
   }
 
@@ -3575,7 +3799,7 @@ async function pedirVozEnVivo(brief,alLlegar,señal){
       try{ const d=await res.json(); if(d&&d.error) porque=d.error+(d.motivo?' ('+d.motivo+')':''); }catch(e){}
     }catch(e){ if(e.name==='AbortError') throw e; }
   }
-  if(!t) throw new Error('en vivo: '+ultimo+(porque?' · '+porque:''));
+  if(!t) throw new Error(tr('errServidor')(ultimo)+(porque?' · '+porque:''));
 
   const lector=t.body.getReader(), dec=new TextDecoder();
   let resto='', texto='', fin=false;
@@ -3595,8 +3819,8 @@ async function pedirVozEnVivo(brief,alLlegar,señal){
   }
   /* Si se cortó antes de decir que había acabado, lo que hay puede ser medio
      plan: mejor el relato local entero que un día a medias. */
-  if(!fin) throw new Error('el flujo se cortó a mitad');
-  if(!texto.trim()) throw new Error('no llegó texto');
+  if(!fin) throw new Error(tr('errCortado'));
+  if(!texto.trim()) throw new Error(tr('errVacio'));
   return texto.trim();
 }
 
@@ -3633,9 +3857,12 @@ async function pedirVoz(brief){
       }catch(e){ if(e.name==='AbortError') throw e; }
     }
   } finally { clearTimeout(reloj); }
-  if(!r) throw new Error('El servidor respondió '+ultimo+(porque?' · '+porque:'')+' en las dos rutas');
+  /* El motivo se le enseña al turista dentro de `tr('plantillas')`, así que no
+     puede ir en español a pelo: un alemán leía «Grund: El servidor respondió
+     501 en las dos rutas». */
+  if(!r) throw new Error(tr('errServidor')(ultimo)+(porque?' · '+porque:''));
   const data=await r.json();
-  if(data.sinClave) throw new Error('sin clave configurada');
+  if(data.sinClave) throw new Error(tr('errSinClave'));
   if(data.error) throw new Error(data.error);
   return String(data.texto||'').trim();
 }
@@ -4025,7 +4252,8 @@ function compartirEscapada(jornadas){
     if(b.restaurante) L.push('· Comer: '+b.restaurante.nombre+', '+b.restaurante.municipio+
       (b.restaurante.telefono?' — '+b.restaurante.telefono:''));
     const g=b.regreso;
-    if(g&&g.ultima_salida) L.push('· Vuelta: última guagua '+g.ultima_salida);
+    if(g&&(g.ultima_salida||g.guagua_de_madrugada))
+      L.push('· Vuelta: '+(g.guagua_de_madrugada?'solo guagua de madrugada, '+g.guagua_de_madrugada:'última guagua '+g.ultima_salida));
     L.push('');
   });
   L.push('Naira · guía de Tenerife');
@@ -4233,6 +4461,18 @@ function cuadriculaMunicipios(lista,alPulsar){
   });
   acc.appendChild(caja);
 }
+/* El idioma del enlace. Compartir «…/?lang=en» por WhatsApp es lo que hace
+   que el que lo abre lo vea ya en su idioma; sin esto, el enlace llegaba
+   siempre en español y había que pulsar el conmutador. Se lee una vez, al
+   arrancar, y se acepta solo uno de los tres. */
+(function idiomaDeLaURL(){
+  try{
+    const q=new URL(location.href).searchParams.get('lang');
+    if(q&&['es','en','de'].indexOf(q)>=0) S.idioma=q;
+    document.documentElement.lang=S.idioma;
+  }catch(e){}
+})();
+
 async function arranque(){
   hilo.innerHTML='';acc.innerHTML='';
   /* «Buenas noches» ya es el saludo: encadenarle «¡Buenas!» sonaba a robot
@@ -4250,7 +4490,10 @@ async function listaMunicipios(){
 }
 async function pCoche(){
   const b=BASES[S.base];
-  await naira(b?('En '+b.et+', muy bien. '+tr('coche')):tr('coche'),330);
+  /* «En Puerto de la Cruz, muy bien.» estaba escrito en español a pelo, así
+     que un inglés leía «En Puerto de la Cruz, muy bien. Do you have a car?»
+     —y es el PRIMER mensaje después de su primera decisión—. Va por `tr()`. */
+  await naira(b?(tr('enMuniBien')(b.et)+' '+tr('coche')):tr('coche'),330);
   /* Dos carteles: el coche y la guagua de la TITSA. Lo de volver al
      municipio sigue siendo un botón: no es una respuesta a la pregunta. */
   cartas([
@@ -4623,7 +4866,9 @@ async function elegirMunicipio(etZona,corrs){
   const co={};
   LUGARES.filter(l=>corrs.indexOf(l.c)>=0).forEach(l=>{ const k=l.co||l.m; co[k]=(co[k]||0)+1; });
   const lista=Object.entries(co).filter(([m,n])=>n>=2).sort((a,b)=>b[1]-a[1]);
-  await naira(tr('qZonaDetalle')(etZona.toLowerCase()),360);
+  /* Iba con `toLowerCase()` y salía «En isla baja (garachico, icod,
+     buenavista). ¿Por dónde exactamente?»: son nombres propios. */
+  await naira(tr('qZonaDetalle')(etZona),360);
   paso('ok','entrada · nivel 2, la comarca',
     '<span class="am">'+lista.length+'</span> comarcas. Anaga va aparte del casco de La Laguna: '+
     'Taganana y Bajamar son municipio de La Laguna, pero nadie que pida «ver La Laguna» quiere que le manden a Anaga.');
@@ -4966,6 +5211,17 @@ Object.entries(IDIOMAS).forEach(([k,v])=>{
   b.title=v.et;
   b.onclick=()=>{
     S.idioma=k;
+    /* El documento se declaraba `lang="es"` pasara lo que pasara: se podía
+       recorrer la web entera en inglés y el lector de pantalla seguía
+       pronunciándolo con fonética española, y Google indexaba las tres
+       versiones como una sola. Una línea. */
+    try{ document.documentElement.lang=k; }catch(e){}
+    /* Y el idioma en la URL, que es lo que permite mandar el enlace ya
+       traducido por WhatsApp. `replaceState` no recarga ni mete nada en el
+       historial: pulsar «atrás» sigue haciendo lo de siempre. */
+    try{ const u=new URL(location.href);
+      if(k==='es') u.searchParams.delete('lang'); else u.searchParams.set('lang',k);
+      history.replaceState(null,'',u); }catch(e){}
     pintaFijos();          /* cabecera, fecha, pie y botón del panel */
     cajaIdi.querySelectorAll('button').forEach(o=>o.setAttribute('aria-pressed','false'));
     b.setAttribute('aria-pressed','true');

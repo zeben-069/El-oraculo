@@ -1,0 +1,10 @@
+# Naira — guía turística de Tenerife
+# La web es una sola página: lo que se quiere indexar es la portada.
+User-agent: *
+Allow: /
+# La página de diagnóstico de las ortofotos va publicada a propósito —es la
+# única prueba que reproduce lo que hace Naira desde el dominio de verdad—,
+# pero no tiene nada que buscar nadie desde Google.
+Disallow: /probar-aereo.html
+
+Sitemap: https://leafy-cobbler-d24e23.netlify.app/sitemap.xml

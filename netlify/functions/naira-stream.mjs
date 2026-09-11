@@ -34,7 +34,17 @@
 //   asume: sigue siendo un freno y no un candado, que es lo que ya era.
 
 const FIRMA = "Eres Naira, gu";
-const CASA = /(^localhost(:|$))|(^127\.0\.0\.1(:|$))|(\.netlify\.app$)|(^netlify\.app$)|naira/i;
+// Los mismos dos agujeros que en naira.js, cerrados igual: se EXIGE la
+// cabecera —sin ella entraba un curl a pelo— y el host es el sitio exacto, no
+// «cualquier cosa que contenga naira» ni «cualquier netlify.app».
+const SITIO = "leafy-cobbler-d24e23.netlify.app";
+function esDeCasa(host) {
+  if (!host) return false;
+  host = String(host).toLowerCase();
+  if (/^localhost(:|$)/.test(host) || /^127\.0\.0\.1(:|$)/.test(host)) return true;
+  if (host === SITIO || host.endsWith("--" + SITIO) || host.endsWith("." + SITIO)) return true;
+  return /^naira\.[a-z0-9.-]+$/.test(host);
+}
 const POR_IP_HORA = 20;
 const TECHO_DIA = 600;
 
@@ -92,9 +102,8 @@ export default async (req) => {
       funcion: "viva",
       formato: "streaming",
       claveEncontrada: !!k,
-      pista: k ? "empieza por sk-ant- y tiene " + k.length + " caracteres"
-               : "ninguna variable empieza por sk-ant-",
-      variablesVistas: Object.keys(process.env || {}).length
+      pista: k ? "hay una variable que empieza por sk-ant-"
+               : "ninguna variable empieza por sk-ant-"
     });
   }
 
@@ -102,8 +111,8 @@ export default async (req) => {
 
   // 2 · de dónde viene
   const de = hostDe(req.headers.get("origin") || req.headers.get("referer") || "");
-  if (de && !CASA.test(de)) {
-    console.warn("llamada desde fuera:", de.slice(0, 80));
+  if (!esDeCasa(de)) {
+    console.warn("llamada desde fuera:", (de || "(sin cabecera)").slice(0, 80));
     return json(403, { error: "Desde ahí no" });
   }
 

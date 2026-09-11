@@ -41,7 +41,31 @@ var FIRMA = "Eres Naira, gu";
 // El ancla `$` de «.netlify.app$» solo casaba con el primero, así que en el
 // navegador que no manda `origin` la llamada se rechazaba con un 403 y la web
 // caía al relato local sin decir por qué. Ahora se compara solo el HOST.
-var CASA = /(^localhost(:|$))|(^127\.0\.0\.1(:|$))|(\.netlify\.app$)|(^netlify\.app$)|naira/i;
+// ── DE DÓNDE SE ACEPTA, Y POR QUÉ ASÍ ──
+// La auditoría del 11 de septiembre encontró dos agujeros aquí, y los dos son
+// de los que solo se ven leyendo despacio:
+//   1. `if (de && !CASA.test(de))` — una petición SIN cabecera `Origin` ni
+//      `Referer` no entraba en el `if` y pasaba entera. Que es exactamente lo
+//      que manda un `curl` a pelo, o sea que el cierre no cerraba nada contra
+//      lo único que pretendía cortar. Ahora la cabecera se EXIGE.
+//      Se puede exigir con tranquilidad porque está comprobado: el navegador
+//      manda `Origin` en todo POST, incluso al mismo sitio, y si no, manda
+//      `Referer`. Y si algún día fallara, el turista no se queda sin plan: la
+//      web cae sola al relato local.
+//   2. `naira` suelto casaba con CUALQUIER host que contuviera esa cadena
+//      —`naira-gratis.example.com` entraba—, y `.netlify.app$` con cualquier
+//      sitio de Netlify del mundo. Ahora es el sitio exacto, sus previos de
+//      despliegue (`algo--leafy-cobbler…`) y un dominio propio que empiece por
+//      `naira.`, que es lo único que se pretendía dejar abierto.
+var SITIO = "leafy-cobbler-d24e23.netlify.app";
+function esDeCasa(host) {
+  if (!host) return false;
+  host = String(host).toLowerCase();
+  if (/^localhost(:|$)/.test(host) || /^127\.0\.0\.1(:|$)/.test(host)) return true;
+  if (host === SITIO || host.slice(-(SITIO.length + 2)) === "--" + SITIO) return true;
+  if (host.slice(-(SITIO.length + 1)) === "." + SITIO) return true;
+  return /^naira\.[a-z0-9.-]+$/.test(host);
+}
 function hostDe(cadena) {
   if (!cadena) return "";
   try { return new URL(cadena).host; } catch (e) { return String(cadena); }
@@ -107,9 +131,11 @@ exports.handler = async function (event) {
         // Antes esto enseñaba doce caracteres de la clave. Son el prefijo y no
         // el secreto, pero esta URL es pública y enseñar trozos de una clave
         // en público es una costumbre que un día sale cara.
-        pista: k ? "empieza por sk-ant- y tiene " + k.length + " caracteres"
-                 : "ninguna variable empieza por sk-ant-",
-        variablesVistas: Object.keys(process.env || {}).length
+        // Ni la longitud de la clave ni cuántas variables hay: esta URL es
+        // pública y las dos cosas le sirven a quien esté tanteando, y a Zeben
+        // no le sirven de nada. Con saber si está o no, basta.
+        pista: k ? "hay una variable que empieza por sk-ant-"
+                 : "ninguna variable empieza por sk-ant-"
       }, null, 2)
     };
   }
@@ -121,8 +147,8 @@ exports.handler = async function (event) {
   // 2 · de dónde viene
   var h = event.headers || {};
   var de = hostDe(h.origin || h.referer || h.Origin || h.Referer || "");
-  if (de && !CASA.test(de)) {
-    console.warn("llamada desde fuera:", de.slice(0, 80));
+  if (!esDeCasa(de)) {
+    console.warn("llamada desde fuera:", (de || "(sin cabecera)").slice(0, 80));
     return { statusCode: 403, headers: cabeceras, body: JSON.stringify({ error: "Desde ahí no" }) };
   }
 

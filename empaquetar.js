@@ -21,7 +21,11 @@ const LISTA=['index.html','manifest.webmanifest','netlify.toml',
   /* La página de diagnóstico va DENTRO del sitio a propósito: abrirla desde
      el ordenador no prueba lo mismo que abrirla desde la web, que es donde
      falla. No la ve ningún turista: hay que escribir su dirección a mano. */
-  'probar-aereo.html']
+  'probar-aereo.html',
+  /* Para que Google sepa que la web habla tres idiomas y que la página de
+     diagnóstico no es contenido. Sin el sitemap, las tres versiones se
+     indexaban como una sola en español. */
+  'robots.txt','sitemap.xml']
   .concat(sueltos)
   .concat(fs.readdirSync('img/estampas').map(f=>'img/estampas/'+f))
   .concat(fs.readdirSync('img/cartas').map(f=>'img/cartas/'+f))
