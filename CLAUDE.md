@@ -918,6 +918,35 @@ siempre. Ahora un paso que empieza por `?` es **opcional** —se pulsa si está 
 se sigue si no—, que esta pregunta solo sale los días con algo y la prueba
 corre con la fecha de hoy.
 
+**Y el botón para montar el día alrededor de un evento, en dos sitios.** Lo
+pidió él —«deberíamos crear un botón donde sea "quieres que el día se monte
+alrededor de un evento 🎉"»— y es la misma pregunta de arriba, puesta donde
+hace falta: en el menú, y **después del plan**, que es cuando uno ve lo que le
+han montado y cambia de idea. Desde el plan, «me da igual» vuelve AL PLAN y no
+al principio: tirar un día ya armado por curiosear la lista sería un castigo.
+El botón solo sale si ese día hay algo, que es la regla de siempre —un botón
+que lleva a una lista vacía es peor que no tenerlo—, y lo que hay lo cuenta
+`hayCosasEseDia()`, una sola vez para los tres sitios que lo usan: si cada uno
+lo contara a su manera, el botón diría un número y la lista enseñaría otro.
+De paso **`elegirEvento()` se quedó sin quien lo llame y se fue**: hacía lo
+mismo pero SOLO con las fiestas de `EVENTOS`, así que desde Güímar no podía
+ofrecer la fiesta infantil de La Laguna. Con él se van cinco claves de `tr()`
+que ya no usaba nadie. Y el rótulo del botón del menú deja de decir «5 fiestas
+ese día»: son una fiesta y cuatro pueblos con programa, así que dice «cosas».
+
+**El botón de compartir el plan no hacía nada, literalmente.** Zeben lo usó y
+lo dijo. Llamaba a `compartir(brief, base)` y **esa función no existe en ningún
+sitio del fichero**: el botón reventaba con un ReferenceError. Se va, que con
+el de la imagen ya hay uno. Y con él se va **la misma llamada fantasma que
+había dentro de `compartirImagen()` como respaldo**, que es lo peor de los dos:
+si la imagen fallaba, el respaldo reventaba y se comía el aviso.
+De paso, dos botones con icono —🏖 para la playa y 🥾 para la naturaleza—, que
+en una lista de siete botones todos iguales el ojo no tiene dónde agarrarse. El
+emoji va FUERA de `tr()`: es el mismo en los tres idiomas y meterlo en la tabla
+sería repetirlo tres veces para nada. Y el tope de botones pasa de **6 a 7**:
+con el del evento nuevo, seis dejaba fuera «prefiero naturaleza», que es justo
+uno de los dos que él quería que se vieran mejor.
+
 **El calendario marca con 🎉 el día que solo tiene programa.** Era un punto.
 Zeben: «podríamos poner un icono 🎉 para saber que hay un evento». Va, pero
 **más pequeño y más flojo** que el icono de la fiesta: con los dos iguales,
@@ -1222,6 +1251,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Le monto el día alrededor de la fiesta infantil» | 11 sep | `loQueHayEseDia()`: antes de armar nada se enseñan las fiestas y los pueblos con programa que le sirven, y elige el turista. Antes el motor cogía la única fiesta de `EVENTOS` y los actos no podían anclar |
 | «Un icono 🎉 en vez del punto» + el rótulo de los pueblos | 11 sep | Hecho, con el 🎉 más flojo que el icono de la fiesta para que no se pierdan las de verdad |
 | Captura con los `**` a la vista | 11 sep | El markdown del modelo se convierte en negrita, y el prompt le dice que no lo use |
+| «Quita el compartir, pon iconos y un botón de eventos» | 11 sep | El de compartir llamaba a una función que no existe: fuera, y fuera también el respaldo que la llamaba. 🏖 y 🥾 en las preferencias, y el botón de montar el día alrededor de un evento en el menú y después del plan |
 | «Destaca el lugar del evento y que lleve a la localidad» | 11 sep | El calendario agrupa los actos por sitio, con la localidad en negrita y pulsable al mapa. De paso salieron los actos repetidos: 648 → 571 |
 | «Elegir varios días en el calendario» | 10 sep | El calendario deja marcar la estancia entera y cuenta día por día lo que cae. El plan sigue siendo de un día |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
