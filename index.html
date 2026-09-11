@@ -317,7 +317,7 @@ const T={
      plantillas:m=>'Naira ha narrado con plantillas porque la API no contestó. Motivo: '+m+'. El motor y el plan son exactamente los mismos: solo cambia quién pone las palabras.',
      escapadaNo:'No he podido armar la escapada entera. Pruebe con un día suelto.',
      rutaNo:'Ahora mismo no tengo la ruta histórica cargada.',
-     evento:'evento',eventos:'eventos',sinEventos:'sin eventos',calAnt:'Mes anterior',calSig:'Mes siguiente',calTit:'¿Qué día quiere disfrutar de Tenerife?',sManana:'Buenos días',sTarde:'Buenas tardes',sNoche:'Buenas noches',calPista:'Los días con fiesta o programa van marcados. Pulse uno para ver qué hay',calPrograma:'Programa del día',calMadrugada:'de madrugada',
+     evento:'evento',eventos:'eventos',sinEventos:'sin eventos',calAnt:'Mes anterior',calSig:'Mes siguiente',calTit:'¿Qué día quiere disfrutar de Tenerife?',sManana:'Buenos días',sTarde:'Buenas tardes',sNoche:'Buenas noches',calPista:'Los días con fiesta o programa van marcados. Pulse uno para ver qué hay',calSinSitio:'Sin sitio indicado',calIrSitio:'Ver en el mapa',calPrograma:'Programa del día',calMadrugada:'de madrugada',
      verPanel:'Ver cómo se armó ▲',cerrarPanel:'Cerrar el detalle ▼',
      lema:'Su día en Tenerife, contado como se cuenta aquí',etDia:'Día',
      fuentes:'Cartografía y fototeca: <code>GRAFCAN — IDECanarias</code>. Horarios de guagua: <code>GTFS de TITSA</code>. Lugares e itinerarios: <code>datos.tenerife.es</code>. Naira no inventa horarios: lo que no sabe, lo dice.',
@@ -382,7 +382,7 @@ const T={
      plantillas:m=>'Naira narrated this from templates because the API did not answer. Reason: '+m+'. The engine and the plan are exactly the same: only who puts the words changes.',
      escapadaNo:'I could not put the whole trip together. Try a single day.',
      rutaNo:'I do not have the historic route loaded right now.',
-     evento:'event',eventos:'events',sinEventos:'no events',calAnt:'Previous month',calSig:'Next month',calTit:'Which day would you like to enjoy Tenerife?',sManana:'Good morning',sTarde:'Good afternoon',sNoche:'Good evening',calPista:'Days with a fiesta or a programme are marked. Tap one to see what is on',calPrograma:"The day's programme",calMadrugada:'after midnight',
+     evento:'event',eventos:'events',sinEventos:'no events',calAnt:'Previous month',calSig:'Next month',calTit:'Which day would you like to enjoy Tenerife?',sManana:'Good morning',sTarde:'Good afternoon',sNoche:'Good evening',calPista:'Days with a fiesta or a programme are marked. Tap one to see what is on',calSinSitio:'No venue given',calIrSitio:'See on the map',calPrograma:"The day's programme",calMadrugada:'after midnight',
      verPanel:'See how it was built ▲',cerrarPanel:'Close the details ▼',
      lema:'Your day in Tenerife, told the way we tell it here',etDia:'Day',
      fuentes:'Maps and photo library: <code>GRAFCAN — IDECanarias</code>. Bus timetables: <code>GTFS from TITSA</code>. Places and routes: <code>datos.tenerife.es</code>. Naira never invents opening hours: what she does not know, she says so.',
@@ -447,7 +447,7 @@ const T={
      plantillas:m=>'Naira hat mit Vorlagen erzählt, weil die API nicht geantwortet hat. Grund: '+m+'. Motor und Plan sind genau dieselben: es ändert sich nur, wer die Worte setzt.',
      escapadaNo:'Ich konnte die ganze Reise nicht zusammenstellen. Versuchen Sie es mit einem einzelnen Tag.',
      rutaNo:'Die historische Route ist gerade nicht geladen.',
-     evento:'Veranstaltung',eventos:'Veranstaltungen',sinEventos:'keine Veranstaltungen',calAnt:'Voriger Monat',calSig:'Nächster Monat',calTit:'An welchem Tag wollen Sie Teneriffa genießen?',sManana:'Guten Morgen',sTarde:'Guten Tag',sNoche:'Guten Abend',calPista:'Tage mit Fiesta oder Programm sind markiert. Tippen Sie einen an, um zu sehen, was los ist',calPrograma:'Programm des Tages',calMadrugada:'nach Mitternacht',
+     evento:'Veranstaltung',eventos:'Veranstaltungen',sinEventos:'keine Veranstaltungen',calAnt:'Voriger Monat',calSig:'Nächster Monat',calTit:'An welchem Tag wollen Sie Teneriffa genießen?',sManana:'Guten Morgen',sTarde:'Guten Tag',sNoche:'Guten Abend',calPista:'Tage mit Fiesta oder Programm sind markiert. Tippen Sie einen an, um zu sehen, was los ist',calSinSitio:'Ohne Ortsangabe',calIrSitio:'Auf der Karte ansehen',calPrograma:'Programm des Tages',calMadrugada:'nach Mitternacht',
      verPanel:'Wie es gebaut wurde ▲',cerrarPanel:'Details schließen ▼',
      lema:'Ihr Tag auf Teneriffa, erzählt wie man es hier erzählt',etDia:'Tag',
      fuentes:'Karten und Fotothek: <code>GRAFCAN — IDECanarias</code>. Busfahrpläne: <code>GTFS von TITSA</code>. Orte und Routen: <code>datos.tenerife.es</code>. Naira erfindet keine Öffnungszeiten: was sie nicht weiß, sagt sie.',
@@ -4930,6 +4930,112 @@ function actosDe(iso){
     .map(a=>madrugada(a)?Object.assign({},a,{mad:true}):a)
     .sort((x,y)=>hDia(x.h)-hDia(y.h));
 }
+/* ── Y dentro del pueblo, agrupado por SITIO ──
+   Zeben, mirando Granadilla: «no que salgan dos de Los Abrigos, en medio una
+   del Médano y luego dos de Los Abrigos». Y tenía razón, pero el arreglo no es
+   ordenar por `lu`: **el mismo sitio está escrito de cinco maneras**. Ese día,
+   en Granadilla, hay «Calles de Los Abrigos», «Los Abrigos, Granadilla de
+   Abona», «Muelle de Los Abrigos», «Muelle y playa de Los Abrigos» y «Plaza de
+   Los Abrigos» — cinco cabeceras para un solo pueblo. Ordenar por el texto tal
+   cual las dejaría igual de picadas.
+   Así que hay que sacar la LOCALIDAD del texto, y eso se hace como en
+   `nucleos.js`: quitarle el genérico de delante («Calles de», «Muelle de»,
+   «Plaza de») y el municipio de detrás. Lo que queda —«Los Abrigos»— es la
+   localidad.
+   **Y no se fía de su propia corazonada**: una localidad solo vale si sale de
+   DOS textos distintos del mismo municipio. Con una sola aparición se queda el
+   sitio tal cual, que es lo que evita que «Parroquia de San Pedro, Sala D» se
+   convierta en un pueblo llamado «Sala D». Medido sobre los 648 actos: de 332
+   cabeceras se pasa a 266, y las que se juntan son las que tenían que juntarse.
+   El sitio exacto **no se pierde**: la cabecera dice la localidad y cada acto
+   seguido lleva el suyo. Que era justo lo que él pedía —«no hace falta que vaya
+   al sitio exacto, pero sí a la localidad, y ya el turista allí la encuentra». */
+/* `sinTildes` ya existe arriba, con la misma cuenta: no se duplica. */
+const normSitio=s=>sinTildes(s).replace(/\b(de|del|la|las|los|el)\b/g,'').replace(/[^a-z0-9]/g,'');
+/* El genérico de delante. Las alternativas largas van PRIMERO: con `muelles?`
+   por delante, «Muelle y playa de Los Abrigos» se quedaba en «y playa de Los
+   Abrigos» y no casaba con los otros cuatro. */
+const SITIO_DELANTE=/^(muelle y playa|salida desde la plaza de la iglesia|plaza de la iglesia|campo (municipal )?de f[úu]tbol|sal[óo]n de actos|casco hist[óo]rico|polideportivo|pabell[óo]n|calles?|plazas?|muelles?|playas?|iglesia|parroquia|ermita|barrio|caser[ií]o|casco|atrio|entorno|cancha|avenidas?|paseo|explanada|recinto|alrededores)\b[^a-záéíóúñ]*(de |del |de la |de los |de las |en )?/i;
+const SITIO_ARTICULO=/^(de|del|la|las|los|el|y|e)$/i;
+/* La misma forma que usa nucleos.js: un nombre de sitio son una a tres
+   palabras, todas con mayúscula salvo los artículos. */
+const pareceSitio=t=>{
+  const p=String(t).split(/\s+/);
+  return p.length>=1&&p.length<=3&&p.every(x=>SITIO_ARTICULO.test(x)||/^[A-ZÁÉÍÓÚÑ]/.test(x));
+};
+/* «Los Abrigos, Granadilla de Abona» → «Los Abrigos». Ojo: el trozo de detrás
+   de la coma NO siempre es el municipio —«Plaza de la iglesia, Punta del
+   Hidalgo» es La Laguna—, así que solo se quita si ES el municipio. */
+const sitioSinMuni=(lu,m)=>String(lu).split(/\s*,\s*/).map(x=>x.trim())
+  .filter(x=>x&&normSitio(x)!==normSitio(m)).join(', ');
+function localidadCruda(lu,m){
+  const s=sitioSinMuni(lu,m); if(!s) return null;
+  const partes=s.split(/\s*,\s*/), ultima=partes[partes.length-1];
+  const pelado=ultima.replace(SITIO_DELANTE,'').trim();
+  return (pelado.length>2&&pareceSitio(pelado))?pelado:null;
+}
+/* Las localidades corroboradas, una vez por carga: salen de los propios actos
+   y no cambian mientras no cambien los datos. */
+let LOCALIDADES=null;
+function localidadesBuenas(){
+  if(LOCALIDADES) return LOCALIDADES;
+  LOCALIDADES={};
+  const vistos={};
+  (typeof ACTOS==='undefined'?[]:ACTOS).forEach(a=>{ if(!a.lu) return;
+    (vistos[a.m]=vistos[a.m]||new Set()).add(a.lu); });
+  Object.keys(vistos).forEach(m=>{
+    const cuenta={};
+    vistos[m].forEach(lu=>{ const L=localidadCruda(lu,m);
+      if(L) (cuenta[L]=cuenta[L]||new Set()).add(lu); });
+    LOCALIDADES[m]=new Set(Object.keys(cuenta).filter(L=>cuenta[L].size>1));
+  });
+  return LOCALIDADES;
+}
+function actosPorSitio(lista){
+  const buenas=localidadesBuenas(), g={};
+  lista.forEach(a=>{
+    if(!a.lu) return;
+    const L=localidadCruda(a.lu,a.m);
+    const vale=L&&buenas[a.m]&&buenas[a.m].has(L);
+    const suelto=sitioSinMuni(a.lu,a.m)||a.lu;
+    const k=(vale?'L:':'S:')+normSitio(vale?L:suelto);
+    g[k]=g[k]||{titulo:vale?L:suelto, juntado:!!vale, actos:[], lus:new Set()};
+    g[k].actos.push(a); g[k].lus.add(suelto);
+  });
+  const salida=Object.keys(g).map(k=>{
+    const x=g[k]; let t=x.titulo;
+    /* Si TODAS las variantes empiezan por la misma palabra —tres «Calle
+       Benítez de Lugo»— se conserva: la cabecera «Benítez de Lugo» a secas ni
+       se reconoce ni se busca bien en un mapa. */
+    if(x.juntado&&x.lus.size>1){
+      const pri=[...x.lus].map(v=>v.split(/\s+/)[0]);
+      if(pri.every(v=>v===pri[0])&&!SITIO_ARTICULO.test(pri[0])&&
+         sinTildes(t).indexOf(sinTildes(pri[0]))!==0) t=pri[0]+' '+t;
+    }
+    return {titulo:t, muni:x.actos[0].m,
+            actos:x.actos.slice().sort((p,q)=>hDia(p.h)-hDia(q.h))};
+  });
+  /* El sitio que más pone, delante: la misma regla que los pueblos. */
+  salida.sort((x,y)=>y.actos.length-x.actos.length||hDia(x.actos[0].h)-hDia(y.actos[0].h));
+  /* Los que no dicen dónde son van al final y **se dice que no lo dicen**:
+     callarlo haría pensar que faltan por cargar. */
+  const sinSitio=lista.filter(a=>!a.lu).sort((p,q)=>hDia(p.h)-hDia(q.h));
+  if(sinSitio.length) salida.push({titulo:null, muni:null, actos:sinSitio});
+  return salida;
+}
+/* El enlace del sitio: se busca por NOMBRE, no por una coordenada inventada.
+   Es la misma regla de `urlDe()` con las fichas de posición aproximada —«para
+   esos se busca por nombre y municipio, que Google resuelve mejor»— y aquí es
+   obligada, porque de un acto no tenemos punto ninguno. Se corta por la
+   primera coma o flecha: «Plaza de los Caídos, Plaza de la Pescadora y playa
+   de Los Cristianos» no es una búsqueda, es una frase. */
+function urlSitioActo(titulo,muni){
+  if(!titulo) return null;
+  const corto=String(titulo).split(/\s*[,→/]|\s+→\s+/)[0].trim();
+  return 'https://www.google.com/maps/search/?api=1&query='+
+         encodeURIComponent(corto+(muni?', '+muni:'')+', Tenerife');
+}
+
 /* El programa del día, agrupado por pueblo: con cincuenta actos de ocho
    municipios una lista corrida no se lee. Manda el que más pone, que es la
    misma regla de la cabecera del plan. */
@@ -5017,11 +5123,23 @@ function pintaCalendario(){
          que se venía a ver. */
       h+='<div class="calActs">';
       if(abierto.fi) h+='<p class="calMuni"><i>'+abierto.fi+'</i></p>';
-      abierto.actos.forEach(a=>{
-        h+='<div class="calAc"><span class="ah">'+(a.h||'—')+'</span>'+
-           '<div><b>'+a.n+'</b>'+
-           ((a.lu||a.mad)?'<i>'+[a.lu,a.mad?tr('calMadrugada'):''].filter(Boolean).join(' · ')+'</i>':'')+
-           '</div></div>';
+      /* Y dentro, por SITIO. La cabecera va en negrita y se pulsa para abrir
+         la localidad en el mapa; debajo, sus actos por hora, cada uno con el
+         sitio exacto cuando no es el de la cabecera. */
+      actosPorSitio(abierto.actos).forEach(gr=>{
+        const url=urlSitioActo(gr.titulo,gr.muni);
+        h+='<p class="calSitio">'+(url
+             ? '<a href="'+url+'" target="_blank" rel="noopener" title="'+tr('calIrSitio')+'">'+
+               gr.titulo+' <span class="pin">▸</span></a>'
+             : '<span class="na">'+tr('calSinSitio')+'</span>')+'</p>';
+        gr.actos.forEach(a=>{
+          const suyo=gr.titulo&&a.lu&&normSitio(sitioSinMuni(a.lu,a.m))!==normSitio(gr.titulo)
+                     ? sitioSinMuni(a.lu,a.m) : '';
+          h+='<div class="calAc"><span class="ah">'+(a.h||'—')+'</span>'+
+             '<div><b>'+a.n+'</b>'+
+             ((suyo||a.mad)?'<i>'+[suyo,a.mad?tr('calMadrugada'):''].filter(Boolean).join(' · ')+'</i>':'')+
+             '</div></div>';
+        });
       });
       h+='</div>';
     }

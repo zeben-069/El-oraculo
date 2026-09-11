@@ -104,6 +104,7 @@ nucleos.js                    arma la página de poner un caserío en el mapa
 plantilla-nucleos.html        su molde
 buscar-nucleos.html           esa página, lista para abrir
 eventos.js                    arma la página de pegar fiestas, y mete las marcadas
+actos-parecidos.md            las parejas de actos que pueden ser el mismo
 plantilla-sitios.html         el molde de la página de dónde es cada fiesta
 sitios-fiestas.html           esa página, lista para abrir
 instagram.js                  el contenido de la semana para la cuenta de Naira
@@ -141,7 +142,7 @@ Dentro de `index.html`, como constantes:
   fiestas × sus años) llevan ya `la`/`lo`/`lu`**, colocadas por Zeben con
   `node eventos.js sitios`, y entonces mandan ellas sobre el casco del pueblo.
   Quedan 13 sin colocar, en 6 municipios.
-- `ACTOS` (648) — los actos de 31 programas de fiestas de 16 municipios:
+- `ACTOS` (642) — los actos de 31 programas de fiestas de 16 municipios:
   día, municipio,
   hora, dónde es y `q` («ninos»/«noche»), que dice a quién le sirve. No son
   fiestas: cuelgan de una que ya está en `EVENTOS` y no anclan el día.
@@ -793,6 +794,54 @@ Mandan los que más actos ponen, que es la misma regla de la cabecera del plan.
 El nombre de la fiesta sigue saliendo solo si **todos** los actos del pueblo
 son de la misma.
 
+**Y dentro del pueblo, por SITIO — que era donde estaba el lío de verdad.**
+Zeben, mirando Granadilla: «no que salgan dos de Los Abrigos, en medio una del
+Médano y luego dos de Los Abrigos». Pero el arreglo NO era ordenar por `lu`:
+**el mismo sitio está escrito de cinco maneras**. Ese día en Granadilla hay
+«Calles de Los Abrigos», «Los Abrigos, Granadilla de Abona», «Muelle de Los
+Abrigos», «Muelle y playa de Los Abrigos» y «Plaza de Los Abrigos» — cinco
+cabeceras para un solo pueblo, y ordenándolas por el texto se quedan igual de
+picadas. Hay que sacar la **localidad** del texto.
+Se hace como en `nucleos.js`: quitarle el genérico de delante («Calles de»,
+«Muelle de», «Plaza de») y el municipio de detrás; lo que queda es la
+localidad. Dos cuidados que costaron:
+· **Las alternativas largas van PRIMERO en el regex.** Con `muelles?` delante,
+  «Muelle y playa de Los Abrigos» se quedaba en «y playa de Los Abrigos» y no
+  casaba con los otros cuatro.
+· **El trozo de detrás de la coma no siempre es el municipio.** «Plaza de la
+  iglesia, Punta del Hidalgo» es La Laguna, y ahí lo de detrás de la coma es
+  justo la localidad que se busca. Solo se quita si ES el municipio.
+**Y no se fía de su propia corazonada:** una localidad vale solo si sale de
+**dos textos distintos** del mismo municipio. Con una sola aparición el sitio
+se queda tal cual, y eso es lo que evita que «Parroquia de San Pedro, Sala D»
+se convierta en un pueblo llamado «Sala D». Medido sobre los actos cargados:
+de **332 cabeceras a 266**, y las que se juntan son las que tenían que juntarse.
+El sitio exacto **no se pierde**: la cabecera dice la localidad y cada acto
+lleva el suyo debajo cuando no es el de la cabecera. Que es lo que él pidió:
+«no hace falta que vaya al sitio exacto, pero sí a la localidad, y ya el turista
+allí encontrará la fiesta».
+Y la cabecera **se pulsa**: abre esa localidad en el mapa. Se busca por
+**nombre**, no por una coordenada — es la misma regla de `urlDe()` con las
+fichas de posición aproximada, y aquí es obligada, que de un acto no tenemos
+punto ninguno. Se corta por la primera coma o flecha, que «Plaza de los Caídos,
+Plaza de la Pescadora y playa de Los Cristianos» no es una búsqueda, es una
+frase. Los actos que no dicen dónde son van al final **y se dice que no lo
+dicen**: callarlo haría pensar que faltan por cargar.
+
+**Agrupar por sitio destapó actos repetidos.** Al quedar juntos se vio que en
+Los Abrigos había dos «Diana floreada» a las nueve y dos «Gran Baile» a las
+diez. `node eventos.js duplicados` no los cazaba porque comparaba los **24
+primeros caracteres exactos** y «Diana floreada» tiene trece. Ahora vale
+también que un nombre **empiece por el otro**, con doce caracteres de mínimo
+para que uno corto no se coma a otro: fueron **6** y se juntaron (648 → 642).
+Lo que **no** se toca son los que solo se PARECEN —«Gran Baile con Nueva
+Ilusión» y «Gran Baile con el grupo Nueva Ilusión», «Procesión diurna…» y
+«Procesión diurna desde la iglesia hasta el muelle…»—: ahí manda la regla de la
+casa, que coincidir en pueblo, día y hora **no** quiere decir que sean lo mismo
+(pueden ser dos actos seguidos de la misma romería). Esos se listan y ya:
+la herramienta escribe **`actos-parecidos.md`** con las **75 parejas**
+agrupadas por día, con una casilla en cada una, y decide quien vive allí.
+
 ## Trampas conocidas
 
 **El ancla del turista pasa por un camino aparte.** Cuando eligen un sitio
@@ -897,9 +946,11 @@ de una parada, y el plan sin coche se separa más del plan con coche.
 Y cierra con los **actos**: por cada día y municipio con programa cargado,
 un plan con niños y otro sin ellos —380 planes—. Lo que se vigila ahí no es la
 dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: de los
-**648 actos cargados** (93 niños, 184 noche, 371 que se callan a propósito),
-**480 ofrecidos**, **0 ofrecidos a quien no toca** y **0 sin clasificar
-ofrecidos**. Esos dos ceros son la prueba de toda la regla.
+**642 actos cargados** (73 marcados de niños, 184 de noche, 385 sin marcar),
+**862 ofrecidos** y **0 ofrecidos a quien no toca**. Ese cero es la prueba de
+toda la regla; los 513 «sin clasificar y ofrecido» ya NO son un fallo, que
+desde que `q` dice solo si es de niños, lo que no está marcado va a los
+adultos y eso es lo normal.
 
 Y el último bloque, **otras fiestas y la cena**: barre los días que tienen dos
 fiestas a menos de 8 km y comprueba que salgan las dos. Referencia: 20 días,
@@ -1064,7 +1115,8 @@ vez que entre algo nuevo, se apunta aquí.**
 | Registro de **locales de hostelería** (9.652 filas, con `latitud`/`longitud`) | 10 sep | **Este es el que se me pasó.** Ahora entra por `hosteleria.js`: 76 fichas nuevas y los cuatro pueblos sin donde comer, cerrados |
 | Los 16 ficheros de datos abiertos del Cabildo | 10 sep | Ver la tabla de abajo, uno por uno |
 | La extensión de Netlify | 10 sep | Con ella se ve el proyecto, los despliegues y las variables desde aquí. Confirmó que **la clave está puesta** y que **lo publicado era del 8 de septiembre**, una semana por detrás de la rama |
-| Segundo artefacto «Fiestas de Tenerife» de Cowork | 10 sep | **538 actos de 22 programas**, transcritos íntegros de lagenda. Cruzados contra los 300 que había: 182 coincidían. `ACTOS` pasa de 300 a **648** tras quitar 47 repetidos |
+| Segundo artefacto «Fiestas de Tenerife» de Cowork | 10 sep | **538 actos de 22 programas**, transcritos íntegros de lagenda. Cruzados contra los 300 que había: 182 coincidían. `ACTOS` pasa de 300 a **648** tras quitar 47 repetidos, y a **642** al afinar el detector |
+| «Destaca el lugar del evento y que lleve a la localidad» | 11 sep | El calendario agrupa los actos por sitio, con la localidad en negrita y pulsable al mapa. De paso salieron 6 repetidos y 75 parejas que se parecen, en `actos-parecidos.md` |
 | «Elegir varios días en el calendario» | 10 sep | El calendario deja marcar la estancia entera y cuenta día por día lo que cae. El plan sigue siendo de un día |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 

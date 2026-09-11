@@ -368,16 +368,32 @@ function duplicados(hazlo){
   const txt=fs.readFileSync(F,'utf8');
   const A=eval(txt+';ACTOS');
   /* mismo pueblo, mismo día, misma hora y el nombre que empieza igual: los
-     dos primeros son datos duros, el tercero es lo que cambia entre fuentes */
+     dos primeros son datos duros, el tercero es lo que cambia entre fuentes.
+     Ojo con el tercero, que se quedaba corto: comparaba los 24 primeros
+     caracteres EXACTOS, así que «Diana floreada» y «Diana floreada por las
+     calles» —el mismo pasacalle contado por dos fuentes, mismo pueblo, mismo
+     día y misma hora— no casaban, porque uno tiene 13 caracteres y el otro 22.
+     Salió a la vista al agrupar el calendario por sitio: los dos aparecían
+     seguidos bajo «Los Abrigos» a las nueve de la mañana. Ahora vale también
+     que uno EMPIECE por el otro, con doce caracteres de mínimo para que un
+     nombre corto no se coma a otro. Coincidir en pueblo, día y hora ya es una
+     atadura fuerte; aun así esto **lista y espera**, como siempre. */
   const clave=a=>a.m+'|'+a.f+'|'+(a.h||'');
   const cab=n=>norm(n).slice(0,24);
+  const MIN=12;
+  const mismoNombre=(x,y)=>{
+    const a=norm(x), b=norm(y);
+    if(cab(x)===cab(y)) return true;
+    const [c,l]=a.length<=b.length?[a,b]:[b,a];
+    return c.length>=MIN&&l.indexOf(c)===0;
+  };
   const fuera=new Set(), juntados=[];
   A.forEach((a,i)=>{
     if(fuera.has(i)) return;
     A.forEach((b,j)=>{
       if(j<=i||fuera.has(j)) return;
       if(clave(a)!==clave(b)) return;
-      if(cab(a.n)!==cab(b.n)) return;
+      if(!mismoNombre(a.n,b.n)) return;
       /* gana el que trae el sitio; si empatan, el nombre más largo, que dice más */
       const ganaA=(!!a.lu&&!b.lu)||(!!a.lu===!!b.lu&&a.n.length>=b.n.length);
       const g=ganaA?a:b, p=ganaA?b:a;
@@ -392,11 +408,68 @@ function duplicados(hazlo){
     '\n    queda: '+x.queda.slice(0,66)+'\n    cae:   '+x.cae.slice(0,66)));
   const limpio=A.filter((a,i)=>!fuera.has(i));
   console.log('\nactos antes: '+A.length+'  ·  se van: '+fuera.size+'  ·  quedan: '+limpio.length);
+  sospechosos(limpio);
   if(!hazlo) return console.log('\n(esto era el ensayo · «node eventos.js duplicados hazlo» para hacerlo)');
   fs.writeFileSync(F,txt.slice(0,txt.indexOf('const ACTOS='))+'const ACTOS='+
     JSON.stringify(limpio,null,0).replace(/\},\{/g,'},\n{')+';\n');
   console.log('\nhecho. Pasa ahora: node lote.js');
 }
+
+/* ── Y los que se PARECEN, que esos no se tocan ──
+   El de arriba junta cuando está seguro: un nombre que empieza por el otro.
+   Pero dos fuentes cuentan el mismo acto con palabras distintas —«Gran Baile
+   con Nueva Ilusión» y «Gran Baile con el grupo Nueva Ilusión», «Procesión
+   diurna…» y «Procesión diurna desde la iglesia hasta el muelle…»— y ahí ya no
+   hay manera de saberlo desde aquí. La regla de la casa lo dice bien claro:
+   coincidir en pueblo, día y hora NO quiere decir que sean lo mismo; pueden ser
+   dos actos seguidos de la misma romería. Así que esto **solo los enseña** —ni
+   con `hazlo` los toca— y decide quien vive allí. */
+function sospechosos(A){
+  const clave=a=>a.m+'|'+a.f+'|'+(a.h||'');
+  const palabras=n=>new Set(norm2(n).split(' ').filter(w=>w.length>3));
+  const pares=[];
+  A.forEach((a,i)=>A.forEach((b,j)=>{
+    if(j<=i||clave(a)!==clave(b)||!a.h) return;
+    const x=palabras(a.n), y=palabras(b.n);
+    if(x.size<2||y.size<2) return;
+    let comun=0; x.forEach(w=>{ if(y.has(w)) comun++; });
+    const parecido=comun/Math.min(x.size,y.size);
+    if(parecido>=0.6) pares.push({a,b,parecido});
+  }));
+  if(!pares.length) return;
+  console.log('\n=== Y ESTOS SE PARECEN · míralos tú, aquí no se tocan ===');
+  console.log('Mismo pueblo, mismo día y misma hora, y el nombre se parece.');
+  console.log('Pueden ser el mismo acto contado por dos fuentes, o dos actos');
+  console.log('seguidos de la misma fiesta. Si sobra uno, se quita a mano.');
+  pares.sort((p,q)=>String(p.a.f+p.a.h).localeCompare(String(q.a.f+q.a.h)));
+  pares.slice(0,12).forEach(x=>
+    console.log('\n· '+x.a.m+' · '+x.a.f+' '+x.a.h+'   ('+Math.round(x.parecido*100)+'% de palabras en común)'+
+      '\n    '+x.a.n.slice(0,70)+'\n    '+x.b.n.slice(0,70)));
+  console.log('\nson '+pares.length+' parejas.');
+  /* Y en un fichero, que doce en pantalla no son setenta y cinco y esto lo
+     tiene que mirar alguien con calma. Es el mismo camino de
+     `actos-reclasificados.md`: la lista se le pasa y él dice cuál sobra. */
+  const porDia={};
+  pares.forEach(x=>{ const k=x.a.f+' · '+x.a.m; (porDia[k]=porDia[k]||[]).push(x); });
+  let md='# Actos que se parecen\n\n'+
+    'Mismo pueblo, mismo día y misma hora, y el nombre comparte casi todas las\n'+
+    'palabras. Casi seguro es **el mismo acto contado por dos fuentes** —el\n'+
+    'programa que pegaste a mano y el artefacto de Cowork—, pero también pueden\n'+
+    'ser **dos actos seguidos de la misma fiesta**, y eso desde aquí no se sabe.\n'+
+    'Por eso no se ha tocado ninguno.\n\n'+
+    'Marca el que sobre de cada pareja y se quita.\n\n'+
+    'Son **'+pares.length+' parejas**.\n';
+  Object.keys(porDia).sort().forEach(k=>{
+    md+='\n## '+k+'\n';
+    porDia[k].forEach(x=>{ md+='\n- `'+(x.a.h||'')+'`  ('+Math.round(x.parecido*100)+'%)\n'+
+      '  - [ ] '+x.a.n+(x.a.lu?'  · _'+x.a.lu+'_':'')+'\n'+
+      '  - [ ] '+x.b.n+(x.b.lu?'  · _'+x.b.lu+'_':'')+'\n'; });
+  });
+  fs.writeFileSync('actos-parecidos.md',md);
+  console.log('\nla lista entera está en actos-parecidos.md');
+}
+const norm2=n=>String(n).normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .toLowerCase().replace(/[^a-z0-9ñ ]/g,' ').replace(/\s+/g,' ').trim();
 
 /* Fiestas repetidas: la genérica sin hora y la concreta con hora.
    ------------------------------------------------------------------
