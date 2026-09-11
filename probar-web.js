@@ -43,26 +43,26 @@ const CARPETA = './capturas';
 const GUIONES = [
   { nombre: 'plan-basico-coche-pareja',
     pasos: ['La Laguna', 'Con coche', 'Grupo, sin niños', 'Un plan para el día entero',
-            'Un poco de todo', 'Un poco de todo'] },
+            '?Me da igual', 'Un poco de todo', 'Un poco de todo'] },
   { nombre: 'con-ninos-playa',
     pasos: ['Candelaria', 'Con coche', 'Familia con niños',
-            'Un plan para el día entero', 'Playas y charcos', 'Comida típica'] },
+            'Un plan para el día entero', '?Me da igual', 'Playas y charcos', 'Comida típica'] },
   { nombre: 'sin-coche',
     pasos: ['Puerto de la Cruz', 'Sin coche, en guagua', 'Grupo, sin niños',
-            'Un plan para el día entero', 'Un poco de todo', 'Un poco de todo'] },
+            'Un plan para el día entero', '?Me da igual', 'Un poco de todo', 'Un poco de todo'] },
   { nombre: 'sorpresa',
     pasos: ['Tegueste', 'Con coche', 'Familia con niños',
             'Sorpréndame — con el tiempo que queda'] },
   { nombre: 'ajustar-parada',
     pasos: ['La Laguna', 'Con coche', 'Grupo, sin niños', 'Un plan para el día entero',
-            'Un poco de todo', 'Un poco de todo', 'Esta no'] },
+            '?Me da igual', 'Un poco de todo', 'Un poco de todo', 'Esta no'] },
   { nombre: 'mas-tranquilo',
     pasos: ['Candelaria', 'Con coche', 'Familia con niños',
-            'Un plan para el día entero', 'Un poco de todo', 'Un poco de todo',
+            'Un plan para el día entero', '?Me da igual', 'Un poco de todo', 'Un poco de todo',
             'Otra cosa más tranquila'] },
   { nombre: 'ingles',
     pasos: ['=EN', 'La Laguna', 'With a car', 'Group, no children',
-            'A plan for a whole day', 'A bit of everything', 'A bit of everything'] },
+            'A plan for a whole day', '?I do not mind', 'A bit of everything', 'A bit of everything'] },
 ];
 
 async function main() {
@@ -99,17 +99,28 @@ async function main() {
            es el que abre el calendario — así que la prueba en inglés abría el
            calendario y luego se quejaba de que no encontraba «With a car».
            Por eso un paso que empiece por «=» se busca EXACTO. */
-        const exacto = paso.startsWith('=');
-        const busca = exacto ? paso.slice(1) : paso;
+        /* Un paso que empieza por «?» es OPCIONAL: si el botón no está, se
+           sigue sin él y no cuenta como fallo. Hace falta desde que Naira
+           pregunta «ese día hay cosas por la isla, ¿le monto el día alrededor
+           de alguna?», que solo sale los días con fiesta o con programa — y
+           como la prueba corre con la fecha de hoy, unos días sale y otros no.
+           Sin esto, los siete recorridos se paraban en el paso cuatro y
+           parecía que la web estaba rota. Es la misma trampa de siempre: la
+           rota era la prueba. */
+        const opcional = paso.startsWith('?');
+        const crudo = opcional ? paso.slice(1) : paso;
+        const exacto = crudo.startsWith('=');
+        const busca = exacto ? crudo.slice(1) : crudo;
         const btn = pag.locator('button', {
           hasText: exacto ? new RegExp('^\\s*' + busca.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*$') : busca
         }).first();
         try {
-          await btn.waitFor({ state: 'visible', timeout: 9000 });
+          await btn.waitFor({ state: 'visible', timeout: opcional ? 2500 : 9000 });
           await btn.click();
           dados.push(busca);
           await pag.waitForTimeout(1600);   /* Naira escribe con pausas */
         } catch (e) {
+          if (opcional) continue;           /* no estaba: ese día no había nada */
           fallados.push(busca);
           break;   /* si un paso no aparece, el resto ya no tiene sentido */
         }

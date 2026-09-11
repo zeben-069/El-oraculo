@@ -875,6 +875,72 @@ del 26, que son distintas de verdad. Y el informe la sigue enseñando aunque no
 se junte nada, que si no, el día que el catálogo esté limpio las parejas
 dudosas desaparecerían sin que nadie las hubiera mirado.
 
+**Y antes de armar nada, se enseña lo que hay y se elige.** Este es el fallo
+de fondo que destapó Zeben probándolo con su novia: desde Güímar, con coche y
+con niños, pidió un día entero para el domingo 13 y le salió una mañana de
+sendero de 7 km de ida en La Crucita y luego la Romería de Benijos en La
+Orotava. Y mientras tanto, **en La Laguna había fiesta infantil a las diez** y
+no salió por ningún lado. La razón: la Romería era lo único que ese día estaba
+en `EVENTOS`, y **un acto de programa nunca ha podido armar el día** — solo
+anclan las fiestas, los actos viajan de propina si el día ya pasa por su
+pueblo.
+Su idea, que es la buena: «estás en Güímar y el domingo 13 hay fiesta infantil
+en La Laguna, pues le comento: mira, hay fiesta infantil, así que te monto el
+día alrededor de ese municipio… y si le interesa más una romería, te armo el
+día alrededor de La Orotava». O sea, **enseñar lo que hay y que elijan**, en vez
+de elegir por ellos y dispersar el día.
+Lo hace `loQueHayEseDia()`, y **no hubo que tocar el motor**: la maquinaria ya
+estaba entera y lo que faltaba era preguntarlo.
+· Una fiesta se fuerza con `S.forzarEvento`, igual que en `elegirEvento()`.
+· Un pueblo con programa se arma con `queApeteceEn(m)`, que es lo que usa
+  «prefiero elegir el sitio yo»: pregunta el tipo de día y ancla en lo mejor a
+  menos de 6 km del casco. Y entonces **los actos de ese pueblo entran solos**
+  en el informe, porque el día ya pasa por allí.
+Tres cuidados:
+· **Un pueblo con fiesta no se ofrece dos veces.** Si ya sale por su fiesta, no
+  sale otra vez por su programa.
+· **El programa se filtra por con quién viajan**, con la misma regla que el
+  motor: con niños solo lo que el nombre dice que es de niños. Por eso desde
+  Güímar con niños sale «La Laguna · 2.º Domingo de Feria Infantil · 10:00 ·
+  30 min» y no la verbena de las once.
+· **Se ordenan por lo que cuesta llegar**, no por cuántos actos ponen: un
+  programa a cuarenta minutos no es un plan de mañana. Cuatro fiestas y cuatro
+  pueblos como mucho, y siempre el «me da igual, elija usted», que es lo que
+  hacía antes.
+Desde Güímar el 13, con niños, ofrece: la Romería de Benijos (50 min), la feria
+infantil de La Laguna (30), la cabalgata de Tegueste (30), la fiesta del agua
+de Los Realejos (50) y las colchonetas de Adeje (55). Eligiendo La Laguna, el
+día se arma en el casco, se come allí y la feria de las diez viaja en el
+informe.
+Ojo con lo que esto le hizo a `probar-web.js`: la pregunta mete un paso más y
+los siete recorridos se paraban en el cuarto. **La rota era la prueba**, como
+siempre. Ahora un paso que empieza por `?` es **opcional** —se pulsa si está y
+se sigue si no—, que esta pregunta solo sale los días con algo y la prueba
+corre con la fecha de hoy.
+
+**El calendario marca con 🎉 el día que solo tiene programa.** Era un punto.
+Zeben: «podríamos poner un icono 🎉 para saber que hay un evento». Va, pero
+**más pequeño y más flojo** que el icono de la fiesta: con los dos iguales,
+veinticuatro de treinta días de septiembre salen marcados igual y las fiestas
+de verdad se pierden entre los tambores. Esa regla no se toca; lo que cambia es
+que el punto no decía QUÉ era y el 🎉 sí.
+Y el rótulo de los pueblos cambia según lo que haya encima: si ya se ha
+nombrado una fiesta, esos pueblos son el «además» y el rótulo es **«🎉 También
+hay más eventos en:»**, un punto más grande que el rótulo de máquina, porque
+ahí se está invitando y no etiquetando. Si no hay fiesta, sigue siendo
+«Programa del día · N».
+
+**Los asteriscos del modelo salían a pelo.** Se vio en una captura suya:
+«**el sendero no es circular**» y «**Arco de Igueque**» con los asteriscos
+puestos, en medio de un texto por lo demás bien resaltado. El modelo escribe en
+markdown porque es como escribe siempre, y aquí nadie lo traducía: `escapar()`
+los deja tal cual y `marca()` no los mira. Se arregla por los dos lados: el
+prompt dice que **nada de markdown** —esto es un WhatsApp, no un documento— y
+`resaltar()` los convierte por si acaso, que el modelo va a seguir haciéndolo.
+La conversión va **al final**, cuando ya están puestas las marcas: hacerlo
+antes metería etiquetas en medio de los nombres que se buscan. Y un asterisco
+suelto, sin pareja, se quita: en pantalla no significa nada.
+
 ## Trampas conocidas
 
 **El ancla del turista pasa por un camino aparte.** Cuando eligen un sitio
@@ -1016,6 +1082,10 @@ la rota era ella:
   ser carteles con dibujo, «Sí, tenemos coche» se quedó en «Con coche» y «Lo
   que haya bueno» desapareció. Los siete recorridos fallaban en el segundo
   paso y parecía que la web no respondía.
+· **Un paso puede no existir ese día.** La pregunta de «ese día hay cosas por
+  la isla» solo sale cuando hay fiesta o programa, y la prueba corre con la
+  fecha de hoy: unos días sale y otros no. Un paso que empieza por `?` es
+  **opcional** y no cuenta como fallo si el botón no está.
 · **Un rótulo de dos letras pilla de todo.** Los botones se buscan por texto
   contenido, así que «EN» —el del idioma— encajaba también en «JUEVES · 12
   EVENTOS», que es el que abre el calendario: la prueba en inglés abría el
@@ -1149,6 +1219,9 @@ vez que entre algo nuevo, se apunta aquí.**
 | Los 16 ficheros de datos abiertos del Cabildo | 10 sep | Ver la tabla de abajo, uno por uno |
 | La extensión de Netlify | 10 sep | Con ella se ve el proyecto, los despliegues y las variables desde aquí. Confirmó que **la clave está puesta** y que **lo publicado era del 8 de septiembre**, una semana por detrás de la rama |
 | Segundo artefacto «Fiestas de Tenerife» de Cowork | 10 sep | **538 actos de 22 programas**, transcritos íntegros de lagenda. Cruzados contra los 300 que había: 182 coincidían. `ACTOS` pasa de 300 a **648** tras quitar 47 repetidos, y a **571** tras tres pasadas de repetidos, la última marcada por él a mano |
+| «Le monto el día alrededor de la fiesta infantil» | 11 sep | `loQueHayEseDia()`: antes de armar nada se enseñan las fiestas y los pueblos con programa que le sirven, y elige el turista. Antes el motor cogía la única fiesta de `EVENTOS` y los actos no podían anclar |
+| «Un icono 🎉 en vez del punto» + el rótulo de los pueblos | 11 sep | Hecho, con el 🎉 más flojo que el icono de la fiesta para que no se pierdan las de verdad |
+| Captura con los `**` a la vista | 11 sep | El markdown del modelo se convierte en negrita, y el prompt le dice que no lo use |
 | «Destaca el lugar del evento y que lleve a la localidad» | 11 sep | El calendario agrupa los actos por sitio, con la localidad en negrita y pulsable al mapa. De paso salieron los actos repetidos: 648 → 571 |
 | «Elegir varios días en el calendario» | 10 sep | El calendario deja marcar la estancia entera y cuenta día por día lo que cae. El plan sigue siendo de un día |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |

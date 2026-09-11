@@ -317,7 +317,7 @@ const T={
      plantillas:m=>'Naira ha narrado con plantillas porque la API no contestó. Motivo: '+m+'. El motor y el plan son exactamente los mismos: solo cambia quién pone las palabras.',
      escapadaNo:'No he podido armar la escapada entera. Pruebe con un día suelto.',
      rutaNo:'Ahora mismo no tengo la ruta histórica cargada.',
-     evento:'evento',eventos:'eventos',sinEventos:'sin eventos',calAnt:'Mes anterior',calSig:'Mes siguiente',calTit:'¿Qué día quiere disfrutar de Tenerife?',sManana:'Buenos días',sTarde:'Buenas tardes',sNoche:'Buenas noches',calPista:'Los días con fiesta o programa van marcados. Pulse uno para ver qué hay',calSinSitio:'Sin sitio indicado',calIrSitio:'Ver en el mapa',calPrograma:'Programa del día',calMadrugada:'de madrugada',
+     evento:'evento',eventos:'eventos',sinEventos:'sin eventos',calAnt:'Mes anterior',calSig:'Mes siguiente',calTit:'¿Qué día quiere disfrutar de Tenerife?',sManana:'Buenos días',sTarde:'Buenas tardes',sNoche:'Buenas noches',calPista:'Los días con fiesta o programa van marcados. Pulse uno para ver qué hay',calSinSitio:'Sin sitio indicado',calMasEventos:'También hay más eventos en:',qHayCosas:'Ese día hay cosas por la isla. ¿Le monto el día alrededor de alguna, o prefiere que se lo arme yo a mi aire?',calIrSitio:'Ver en el mapa',calPrograma:'Programa del día',calMadrugada:'de madrugada',
      verPanel:'Ver cómo se armó ▲',cerrarPanel:'Cerrar el detalle ▼',
      lema:'Su día en Tenerife, contado como se cuenta aquí',etDia:'Día',
      fuentes:'Cartografía y fototeca: <code>GRAFCAN — IDECanarias</code>. Horarios de guagua: <code>GTFS de TITSA</code>. Lugares e itinerarios: <code>datos.tenerife.es</code>. Naira no inventa horarios: lo que no sabe, lo dice.',
@@ -382,7 +382,7 @@ const T={
      plantillas:m=>'Naira narrated this from templates because the API did not answer. Reason: '+m+'. The engine and the plan are exactly the same: only who puts the words changes.',
      escapadaNo:'I could not put the whole trip together. Try a single day.',
      rutaNo:'I do not have the historic route loaded right now.',
-     evento:'event',eventos:'events',sinEventos:'no events',calAnt:'Previous month',calSig:'Next month',calTit:'Which day would you like to enjoy Tenerife?',sManana:'Good morning',sTarde:'Good afternoon',sNoche:'Good evening',calPista:'Days with a fiesta or a programme are marked. Tap one to see what is on',calSinSitio:'No venue given',calIrSitio:'See on the map',calPrograma:"The day's programme",calMadrugada:'after midnight',
+     evento:'event',eventos:'events',sinEventos:'no events',calAnt:'Previous month',calSig:'Next month',calTit:'Which day would you like to enjoy Tenerife?',sManana:'Good morning',sTarde:'Good afternoon',sNoche:'Good evening',calPista:'Days with a fiesta or a programme are marked. Tap one to see what is on',calSinSitio:'No venue given',calMasEventos:'There is more going on in:',qHayCosas:'There are things on around the island that day. Shall I build the day around one of them, or would you rather I just put a day together?',calIrSitio:'See on the map',calPrograma:"The day's programme",calMadrugada:'after midnight',
      verPanel:'See how it was built ▲',cerrarPanel:'Close the details ▼',
      lema:'Your day in Tenerife, told the way we tell it here',etDia:'Day',
      fuentes:'Maps and photo library: <code>GRAFCAN — IDECanarias</code>. Bus timetables: <code>GTFS from TITSA</code>. Places and routes: <code>datos.tenerife.es</code>. Naira never invents opening hours: what she does not know, she says so.',
@@ -447,7 +447,7 @@ const T={
      plantillas:m=>'Naira hat mit Vorlagen erzählt, weil die API nicht geantwortet hat. Grund: '+m+'. Motor und Plan sind genau dieselben: es ändert sich nur, wer die Worte setzt.',
      escapadaNo:'Ich konnte die ganze Reise nicht zusammenstellen. Versuchen Sie es mit einem einzelnen Tag.',
      rutaNo:'Die historische Route ist gerade nicht geladen.',
-     evento:'Veranstaltung',eventos:'Veranstaltungen',sinEventos:'keine Veranstaltungen',calAnt:'Voriger Monat',calSig:'Nächster Monat',calTit:'An welchem Tag wollen Sie Teneriffa genießen?',sManana:'Guten Morgen',sTarde:'Guten Tag',sNoche:'Guten Abend',calPista:'Tage mit Fiesta oder Programm sind markiert. Tippen Sie einen an, um zu sehen, was los ist',calSinSitio:'Ohne Ortsangabe',calIrSitio:'Auf der Karte ansehen',calPrograma:'Programm des Tages',calMadrugada:'nach Mitternacht',
+     evento:'Veranstaltung',eventos:'Veranstaltungen',sinEventos:'keine Veranstaltungen',calAnt:'Voriger Monat',calSig:'Nächster Monat',calTit:'An welchem Tag wollen Sie Teneriffa genießen?',sManana:'Guten Morgen',sTarde:'Guten Tag',sNoche:'Guten Abend',calPista:'Tage mit Fiesta oder Programm sind markiert. Tippen Sie einen an, um zu sehen, was los ist',calSinSitio:'Ohne Ortsangabe',calMasEventos:'Mehr los ist auch in:',qHayCosas:'An dem Tag ist einiges auf der Insel los. Soll ich den Tag um etwas davon herum bauen, oder stelle ich Ihnen einfach einen zusammen?',calIrSitio:'Auf der Karte ansehen',calPrograma:'Programm des Tages',calMadrugada:'nach Mitternacht',
      verPanel:'Wie es gebaut wurde ▲',cerrarPanel:'Details schließen ▼',
      lema:'Ihr Tag auf Teneriffa, erzählt wie man es hier erzählt',etDia:'Tag',
      fuentes:'Karten und Fotothek: <code>GRAFCAN — IDECanarias</code>. Busfahrpläne: <code>GTFS von TITSA</code>. Orte und Routen: <code>datos.tenerife.es</code>. Naira erfindet keine Öffnungszeiten: was sie nicht weiß, sagt sie.',
@@ -672,6 +672,22 @@ function resaltar(txt,b){
     h=h.replace(/\b(l[íi]nea|line|Linie)\s(\d{1,3})\b/gi,'$1 <mark class="dato">$2</mark>');
     h=h.replace(/\b(CERRADA|CERRADO|CLOSED|GESCHLOSSEN|PELIGROSA|PELIGROSO|DANGEROUS|GEF[ÄA]HRLICH|RESERVA OBLIGATORIA|BOOKING REQUIRED|USO PROHIBIDO)\b/g,
                 '<mark class="ojo">$&</mark>');
+  }catch(e){}
+  /* ── Los asteriscos del modelo ──
+     Se vio en una captura de Zeben: «**el sendero no es circular**» y
+     «**Arco de Igueque**» salían con los asteriscos puestos, en medio de un
+     texto por lo demás bien resaltado. El modelo escribe en markdown porque es
+     como escribe siempre, y aquí nadie lo estaba traduciendo: `escapar()` los
+     deja tal cual y `marca()` no los mira. Como lo que quiere decir con ellos
+     —«esto es importante»— es justo lo que la negrita hace, se convierten en
+     vez de tirarse. Va al FINAL, cuando ya están puestas las marcas: hacerlo
+     antes metería etiquetas en medio de los nombres que se buscan.
+     Y los que queden sueltos —un asterisco sin pareja— se quitan, que en
+     pantalla no significan nada. */
+  try{
+    h=h.replace(/\*\*([^*\n]{1,160}?)\*\*/g,'<b>$1</b>');
+    h=h.replace(/(^|[^*])\*([^*\n]{1,120}?)\*(?!\*)/g,'$1<i>$2</i>');
+    h=h.replace(/\*\*?/g,'');
   }catch(e){}
   return ritmo(h);
 }
@@ -4796,6 +4812,83 @@ async function sorprender(){
    restaurante. Dos botones para lo mismo y ninguno hacía lo que dice.
    Ahora este arma el día ENTERO: si es hoy y ya no da tiempo, salta a mañana
    y lo dice. El de «Sorpréndame» se queda con lo que resta de hoy. */
+/* ============ LO QUE HAY ESE DÍA, ANTES DE ARMAR NADA ============
+   Zeben hizo la prueba con su novia y salió un día raro: desde Güímar, con
+   coche y con niños, el motor cogió la Romería de Benijos —lo único que ese
+   domingo estaba en EVENTOS— y montó la mañana en un sendero de 7 km de ida
+   en La Crucita. Y mientras tanto, en La Laguna había **fiesta infantil a las
+   diez**. No salió por ningún lado, y ahí está el fallo de fondo: **un acto de
+   programa nunca ha podido armar el día**. Solo las fiestas de `EVENTOS`
+   anclan, y los actos viajan de propina si el día ya pasa por su pueblo.
+   Su idea, que es la buena: «estás en Güímar y el domingo 13 hay fiesta
+   infantil en La Laguna, pues le comento: mira, hay fiesta infantil, así que
+   te monto el día alrededor de ese municipio… y si le interesa más una
+   romería, te armo el día alrededor de La Orotava».
+   O sea: **enseñar lo que hay y que elijan**, en vez de elegir por ellos y
+   dispersar el día. La maquinaria ya estaba toda:
+   · una fiesta se fuerza con `S.forzarEvento`, como en `elegirEvento()`;
+   · un pueblo se arma con `queApeteceEn(m)`, que es lo que usa «elegir sitio»
+     —pregunta el tipo de día y ancla en lo mejor a menos de 6 km del casco—,
+     y entonces los actos de ese pueblo entran solos en el informe.
+   Lo que faltaba era preguntarlo. */
+function programasDelDia(f,conNinos){
+  if(typeof actosDe!=='function') return [];
+  /* el mismo filtro que el motor: con niños, solo lo que el nombre dice que
+     es de niños; sin ellos, todo lo demás */
+  const vale=a=>conNinos?a.q==='ninos':a.q!=='ninos';
+  const utiles=actosDe(f).filter(a=>vale(a)&&
+    !(conNinos&&a.h&&(a.h>='23:00'||a.h<'07:00')));
+  const g={};
+  utiles.forEach(a=>{ (g[a.m]=g[a.m]||[]).push(a); });
+  return Object.keys(g).map(m=>({m:m,
+      actos:g[m].slice().sort((x,y)=>hDia(x.h)-hDia(y.h))}));
+}
+async function loQueHayEseDia(){
+  const f=S.fecha, base=BASES[S.base];
+  if(!base) return false;
+  /* Las de noche van al final: arman el remate, no el día. Misma regla que
+     `construir()`. */
+  const evs=EVENTOS.filter(e=>e.f===f)
+    .sort((a,b)=>(esFiestaDeNoche(a)?1:0)-(esFiestaDeNoche(b)?1:0)||puntuar(b)-puntuar(a));
+  const conFiesta={}; evs.forEach(e=>{ conFiesta[e.m]=1; });
+  /* Un pueblo con fiesta ya sale por la fiesta: ofrecerlo dos veces es ruido.
+     Y se ordenan por lo que cuesta llegar, que es lo que de verdad decide: un
+     programa a cuarenta minutos no es un plan de mañana. */
+  const progs=programasDelDia(f,!!S.ninos)
+    .filter(p=>!conFiesta[p.m]&&BASES[p.m])
+    .map(p=>Object.assign(p,{min:minutosA(base,(BASES[p.m]||{}).corr)}))
+    .sort((a,b)=>a.min-b.min);
+  if(!evs.length&&!progs.length) return false;
+
+  paso('ok','lo que hay ese día, antes de armar nada',
+    '<span class="am">'+evs.length+'</span> fiesta'+(evs.length===1?'':'s')+' y '+
+    '<span class="am">'+progs.length+'</span> pueblo'+(progs.length===1?'':'s')+' con programa que le sirve a '+
+    (S.ninos?'una familia con niños':'dos adultos')+'. Se le enseñan y elige: '+
+    'el día se arma alrededor de lo que elija, no de lo primero que puntúe.');
+
+  await naira(tr('qHayCosas'),380);
+  const L=[];
+  evs.slice(0,4).forEach(e=>{
+    const todoDia=esFiestaDeTodoElDia(e);
+    const cuando=todoDia?tr('todoElDia'):(e.h?e.h:e.fr);
+    const lejos=(e.m===base.m)?tr('aquiMismo'):minutosA(base,e.c)+' '+tr('min');
+    L.push({t:iconoFiesta(e.n)+' '+e.n+' · '+e.m+'\n'+cuando+' · '+lejos,
+      fn:()=>{ S.anclaElegida=null; S.ahora=null;
+        S.forzarEvento=e.n; S.fiestaTodoElDia=todoDia?e.n:null; pedirPlan(); }});
+  });
+  progs.slice(0,4).forEach(p=>{
+    const a=p.actos[0], n=p.actos.length;
+    const lejos=(p.m===base.m)?tr('aquiMismo'):p.min+' '+tr('min');
+    L.push({t:'🎉 '+p.m+'\n'+a.n.slice(0,52)+(a.h?' · '+a.h:'')+
+        (n>1?' · +'+(n-1):'')+' · '+lejos,
+      fn:()=>{ S.forzarEvento=null; S.fiestaTodoElDia=null;
+        S.anclaElegida=null; S.ahora=null; queApeteceEn(p.m); }});
+  });
+  L.push({t:tr('meDaIgual'),fn:()=>{S.forzarEvento=null;S.fiestaTodoElDia=null;queApetece()}});
+  opciones(L);
+  return true;
+}
+
 async function planDelDia(){
   S.anclaElegida=null; S.descartados=null; S.prefTipo=null; S.ritmo=null;
   S.ahora=null; S.diaEntero=true;
@@ -4815,6 +4908,9 @@ async function planDelDia(){
   }else{
     paso('ok','un día entero','Se arma el día completo, de la mañana al atardecer, sin recortar por el reloj.');
   }
+  /* Si ese día hay algo, se enseña y se elige; el flujo sigue por el botón
+     que pulsen. Si no hay nada, se pregunta el tipo de día como siempre. */
+  if(await loQueHayEseDia()) return;
   queApetece();
 }
 
@@ -5083,8 +5179,14 @@ function pintaCalendario(){
     /* La fiesta lleva su icono; el día que solo tiene programa lleva un punto.
        Con el icono en los dos, veinticuatro de treinta días salían marcados
        igual y las fiestas de verdad se perdían entre los tambores. */
+    /* El día que solo tiene programa llevaba un punto. Zeben: «podríamos poner
+       un icono 🎉 para saber que hay un evento». Va, pero **más pequeño y más
+       flojo** que el de la fiesta: con los dos iguales, veinticuatro de treinta
+       días de septiembre salían marcados igual y las fiestas de verdad se
+       perdían entre los tambores. Esa regla no se toca; lo que cambia es que
+       el punto no decía QUÉ era, y el 🎉 sí. */
     const marca=evs.length?'<span class="fi">'+iconoFiesta(evs[0].n)+'</span>'
-               :acs.length?'<span class="pt">•</span>':'';
+               :acs.length?'<span class="pt">🎉</span>':'';
     h+='<button class="'+cl.join(' ')+'" data-dia="'+iso+'"'+(fuera?' disabled':'')+'>'+
        '<span class="nd">'+d+'</span>'+marca+'</button>';
   }
@@ -5112,7 +5214,13 @@ function pintaCalendario(){
     const grupos=actosPorPueblo(hoyAct);
     if(!calMuniAbierto||!grupos.some(g=>g.m===calMuniAbierto))
       calMuniAbierto=grupos.length===1?grupos[0].m:null;
-    h+='<p class="calActT">'+tr('calPrograma')+' · '+hoyAct.length+'</p>';
+    /* El rótulo cambia según lo que haya encima. Si ya se ha nombrado una
+       fiesta, estos pueblos son el «además»; si no hay fiesta, esto ES el
+       programa del día. Lo pidió así Zeben: «que ponga algo un poquito más
+       grande, 🎉 También hay más eventos en:». */
+    h+=hoyEvs.length
+       ? '<p class="calMas">🎉 '+tr('calMasEventos')+'</p>'
+       : '<p class="calActT">'+tr('calPrograma')+' · '+hoyAct.length+'</p>';
     h+='<div class="calChips">'+grupos.map(g=>
       '<button class="calChip'+(g.m===calMuniAbierto?' ab':'')+'" data-muni="'+g.m+'">'+
       g.m+' <b>'+g.actos.length+'</b></button>').join('')+'</div>';
