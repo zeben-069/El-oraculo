@@ -317,7 +317,7 @@ const T={
      plantillas:m=>'Naira ha narrado con plantillas porque la API no contestó. Motivo: '+m+'. El motor y el plan son exactamente los mismos: solo cambia quién pone las palabras.',
      escapadaNo:'No he podido armar la escapada entera. Pruebe con un día suelto.',
      rutaNo:'Ahora mismo no tengo la ruta histórica cargada.',
-     evento:'evento',eventos:'eventos',sinEventos:'sin eventos',calAnt:'Mes anterior',calSig:'Mes siguiente',calTit:'¿Qué día quiere disfrutar de Tenerife?',sManana:'Buenos días',sTarde:'Buenas tardes',sNoche:'Buenas noches',calEstancia:(n)=>'Su estancia · '+n+' días',calQuitaRango:'quitar',calElegirDia:'Pulse el día que quiera que le monte',calPista:'Los días con fiesta o programa van marcados. Pulse dos para ver una estancia entera',calPrograma:'Programa del día',calMadrugada:'de madrugada',
+     evento:'evento',eventos:'eventos',sinEventos:'sin eventos',calAnt:'Mes anterior',calSig:'Mes siguiente',calTit:'¿Qué día quiere disfrutar de Tenerife?',sManana:'Buenos días',sTarde:'Buenas tardes',sNoche:'Buenas noches',calPista:'Los días con fiesta o programa van marcados. Pulse uno para ver qué hay',calPrograma:'Programa del día',calMadrugada:'de madrugada',
      verPanel:'Ver cómo se armó ▲',cerrarPanel:'Cerrar el detalle ▼',
      lema:'Su día en Tenerife, contado como se cuenta aquí',etDia:'Día',
      fuentes:'Cartografía y fototeca: <code>GRAFCAN — IDECanarias</code>. Horarios de guagua: <code>GTFS de TITSA</code>. Lugares e itinerarios: <code>datos.tenerife.es</code>. Naira no inventa horarios: lo que no sabe, lo dice.',
@@ -382,7 +382,7 @@ const T={
      plantillas:m=>'Naira narrated this from templates because the API did not answer. Reason: '+m+'. The engine and the plan are exactly the same: only who puts the words changes.',
      escapadaNo:'I could not put the whole trip together. Try a single day.',
      rutaNo:'I do not have the historic route loaded right now.',
-     evento:'event',eventos:'events',sinEventos:'no events',calAnt:'Previous month',calSig:'Next month',calTit:'Which day would you like to enjoy Tenerife?',sManana:'Good morning',sTarde:'Good afternoon',sNoche:'Good evening',calEstancia:(n)=>'Your stay · '+n+' days',calQuitaRango:'clear',calElegirDia:'Tap the day you want planned',calPista:'Days with a fiesta or a programme are marked. Tap two to see a whole stay',calPrograma:"The day's programme",calMadrugada:'after midnight',
+     evento:'event',eventos:'events',sinEventos:'no events',calAnt:'Previous month',calSig:'Next month',calTit:'Which day would you like to enjoy Tenerife?',sManana:'Good morning',sTarde:'Good afternoon',sNoche:'Good evening',calPista:'Days with a fiesta or a programme are marked. Tap one to see what is on',calPrograma:"The day's programme",calMadrugada:'after midnight',
      verPanel:'See how it was built ▲',cerrarPanel:'Close the details ▼',
      lema:'Your day in Tenerife, told the way we tell it here',etDia:'Day',
      fuentes:'Maps and photo library: <code>GRAFCAN — IDECanarias</code>. Bus timetables: <code>GTFS from TITSA</code>. Places and routes: <code>datos.tenerife.es</code>. Naira never invents opening hours: what she does not know, she says so.',
@@ -447,7 +447,7 @@ const T={
      plantillas:m=>'Naira hat mit Vorlagen erzählt, weil die API nicht geantwortet hat. Grund: '+m+'. Motor und Plan sind genau dieselben: es ändert sich nur, wer die Worte setzt.',
      escapadaNo:'Ich konnte die ganze Reise nicht zusammenstellen. Versuchen Sie es mit einem einzelnen Tag.',
      rutaNo:'Die historische Route ist gerade nicht geladen.',
-     evento:'Veranstaltung',eventos:'Veranstaltungen',sinEventos:'keine Veranstaltungen',calAnt:'Voriger Monat',calSig:'Nächster Monat',calTit:'An welchem Tag wollen Sie Teneriffa genießen?',sManana:'Guten Morgen',sTarde:'Guten Tag',sNoche:'Guten Abend',calEstancia:(n)=>'Ihr Aufenthalt · '+n+' Tage',calQuitaRango:'löschen',calElegirDia:'Tippen Sie den Tag an, den ich planen soll',calPista:'Tage mit Fiesta oder Programm sind markiert. Tippen Sie zwei an, um einen ganzen Aufenthalt zu sehen',calPrograma:'Programm des Tages',calMadrugada:'nach Mitternacht',
+     evento:'Veranstaltung',eventos:'Veranstaltungen',sinEventos:'keine Veranstaltungen',calAnt:'Voriger Monat',calSig:'Nächster Monat',calTit:'An welchem Tag wollen Sie Teneriffa genießen?',sManana:'Guten Morgen',sTarde:'Guten Tag',sNoche:'Guten Abend',calPista:'Tage mit Fiesta oder Programm sind markiert. Tippen Sie einen an, um zu sehen, was los ist',calPrograma:'Programm des Tages',calMadrugada:'nach Mitternacht',
      verPanel:'Wie es gebaut wurde ▲',cerrarPanel:'Details schließen ▼',
      lema:'Ihr Tag auf Teneriffa, erzählt wie man es hier erzählt',etDia:'Tag',
      fuentes:'Karten und Fotothek: <code>GRAFCAN — IDECanarias</code>. Busfahrpläne: <code>GTFS von TITSA</code>. Orte und Routen: <code>datos.tenerife.es</code>. Naira erfindet keine Öffnungszeiten: was sie nicht weiß, sagt sie.',
@@ -853,7 +853,12 @@ function puntuar(e){
 const hDia=h=>{const n=h?+String(h).slice(0,2)+ +String(h).slice(3,5)/60:99;return n<6?n+24:n;};
 function actosDelDia(f,munis,corr,conNinos){
   if(typeof ACTOS==='undefined'||!ACTOS.length) return [];
-  const q=conNinos?'ninos':'noche';
+  /* Con niños manda la etiqueta: solo lo que el nombre dice que es para ellos.
+     A dos adultos se les ofrece TODO lo demás —la procesión, la misa cantada,
+     el torneo de dominó—, que es lo que pidió Zeben: «a lo mejor hay una
+     procesión y eso le puede interesar a mucha gente». La etiqueta `q` dejó de
+     ser una caja excluyente y pasa a decir solo una cosa: si es de niños. */
+  const paraQuien=a=>conNinos?a.q==='ninos':a.q!=='ninos';
   const mismo=a=>munis.indexOf(a.m)>=0;
   const centro=m=>{for(const k in BASES) if(BASES[k].m===m) return BASES[k]; return BASES[m]||null;};
   const centros=munis.map(centro).filter(b=>b&&b.la!=null);
@@ -868,14 +873,16 @@ function actosDelDia(f,munis,corr,conNinos){
   const sig=manana.toISOString().slice(0,10);
   const madrugada=a=>!!(a.h&&a.h<'06:00');
   const esDeHoy=a=>(a.f===f&&!madrugada(a))||(a.f===sig&&madrugada(a));
-  return ACTOS.filter(a=>esDeHoy(a)&&a.q===q&&cerca(a))
+  return ACTOS.filter(a=>esDeHoy(a)&&paraQuien(a)&&cerca(a))
     /* con niños, nada que empiece de madrugada */
     .filter(a=>!(conNinos&&a.h&&(a.h>='23:00'||a.h<'07:00')))
     /* Para elegir CUÁLES caben mandan los del propio pueblo; para contarlos,
        manda la hora. Y la madrugada es el final del día, no el principio: los
        fuegos de la víspera son a las 00:00 y van los últimos. */
     .sort((a,b)=>(mismo(b)?1:0)-(mismo(a)?1:0)||hDia(a.h)-hDia(b.h))
-    .slice(0,4)
+    /* A dos adultos les caben seis: ahora compiten todos los actos del pueblo
+       y con cuatro huecos la procesión de la mañana tapaba la verbena. */
+    .slice(0,conNinos?4:6)
     .sort((a,b)=>hDia(a.h)-hDia(b.h));
 }
 
@@ -2198,16 +2205,23 @@ function construir(){
     }:null,
     /* El programa de las fiestas, filtrado por quién viaja. No es una parada
        del motor ni lleva coordenadas: es lo que está pasando en el pueblo ese
-       día y a esa gente le sirve. Con niños, la feria infantil y el cine al
-       aire libre; con dos adultos, la verbena y los fuegos. Lo que no se supo
-       clasificar no viaja: nos callamos antes que colocarle un torneo de
-       dominó a una familia diciendo que es para ellos. */
+       día y a esa gente le sirve. Con niños va SOLO lo que el nombre dice que
+       es para ellos —la feria infantil, el cine al aire libre, los castillos
+       de agua—, que ahí callarse es mejor que colocarle un torneo de dominó a
+       una familia diciendo que es para ella. A dos adultos va TODO lo demás,
+       por orden de Zeben: «muestra todas las fiestas, porque a lo mejor hay
+       una procesión y eso le puede interesar a mucha gente». Eso incluye la
+       misa cantada y el campeonato de envite, y por eso el `como_contarlo` de
+       los adultos dice que son lo que pasa en el pueblo, no un plan para
+       ellos: la elección la hacen ellos, que para eso se les enseña. */
     actividades_de_la_fiesta: actosHoy.length?(function(){
       const cuenta={}; actosHoy.forEach(a=>cuenta[a.m]=(cuenta[a.m]||0)+1);
       const jefe=Object.keys(cuenta).sort((a,b)=>cuenta[b]-cuenta[a])[0];
       const mandan=actosHoy.find(a=>a.m===jefe);
       return {
       para: S.ninos?'una familia con niños':'dos adultos',
+      /* con niños viene elegido; sin ellos es el programa tal cual */
+      elegido_para_ellos: !!S.ninos,
       /* Un día puede llevar actos de dos pueblos —quien duerme en Tegueste ve
          los del Cristo de La Laguna—, así que la cabecera es el pueblo que más
          pone, no el que casualmente empieza más temprano. */
@@ -2223,7 +2237,7 @@ function construir(){
         de_madrugada:(a.f!==f)?true:null})),
       como_contarlo: S.ninos
         ? 'Esto es el programa de las fiestas del pueblo, no una parada más. Ofréceselo como un extra del día —«y además, hoy en el pueblo hay…»—, con la hora y el sitio si los tiene. Si cae a una hora que no encaja con el resto del plan, dilo y que decidan ellos; no reordenes el día por esto.'
-        : 'Esto es el programa de las fiestas del pueblo. Lo de la noche —verbena, fuegos, concierto— va DESPUÉS del plan, como el remate opcional del día: cuéntalo con su hora y su sitio, y no lo metas como una parada más.'
+        : 'Esto es el programa de las fiestas del pueblo tal cual lo publica el ayuntamiento, sin elegir por ellos: puede traer una procesión, una misa cantada o un campeonato de envite junto a la verbena. Cuéntalo como lo que está pasando en el pueblo —«hoy allí hay de todo: a las siete la procesión y a las once verbena»— y no como un plan hecho a su medida. Lo de la noche va DESPUÉS del plan, como el remate opcional del día, con su hora y su sitio. Y no te inventes que algo les va a encantar: enseña lo que hay.'
       };
     })():null,
     paradas: paradas.map(p=>({nombre:p.n,tipo:p.tipo||null,servicios:p.serv||null,accesible:p.acc||null,fuente_oficial:p.of||null,franja:p.fr,duracion_min:p.dur,cuando_no:p.no||null,reserva_obligatoria:p.res_texto||p.res||null,
@@ -3061,7 +3075,11 @@ const N={
   manana:(n,d)=>'Empiezan la mañana por '+n+', que con calma son cosa de '+d+' minutos.',
   mananaEv:(n,h)=>' Y a mediodía, al lío: '+n+h+'.',
   noHay:(t)=>'De '+t+' por aquí cerca no tengo nada abierto ahora mismo, así que les digo lo que sí hay.\n',
-  actos:(m,f)=>'Y otra cosa, que hoy '+m+' está de fiestas'+(f?' —'+f+'—':'')+': hay cosas del programa que les van a encajar.',
+  /* Con niños la lista viene elegida y se puede prometer; a dos adultos va el
+     programa entero, así que se enseña y ya. Prometer que una misa cantada les
+     va a encajar es exactamente lo que esta casa no hace. */
+  actos:(m,f,el)=>'Y otra cosa, que hoy '+m+' está de fiestas'+(f?' —'+f+'—':'')+
+    (el?': hay cosas del programa que les van a encajar.':'. Esto es lo que pone el programa:'),
   actoLin:(n,h,d,k,m)=>'· '+n+(h?', a las '+h:'')+(d?', en '+d:'')+(m?' ('+m+')':'')+'.',
   masFi:'Y por ahí cerca ese día hay más:',
   masFiLin:(n,m,h,d)=>'· '+n+', en '+m+(h?', a las '+h:'')+(d?', a '+d+' km':'')+'.',
@@ -3137,7 +3155,8 @@ const N={
   manana:(n,d)=>'Start the morning at '+n+' — about '+d+' minutes taking it easy.',
   mananaEv:(n,h)=>' And at midday, straight to '+n+h+'.',
   noHay:(t)=>'There is no '+t+' open near here right now, so let me tell you what there is.\n',
-  actos:(m,f)=>'One more thing: '+m+' is in fiestas today'+(f?' —'+f+'—':'')+', and the programme has something that fits you.',
+  actos:(m,f,el)=>'One more thing: '+m+' is in fiestas today'+(f?' —'+f+'—':'')+
+    (el?', and the programme has something that fits you.':'. Here is what the programme says:'),
   actoLin:(n,h,d,k,m)=>'· '+n+(k?' ('+k+')':'')+(h?', at '+h:'')+(d?', at '+d:'')+(m?' — '+m:'')+'.',
   masFi:'And there is more going on nearby that day:',
   masFiLin:(n,m,h,d)=>'· '+n+', in '+m+(h?', at '+h:'')+(d?', '+d+' km away':'')+'.',
@@ -3213,7 +3232,8 @@ const N={
   manana:(n,d)=>'Beginnen Sie den Morgen bei '+n+' — in Ruhe etwa '+d+' Minuten.',
   mananaEv:(n,h)=>' Und mittags direkt zu '+n+h+'.',
   noHay:(t)=>'In der Nähe hat gerade nichts mit '+t+' offen, deshalb sage ich Ihnen, was es gibt.\n',
-  actos:(m,f)=>'Und noch etwas: in '+m+' ist heute Fiesta'+(f?' —'+f+'—':'')+', und im Programm steht etwas Passendes für Sie.',
+  actos:(m,f,el)=>'Und noch etwas: in '+m+' ist heute Fiesta'+(f?' —'+f+'—':'')+
+    (el?', und im Programm steht etwas Passendes für Sie.':'. Das steht im Programm:'),
   actoLin:(n,h,d,k,m)=>'· '+n+(k?' ('+k+')':'')+(h?', um '+h:'')+(d?', '+d:'')+(m?' — '+m:'')+'.',
   masFi:'Und in der Nähe ist an dem Tag noch mehr los:',
   masFiLin:(n,m,h,d)=>'· '+n+', in '+m+(h?', um '+h:'')+(d?', '+d+' km entfernt':'')+'.',
@@ -3462,7 +3482,7 @@ function narrarLocal(b){
      no, con clave de API se dice y sin ella no. */
   if(b.actividades_de_la_fiesta&&F.actos){
     const a=b.actividades_de_la_fiesta;
-    t.push(F.actos(a.municipio,a.de_las_fiestas)+'\n'+'\n'+
+    t.push(F.actos(a.municipio,a.de_las_fiestas,a.elegido_para_ellos)+'\n'+'\n'+
       a.lista.map(x=>F.actoLin(x.nombre,x.hora,x.donde,actoTr(x.nombre),
         x.municipio!==a.municipio?x.municipio:null)).join('\n'));
   }
@@ -3494,11 +3514,12 @@ function narrarLocal(b){
 }
 
 /* ============ LLAMADA A LA API ============ */
-async function pedirVoz(brief){
-  /* La clave NO vive aquí. Se le pide el texto a nuestra propia función,
-     que corre en el servidor de Netlify y es la única que ve la clave.
-     Si esa función no existe todavía, se cae con elegancia al narrador local. */
-  const cuerpo={
+/* El cuerpo es el mismo para los dos caminos —el que va soltando texto y el
+   que trae la respuesta entera—, así que se arma una sola vez: si se duplica,
+   un día se toca uno y no el otro y el plan sale distinto según qué función
+   conteste, que es de los fallos más difíciles de ver. */
+function cuerpoDeLaPeticion(brief){
+  return {
     system:txtPrompt.value
       +'\n\nLOS PORQUÉS EN OTRO IDIOMA'
       +'\nLas descripciones de los lugares vienen del Cabildo de Tenerife y están en español.'
@@ -3512,6 +3533,62 @@ async function pedirVoz(brief){
       'INFORME (único material que puedes usar):\n'+JSON.stringify(brief)+
       '\n\nEscribe la respuesta de Naira. Solo el mensaje, sin comillas ni preámbulo.'}]
   };
+}
+
+/* ── El camino que va soltando el texto ──
+   Zeben: «deberíamos poner que Naira trabaje en streaming porque tarda mucho
+   pensando». El plan tarda entre veinte y treinta y cinco segundos en estar
+   entero, y ese era el problema de verdad detrás de los dos relojes que ya
+   hemos alargado dos veces: no es que fueran cortos, es que se estaba
+   esperando a tener TODO antes de enseñar NADA. Pidiendo el texto por trozos
+   la primera frase aparece en dos o tres segundos y ya no hay espera que
+   agotar — y de paso, si algo se corta a mitad, lo que llegó se queda.
+   `alLlegar` recibe el texto ACUMULADO, no el trocito: quien pinta no tiene
+   que llevar la cuenta. Devuelve el texto entero cuando acaba.
+   Y si esta función no está desplegada —o el formato moderno no va— esto
+   lanza y `pedirVoz()` sigue con la de siempre: por eso no se toca nada más. */
+async function pedirVozEnVivo(brief,alLlegar,señal){
+  const RUTAS=['/.netlify/functions/naira-stream','/api/naira-stream'];
+  let t=null, ultimo=0, porque='';
+  for(const ruta of RUTAS){
+    try{
+      const res=await fetch(ruta,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(cuerpoDeLaPeticion(brief)),signal:señal});
+      ultimo=res.status;
+      if(res.ok&&res.body){ t=res; break; }
+      try{ const d=await res.json(); if(d&&d.error) porque=d.error+(d.motivo?' ('+d.motivo+')':''); }catch(e){}
+    }catch(e){ if(e.name==='AbortError') throw e; }
+  }
+  if(!t) throw new Error('en vivo: '+ultimo+(porque?' · '+porque:''));
+
+  const lector=t.body.getReader(), dec=new TextDecoder();
+  let resto='', texto='', fin=false;
+  for(;;){
+    const {done,value}=await lector.read();
+    if(done) break;
+    resto+=dec.decode(value,{stream:true});
+    const lineas=resto.split('\n'); resto=lineas.pop();
+    for(const linea of lineas){
+      if(!linea.startsWith('data:')) continue;
+      const crudo=linea.slice(5).trim(); if(!crudo) continue;
+      let ev; try{ ev=JSON.parse(crudo); }catch(e){ continue; }
+      if(ev.error) throw new Error(ev.error);
+      if(ev.fin){ fin=true; continue; }
+      if(typeof ev.t==='string'){ texto+=ev.t; if(alLlegar) alLlegar(texto); }
+    }
+  }
+  /* Si se cortó antes de decir que había acabado, lo que hay puede ser medio
+     plan: mejor el relato local entero que un día a medias. */
+  if(!fin) throw new Error('el flujo se cortó a mitad');
+  if(!texto.trim()) throw new Error('no llegó texto');
+  return texto.trim();
+}
+
+async function pedirVoz(brief){
+  /* La clave NO vive aquí. Se le pide el texto a nuestra propia función,
+     que corre en el servidor de Netlify y es la única que ve la clave.
+     Si esa función no existe todavía, se cae con elegancia al narrador local. */
+  const cuerpo=cuerpoDeLaPeticion(brief);
   /* Sin tiempo límite, si el servidor no contesta ni falla el chat se cuelga.
      Pero 26 segundos era CORTO: el informe son unos 8.800 tokens de entrada y
      hasta 1.800 de salida, y eso tarda entre veinte y treinta y cinco segundos.
@@ -3593,23 +3670,56 @@ async function pedirPlan(){
   acc.innerHTML='<button class="opt" disabled>'+tr('pensando')+'</button>';
   const t=document.createElement('div');t.className='escribiendo';t.innerHTML='<i></i><i></i><i></i>';
   hilo.appendChild(t);hilo.scrollTop=hilo.scrollHeight;
-  let acabado=false;
+  let acabado=false, enVivo=null, algoLlego=false, burbujaViva=null;
   /* La red de seguridad tiene que ir por DETRÁS del corte de la petición: si
-     salta antes, mata una respuesta que venía en camino. */
-  const seguro=setTimeout(()=>{           /* red de seguridad por si algo se atasca */
-    if(acabado) return;
-    acabado=true;
+     salta antes, mata una respuesta que venía en camino. Y con el texto
+     llegando por trozos hay una regla más: **el reloj no cuenta mientras algo
+     esté llegando**. Cortar a una respuesta que se está escribiendo sola sería
+     tirar medio plan ya pintado por haber tardado en escribir el final. */
+  let ultimoTrozo=Date.now();
+  const seguro=setInterval(()=>{          /* red de seguridad por si algo se atasca */
+    if(acabado||Date.now()-ultimoTrozo<62000) return;
+    acabado=true; clearInterval(seguro);
+    if(enVivo) try{ enVivo.abort(); }catch(e){}
     if(t.parentNode) t.remove();
+    if(burbujaViva) burbujaViva.remove();
     const texto=narrarLocal(brief);
     burbuja(resaltar(texto,brief),'naira','<span class="sello">Naira, narrando en local</span>'
       +dibujaRuta(brief)+bloqueMapas(brief,BASES[S.base]));
     preguntarQueTal(brief);
-  },62000);
+  },2000);
+  /* La burbuja se crea en cuanto llega la primera palabra y se va rellenando.
+     `ritmo()` se le pasa entero cada vez —no se añade el trocito— porque un
+     párrafo no se sabe que lo es hasta que llega su línea en blanco. Lo que no
+     se hace todavía es `resaltar()`: eso busca nombres y cifras del informe en
+     el texto, y sobre una frase a medias marcaría a medias. Va al final. */
+  const pintando=(texto)=>{
+    ultimoTrozo=Date.now(); algoLlego=true;
+    if(t.parentNode) t.remove();
+    if(!burbujaViva){ burbujaViva=burbuja('','naira'); burbujaViva.classList.add('viva'); }
+    burbujaViva.innerHTML=ritmo(texto);
+    hilo.scrollTop=hilo.scrollHeight;
+  };
   try{
-    const texto=await pedirVoz(brief);
+    let texto;
+    try{
+      enVivo=new AbortController();
+      texto=await pedirVozEnVivo(brief,pintando,enVivo.signal);
+    }catch(e){
+      if(acabado) return;
+      /* Si no llegó ni una palabra, se prueba con la función de siempre: puede
+         ser que el formato moderno no esté desplegado. Si ya había texto en
+         pantalla, no: repetir la llamada sería pagarla dos veces y además
+         reescribir delante del turista lo que ya estaba leyendo. */
+      if(algoLlego||(e&&e.name==='AbortError')) throw e;
+      if(burbujaViva){ burbujaViva.remove(); burbujaViva=null; }
+      if(!t.parentNode) hilo.appendChild(t);
+      texto=await pedirVoz(brief);
+    }
     if(acabado) return;
-    acabado=true; clearTimeout(seguro);
-    t.remove();
+    acabado=true; clearInterval(seguro);
+    if(t.parentNode) t.remove();
+    if(burbujaViva){ burbujaViva.remove(); burbujaViva=null; }
     const rev=revisar(texto,brief);
     const sello='<span class="sello '+(rev.limpio?'ok':'mal')+'">'+
       (rev.limpio?'Todas las cifras salen del informe':'Revisar en el detalle')+'</span>';
@@ -3618,8 +3728,9 @@ async function pedirPlan(){
     preguntarQueTal(brief);
   }catch(e){
     if(acabado) return;
-    acabado=true; clearTimeout(seguro);
+    acabado=true; clearInterval(seguro);
     if(t.parentNode) t.remove();
+    if(burbujaViva) burbujaViva.remove();
     const texto=narrarLocal(brief);
     const rev=revisar(texto,brief);
     /* Ojo: aquí faltaba resaltar(). Los otros dos caminos —el bueno y el del
@@ -4793,16 +4904,15 @@ function pintaFijos(){
    El <input> sigue existiendo, oculto: guarda el valor y dispara el `change`
    que ya escuchaba el motor. Aquí solo se pinta y se pulsa.                  */
 let calMesVisto=null;                 /* el mes que se está mirando, no el elegido */
-/* ── El rango de días, para quien viene una semana ──
-   Zeben: «estaría bien poder elegir varios días en el calendario». El plan
-   sigue siendo de UN día —esa regla no se toca, todo el motor cuelga de
-   `S.fecha`—: el rango es para MIRAR. Quien está aquí del 12 al 19 quiere ver
-   de un vistazo qué cae en su estancia y luego elegir el día. Así que
-   `calRango` no entra en el motor: solo pinta el pie del calendario.
-   Se marca como en cualquier web de reservas, que es el gesto que la gente
-   ya conoce: se pulsa el primer día y luego el último. */
-let calRango=null;
-const CAL_TOPE=21;   /* más de tres semanas no es una estancia, es el año */
+/* ── Hubo un rango de días y se quitó ──
+   Se puso para que quien viene una semana viera su estancia entera; el plan
+   seguía siendo de un día y el rango solo pintaba el pie. Zeben lo probó y lo
+   cortó: «elegir varios días y no hacer nada no vale para nada, mejor
+   quitarlo». Tenía razón — pedía un segundo gesto para enseñar una lista más
+   larga de lo mismo. Lo que sí hacía falta era que el día elegido se leyera
+   bien, y eso es lo de abajo: los pueblos por separado, con su número.
+   El pueblo abierto en el pie del calendario. Solo pinta: el motor no lo mira. */
+let calMuniAbierto=null;
 
 function fiestasDe(iso){ return EVENTOS.filter(e=>e.f===iso); }
 function isoDe(a,m,d){ return a+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
@@ -4862,8 +4972,6 @@ function pintaCalendario(){
     const cl=['calD'];
     if(iso===S.fecha) cl.push('sel');
     if(iso===hoy) cl.push('hoy');
-    if(calRango&&calRango.a&&calRango.b&&iso>calRango.a&&iso<=calRango.b) cl.push('enRango');
-    if(calRango&&calRango.a===iso) cl.push('deRango');
     if(evs.length) cl.push('conFiesta');
     else if(acs.length) cl.push('conActo');   /* hay programa, pero la fiesta es otro día */
     /* La fiesta lleva su icono; el día que solo tiene programa lleva un punto.
@@ -4876,11 +4984,6 @@ function pintaCalendario(){
   }
   h+='</div><p class="calPista">'+tr('calPista')+'</p>';
 
-  /* Si hay un rango marcado, el pie cuenta la ESTANCIA entera: un día por
-     línea con lo que cae en él. Es lo que se viene a mirar cuando uno tiene
-     billete del 12 al 19. Cada día se puede pulsar para armarle el plan. */
-  if(calRango&&calRango.a&&calRango.b){ caja.innerHTML=h+pieRango(); atarCal(caja,a,m); return; }
-
   /* lo que hay el día elegido: es para lo que existe el calendario */
   const hoyEvs=fiestasDe(S.fecha), hoyAct=actosDe(S.fecha);
   h+='<div class="calPie">';
@@ -4890,61 +4993,42 @@ function pintaCalendario(){
     if(hoyEvs.length>4) h+='<p class="calNada">+'+(hoyEvs.length-4)+'</p>';
   }else if(!hoyAct.length) h+='<p class="calNada">'+tr('sinEventos')+'</p>';
   if(hoyAct.length){
-    /* Se enseñan TODOS, en una caja que se desliza: recortar a cinco dejaba
-       fuera los fuegos de las doce, que es justo lo que se venía a ver. */
-    h+='<p class="calActT">'+tr('calPrograma')+' · '+hoyAct.length+'</p><div class="calActs">';
-    actosPorPueblo(hoyAct).forEach(g=>{
-      h+='<p class="calMuni">'+g.m+(g.fi?' <i>· '+g.fi+'</i>':'')+'</p>';
-      g.actos.forEach(a=>{
+    /* ── Los pueblos primero, y dentro lo que ponen ──
+       Idea de Zeben, y viene de ver el artefacto de Cowork: «podrías ponerlo
+       separado por municipios, y así cuando pinchas que ponga en Granadilla 3,
+       en Arafo 2, y tú pinches y veas lo que hay, más que una lista entera de
+       eventos que puede ser muy pesado». Un día cargado tiene CINCUENTA actos
+       de ocho municipios: enseñados de corrido son un muro, y al que está en
+       Arafo le sobran cuarenta y ocho. Con el pueblo delante se ve de un
+       vistazo dónde hay movimiento y se abre solo lo suyo.
+       Si hay un solo pueblo se abre solo: pedir un clic para enseñar lo único
+       que hay es un clic de más. */
+    const grupos=actosPorPueblo(hoyAct);
+    if(!calMuniAbierto||!grupos.some(g=>g.m===calMuniAbierto))
+      calMuniAbierto=grupos.length===1?grupos[0].m:null;
+    h+='<p class="calActT">'+tr('calPrograma')+' · '+hoyAct.length+'</p>';
+    h+='<div class="calChips">'+grupos.map(g=>
+      '<button class="calChip'+(g.m===calMuniAbierto?' ab':'')+'" data-muni="'+g.m+'">'+
+      g.m+' <b>'+g.actos.length+'</b></button>').join('')+'</div>';
+    const abierto=grupos.find(g=>g.m===calMuniAbierto);
+    if(abierto){
+      /* Los del pueblo abierto van TODOS, en una caja que se desliza:
+         recortar a cinco dejaba fuera los fuegos de las doce, que es justo lo
+         que se venía a ver. */
+      h+='<div class="calActs">';
+      if(abierto.fi) h+='<p class="calMuni"><i>'+abierto.fi+'</i></p>';
+      abierto.actos.forEach(a=>{
         h+='<div class="calAc"><span class="ah">'+(a.h||'—')+'</span>'+
            '<div><b>'+a.n+'</b>'+
            ((a.lu||a.mad)?'<i>'+[a.lu,a.mad?tr('calMadrugada'):''].filter(Boolean).join(' · ')+'</i>':'')+
            '</div></div>';
       });
-    });
-    h+='</div>';
+      h+='</div>';
+    }
   }
   h+='</div>';
   caja.innerHTML=h;
   atarCal(caja,a,m);
-}
-
-/* ── el pie cuando hay una estancia marcada ──
-   Un día por línea, con lo que cae en él. Los días vacíos también salen: que
-   no haya nada el martes es una respuesta, y callarla haría pensar que falta
-   por cargar. */
-function pieRango(){
-  const dias=[]; const d=new Date(calRango.a+'T12:00:00'), fin=new Date(calRango.b+'T12:00:00');
-  while(d<=fin && dias.length<CAL_TOPE){ dias.push(isoDe(d.getFullYear(),d.getMonth(),d.getDate()));
-    d.setDate(d.getDate()+1); }
-  const LOCD={es:'es-ES',en:'en-GB',de:'de-DE'}[S.idioma]||'es-ES';
-  let n=0;
-  let h='<div class="calPie"><p class="calActT">'+tr('calEstancia')(dias.length)+
-        ' <button class="calQuita" data-quita="1">'+tr('calQuitaRango')+'</button></p>'+
-        '<div class="calActs">';
-  dias.forEach(iso=>{
-    const evs=fiestasDe(iso), acs=actosDe(iso);
-    n+=evs.length+acs.length;
-    const dd=new Date(iso+'T12:00:00')
-      .toLocaleDateString(LOCD,{weekday:'long',day:'numeric',month:'short'});
-    h+='<button class="calRD'+(iso===S.fecha?' sel':'')+'" data-dia="'+iso+'">'+
-       '<b>'+dd.charAt(0).toUpperCase()+dd.slice(1)+'</b>';
-    if(evs.length) h+=evs.map(e=>'<i>'+iconoFiesta(e.n)+' '+e.n+' · '+e.m+(e.h?' · '+e.h:'')+'</i>').join('');
-    /* Los pueblos, recortados a tres. Un día cargado tiene programa en DOCE
-       municipios de la isla y ponerlos todos deja una línea que nadie lee y
-       que además no le sirve a quien está en uno solo. Mandan los que más
-       actos ponen, que es la misma regla de la cabecera del plan. */
-    if(acs.length){
-      const porM={}; acs.forEach(x=>porM[x.m]=(porM[x.m]||0)+1);
-      const orden=Object.keys(porM).sort((x,y)=>porM[y]-porM[x]);
-      const tres=orden.slice(0,3).join(', ')+(orden.length>3?' +'+(orden.length-3):'');
-      h+='<i class="pr">'+tr('calPrograma')+' · '+acs.length+' · '+tres+'</i>';
-    }
-    if(!evs.length&&!acs.length) h+='<i class="na">'+tr('sinEventos')+'</i>';
-    h+='</button>';
-  });
-  h+='</div><p class="calPista">'+tr('calElegirDia')+'</p></div>';
-  return h;
 }
 
 function atarCal(caja,a,m){
@@ -4953,20 +5037,15 @@ function atarCal(caja,a,m){
     calMesVisto={a:a+Math.floor((m+paso)/12), m:((m+paso)%12+12)%12};
     pintaCalendario();
   });
-  const quita=caja.querySelector('[data-quita]');
-  if(quita) quita.onclick=()=>{ calRango=null; pintaCalendario(); };
-  caja.querySelectorAll('.calD,.calRD').forEach(b=>b.onclick=()=>{
+  /* el pueblo se abre y se cierra; abrir otro cierra el anterior */
+  caja.querySelectorAll('.calChip').forEach(b=>b.onclick=()=>{
+    const mu=b.getAttribute('data-muni');
+    calMuniAbierto=(calMuniAbierto===mu)?null:mu;
+    pintaCalendario();
+  });
+  caja.querySelectorAll('.calD').forEach(b=>b.onclick=()=>{
     const iso=b.getAttribute('data-dia');
-    /* El gesto es el de cualquier web de reservas: el primer día abre la
-       estancia y el segundo la cierra. Pulsar antes del primero, o cuando ya
-       está cerrada, empieza de nuevo — así nunca se queda en un estado del
-       que no se sepa salir. Los del pie no abren rango: ahí ya se está
-       eligiendo el día del plan. */
-    if(b.classList.contains('calD')){
-      if(!calRango||calRango.b||iso<=calRango.a) calRango={a:iso,b:null};
-      else if(diasEntre(calRango.a,iso)>CAL_TOPE) calRango={a:iso,b:null};
-      else { calRango.b=iso; pintaCalendario(); return; }   /* cerrar no cambia el día del plan */
-    }
+    calMuniAbierto=null;             /* otro día, otro programa */
     /* se escribe en el <input> y se avisa como si lo hubiera tocado una
        persona: así el motor se entera por el mismo sitio de siempre */
     inpF.value=iso;
@@ -4974,8 +5053,6 @@ function atarCal(caja,a,m){
     pintaCalendario();
   });
 }
-const diasEntre=(a,b)=>Math.round(
-  (new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/86400000);
 
 function abreCalendario(abrir){
   const caja=document.getElementById('calendario'), bot=document.getElementById('btnCal');

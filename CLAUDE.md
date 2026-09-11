@@ -64,6 +64,7 @@ img/cartas/*.jpg              los 10 carteles de las preguntas con dibujo
 img/zonas/*.jpg               las 6 franjas de las zonas de la isla
 netlify.toml
 netlify/functions/naira.js    proxy a la API (guarda la clave)
+netlify/functions/naira-stream.mjs  el mismo, soltando el texto según llega
 netlify/functions/tiempo.js   AEMET, dos saltos con reintentos
 datos/hitos-historicos.js     46 hitos del itinerario de Santa Cruz
 datos/senderos-anaga.js       7 caminos de Anaga (CARGADO PERO SIN USAR)
@@ -344,13 +345,34 @@ viven en `ACTOS`, colgando del día y del municipio, y **no compiten por ser el
 ancla del día**: no son una parada, son lo que está pasando en el pueblo.
 
 Cada acto trae en `q` a quién le sirve, sacado **del nombre** como los iconos
-de fiesta: con niños salen la feria infantil, el cine al aire libre y los
-castillos de agua; a dos adultos, la verbena, los fuegos y el concierto. Lo
-que no se supo clasificar **se queda sin `q` y no se le ofrece a nadie**: de
-72 actos de tres programas, la mitad —un torneo de dominó, una misa, una
-exposición de manualidades—. Es la regla de siempre: antes callarse que
-colocarle un torneo de dominó a una familia con niños diciendo que es para
-ellos.
+de fiesta. **Y `q` dice UNA sola cosa: si el acto es de niños.** Eso, y solo
+eso, va al plan con niños —la feria infantil, el cine al aire libre, los
+castillos de agua—; **todo lo demás va al de dos adultos**, incluida la misa
+cantada y el campeonato de envite.
+
+No era así, y lo cambió Zeben: «para los adultos muestra todas las fiestas,
+porque a lo mejor hay una procesión y eso le puede interesar a mucha gente;
+para niños lee el enunciado». Antes `q` era una **caja de dos lados** —`ninos`
+o `noche`— y lo que no caía en ninguna no se le ofrecía a nadie: de 648 actos,
+**371 se callaban** y una feria de artesanía de las once de la mañana dejaba de
+ofrecérsele a una pareja porque la hora la había metido en la caja de los
+niños. De 480 actos ofrecidos se pasa a **863**, y quien va con niños sigue sin
+ver un torneo de dominó.
+Lo que esto obliga a cambiar en dos sitios más, y hay que entenderlo antes de
+tocarlo:
+· **La regla de la hora ya no marca `ninos`.** Un pasacalle de las once no dice
+  en su nombre que sea de niños, y marcarlo así lo escondía de la pareja. Sigue
+  marcando `noche`, que describe el acto y no le quita nada a nadie. Fueron 21
+  actos que salen de la caja de los niños: sortijas, ferias de artesanía,
+  actuaciones, la zumba de la playa.
+· **Y el tono cambia.** A dos adultos ya no se les puede decir «hay cosas del
+  programa que les van a encajar»: va el programa entero. El informe lleva
+  `elegido_para_ellos`, el prompt lo explica y el narrador local dice «esto es
+  lo que pone el programa» en vez de prometer. Prometer que una misa cantada
+  les va a encajar es exactamente lo que esta casa no hace.
+De paso entraron en el nombre tres cosas que faltaban —«Fiesta de la Familia»,
+«Fiesta del agua» y los «castillos acuáticos»—, que son de niños y se estaban
+colando por la hora.
 
 Solo salen los del día del plan y de la zona por donde pasa —municipio de
 alguna parada, de la fiesta o de la cama—, que anunciar una verbena a 40 km no
@@ -729,26 +751,32 @@ día con fiesta lleva su icono y el que **solo** tiene programa lleva un punto:
 poniendo el icono en los dos, veinticuatro de treinta días de septiembre salían
 marcados igual y las fiestas de verdad se perdían entre los tambores.
 
-**Y el calendario deja marcar la estancia entera.** Zeben: «estaría bien poder
-elegir varios días en el calendario del encabezado». El plan sigue siendo de
-**UN día** —esa regla no se toca, todo el motor cuelga de `S.fecha`—: el rango
-es para **mirar**. Quien tiene billete del 12 al 19 quiere ver de un vistazo
-qué cae en su estancia y luego elegir el día.
-El gesto es el de cualquier web de reservas, que es el que la gente ya conoce:
-se pulsa el primer día y luego el último. Pulsar antes del primero, o con la
-estancia ya cerrada, empieza otra vez — así no hay manera de quedarse en un
-estado del que no se sepa salir. Y **una pulsación sola sigue haciendo lo de
-siempre**: escribe en el `<input>` oculto y dispara el `change`, así que nada
-de lo que funcionaba se entera del cambio.
-El pie pasa entonces a contar un día por línea, **incluidos los vacíos**: que
-el martes no haya nada es una respuesta, y callarla haría pensar que falta por
-cargar. Cada línea se pulsa para armarle el plan a ese día.
-Dos topes, los dos por la misma razón —que la lista se lea—: la estancia se
-corta en **21 días**, que más que eso no es una estancia; y los pueblos con
-programa se recortan a **tres y un “+N”**, que un día cargado tiene programa en
-DOCE municipios de la isla y ponerlos todos deja una línea que nadie lee y que
-además no le sirve a quien está en uno solo. Mandan los que más actos ponen,
-que es la misma regla de la cabecera del plan.
+**El calendario llegó a marcar la estancia entera, y se quitó.** Se puso
+porque Zeben lo pidió —«estaría bien poder elegir varios días en el calendario
+del encabezado»—: el plan seguía siendo de un día y el rango solo servía para
+mirar qué caía en la semana. Lo probó y lo cortó él mismo: **«elegir varios
+días y no hacer nada no vale para nada, para eso mejor quitarlo»**. Y tenía
+razón: pedía un segundo gesto para enseñar una lista más larga de lo mismo.
+Se fue entero —`calRango`, `pieRango`, el tope de 21 días, las tres claves de
+`tr()` y sus cuatro reglas de CSS—. Lo que se queda es lo de siempre: una
+pulsación escribe en el `<input>` oculto y dispara el `change`.
+
+**Lo que sí hacía falta era que el día elegido se leyera: los pueblos
+delante.** También suyo, y viene de mirar el artefacto de Cowork: «podrías
+ponerlo separado por municipios, y así cuando pinchas que ponga en Granadilla
+3, en Arafo 2, y tú pinches y veas lo que hay, más que una lista entera de
+eventos que puede ser muy pesado». Un día grande tiene **cincuenta actos de
+diez municipios**, y de corrido eso es un muro que además no le sirve a quien
+está en uno solo. Ahora el pie enseña **los pueblos con su número** y se abre
+el que se pulse; dentro van **todos** los actos de ese pueblo, que recortar a
+cinco dejaba fuera los fuegos de las doce. Tres detalles:
+· Si hay **un solo pueblo se abre solo**: pedir un clic para enseñar lo único
+  que hay es un clic de más.
+· Abrir otro **cierra el anterior**, y volver a pulsar el abierto lo cierra.
+· Cambiar de día **cierra lo que hubiera abierto**: otro día, otro programa.
+Mandan los que más actos ponen, que es la misma regla de la cabecera del plan.
+El nombre de la fiesta sigue saliendo solo si **todos** los actos del pueblo
+son de la misma.
 
 ## Trampas conocidas
 
@@ -1623,9 +1651,40 @@ Lo que sigue **sin usar** de lo suyo, y por qué:
   al modelo le da igual leerlo así.
   Si aun así no llega, el siguiente sospechoso es el **límite de tiempo de las
   funciones de Netlify**, que es de unos segundos y no se puede estirar sin
-  más. La solución de verdad para eso es **streaming**: el texto va llegando
-  según se escribe, no se agota ninguna espera y además el turista lo ve
-  aparecer en vez de mirar tres puntitos medio minuto.
+  más. La solución de verdad para eso es **streaming**, y está abajo.
+
+- **Y el streaming, que era el arreglo de verdad.** Zeben: «deberíamos poner
+  que Naira trabaje en streaming porque tarda mucho pensando y a mí, por
+  ejemplo, no me va la apikey». Las dos mitades de esa frase son el mismo
+  problema, y era el que llevaba detrás de los dos relojes que ya habíamos
+  alargado dos veces: **no es que fueran cortos, es que se esperaba a tenerlo
+  TODO antes de enseñar NADA**. Pidiendo el texto por trozos, la primera frase
+  aparece en dos o tres segundos y ya no hay espera que agotar.
+  Son **dos ficheros, y a propósito**. El formato clásico de Netlify
+  (`exports.handler`, que devuelve un objeto) no puede ir soltando texto: para
+  eso hace falta el moderno, que devuelve un `Response` de verdad, y la
+  extensión **`.mjs` es lo que se lo dice a Netlify sin `package.json`** —que es
+  justo lo que la función lleva evitando desde el principio—. Así que
+  `naira-stream.mjs` va al lado de `naira.js`, no en su lugar: **el navegador
+  prueba la nueva y, si no está o falla antes de la primera palabra, cae sola en
+  la de siempre**, y si esa tampoco, al relato local. Tres redes, no una.
+  Cuatro cosas que hay que saber para tocar esto:
+  · **Los tres cierres están copiados en el `.mjs` y hay que tocar los dos.** No
+    hay fichero compartido porque cualquier cosa dentro de `netlify/functions`
+    la trata Netlify como otra función. Quien arregle un cierre en uno y no en
+    el otro deja la puerta abierta en el que no mire.
+  · **El contador del freno es suyo**, no el de `naira.js`: son dos procesos y
+    no comparten memoria, o sea que el techo real es el doble del escrito. Se
+    asume, que ya era un freno y no un candado.
+  · **La red de seguridad dejó de ser un reloj y pasó a mirar el pulso.** Cortar
+    a los 62 segundos a una respuesta que se está escribiendo sola sería tirar
+    medio plan ya pintado; ahora la cuenta se reinicia con cada trozo que llega.
+  · **`resaltar()` va al final, no mientras llega.** Busca nombres y cifras del
+    informe dentro del texto, y sobre una frase a medias marcaría a medias.
+    Mientras llega solo se le pasa `ritmo()`, y entero cada vez: un párrafo no
+    se sabe que lo es hasta que llega su línea en blanco.
+  Y si el flujo se corta antes de decir que acabó, **lo que hay se tira**: medio
+  plan es peor que el relato local entero.
 
 - **El Instagram: el contenido sale de los datos, publicar lo hace él.**
   Zeben abrió la cuenta y preguntó si se podía montar un agente que se la

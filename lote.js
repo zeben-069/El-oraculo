@@ -259,7 +259,13 @@ const ACTOS=(()=>{ try{ const t=require('fs').readFileSync('datos/actos.js','utf
 if(!ACTOS.length) console.log('  (no hay ningún programa cargado)');
 else{
   const dias=[...new Set(ACTOS.map(a=>a.f))].sort();
-  let salen=0, mal=0, sinQ=0, conActos=0, pruebas=0;
+  /* Lo que se vigila cambió con la orden de Zeben del 11 de septiembre: `q`
+     ya no es una caja de dos lados, dice solo si el acto es de niños. Así que
+     la violación es una sola y va en las dos direcciones: que a una familia se
+     le ofrezca algo que no está marcado de niños, o que a dos adultos se les
+     ofrezca algo que sí. Lo que no está clasificado ya no es un fallo cuando
+     sale: es lo normal, y por eso se cuenta aparte y sin mayúsculas. */
+  let salen=0, mal=0, sinQ=0, conActos=0, pruebas=0, nocturnoNinos=0;
   dias.forEach(f=>{
     [...new Set(ACTOS.filter(a=>a.f===f).map(a=>a.m))].forEach(muni=>{
       [true,false].forEach(ninos=>{
@@ -276,8 +282,11 @@ else{
           /* ojo: un acto de madrugada se ofrece en el día ANTERIOR, así que
              no se puede buscar por la fecha del plan */
           const ficha=ACTOS.find(y=>y.n===x.nombre&&y.m===x.municipio);
+          const esDeNinos=!!ficha&&ficha.q==='ninos';
+          if(ninos!==esDeNinos) mal++;
           if(!ficha||!ficha.q) sinQ++;
-          else if(ficha.q!==(ninos?'ninos':'noche')) mal++;
+          /* con niños, nada de madrugada ni de después de las once */
+          if(ninos&&ficha&&ficha.h&&(ficha.h>='23:00'||ficha.h<'07:00')) nocturnoNinos++;
         });
       });
     });
@@ -288,8 +297,10 @@ else{
     ACTOS.filter(a=>!a.q).length+' sin clasificar)');
   console.log('  planes probados           : '+pruebas+'   ·  con algo del programa: '+conActos);
   console.log('  actos ofrecidos           : '+salen);
-  console.log('  OFRECIDO A QUIEN NO TOCA  : '+mal);
-  console.log('  SIN CLASIFICAR y ofrecido : '+sinQ);
+  console.log('  OFRECIDO A QUIEN NO TOCA  : '+mal+
+    '   (de niños a una pareja, o no marcado de niños a una familia)');
+  console.log('  DE NOCHE OFRECIDO CON NIÑOS: '+nocturnoNinos);
+  console.log('  sin clasificar y ofrecido : '+sinQ+'   (normal: van con los adultos)');
 }
 
 /* ── LAS OTRAS FIESTAS DEL DÍA Y LA CENA ────────────────────────────────

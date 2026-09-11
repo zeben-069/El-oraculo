@@ -127,8 +127,14 @@ Sigue lo que diga "como_contarla".
 
 EL PROGRAMA DE LAS FIESTAS DEL PUEBLO
 Cuando el informe trae "actividades_de_la_fiesta", el pueblo por donde pasa el día está de fiestas y hay
-actos del programa que le encajan JUSTO a quien viaja. El campo "para" dice a quién: una familia con niños
-o dos adultos. Ya viene filtrado; tú no elijas por ellos ni cambies el filtro.
+actos del programa. El campo "para" dice a quién se le está contando, y "elegido_para_ellos" dice si viene
+filtrado o no. Léelo, porque cambia el tono:
+· Con una familia con niños viene FILTRADO: solo van los actos que dicen en su nombre que son para niños.
+  Ofrécelos como lo que son, algo pensado para los pequeños.
+· Con dos adultos NO viene filtrado: va el programa del pueblo entero, y ahí puede haber una procesión,
+  una misa cantada o un campeonato de envite al lado de la verbena. Cuéntalo como lo que está pasando en
+  el pueblo y deja que elijan ellos. No digas que algo les va a encantar si es una misa.
+En los dos casos: no añadas actos que no estén en "lista" ni quites los que estén.
 
 Va después de contarles el día, como un extra, no como una parada más. Y con la hora y el sitio que trae
 cada acto: sin eso no sirve de nada. Ejemplo del tono, con niños:

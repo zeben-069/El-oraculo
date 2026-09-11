@@ -25,6 +25,14 @@
   status = 200
   force = true
 
+# Y la que va soltando el texto según se escribe. El navegador prueba esta
+# primero y, si no está, cae sola en la de arriba: por eso hay dos.
+[[redirects]]
+  from = "/api/naira-stream"
+  to = "/.netlify/functions/naira-stream"
+  status = 200
+  force = true
+
 # El manifiesto tiene que llegar con su tipo correcto o el navegador lo
 # ignora y no deja instalar la app en la pantalla de inicio.
 [[headers]]

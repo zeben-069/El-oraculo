@@ -200,7 +200,7 @@ function sacaLugar(n){
 /* Para quién es el acto, sacado del nombre. Primero se mira lo de niños:
    una «Gala de elección de la Reina Infantil» es una gala, sí, pero lo que
    manda ahí es el infantil. */
-const ACTO_NINOS=/infantil|para (los |l@s )?ni[ñn]os|familiar|para toda la familia|actividades? infantil|pinta ?caras|hinchable|colchoneta|castillo de agua|fiesta de la espuma|globoflexia|payaso|t[íi]teres|marionet|cuentacuentos|taller(es)? infantil|juegos (infantiles|tradicionales|populares)|cine (al aire libre|de verano|en la calle)|circo|cabalgata|mascota|parque acu[áa]tico|espuma|gui[ñn]ol/i;
+const ACTO_NINOS=/infantil|para (los |l@s )?ni[ñn]os|familiar|para toda la familia|fiesta de la familia|fiesta del agua|castillos? acu[áa]tic|actividades? infantil|pinta ?caras|hinchable|colchoneta|castillo de agua|fiesta de la espuma|globoflexia|payaso|t[íi]teres|marionet|cuentacuentos|taller(es)? infantil|juegos (infantiles|tradicionales|populares)|cine (al aire libre|de verano|en la calle)|circo|cabalgata|mascota|parque acu[áa]tico|espuma|gui[ñn]ol/i;
 const ACTO_NOCHE=/verbena|megaverbena|orquesta|gran baile|baile (del|de|tardeo)|tardeo|\bdj\b|concierto|drag|noche de humor|humorista|rock|festival|fuegos artificiales|fuegos del|fuegos de la|pirotecni|gala|noche de|cata de vinos|romer[íi]a|bailable|parranda/i;
 /* ── Y hay palabras que no dicen para quién es: lo dice la HORA ──
    Las reglas de arriba se escribieron con 300 actos y ahora hay 648, y el
@@ -211,10 +211,19 @@ const ACTO_NOCHE=/verbena|megaverbena|orquesta|gran baile|baile (del|de|tardeo)|
    una fiesta de la cerveza a las nueve de la noche, no—. Así que decide la
    hora, que es la misma regla que ya usa el motor para las franjas: **de día
    a los niños, de noche a dos adultos**.
-   Ojo con lo que esto significa, porque el campo es EXCLUYENTE: lo que se
-   marca `ninos` no lo ven dos adultos y al revés. Una feria de las cinco de
-   la tarde deja de ofrecerse a una pareja. Por eso la lista de lo que cambia
-   se enseña entera y la corrige quien vive aquí. */
+   ── Y esto cambió el 11 de septiembre, por orden de Zeben ──
+   Antes `q` era una caja excluyente con dos lados y la hora repartía: de día a
+   los niños, de noche a dos adultos. El efecto era que una feria de artesanía
+   de las once dejaba de ofrecérsele a una pareja. Él lo cortó de raíz: «para
+   los adultos muestra todas las fiestas, porque a lo mejor hay una procesión y
+   eso le puede interesar a mucha gente; para niños lee el enunciado». Así que
+   ahora `q` dice UNA sola cosa: **si el nombre dice que es para niños**. Eso, y
+   solo eso, se ofrece en un plan con niños; todo lo demás —la procesión, la
+   misa cantada, el torneo de dominó— va al plan de dos adultos.
+   Por eso la regla de la hora ya no marca `ninos`: un pasacalle de las once no
+   dice en su nombre que sea de niños, y marcarlo así lo escondía de la pareja.
+   Sigue marcando `noche` porque eso describe el acto y no le quita nada a
+   nadie. */
 const ACTO_SEGUN_HORA=/^(pasacalles?|feria (del|de la|de los|popular|de artesan|de animales)|fiesta (de la|del) (cerveza|agua|espuma|sombrero)|m[úu]sica en vivo|actuaci[óo]n (de|del)|domingo salser|actividades salseras|tenderete|[IVXL]* ?encuentro (de|anual) (habaneras|solistas|parranderos|tocadores)|zumba|sortija|yincana|gincana)/i;
 const CORTE_NOCHE='18:00';
 /* Y hay palabras que mandan por encima de la hora: si el acto es una misa, un
@@ -238,11 +247,9 @@ function clasificaActo(n,h){
      se invente lo que no sabe. */
   if(ACTO_NINOS.test(t)) return 'ninos';
   if(ACTO_NOCHE.test(t)) return 'noche';
-  if(ACTO_SEGUN_HORA.test(t) && !NO_ES_PARA_NADIE.test(t)){
-    if(!h) return null;            /* sin hora no se puede decidir: se calla */
-    return (h>=CORTE_NOCHE||h<'06:00') ? 'noche' : 'ninos';
-  }
-  return null;                     /* lo que no se sabe, no se ofrece */
+  if(ACTO_SEGUN_HORA.test(t) && !NO_ES_PARA_NADIE.test(t) && h && (h>=CORTE_NOCHE||h<'06:00'))
+    return 'noche';
+  return null;                     /* ni de niños ni de noche: va con los adultos */
 }
 
 function meterActos(fichero,fiesta){

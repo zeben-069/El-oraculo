@@ -105,24 +105,6 @@ body[data-luz="noche"] .calTit{color:var(--tea)}
 .calD.hoy{box-shadow:inset 0 0 0 1.5px var(--arena)}
 .calD.conFiesta .nd{font-weight:800;color:var(--cochinilla)}
 .calD.sel{background:var(--laurisilva);color:#F6F1E4}
-/* Los días de la estancia: un fondo tenue que deja ver el icono de la fiesta
-   y el punto del programa, que es lo que se viene a mirar. El primero y el
-   último se redondean por fuera, como en cualquier calendario de reservas. */
-.calD.enRango{background:var(--arena)}
-.calD.deRango{background:var(--laurisilva);color:#F6F1E4}
-.calD.deRango .nd,.calD.deRango.conFiesta .nd{color:#F6F1E4;font-weight:800}
-.calRD{display:block;width:100%;text-align:left;background:var(--cal-hueso);border:0;
-  border-left:2.5px solid var(--arena);border-radius:0 8px 8px 0;padding:6px 9px;
-  margin:0 0 4px;cursor:pointer;font:inherit;color:inherit}
-.calRD:hover{background:var(--arena)}
-.calRD.sel{border-left-color:var(--laurisilva);background:var(--arena)}
-.calRD b{display:block;font:700 13px/1.35 system-ui}
-.calRD i{display:block;font:400 12px/1.45 system-ui;font-style:normal;color:var(--tea-suave);margin-top:1px}
-.calRD i.pr{color:var(--laurisilva)}
-.calRD i.na{opacity:.5}
-.calQuita{font:600 11px system-ui;background:none;border:1.2px solid var(--arena);
-  border-radius:6px;color:var(--tea-suave);padding:2px 7px;margin-left:7px;cursor:pointer}
-.calQuita:hover{background:var(--arena)}
 .calD.sel .nd,.calD.sel.conFiesta .nd{color:#F6F1E4;font-weight:800}
 .calPie{margin:10px 0 0;padding:9px 0 0;border-top:1px dotted var(--arena)}
 .calEv{display:flex;gap:9px;align-items:flex-start;padding:4px 0}
@@ -131,10 +113,20 @@ body[data-luz="noche"] .calTit{color:var(--tea)}
 .calEv i{font-style:normal;font-size:11.5px;color:var(--tea-suave);font-family:var(--mono)}
 .calNada{margin:0;font-size:12.5px;color:var(--tea-suave);font-family:var(--mono)}
 /* EL PROGRAMA DEL DÍA. Un día grande de fiestas pone cincuenta actos de ocho
-   pueblos: van agrupados por municipio y en una caja que se desliza, porque
-   recortar la lista dejaba fuera los fuegos de las doce — que es justo lo
-   que se venía a mirar. El día que solo tiene actos se marca más flojo que
-   el que tiene fiesta: hay programa, pero el día grande es otro. */
+   pueblos, y de corrido eso es un muro. Delante van los PUEBLOS con su número
+   —«Granadilla 3», «Arafo 2»— y se abre el que se pulse; dentro, los actos de
+   ese pueblo van todos, en una caja que se desliza, porque recortar la lista
+   dejaba fuera los fuegos de las doce, que es justo lo que se venía a mirar.
+   El día que solo tiene actos se marca más flojo que el que tiene fiesta:
+   hay programa, pero el día grande es otro. */
+.calChips{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 7px}
+.calChip{font:600 12px/1 system-ui;background:var(--cal-hueso);border:1.2px solid var(--arena);
+  border-radius:999px;color:var(--tea);padding:6px 10px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px}
+.calChip b{font:700 11px var(--mono);color:var(--tea-suave)}
+.calChip:hover{background:var(--arena)}
+.calChip.ab{background:var(--laurisilva);border-color:var(--laurisilva);color:#F6F1E4}
+.calChip.ab b{color:#F6F1E4;opacity:.85}
 .calD.conActo .nd{font-weight:700}
 .calD .pt{font-size:9px;line-height:1;margin-top:2px;color:var(--cochinilla);opacity:.55}
 .calD.sel .pt{color:#F6F1E4;opacity:.8}
@@ -170,6 +162,16 @@ body[data-luz="noche"] .calPie{border-top-color:#3A3048}
   background:var(--laurisilva);color:#F6F1E4;align-self:flex-end;
   border-radius:20px 20px 5px 20px;font-weight:500;
 }
+/* LA BURBUJA QUE SE ESTÁ ESCRIBIENDO. El texto llega por trozos, así que la
+   burbuja crece sola: sin la barrita del final parece que se ha quedado
+   colgada a mitad de frase. Y sin animación de entrada, que se repintaría
+   veinte veces mientras llega el plan. */
+.b.naira.viva{animation:none}
+.b.naira.viva .relato>:last-child::after{
+  content:'';display:inline-block;width:.5em;height:1.05em;margin-left:2px;
+  vertical-align:-.18em;background:var(--laurisilva);opacity:.6;
+  animation:latir 1s steps(2,end) infinite}
+@keyframes latir{50%{opacity:0}}
 .invitaUbi{display:flex;flex-direction:column;align-items:center;gap:9px;font-family:var(--cuerpo);
   font-size:14px;color:var(--tea);line-height:1.4;text-align:center}
 button.btnUbi{background:var(--laurisilva);color:var(--cal);border:0;border-radius:999px;
