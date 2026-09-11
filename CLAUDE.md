@@ -142,7 +142,7 @@ Dentro de `index.html`, como constantes:
   fiestas × sus años) llevan ya `la`/`lo`/`lu`**, colocadas por Zeben con
   `node eventos.js sitios`, y entonces mandan ellas sobre el casco del pueblo.
   Quedan 13 sin colocar, en 6 municipios.
-- `ACTOS` (642) — los actos de 31 programas de fiestas de 16 municipios:
+- `ACTOS` (571) — los actos de 31 programas de fiestas de 16 municipios:
   día, municipio,
   hora, dónde es y `q` («ninos»/«noche»), que dice a quién le sirve. No son
   fiestas: cuelgan de una que ya está en `EVENTOS` y no anclan el día.
@@ -828,19 +828,52 @@ Plaza de la Pescadora y playa de Los Cristianos» no es una búsqueda, es una
 frase. Los actos que no dicen dónde son van al final **y se dice que no lo
 dicen**: callarlo haría pensar que faltan por cargar.
 
-**Agrupar por sitio destapó actos repetidos.** Al quedar juntos se vio que en
-Los Abrigos había dos «Diana floreada» a las nueve y dos «Gran Baile» a las
-diez. `node eventos.js duplicados` no los cazaba porque comparaba los **24
-primeros caracteres exactos** y «Diana floreada» tiene trece. Ahora vale
-también que un nombre **empiece por el otro**, con doce caracteres de mínimo
-para que uno corto no se coma a otro: fueron **6** y se juntaron (648 → 642).
-Lo que **no** se toca son los que solo se PARECEN —«Gran Baile con Nueva
-Ilusión» y «Gran Baile con el grupo Nueva Ilusión», «Procesión diurna…» y
-«Procesión diurna desde la iglesia hasta el muelle…»—: ahí manda la regla de la
-casa, que coincidir en pueblo, día y hora **no** quiere decir que sean lo mismo
-(pueden ser dos actos seguidos de la misma romería). Esos se listan y ya:
-la herramienta escribe **`actos-parecidos.md`** con las **75 parejas**
-agrupadas por día, con una casilla en cada una, y decide quien vive allí.
+**Agrupar por sitio destapó actos repetidos, y eran muchos.** Al quedar juntos
+se vio que en Los Abrigos había dos «Diana floreada» a las nueve y dos «Gran
+Baile» a las diez: el programa que Zeben pegó a mano y el artefacto de Cowork
+contando lo mismo con otras palabras. De 648 actos se pasa a **571** en tres
+pasadas, cada una más floja que la anterior y ninguna adivinando:
+
+| pasada | qué junta | cuántos |
+|---|---|---|
+| `duplicados` | un nombre **empieza por** el otro | 6 |
+| `parecidos` | las palabras de uno están **todas dentro** del otro | 57 |
+| `parecidos actos-parecidos.md` | lo que marcó Zeben a mano | 14 |
+
+· **La primera** se quedaba corta: comparaba los **24 primeros caracteres
+  exactos** y «Diana floreada» tiene trece. Ahora vale también que un nombre
+  empiece por el otro, con doce caracteres de mínimo para que uno corto no se
+  coma a otro.
+· **La segunda la abrió Zeben**: «si son los mismos eventos quédate con los que
+  más datos tengo y estén más completos, seguro que se mezcló con los que metí
+  yo a mano». Y **«parecerse» no es compartir palabras, es que uno esté DENTRO
+  del otro**. Con el porcentaje a secas —60% de palabras en común— se juntaban
+  «Feria de Artesanía, hasta las 18:00» y «Feria del Motor, hasta las 18:00»,
+  que son **dos ferias distintas a la misma hora** en Los Realejos: de tres
+  palabras compartían dos y pasaba. Ese es exactamente el caso del que avisa la
+  regla de la casa. Exigiendo que TODAS las palabras de uno estén en el otro,
+  esa pareja se cae y siguen entrando las de verdad: «Gran Baile con Nueva
+  Ilusión» está entero dentro de «Gran Baile con el grupo Nueva Ilusión».
+· **Y el que se queda es el MÁS COMPLETO**, que es lo que él pidió: primero
+  cuántos campos trae llenos —con el sitio contando doble, que es el que hace
+  útil al acto—, y si empatan, el nombre más largo. Lo que le falte se rellena
+  con el que cae, así que no se pierde un dato por el camino. Ojo con una cosa
+  que costaba ver: **la clasificación hay que recalcularla**, porque rellenar
+  campos vacíos le podía pegar al ganador el `q` del que cae, sacado de otro
+  nombre.
+· **La tercera no es una regla, es él.** Quedaban 15 parejas que ninguna regla
+  separa —«Celebración eucarística» contra «Celebración de la eucaristía»,
+  «Ntra. Sra.» contra «Nuestra Señora», «Gran fiesta» contra «Gran Verbena»—.
+  La herramienta escribe **`actos-parecidos.md`** agrupado por día y con una
+  casilla en cada acto; se marca con una equis el que sobra y
+  `node eventos.js parecidos actos-parecidos.md` lo quita. Se busca por
+  **nombre dentro de su día y su pueblo**, no por el nombre a secas: «Santa
+  misa y procesión» está tres veces en el catálogo y quitar «las dos primeras
+  que aparezcan» habría borrado la de otro día.
+Queda **una pareja sin resolver a propósito**: las dos ferias de Los Realejos
+del 26, que son distintas de verdad. Y el informe la sigue enseñando aunque no
+se junte nada, que si no, el día que el catálogo esté limpio las parejas
+dudosas desaparecerían sin que nadie las hubiera mirado.
 
 ## Trampas conocidas
 
@@ -946,9 +979,9 @@ de una parada, y el plan sin coche se separa más del plan con coche.
 Y cierra con los **actos**: por cada día y municipio con programa cargado,
 un plan con niños y otro sin ellos —380 planes—. Lo que se vigila ahí no es la
 dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: de los
-**642 actos cargados** (73 marcados de niños, 184 de noche, 385 sin marcar),
-**862 ofrecidos** y **0 ofrecidos a quien no toca**. Ese cero es la prueba de
-toda la regla; los 513 «sin clasificar y ofrecido» ya NO son un fallo, que
+**571 actos cargados** (66 marcados de niños, 170 de noche, 335 sin marcar),
+**811 ofrecidos** y **0 ofrecidos a quien no toca**. Ese cero es la prueba de
+toda la regla; los 483 «sin clasificar y ofrecido» ya NO son un fallo, que
 desde que `q` dice solo si es de niños, lo que no está marcado va a los
 adultos y eso es lo normal.
 
@@ -1115,8 +1148,8 @@ vez que entre algo nuevo, se apunta aquí.**
 | Registro de **locales de hostelería** (9.652 filas, con `latitud`/`longitud`) | 10 sep | **Este es el que se me pasó.** Ahora entra por `hosteleria.js`: 76 fichas nuevas y los cuatro pueblos sin donde comer, cerrados |
 | Los 16 ficheros de datos abiertos del Cabildo | 10 sep | Ver la tabla de abajo, uno por uno |
 | La extensión de Netlify | 10 sep | Con ella se ve el proyecto, los despliegues y las variables desde aquí. Confirmó que **la clave está puesta** y que **lo publicado era del 8 de septiembre**, una semana por detrás de la rama |
-| Segundo artefacto «Fiestas de Tenerife» de Cowork | 10 sep | **538 actos de 22 programas**, transcritos íntegros de lagenda. Cruzados contra los 300 que había: 182 coincidían. `ACTOS` pasa de 300 a **648** tras quitar 47 repetidos, y a **642** al afinar el detector |
-| «Destaca el lugar del evento y que lleve a la localidad» | 11 sep | El calendario agrupa los actos por sitio, con la localidad en negrita y pulsable al mapa. De paso salieron 6 repetidos y 75 parejas que se parecen, en `actos-parecidos.md` |
+| Segundo artefacto «Fiestas de Tenerife» de Cowork | 10 sep | **538 actos de 22 programas**, transcritos íntegros de lagenda. Cruzados contra los 300 que había: 182 coincidían. `ACTOS` pasa de 300 a **648** tras quitar 47 repetidos, y a **571** tras tres pasadas de repetidos, la última marcada por él a mano |
+| «Destaca el lugar del evento y que lleve a la localidad» | 11 sep | El calendario agrupa los actos por sitio, con la localidad en negrita y pulsable al mapa. De paso salieron los actos repetidos: 648 → 571 |
 | «Elegir varios días en el calendario» | 10 sep | El calendario deja marcar la estancia entera y cuenta día por día lo que cae. El plan sigue siendo de un día |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 

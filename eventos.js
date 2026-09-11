@@ -363,7 +363,26 @@ function reclasificar(){
 
        node eventos.js duplicados         dice qué juntaría, sin tocar nada
        node eventos.js duplicados hazlo   lo hace                            */
-function duplicados(hazlo){
+/* Cuál de los dos se queda: EL MÁS COMPLETO.
+   Lo dijo Zeben al ver la lista de los que se parecen: «quédate con los que
+   más datos tengo y estén más completos, seguro que se mezcló con los que metí
+   yo a mano». Así que no manda la fuente ni el orden, mandan los datos: primero
+   cuántos campos trae lleno —el sitio, la hora, la fiesta de la que cuelga, la
+   clasificación—, con el sitio pesando doble porque es el que hace útil al
+   acto, y si empatan, el nombre más largo, que es el que cuenta más. */
+function riqueza(a){
+  let n=0;
+  Object.keys(a).forEach(k=>{ if(a[k]!=null&&a[k]!=='') n++; });
+  if(a.lu) n++;                    /* el sitio vale por dos */
+  return n;
+}
+function ganador(a,b){
+  const ra=riqueza(a), rb=riqueza(b);
+  if(ra!==rb) return ra>rb;
+  return String(a.n||'').length>=String(b.n||'').length;
+}
+
+function duplicados(hazlo,flojo){
   const F='datos/actos.js';
   const txt=fs.readFileSync(F,'utf8');
   const A=eval(txt+';ACTOS');
@@ -387,32 +406,122 @@ function duplicados(hazlo){
     const [c,l]=a.length<=b.length?[a,b]:[b,a];
     return c.length>=MIN&&l.indexOf(c)===0;
   };
+  /* Y con `flojo`, además, los que solo SE PARECEN: mismo pueblo, mismo día,
+     misma hora y el nombre compartiendo casi todas las palabras. Esto estuvo
+     un tiempo solo listando, porque la regla de la casa dice que coincidir en
+     pueblo, día y hora no quiere decir que sean lo mismo. Lo abrió Zeben:
+     «si son los mismos eventos quédate con el más completo, seguro que se
+     mezcló con los que metí yo a mano». Sigue exigiendo HORA: sin ella, dos
+     actos del mismo día no tienen nada que los ate. */
+  /* Y «parecerse» no es compartir palabras: es que UNO ESTÉ DENTRO DEL OTRO.
+     Con el porcentaje a secas se juntaban «Feria de Artesanía, hasta las
+     18:00» y «Feria del Motor, hasta las 18:00» —dos ferias distintas a la
+     misma hora—, porque de tres palabras compartían dos y el 67% pasaba. Son
+     justo el caso que avisa la regla de la casa: mismo pueblo, mismo día y
+     misma hora no quiere decir que sean lo mismo.
+     Exigiendo que todas las palabras de uno estén en el otro, esa pareja se
+     cae —«artesanía» no está en el otro y «motor» tampoco— y siguen entrando
+     las de verdad: «Gran Baile con Nueva Ilusión» está entero dentro de «Gran
+     Baile con el grupo Nueva Ilusión». Se paga un precio: «Subida de Ntra.
+     Sra. de Abona» no entra en «Subida de Nuestra Señora de Abona», porque la
+     abreviatura es otra palabra. Esa se queda en la lista para mirarla. */
+  const unoDentroDelOtro=(x,y)=>{
+    const px=palabrasDe(x), py=palabrasDe(y);
+    const [c,g]=px.size<=py.size?[px,py]:[py,px];
+    if(c.size<2) return false;
+    let dentro=true; c.forEach(w=>{ if(!g.has(w)) dentro=false; });
+    return dentro;
+  };
   const fuera=new Set(), juntados=[];
   A.forEach((a,i)=>{
     if(fuera.has(i)) return;
     A.forEach((b,j)=>{
       if(j<=i||fuera.has(j)) return;
       if(clave(a)!==clave(b)) return;
-      if(!mismoNombre(a.n,b.n)) return;
-      /* gana el que trae el sitio; si empatan, el nombre más largo, que dice más */
-      const ganaA=(!!a.lu&&!b.lu)||(!!a.lu===!!b.lu&&a.n.length>=b.n.length);
+      let como='empieza igual';
+      if(!mismoNombre(a.n,b.n)){
+        if(!flojo||!a.h||!unoDentroDelOtro(a.n,b.n)) return;
+        como='se parecen';
+      }
+      const ganaA=ganador(a,b);
       const g=ganaA?a:b, p=ganaA?b:a;
       Object.keys(p).forEach(k=>{ if(g[k]==null||g[k]==='') g[k]=p[k]; });
+      /* El nombre que se queda es el del ganador, así que la clasificación
+         tiene que volver a salir de ÉL: rellenar campos vacíos podía haberle
+         pegado el `q` del que cae, que se sacó de otro nombre. */
+      const q=clasificaActo(g.n,g.h);
+      if(q) g.q=q; else delete g.q;
       fuera.add(ganaA?j:i);
-      juntados.push({queda:g.n,cae:p.n,m:g.m,f:g.f,h:g.h||''});
+      juntados.push({queda:g.n,cae:p.n,m:g.m,f:g.f,h:g.h||'',como:como});
     });
   });
-  console.log('=== ACTOS REPETIDOS ===');
-  if(!juntados.length) return console.log('ninguno: los '+A.length+' actos son distintos entre sí.');
-  juntados.forEach(x=>console.log('\n· '+x.m+' · '+x.f+' '+x.h+
-    '\n    queda: '+x.queda.slice(0,66)+'\n    cae:   '+x.cae.slice(0,66)));
+  console.log('=== ACTOS REPETIDOS ==='+(flojo?'  (también los que se parecen)':''));
+  /* Aunque no se junte ninguno hay que enseñar los que SE PARECEN: si no, el
+     día que el catálogo esté limpio de repetidos exactos, las parejas dudosas
+     desaparecían del informe sin que nadie las hubiera mirado. */
+  if(!juntados.length){
+    console.log('ninguno: los '+A.length+' actos son distintos entre sí.');
+    return sospechosos(A);
+  }
+  juntados.forEach(x=>console.log('\n· '+x.m+' · '+x.f+' '+x.h+'   ['+x.como+']'+
+    '\n    queda: '+x.queda.slice(0,74)+'\n    cae:   '+x.cae.slice(0,74)));
   const limpio=A.filter((a,i)=>!fuera.has(i));
   console.log('\nactos antes: '+A.length+'  ·  se van: '+fuera.size+'  ·  quedan: '+limpio.length);
   sospechosos(limpio);
-  if(!hazlo) return console.log('\n(esto era el ensayo · «node eventos.js duplicados hazlo» para hacerlo)');
+  if(!hazlo) return console.log('\n(esto era el ensayo · «node eventos.js '+
+    (flojo?'parecidos':'duplicados')+' hazlo» para hacerlo)');
   fs.writeFileSync(F,txt.slice(0,txt.indexOf('const ACTOS='))+'const ACTOS='+
     JSON.stringify(limpio,null,0).replace(/\},\{/g,'},\n{')+';\n');
   console.log('\nhecho. Pasa ahora: node lote.js');
+}
+
+/* ── Y las que quedan, se resuelven marcando el fichero ──
+   `actos-parecidos.md` sale con una casilla en cada acto de cada pareja. Las
+   que la regla no sabe separar —«Misa en honor a la Virgen del Rosario y
+   procesión…» contra «Santa Misa en honor a la Virgen del Rosario, cantada por
+   el Grupo La Diata, y procesión…»— las mira quien vive allí, marca la que
+   sobra con una equis y esto la quita:
+
+       node eventos.js parecidos actos-parecidos.md
+
+   Se busca por NOMBRE exacto, no por número de línea: así el fichero se puede
+   reordenar o recortar y sigue valiendo. Lo que no se encuentre se canta, que
+   una marca que no hace nada es peor que ninguna. */
+function quitarMarcados(fichero){
+  const F='datos/actos.js';
+  const txt=fs.readFileSync(F,'utf8');
+  const A=eval(txt+';ACTOS');
+  const md=fs.readFileSync(fichero,'utf8');
+  /* «  - [x] Nombre del acto  · _sitio_» — el sitio va detrás del · y no
+     forma parte del nombre. Y se lee con el DÍA Y EL PUEBLO de la cabecera
+     «## 2026-09-12 · Los Realejos» encima: por el nombre a secas no vale, que
+     «Santa misa y procesión» está tres veces en el fichero y quitar «las dos
+     primeras que aparezcan» habría borrado la de otro día. */
+  const marcados=[]; let dia=null, muni=null;
+  md.split('\n').forEach(l=>{
+    const cab=l.match(/^##\s*(\d{4}-\d{2}-\d{2})\s*·\s*(.+?)\s*$/);
+    if(cab){ dia=cab[1]; muni=cab[2]; return; }
+    const mk=l.match(/^\s*-\s*\[[xX]\]\s*(.+)$/);
+    if(mk) marcados.push({n:mk[1].split(/\s+·\s+_/)[0].trim(), f:dia, m:muni});
+  });
+  if(!marcados.length) return console.log('no hay ninguna casilla marcada en '+fichero+
+    '.\nMarca con una equis —[x]— el acto que sobra de cada pareja.');
+  const fuera=new Set(), sinEncontrar=[];
+  marcados.forEach(x=>{
+    const i=A.findIndex((a,k)=>!fuera.has(k)&&a.n===x.n&&
+      (!x.f||a.f===x.f)&&(!x.m||a.m===x.m));
+    if(i<0) sinEncontrar.push(x.n); else fuera.add(i);
+  });
+  console.log('=== MARCADOS EN '+fichero+' ===');
+  marcados.forEach(x=>console.log('   '+(sinEncontrar.indexOf(x.n)<0?'fuera: ':'NO ESTÁ: ')+
+    (x.f||'?')+' · '+x.n.slice(0,62)));
+  if(sinEncontrar.length) console.log('\nOjo: '+sinEncontrar.length+
+    ' no se encontraron por su nombre. Puede que ya se hubieran quitado.');
+  const limpio=A.filter((a,i)=>!fuera.has(i));
+  console.log('\nactos antes: '+A.length+'  ·  se van: '+fuera.size+'  ·  quedan: '+limpio.length);
+  fs.writeFileSync(F,txt.slice(0,txt.indexOf('const ACTOS='))+'const ACTOS='+
+    JSON.stringify(limpio,null,0).replace(/\},\{/g,'},\n{')+';\n');
+  console.log('hecho. Pasa ahora: node lote.js');
 }
 
 /* ── Y los que se PARECEN, que esos no se tocan ──
@@ -426,7 +535,7 @@ function duplicados(hazlo){
    con `hazlo` los toca— y decide quien vive allí. */
 function sospechosos(A){
   const clave=a=>a.m+'|'+a.f+'|'+(a.h||'');
-  const palabras=n=>new Set(norm2(n).split(' ').filter(w=>w.length>3));
+  const palabras=palabrasDe;
   const pares=[];
   A.forEach((a,i)=>A.forEach((b,j)=>{
     if(j<=i||clave(a)!==clave(b)||!a.h) return;
@@ -445,7 +554,7 @@ function sospechosos(A){
   pares.slice(0,12).forEach(x=>
     console.log('\n· '+x.a.m+' · '+x.a.f+' '+x.a.h+'   ('+Math.round(x.parecido*100)+'% de palabras en común)'+
       '\n    '+x.a.n.slice(0,70)+'\n    '+x.b.n.slice(0,70)));
-  console.log('\nson '+pares.length+' parejas.');
+  console.log('\nson '+pares.length+(pares.length===1?' pareja.':' parejas.'));
   /* Y en un fichero, que doce en pantalla no son setenta y cinco y esto lo
      tiene que mirar alguien con calma. Es el mismo camino de
      `actos-reclasificados.md`: la lista se le pasa y él dice cuál sobra. */
@@ -458,7 +567,7 @@ function sospechosos(A){
     'ser **dos actos seguidos de la misma fiesta**, y eso desde aquí no se sabe.\n'+
     'Por eso no se ha tocado ninguno.\n\n'+
     'Marca el que sobre de cada pareja y se quita.\n\n'+
-    'Son **'+pares.length+' parejas**.\n';
+    'Son **'+pares.length+(pares.length===1?' pareja**.\n':' parejas**.\n');
   Object.keys(porDia).sort().forEach(k=>{
     md+='\n## '+k+'\n';
     porDia[k].forEach(x=>{ md+='\n- `'+(x.a.h||'')+'`  ('+Math.round(x.parecido*100)+'%)\n'+
@@ -468,6 +577,7 @@ function sospechosos(A){
   fs.writeFileSync('actos-parecidos.md',md);
   console.log('\nla lista entera está en actos-parecidos.md');
 }
+const palabrasDe=n=>new Set(norm2(n).split(' ').filter(w=>w.length>3));
 const norm2=n=>String(n).normalize('NFD').replace(/[\u0300-\u036f]/g,'')
   .toLowerCase().replace(/[^a-z0-9ñ ]/g,' ').replace(/\s+/g,' ').trim();
 
@@ -693,7 +803,11 @@ const arg=process.argv[2];
 if(!arg||arg==='pegar') pagina();
 else if(arg==='actos') meterActos(process.argv[3],process.argv[4]);
 else if(arg==='reclasificar') reclasificar();
-else if(arg==='duplicados') duplicados(process.argv[3]==='hazlo');
+else if(arg==='duplicados') duplicados(process.argv[3]==='hazlo',false);
+else if(arg==='parecidos'){
+  const x=process.argv[3];
+  if(x&&x!=='hazlo') quitarMarcados(x); else duplicados(x==='hazlo',true);
+}
 else if(arg==='repetidas') repetidas(process.argv[3]==='hazlo');
 else if(arg==='en-el-programa') enElPrograma(process.argv[3]);
 else if(arg==='sitios') paginaSitios();
