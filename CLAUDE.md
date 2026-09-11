@@ -46,6 +46,21 @@ Y lo que la extensión **no** arregla: desde el contenedor sigue sin poder
 llamarse a la web (403 en el proxy, como con GRAFCAN y Commons), así que
 `…/functions/naira?probar=1` hay que abrirlo desde casa.
 
+**Y lo segundo que no arregla, probado el 11 de septiembre: tampoco puedo
+desplegar yo.** Zeben lo dio por hecho —«cuando crees el zip o tengas que
+hacer una mejora lo subes tú mismo, que para eso te puse la extensión»— y era
+lo razonable de suponer, pero no sale. La extensión tiene la operación de
+desplegar y lo que devuelve es **un comando para ejecutar aquí**, que comprime
+la carpeta y la sube; y esa subida va a `netlify-mcp.netlify.app`, que la
+política de red del contenedor **deniega igual que todo lo demás** (403 en el
+CONNECT). Comprobado también `api.netlify.com` y `app.netlify.com`: los tres.
+O sea que la extensión sirve para **mirar** —el proyecto, los despliegues, las
+variables— y no para **escribir**. El zip sigue soltándolo él.
+Lo que sí quedó hecho es que el día que esa puerta se abra no haya que pensar:
+`empaquetar.js` escribe `.netlifyignore` desde su propia lista, así que
+desplegar la carpeta publicaría exactamente lo mismo que el zip y no las
+herramientas ni los ficheros del Cabildo.
+
 ## Estructura
 
 ```
