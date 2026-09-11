@@ -130,15 +130,28 @@ function pasaElFreno(event) {
 //   escribir el mismo+1. Para un freno da igual; para un contador de dinero no
 //   valdría.
 let _tienda = null, _porQue = "sin probar";
-async function tienda() {
+// `ev` solo lo pasa la función CLÁSICA (exports.handler). Es la pieza que me
+// faltaba y que hizo fallar la primera prueba: en el formato clásico el acceso
+// al cajón NO está en el entorno, **viene dentro del `event`** (en `event.blobs`)
+// y hay que engancharlo con `connectLambda(event)` antes de pedir la tienda.
+// Sin eso, `getStore()` responde «The environment has not been configured to
+// use Netlify Blobs», que es exactamente lo que salió. En el formato moderno
+// (el del streaming) no hace falta: ahí el entorno sí viene puesto.
+async function tienda(ev) {
   if (_tienda !== null) return _tienda;
   try {
     const mod = await import("@netlify/blobs");
-    _tienda = mod.getStore({ name: "naira-freno", consistency: "strong" });
+    if (ev && ev.blobs && mod.connectLambda) mod.connectLambda(ev);
+    // Sin `consistency: "strong"`: en el formato clásico ese modo pide un
+    // `uncachedEdgeURL` que el contexto del Lambda no trae, y revienta la
+    // lectura. Con consistencia normal basta y sobra — ya está dicho arriba
+    // que esto no es atómico, y para un contador de peticiones da igual leer
+    // un número con un segundo de retraso.
+    _tienda = mod.getStore({ name: "naira-freno" });
     _porQue = "va";
   } catch (e) {
     _tienda = false;
-    _porQue = "no se pudo cargar @netlify/blobs: " + ((e && e.message) || e);
+    _porQue = ((e && e.message) || String(e));
     console.warn("Blobs no disponible, se cuenta en memoria ·", _porQue);
   }
   return _tienda;
@@ -152,16 +165,21 @@ async function suma(t, clave, techo) {
   try { await t.setJSON(clave, { n: n + 1 }); } catch (e) {}
   return { pasa: true, n: n + 1 };
 }
-async function frenoCompartido(ip) {
-  const t = await tienda();
+async function frenoCompartido(ip, ev) {
+  const t = await tienda(ev);
   if (!t) return null;                       // sin cajón: que decida la memoria
   const ahora = new Date().toISOString();
   const dia = ahora.slice(0, 10), hora = ahora.slice(0, 13);
   try {
-    const d = await suma(t, "dia-" + dia, TECHO_DIA);
-    if (!d.pasa) return "techo del día";
+    // La IP PRIMERO y el día después: al revés, las peticiones que el freno
+    // acababa de cortar seguían gastando cupo del día. Se vio en el volcado
+    // del cajón —26 en el contador del día habiendo cortado 6—, o sea que a
+    // quien machacara la web le bastaba con eso para agotar el techo diario
+    // de todo el mundo.
     const i = await suma(t, "ip-" + ip + "-" + hora, POR_IP_HORA);
     if (!i.pasa) return "demasiadas seguidas";
+    const d = await suma(t, "dia-" + dia, TECHO_DIA);
+    if (!d.pasa) return "techo del día";
     return "";                               // cadena vacía = pasa, y ya contado
   } catch (e) {
     console.warn("fallo contando en Blobs:", e && e.message);
@@ -170,19 +188,27 @@ async function frenoCompartido(ip) {
 }
 // Para `?probar=1`: ida y vuelta de verdad, que saber que el módulo carga no
 // es saber que el cajón escribe.
-async function pruebaDelCajon() {
-  const t = await tienda();
-  if (!t) return { almacen: "memoria", porque: _porQue };
+async function pruebaDelCajon(ev) {
+  // Las pistas son para no tener que volver a preguntar si esto falla otra
+  // vez: dicen QUÉ hay, nunca cuánto vale. Son booleanos, no secretos.
+  const pistas = {
+    paquete_cargado: null,
+    contexto_en_el_event: !!(ev && ev.blobs),
+    contexto_en_el_entorno: !!(process.env && process.env.NETLIFY_BLOBS_CONTEXT)
+  };
+  const t = await tienda(ev);
+  pistas.paquete_cargado = _porQue.indexOf("Cannot find") < 0;
+  if (!t) return { almacen: "memoria", porque: _porQue, pistas: pistas };
   try {
     const k = "prueba-" + Date.now();
     await t.setJSON(k, { ok: true });
     const v = await t.get(k, { type: "json" });
     try { await t.delete(k); } catch (e) {}
     return v && v.ok
-      ? { almacen: "blobs", porque: "escribe y lee: el freno es compartido" }
-      : { almacen: "memoria", porque: "escribió pero no leyó lo mismo" };
+      ? { almacen: "blobs", porque: "escribe y lee: el freno es compartido", pistas: pistas }
+      : { almacen: "memoria", porque: "escribió pero no leyó lo mismo", pistas: pistas };
   } catch (e) {
-    return { almacen: "memoria", porque: "el cajón falló: " + ((e && e.message) || e) };
+    return { almacen: "memoria", porque: "el cajón falló: " + ((e && e.message) || e), pistas: pistas };
   }
 }
 
@@ -202,7 +228,7 @@ exports.handler = async function (event) {
   var q = event.queryStringParameters || {};
   if (q.probar) {
     var k = buscarClave();
-    var cajon = await pruebaDelCajon();
+    var cajon = await pruebaDelCajon(event);
     return {
       statusCode: 200,
       headers: cabeceras,
@@ -213,6 +239,7 @@ exports.handler = async function (event) {
         // dentro: si dice «blobs», el freno pasa a ser de verdad.
         freno: cajon.almacen,
         freno_porque: cajon.porque,
+        freno_pistas: cajon.pistas,
         claveEncontrada: !!k,
         // Antes esto enseñaba doce caracteres de la clave. Son el prefijo y no
         // el secreto, pero esta URL es pública y enseñar trozos de una clave
@@ -240,7 +267,7 @@ exports.handler = async function (event) {
 
   // 3 · cuántas van. Primero el contador compartido; si no hay cajón, el de
   // memoria de siempre. `""` quiere decir «pasa, y ya está contado allí».
-  var frenado = await frenoCompartido(ipDe(event));
+  var frenado = await frenoCompartido(ipDe(event), event);
   if (frenado === null) frenado = pasaElFreno(event);
   if (frenado) {
     console.warn("freno:", frenado, ipDe(event));

@@ -1089,8 +1089,38 @@ un sitio que todos leen. Cómo está montado:
   porque deja al turista sin plan. Probado aquí en los dos casos.
 · **No es atómico.** Dos peticiones a la vez pueden leer el mismo número y
   escribir el mismo+1. Para un freno da igual.
-· **La prueba la responde `?probar=1`**, que ahora dice `freno: blobs` o
-  `freno: memoria` y el porqué. Eso es lo que hay que mirar al soltar el zip.
+· **La prueba la responde `?probar=1`**, que dice `freno: blobs` o
+  `freno: memoria`, el porqué, y tres pistas —si cargó el paquete, si el
+  contexto venía en el `event` y si venía en el entorno—. Esas pistas existen
+  para no tener que preguntar dos veces: dicen QUÉ hay, nunca cuánto vale.
+
+**Y la primera prueba de verdad salió «memoria», por dos cosas encadenadas que
+conviene no volver a pisar.** El despliegue en sí fue bien —las tres funciones
+desplegadas, y la del streaming como función v2 de verdad—, o sea que
+`package.json` **no rompe el zip**. Lo que fallaba era el código:
+· **En el formato clásico el acceso al cajón NO está en el entorno: viene
+  dentro del `event`**, en `event.blobs`, y hay que engancharlo con
+  `connectLambda(event)` antes de pedir la tienda. Sin eso, `getStore()`
+  responde «The environment has not been configured to use Netlify Blobs», que
+  es exactamente lo que salió. En el formato moderno —el del streaming— no hace
+  falta: ahí el entorno sí viene puesto, y por eso esa función sí habría
+  funcionado desde el primer intento.
+· Y debajo había otro: **`consistency:'strong'` no vale en el formato clásico**,
+  porque pide un `uncachedEdgeURL` que el contexto del Lambda no trae, y
+  revienta la lectura. Con consistencia normal basta: esto ya no era atómico.
+Ojo con cómo se probó, que es la trampa de siempre un piso más abajo: la
+primera simulación le pasaba al `event` el contexto ENTERO, y `connectLambda`
+quiere solo `{url, token}` en `event.blobs` y el id del sitio y del despliegue
+**en las cabeceras** (`x-nf-site-id`, `x-nf-deploy-id`). Con la forma mal, el
+fallo parecía del código. **La rota era la prueba**, otra vez.
+Probado ya con un cajón de mentira en local: 26 peticiones repartidas entre las
+dos funciones cortan a las 20 **contando las dos juntas**, que es justo lo que
+no pasaba antes.
+· Y de paso salió un fallo que solo se ve mirando lo que queda escrito en el
+  cajón: **el contador del día se miraba ANTES que el de la IP**, así que las
+  peticiones que el freno acababa de cortar seguían gastando cupo diario —26 en
+  el contador del día habiendo cortado 6—. A quien machacara la web le bastaba
+  con eso para agotar el techo de todo el mundo. Ahora manda la IP primero.
 · **El zip va SIN `node_modules`** —27 MB, casi todo OpenTelemetry, que entra
   de arrastre por `@netlify/otel`—, porque el despliegue por zip hace build
   («Build from drop deployment») y ahí Netlify instala él las dependencias. Si
