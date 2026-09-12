@@ -46,7 +46,7 @@ const GUIONES = [
             '?Me da igual', 'Un poco de todo', 'Un poco de todo'] },
   { nombre: 'con-ninos-playa',
     pasos: ['Candelaria', 'Con coche', 'Familia con niños',
-            'Un plan para el día entero', '?Me da igual', 'Playas y charcos', 'Comida típica'] },
+            'Un plan para el día entero', '?Me da igual', 'Charcos y playas', 'Comida típica'] },
   { nombre: 'sin-coche',
     pasos: ['Puerto de la Cruz', 'Sin coche, en guagua', 'Grupo, sin niños',
             'Un plan para el día entero', '?Me da igual', 'Un poco de todo', 'Un poco de todo'] },

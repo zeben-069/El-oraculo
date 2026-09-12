@@ -76,7 +76,7 @@ manifest.webmanifest          para instalar en la pantalla de inicio
 icono.svg / icono-*.png
 img/naira-social.jpg          previsualización al compartir
 img/estampas/*.jpg            las 31 fotos de municipio (una por ficha)
-img/cartas/*.jpg              los 10 carteles de las preguntas con dibujo
+img/cartas/*.jpg              los 12 carteles de las preguntas con dibujo
 img/comarcas/*.jpg            los 2 carteles de Anaga y la cumbre
 img/zonas/*.jpg               las 6 franjas de zona (EN DISCO, ya no se publican)
 netlify.toml
@@ -98,6 +98,7 @@ guaguas.js                    le pone a cada ficha su parada de guagua
 matriz.js                     rehace la matriz de TITSA desde el GTFS oficial
 municipios.js                 cruza el municipio de cada ficha con el Cabildo
 municipios-dudosos.md         esa lista, con casillas, para que la mire él
+recortar-cartel.js            saca la ilustración de una maqueta de cartel
 fotos.js                      la lista de fotos que faltan, y las mete
 fotos-encargo.md              esa lista para encargársela a otro (con reglas)
 fotos-buscar.js               busca candidatas en Commons (se ejecuta en su máquina)
@@ -1403,6 +1404,69 @@ Lo que esto obliga a cambiar debajo:
   `tr()`: son dato, no interfaz.
 
 
+
+## Las cinco cartas del tipo de día
+
+Zeben mandó cinco ilustraciones nuevas —charcos y playas, senderos y
+naturaleza, museos y casco histórico, un poco de todo, y tenderete y
+tradiciones— para la pregunta de qué plan prefiere hoy.
+
+**Lo primero que hubo que hacerles es quitarles el rótulo de dentro.** Venían
+como maqueta de móvil, con el título quemado en una banda blanca sobre el
+dibujo. Eso no vale y ya está escrito arriba: el cartel se ve igual en inglés y
+en alemán, y el rótulo lo escribe `tr()` DEBAJO. El recorte lo hace **`recortar-cartel.js`**
+—Playwright y un canvas, que aquí no hay ni PIL ni ImageMagick—: busca el borde
+del cartel, baja hasta **la primera fila en la que más del 60% del ancho
+interior es blanco** —que es la banda del rótulo— y corta por encima. Salen
+cuadrados de unos 500 px que se guardan a 360, como las otras cartas.
+
+    node recortar-cartel.js entrada.png img/cartas/senderos.jpg
+
+Que exista la herramienta no es adorno: los dos carteles de Anaga y la cumbre
+se recortaron a mano hace unas horas y a la segunda vez ya tocaba, que es la
+lección de `guaguas.js` y de `matriz.js`.
+
+**Tres sustituyen a las que había** (`senderos`, `playas-y-charcos`, `museos`) y
+**los rótulos se cambiaron a los suyos**, que además son más honrados con el
+filtro de detrás: «Senderos» pasa a **«Senderos y naturaleza»**, que es
+exactamente lo que `TIPOS_DIA.naturaleza` deja pasar —miradores, árboles, áreas
+recreativas—, la misma corrección que en su día hubo que hacerle a «Museos y
+cascos». El núcleo **no** cambia: sigue siendo `/^Sendero$/`, así que el aviso
+de «aquí no hay ni uno fichado» sigue saltando donde toca.
+
+**«Un poco de todo» sube de botón a carta.** Iba de botón de texto debajo de
+las tres, y no por decisión de diseño: era que el único dibujo que había era el
+de la mesa puesta, que es de comida. Con el suyo —el casco, el sendero, el
+charco y los músicos en un solo cuadro— ya dice lo que ofrece. Va en
+`dia-de-todo.jpg`, **no en `un-poco-de-todo.jpg`**, que ese es el de la pregunta
+de qué comer y son dos cosas distintas con el mismo nombre.
+Y de paso las cuatro se escriben **una sola vez**, en `CARTAS_DIA`: estaban
+duplicadas en `queApetece()` y en `queApeteceEn()`, y con dos copias el cuarto
+cartel habría entrado en un lado y no en el otro.
+
+**Y «Tenderete y tradiciones» no filtra el catálogo, abre el calendario.** Esta
+es la decisión del día y la tomó él. En las fichas **no hay ninguna etiqueta de
+folclore ni de gastronomía**: montarle un filtro por tipo de sitio prometería
+fiesta y daría un casco histórico, que es literalmente el fallo de «Senderos» en
+Santa Úrsula. Lo que sí hay es el calendario de los 31 municipios, que no
+publica nadie más, así que la carta abre `loQueHayEseDia()` — las fiestas y los
+pueblos con programa de ese día, y elige el turista.
+Tres cosas que van con eso:
+· **Solo sale los días que hay algo**, con la misma condición y el mismo conteo
+  que el botón 🎉 (`hayCosasEseDia()`). Una carta que lleva a una lista vacía es
+  peor que no tenerla.
+· **Se solapa a propósito.** El día con fiestas ya enseña la lista ANTES de esta
+  pregunta, y aquí se llega diciendo «me da igual». La carta es la segunda
+  oportunidad, no el único camino, y por eso al cerrar la lista vuelve a esta
+  misma pregunta y no al principio.
+· **En `queApeteceEn()` no aparece**, que ahí el pueblo ya está elegido y su
+  programa viaja solo en el informe.
+
+**Y el CSS de la fila impar.** Había una regla para centrar el tercer cartel
+cuando se quedaba solo en la fila de dos columnas; con cinco pasa lo mismo con
+el quinto. Ahora la regla vale para el tercero y para el quinto. El uno no
+entra: un cartel solo va entero, no a media caja.
+
 ## El municipio de una ficha, y quién lo dice
 
 Zeben leyó el aviso del cartel de Vilaflor y cortó por lo sano: **«Teleférico
@@ -1741,7 +1805,7 @@ costa a la cumbre y con el centroide ganaba el Observatorio del Teide, a 10 km
 y 2.400 m de altura. Quien sí sabe lo que quiere ver tiene el botón «Prefiero
 elegir el sitio yo».
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 227 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 228 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **La leyenda del mapa también.** Los cuatro rótulos —«Dónde duermen», «La
@@ -1765,7 +1829,9 @@ sin traducirse.
 pintan con `cartas()`, y el rótulo va
 DEBAJO, sacado de `tr()`. Los carteles originales traían el texto incrustado
 y en español: así no valían en inglés ni en alemán. Se recortaron por el
-círculo, y si se añaden más hay que hacer lo mismo. Los de «con quién viajan»
+círculo, y si se añaden más hay que hacer lo mismo — los cinco del tipo de día
+que mandó el 12 de septiembre venían otra vez con el título quemado dentro y
+hubo que cortarlo, que es el mismo trabajo dos veces. Los de «con quién viajan»
 son apaisados y con forma de bocadillo: van uno por fila, con `ancho:true`, y
 se pintan con `object-fit:contain` sobre el color del fondo, porque
 recortarlos por el centro les cortaría el pico.
@@ -1840,6 +1906,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | Los dos carteles de Anaga y la cumbre | 12 sep | `img/comarcas/`. Recortados a 400×225 como las 31 estampas; se pierde el rótulo quemado dentro porque en 16:9 no cabían el pico y el letrero, y el nombre ya lo escribe la tarjeta |
 | «Los municipios, no los lugares» + «un aviso para quien pinche Vilaflor» | 12 sep | El nivel 2 son los pueblos con su estampa, y el aviso de lo que se queda en el otro cartel, con los km medidos |
 | «El Teleférico, los Roques de García y Guajara NO son de Vilaflor, son de La Orotava» | 12 sep | Cierto, y el Cabildo lo confirma. De ahí sale `municipios.js`, que cruza las fichas con los 453 puntos testigo de sus itinerarios: **211 discrepancias, 31 a menos de 300 m**, con un nido en Anaga y otro en el Teide. Aplicadas las tres suyas; las demás, a la espera de que las mire. Y destapó tres cosas debajo: el aviso del cartel medía desde el pueblo equivocado, el cartel del Teide se quedaba en 21 fichas de 44, y los «N sitios» de las 31 estampas estaban descuadrados |
+| Las cinco ilustraciones del tipo de día | 12 sep | `img/cartas/`. Recortadas quitándoles el rótulo quemado dentro. Tres sustituyen a las que había y les dan nombre mejor; «un poco de todo» sube de botón a carta; y «Tenderete y tradiciones» abre el calendario de fiestas, que es el único dato que respalda lo que promete |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si

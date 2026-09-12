@@ -341,7 +341,7 @@ const T={
      tGente:'¿Con quién viajan?',
      tCoche:'¿Coche o guagua?',
      cConCoche:'Con coche',cSinCoche:'Sin coche, en guagua',
-     cSenderos:'Senderos',cAgua:'Playas y charcos',cMuseos:'Museos y cascos',cTodo:'Un poco de todo',cTipica:'Comida típica',cDeTodo:'Un poco de todo',
+     cTenderete:'Tenderete y tradiciones',cSenderos:'Senderos y naturaleza',cAgua:'Charcos y playas',cMuseos:'Museos y casco histórico',cTodo:'Un poco de todo',cTipica:'Comida típica',cDeTodo:'Un poco de todo',
      dos:'Dos adultos',familia:'Familia con niños',grupo:'Grupo, sin niños',
      listo_c:'Perfecto, con coche tienen la isla entera. ¿Por dónde tiramos?',
      listo_s:'Perfecto. Sin coche también se hacen cosas buenas, solo hay que atar la vuelta. ¿Por dónde tiramos?',
@@ -403,7 +403,7 @@ const T={
      tGente:'Who is travelling?',
      tCoche:'Car or bus?',
      cConCoche:'With a car',cSinCoche:'By bus',
-     cSenderos:'Trails',cAgua:'Beaches and pools',cMuseos:'Museums and old towns',cTodo:'A bit of everything',cTipica:'Local food',cDeTodo:'A bit of everything',
+     cTenderete:'Fiestas and local traditions',cSenderos:'Trails and nature',cAgua:'Pools and beaches',cMuseos:'Museums and old towns',cTodo:'A bit of everything',cTipica:'Local food',cDeTodo:'A bit of everything',
      dos:'Two adults',familia:'Family with children',grupo:'Group, no children',
      listo_c:'With a car the whole island is yours. Where shall we start?',
      listo_s:'No car is fine, we just need to sort the way back. Where shall we start?',
@@ -465,7 +465,7 @@ const T={
      tGente:'Wer reist mit?',
      tCoche:'Auto oder Bus?',
      cConCoche:'Mit Auto',cSinCoche:'Mit dem Bus',
-     cSenderos:'Wanderwege',cAgua:'Strände und Meerbecken',cMuseos:'Museen und Altstädte',cTodo:'Von allem etwas',cTipica:'Typisch kanarisch',cDeTodo:'Von allem etwas',
+     cTenderete:'Fiestas und Traditionen',cSenderos:'Wanderwege und Natur',cAgua:'Meerbecken und Strände',cMuseos:'Museen und Altstädte',cTodo:'Von allem etwas',cTipica:'Typisch kanarisch',cDeTodo:'Von allem etwas',
      dos:'Zwei Erwachsene',familia:'Familie mit Kindern',grupo:'Gruppe, ohne Kinder',
      listo_c:'Mit Auto gehört Ihnen die ganze Insel. Womit fangen wir an?',
      listo_s:'Ohne Auto geht auch viel, wir müssen nur den Rückweg klären. Womit fangen wir an?',
@@ -5211,13 +5211,8 @@ async function queApeteceEn(muni,filtro){
             '<span class="si">'+(l?l.n:'—')+'</span>, el de más peso.'));
     preguntaComida();
   };
-  cartas([
-    {t:tr('cSenderos'),img:'senderos',        fn:()=>elegir('naturaleza')},
-    {t:tr('cAgua'),    img:'playas-y-charcos',fn:()=>elegir('playa')},
-    {t:tr('cMuseos'),  img:'museos',          fn:()=>elegir('museos')}
-  ],tr('tDia'));
-  [[tr('cTodo'),()=>elegir('todo')],
-   [tr('elijoYo'),()=>elegirLugar(muni)],
+  cartas(CARTAS_DIA(elegir),tr('tDia'));
+  [[tr('elijoYo'),()=>elegirLugar(muni)],
    [tr('cambMuni'),()=>elegirSitio()]].forEach(([et,fn])=>{
     const b=document.createElement('button');
     b.className='opt'; b.textContent=et;
@@ -5389,19 +5384,46 @@ async function planDelDia(){
 
 async function queApetece(){
   await naira(tr(S.ninos?'qDiaNinos':'qDia'),380);
-  /* Tres carteles: el de «un poco de todo» era el de la mesa puesta, que es
-     de comida y aquí no pinta nada. La opción no se pierde —quien no tiene
-     preferencia la necesita—, pero va como botón debajo. */
-  cartas([
-    {t:tr('cSenderos'),img:'senderos',        fn:()=>{S.apetece='naturaleza';S.faltaNucleo=null;preguntaComida()}},
-    {t:tr('cAgua'),    img:'playas-y-charcos',fn:()=>{S.apetece='playa';S.faltaNucleo=null;preguntaComida()}},
-    {t:tr('cMuseos'),  img:'museos',          fn:()=>{S.apetece='museos';S.faltaNucleo=null;preguntaComida()}}
-  ],tr('tDia'));
-  const b=document.createElement('button');
-  b.className='opt'; b.textContent=tr('cTodo');
-  b.onclick=()=>{acc.innerHTML='';burbuja(tr('cTodo'),'yo');S.apetece='todo';S.faltaNucleo=null;preguntaComida()};
-  acc.appendChild(b);
+  /* CUATRO carteles, y a veces cinco.
+     «Un poco de todo» iba de botón de texto debajo, y no por diseño: era que
+     el único dibujo que había era el de la mesa puesta, que es de comida y
+     aquí no pintaba nada. Con el suyo —el casco, el sendero, el charco y los
+     músicos en un solo cuadro— ya dice lo que ofrece y sube a carta.
+     Y la quinta, «Tenderete y tradiciones», sale SOLO los días que hay algo.
+     Esa carta no filtra el catálogo: no hay etiqueta de folclore ni de
+     gastronomía en las fichas, así que un filtro por tipo prometería fiesta y
+     daría un casco histórico — el fallo de «Senderos» en Santa Úrsula otra
+     vez. Lo que sí hay es el calendario de los 31 municipios, que no publica
+     nadie más, así que la carta abre eso: las fiestas y los pueblos con
+     programa de ese día, y elige el turista.
+     Por eso lleva la misma condición que el botón 🎉 —`hayCosasEseDia()`, el
+     mismo conteo para los cuatro sitios que lo usan— y por eso no aparece
+     cuando no hay nada: una carta que lleva a una lista vacía es peor que no
+     tenerla.
+     Ojo, que se solapa a propósito: el día con fiestas ya enseña la lista
+     ANTES de esta pregunta, y aquí se llega diciendo «me da igual». La carta
+     es la segunda oportunidad, no el único camino, y por eso vuelve a esta
+     misma pregunta si cierran la lista. */
+  cartas(CARTAS_DIA(
+    ap=>{S.apetece=ap;S.faltaNucleo=null;preguntaComida()},
+    hayCosasEseDia().total?()=>loQueHayEseDia(()=>queApetece()):null
+  ),tr('tDia'));
 }
+/* Las cartas del tipo de día, en un solo sitio: se pintan igual desde el
+   camino principal y desde el de «elijo yo el pueblo», y estaban escritas dos
+   veces, que es como un cartel nuevo entra en un lado y no en el otro. Lo
+   único que cambia entre los dos caminos es qué se hace al pulsar, así que eso
+   llega por argumento.
+   El segundo argumento es el de «Tenderete»: si viene, se añade la quinta. Va
+   así y no como una bandera porque desde el mapa —`queApeteceEn()`— esa carta
+   no tiene sentido: allí el pueblo ya está elegido y su programa viaja solo en
+   el informe. */
+const CARTAS_DIA=(fn,fiestas)=>[
+  {t:tr('cSenderos'),img:'senderos',        fn:()=>fn('naturaleza')},
+  {t:tr('cAgua'),    img:'playas-y-charcos',fn:()=>fn('playa')},
+  {t:tr('cMuseos'),  img:'museos',          fn:()=>fn('museos')},
+  {t:tr('cTodo'),    img:'dia-de-todo',     fn:()=>fn('todo')}
+].concat(fiestas?[{t:tr('cTenderete'),img:'tenderete',fn:fiestas}]:[]);
 async function preguntaComida(){
   await naira(tr('qComida'),360);
   /* Dos cartas y no tres: el pescado sale de la pregunta porque la elección

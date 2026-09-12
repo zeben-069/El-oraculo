@@ -392,9 +392,12 @@ button.carta .rotulo{
 .cartas.anchas{grid-template-columns:1fr}
 button.carta.ancha .lamina{aspect-ratio:16/9;background-color:var(--cal)}
 button.carta.ancha .lamina img{object-fit:contain}
-/* Con tres carteles y dos columnas, el tercero se queda solo en la fila:
-   centrado se lee como algo querido y no como un hueco. */
-.cartas:not(.anchas) > .carta:last-child:nth-child(3){grid-column:1 / -1;width:calc(50% - 5px);margin:0 auto}
+/* Con un número impar de carteles y dos columnas, el último se queda solo en
+   la fila: centrado se lee como algo querido y no como un hueco. Son tres o
+   cinco —cinco los días que hay fiestas, que entonces sale «Tenderete»—, y el
+   uno no entra: un cartel solo va entero, no a media caja. */
+.cartas:not(.anchas) > .carta:last-child:nth-child(3),
+.cartas:not(.anchas) > .carta:last-child:nth-child(5){grid-column:1 / -1;width:calc(50% - 5px);margin:0 auto}
 body[data-luz="noche"] button.carta{background:#211A2C;border-color:#5B4C6E;box-shadow:3px 3px 0 #5B4C6E}
 body[data-luz="noche"] button.carta .rotulo{color:var(--tea)}
 @media(max-width:420px){.cartas{grid-template-columns:1fr 1fr;gap:9px}
