@@ -232,10 +232,19 @@ if(typeof L==='undefined'){
 
 <!-- Datos del Ayuntamiento de Santa Cruz, en ficheros aparte para no engordar
      más este archivo. De momento solo se cargan: todavía no los pinta nadie. -->
+<!-- Cuatro ficheros de datos dejaron de cargarse aquí el 12 de septiembre:
+     `senderos-anaga.js`, `miradores.js`, `senderos-tenerife.js` y
+     `titsa-regreso.js`. Los cuatro declaraban su constante y **nadie la leía**:
+     el motor no nombra `SENDEROS_ANAGA`, `MIRADORES`, `SENDEROS_TF` ni
+     `REGRESO` en ninguna parte. El desnivel y la matrícula de un sendero no
+     salen de `SENDEROS_TF`: están fichados en la propia ficha (`sub`, `mts`,
+     `mat`), que es lo que el motor lee. Eran **159 KB** que el turista se
+     bajaba para nada, y 145 de ellos eran los itinerarios del Cabildo.
+     Los ficheros SIGUEN en `datos/`, a propósito: son la cosecha de unos
+     geojson de 14 MB y tirarlos obligaría a volver a bajarlos. Volver a
+     cargarlos es añadir la etiqueta aquí; `banco.js` y `empaquetar.js` leen
+     esta lista, así que se enteran solos. -->
 <script src="datos/hitos-historicos.js"></script>
-<script src="datos/senderos-anaga.js"></script>
-<script src="datos/miradores.js"></script>
-<script src="datos/senderos-tenerife.js"></script>
 <script src="datos/lugares.js"></script>
 <script src="datos/restaurantes.js"></script>
 <script src="datos/eventos.js"></script>
@@ -243,7 +252,6 @@ if(typeof L==='undefined'){
 <script src="datos/bases.js"></script>
 <script src="datos/estampas.js"></script>
 <script src="datos/titsa-matriz.js"></script>
-<script src="datos/titsa-regreso.js"></script>
 <script src="datos/ine.js"></script>
 <script src="prompt.js"></script>
 <script>
@@ -312,7 +320,7 @@ const T={
      frDeManana:'Por la mañana',frDeMediodia:'A mediodía',frDeTarde:'Por la tarde',frDeAtardecer:'Al caer el día',frDeNoche:'De noche',
      holaSolo:'¡Buenas! ',
      elijoYo:'Prefiero elegir el sitio yo',
-     agenda:'¿Qué evento hay hoy?',hoyEs:'hoy',mananaEs:'mañana',deMadrugada:'de madrugada',enMuniBien:(m)=>'En '+m+', muy bien.',abrirMapa:'Abrir en Google Maps',errServidor:(n)=>'el servidor respondió '+n,errSinClave:'no hay clave de API configurada',errCortado:'la respuesta se cortó a mitad',errVacio:'no llegó texto',frecMucha:'muy a menudo, no hace falta mirar el horario',frecMedia:'cada media hora aproximadamente',frecHora:'cada hora aproximadamente',frecPocas:(n)=>'unas '+n+' al día: conviene mirar el horario antes de salir',frecMuyPocas:(n)=>'solo '+n+' al día, así que hay que planificarla',avEstanFuera:(a,b,h,l)=>'Están en '+a+' y duermen en '+b+'. La última guagua de vuelta sale a las '+h+', '+l+'. Cuenten con eso antes de alargar la tarde.',porLinea:(n)=>'línea '+n,cambiandoEn:(v)=>'cambiando en '+v,avVueltaPronto:(d,b,h)=>'Ojo con la vuelta: la última guagua de '+d+' hacia '+b+' sale a las '+h+', o sea antes del atardecer. Si se quieren quedar, cuenten con taxi.',
+     agenda:'¿Qué evento hay hoy?',hoyEs:'hoy',mananaEs:'mañana',deMadrugada:'de madrugada',enMuniBien:(m)=>'En '+m+', muy bien.',abrirMapa:'Abrir en Google Maps',errServidor:(n)=>'el servidor respondió '+n,errSinClave:'no hay clave de API configurada',errCortado:'la respuesta se cortó a mitad',errVacio:'no llegó texto',frecMucha:'muy a menudo, no hace falta mirar el horario',frecMedia:'cada media hora aproximadamente',frecHora:'cada hora aproximadamente',frecPocas:(n)=>'unas '+n+' al día: conviene mirar el horario antes de salir',frecMuyPocas:(n)=>'solo '+n+' al día, así que hay que planificarla',rgTitulo:(m)=>'La última guagua a '+m,rgQuedan:(h,t)=>'Sale a las '+h+'. Le quedan '+t+'.',rgLinea:(l)=>'Línea '+l+'.',rgConCambios:(l,n)=>'Línea '+l+', con '+n+(n>1?' cambios':' cambio')+'.',rgYaSalio:(h)=>'Ya salió, a las '+h+'.',rgBuho:(h)=>'Queda el búho de las '+h+', que es el servicio de noche.',rgTaxi:'De aquí en adelante, taxi.',rgVayanSaliendo:'Vayan saliendo.',rgHM:(h,m)=>h+' h '+m+' min',rgM:(m)=>m+' min',avEstanFuera:(a,b,h,l)=>'Están en '+a+' y duermen en '+b+'. La última guagua de vuelta sale a las '+h+', '+l+'. Cuenten con eso antes de alargar la tarde.',porLinea:(n)=>'línea '+n,cambiandoEn:(v)=>'cambiando en '+v,avVueltaPronto:(d,b,h)=>'Ojo con la vuelta: la última guagua de '+d+' hacia '+b+' sale a las '+h+', o sea antes del atardecer. Si se quieren quedar, cuenten con taxi.',
      fueraMapa:(k)=>'· fuera del mapa, a '+k+' km',
      qAgenda:(d,n)=>'Hay '+n+' '+(n===1?'cosa apuntada':'cosas apuntadas')+' en los próximos '+d+' días. ¿Le armo el día alrededor de alguna?',
      zSur:'Sur y suroeste',zCumbre:'Cumbre y Teide',
@@ -377,7 +385,7 @@ const T={
      frDeManana:'In the morning',frDeMediodia:'At midday',frDeTarde:'In the afternoon',frDeAtardecer:'As the day ends',frDeNoche:'At night',
      holaSolo:'Hello! ',
      elijoYo:'I would rather pick the place myself',
-     agenda:'What is on today?',hoyEs:'today',mananaEs:'tomorrow',deMadrugada:'after midnight',enMuniBien:(m)=>m+', very good.',abrirMapa:'Open in Google Maps',errServidor:(n)=>'the server answered '+n,errSinClave:'no API key configured',errCortado:'the answer was cut off',errVacio:'no text arrived',frecMucha:'very often, no need to check the timetable',frecMedia:'roughly every half hour',frecHora:'roughly every hour',frecPocas:(n)=>'about '+n+' a day: worth checking the timetable before you go',frecMuyPocas:(n)=>'only '+n+' a day, so it needs planning',avEstanFuera:(a,b,h,l)=>'You are in '+a+' and sleeping in '+b+'. The last bus back leaves at '+h+', '+l+'. Bear that in mind before stretching the evening.',porLinea:(n)=>'line '+n,cambiandoEn:(v)=>'changing at '+v,avVueltaPronto:(d,b,h)=>'Careful with the way back: the last bus from '+d+' to '+b+' leaves at '+h+', before sunset. If you want to stay on, count on a taxi.',
+     agenda:'What is on today?',hoyEs:'today',mananaEs:'tomorrow',deMadrugada:'after midnight',enMuniBien:(m)=>m+', very good.',abrirMapa:'Open in Google Maps',errServidor:(n)=>'the server answered '+n,errSinClave:'no API key configured',errCortado:'the answer was cut off',errVacio:'no text arrived',frecMucha:'very often, no need to check the timetable',frecMedia:'roughly every half hour',frecHora:'roughly every hour',frecPocas:(n)=>'about '+n+' a day: worth checking the timetable before you go',frecMuyPocas:(n)=>'only '+n+' a day, so it needs planning',rgTitulo:(m)=>'Last bus back to '+m,rgQuedan:(h,t)=>'It leaves at '+h+'. You have '+t+' left.',rgLinea:(l)=>'Line '+l+'.',rgConCambios:(l,n)=>'Line '+l+', with '+n+(n>1?' changes':' change')+'.',rgYaSalio:(h)=>'It already left, at '+h+'.',rgBuho:(h)=>'There is still the '+h+' bus, but that is the night service.',rgTaxi:'After that it is a taxi.',rgVayanSaliendo:'Time to head off.',rgHM:(h,m)=>h+' h '+m+' min',rgM:(m)=>m+' min',avEstanFuera:(a,b,h,l)=>'You are in '+a+' and sleeping in '+b+'. The last bus back leaves at '+h+', '+l+'. Bear that in mind before stretching the evening.',porLinea:(n)=>'line '+n,cambiandoEn:(v)=>'changing at '+v,avVueltaPronto:(d,b,h)=>'Careful with the way back: the last bus from '+d+' to '+b+' leaves at '+h+', before sunset. If you want to stay on, count on a taxi.',
      fueraMapa:(k)=>'· off the map, '+k+' km away',
      qAgenda:(d,n)=>'I have '+n+' '+(n===1?'thing':'things')+' on in the next '+d+' days. Shall I build the day around one of them?',
      zSur:'South and south-west',zCumbre:'The summit and Teide',
@@ -442,7 +450,7 @@ const T={
      frDeManana:'Am Vormittag',frDeMediodia:'Mittags',frDeTarde:'Am Nachmittag',frDeAtardecer:'Zum Tagesausklang',frDeNoche:'Abends',
      holaSolo:'Hallo! ',
      elijoYo:'Ich wähle den Ort lieber selbst',
-     agenda:'Was ist heute los?',hoyEs:'heute',mananaEs:'morgen',deMadrugada:'nach Mitternacht',enMuniBien:(m)=>m+', sehr gut.',abrirMapa:'In Google Maps öffnen',errServidor:(n)=>'der Server antwortete '+n,errSinClave:'kein API-Schlüssel konfiguriert',errCortado:'die Antwort brach ab',errVacio:'es kam kein Text an',frecMucha:'sehr oft, Sie müssen nicht in den Fahrplan schauen',frecMedia:'etwa alle halbe Stunde',frecHora:'etwa stündlich',frecPocas:(n)=>'etwa '+n+' am Tag: schauen Sie vorher in den Fahrplan',frecMuyPocas:(n)=>'nur '+n+' am Tag, das muss man planen',avEstanFuera:(a,b,h,l)=>'Sie sind in '+a+' und übernachten in '+b+'. Der letzte Bus zurück fährt um '+h+', '+l+'. Denken Sie daran, bevor der Abend länger wird.',porLinea:(n)=>'Linie '+n,cambiandoEn:(v)=>'Umstieg in '+v,avVueltaPronto:(d,b,h)=>'Achtung beim Rückweg: der letzte Bus von '+d+' nach '+b+' fährt um '+h+', also vor Sonnenuntergang. Wenn Sie länger bleiben wollen, rechnen Sie mit einem Taxi.',
+     agenda:'Was ist heute los?',hoyEs:'heute',mananaEs:'morgen',deMadrugada:'nach Mitternacht',enMuniBien:(m)=>m+', sehr gut.',abrirMapa:'In Google Maps öffnen',errServidor:(n)=>'der Server antwortete '+n,errSinClave:'kein API-Schlüssel konfiguriert',errCortado:'die Antwort brach ab',errVacio:'es kam kein Text an',frecMucha:'sehr oft, Sie müssen nicht in den Fahrplan schauen',frecMedia:'etwa alle halbe Stunde',frecHora:'etwa stündlich',frecPocas:(n)=>'etwa '+n+' am Tag: schauen Sie vorher in den Fahrplan',frecMuyPocas:(n)=>'nur '+n+' am Tag, das muss man planen',rgTitulo:(m)=>'Der letzte Bus zurück nach '+m,rgQuedan:(h,t)=>'Er fährt um '+h+'. Sie haben noch '+t,rgLinea:(l)=>'Linie '+l+'.',rgConCambios:(l,n)=>'Linie '+l+', mit '+n+(n>1?' Umstiegen':' Umstieg')+'.',rgYaSalio:(h)=>'Er ist schon um '+h+' gefahren.',rgBuho:(h)=>'Es bleibt der Bus um '+h+', aber das ist der Nachtdienst.',rgTaxi:'Danach hilft nur noch ein Taxi.',rgVayanSaliendo:'Machen Sie sich auf den Weg.',rgHM:(h,m)=>h+' Std. '+m+' Min.',rgM:(m)=>m+' Min.',avEstanFuera:(a,b,h,l)=>'Sie sind in '+a+' und übernachten in '+b+'. Der letzte Bus zurück fährt um '+h+', '+l+'. Denken Sie daran, bevor der Abend länger wird.',porLinea:(n)=>'Linie '+n,cambiandoEn:(v)=>'Umstieg in '+v,avVueltaPronto:(d,b,h)=>'Achtung beim Rückweg: der letzte Bus von '+d+' nach '+b+' fährt um '+h+', also vor Sonnenuntergang. Wenn Sie länger bleiben wollen, rechnen Sie mit einem Taxi.',
      fueraMapa:(k)=>'· außerhalb der Karte, '+k+' km entfernt',
      qAgenda:(d,n)=>'Ich habe '+n+' '+(n===1?'Sache':'Sachen')+' in den nächsten '+d+' Tagen. Soll ich den Tag darum herum bauen?',
      zSur:'Süden und Südwesten',zCumbre:'Gipfel und Teide',
@@ -1923,6 +1931,13 @@ function construir(){
       ?'Fichas verificadas <span class="si">simuladas</span>. Se envían <span class="am">'+conPorque.length+'</span> porqués al modelo.'+(sinPorque.length?'<br><span class="no">Callados: '+sinPorque.map(p=>p.n).join(', ')+'.</span>':'')
       :'<span class="no">Ninguna ficha verificada: el informe va SIN porqués.</span> El modelo no los recibe, luego no puede contarlos. Callados: '+(paradas.map(p=>p.n).join(', ')||'—')+'.');
 
+  /* El reloj de la última guagua se apaga ANTES de mirar si llevan coche, y
+     solo lo enciende la rama que de verdad tiene una hora. Apagarlo dentro del
+     `if` no vale, y se vio probándolo: quien pedía un plan en guagua y luego
+     otro en coche se llevaba pegada la cuenta atrás del anterior —«la última
+     guagua a Tegueste», yendo en coche desde Candelaria—. Una cuenta atrás
+     equivocada es peor que ninguna. */
+  S.ultimaGuagua=null;
   if(!S.coche){
     const ds2=diaSemana(f);
     const tipoDia = tipoDeDia(f);
@@ -2004,6 +2019,12 @@ function construir(){
         (r.directa!=null?'<br>Directa antes, a las <span class="am">'+txtLargo(r.directa)+'</span> (línea '+r.directa_linea+').':'')+
         (r.buho!=null?'<br>Y un búho de madrugada a las '+txt(r.buho)+', que NO se cuenta como la última.':'')+
         (r.ultima<19*60?'<br><span class="no">Sale antes del atardecer. Va como primer aviso.</span>':''));
+      /* La hora EN CRUDO para el reloj de cuenta atrás, y a propósito FUERA
+         del informe. El prompt manda que todas las cifras salgan del informe,
+         así que un `1529` suelto ahí acabaría dicho en voz alta como si fuera
+         una hora. Esto no es para contarlo: es para restarlo. */
+      S.ultimaGuagua={min:r.ultima, linea:r.linea, hasta:base.m, desde:destMuni,
+                      fecha:f, cambios:cambios, buho:(r.buho!=null?r.buho:null)};
       /* Los avisos van por `tr()`: se escribían en español a pelo. */
       if(r.ultima<19*60) R.avisos.unshift(tr('avVueltaPronto')(destMuni,base.m,txt(r.ultima)));
     }else{
@@ -2918,6 +2939,68 @@ function urlSendero(la,lo,nombre){
       pero es el sitio DE VERDAD y ya está licenciada como el resto del mapa.
    3. icono, si no hay coordenadas. */
 
+/* ── EL RELOJ DE LA ÚLTIMA GUAGUA ───────────────────────────────────────
+   La auditoría del 11 de septiembre lo dejó apuntado como «decisión
+   pendiente», y lo estaba por el DATO, no por la pantalla: mientras la última
+   guagua que teníamos era el búho de las cuatro de la mañana, una cuenta atrás
+   habría dicho «le quedan seis horas» a alguien que en realidad tenía que
+   correr. Desde que la matriz sale del GTFS la hora es de verdad, así que la
+   resta ya se puede enseñar.
+   Tres cosas que hay que entender antes de tocarlo:
+   · **Solo si el plan es para HOY.** La web salta sola a mañana a partir de
+     media tarde, y una cuenta atrás de mañana no es una cuenta atrás: sería un
+     número enorme que no significa nada. Los otros días la hora ya la cuenta
+     el relato.
+   · **La hora cruda NO está en el informe.** Vive en `S.ultimaGuagua`, que lo
+     pone el motor. En el informe iría como un `1529` suelto y el prompt manda
+     que todas las cifras salgan de ahí: el modelo la leería como una hora y la
+     diría mal. Esto no es para contarlo, es para restarlo.
+   · **La cuenta la lleva el navegador, no el plan.** El nodo guarda el
+     instante de salida en `data-guagua` y `pintaRelojes()` lo repasa cada
+     medio minuto. Así el reloj sigue vivo mientras el turista lee el plan, que
+     es justo cuando se le va el tiempo. */
+function cuerpoReloj(d){
+  const sale=+d.guagua, falta=Math.round((sale-Date.now())/60000);
+  const hh=n=>{const x=new Date(n);return String(x.getHours()).padStart(2,'0')+':'+
+                String(x.getMinutes()).padStart(2,'0')};
+  const linea=d.linea
+    ? (+d.cambios>0 ? tr('rgConCambios')(d.linea,+d.cambios) : tr('rgLinea')(d.linea))
+    : '';
+  if(falta<0){
+    /* Ya salió. No se disimula y no se deja en el aire: o queda el búho —con su
+       nombre, que no es la guagua de vuelta— o es taxi. */
+    /* Y el búho solo si NO ha pasado también: ofrecer un servicio de noche
+       que ya se fue es la misma mentira de la que va todo esto. */
+    const hayBuho = d.buho && +d.buho > Date.now();
+    return {estado:'ya', txt:tr('rgYaSalio')(hh(sale))+' '+
+      (hayBuho ? tr('rgBuho')(hh(+d.buho)) : tr('rgTaxi'))};
+  }
+  const t = falta>=60 ? tr('rgHM')(Math.floor(falta/60),falta%60) : tr('rgM')(falta);
+  return {estado: falta<=30?'justo':falta<=90?'aviso':'ok',
+    txt:tr('rgQuedan')(hh(sale),t)+(linea?' '+linea:'')+
+        (falta<=30?' '+tr('rgVayanSaliendo'):'')};
+}
+/* Repasa los relojes que haya pintados. Se llama al pintar y cada 30 s. */
+function pintaRelojes(){
+  let nodos=[];
+  try{ nodos=[...document.querySelectorAll('[data-guagua]')]; }catch(e){ return; }
+  nodos.forEach(el=>{
+    const r=cuerpoReloj(el.dataset);
+    el.className='relojG '+r.estado;
+    el.innerHTML=r.txt;
+  });
+}
+function relojGuagua(){
+  const g=S.ultimaGuagua;
+  if(!g||g.min==null||g.fecha!==hoyISO()) return '';
+  const cuando=m=>{const d=new Date(g.fecha+'T00:00:00');d.setMinutes(d.getMinutes()+m);return d.getTime()};
+  const d={guagua:cuando(g.min), linea:g.linea||'', cambios:g.cambios||0,
+           buho:(g.buho!=null?cuando(g.buho):'')};
+  const r=cuerpoReloj(d);
+  return '<div class="grupo"><i>'+tr('rgTitulo')(g.hasta)+'</i>'+
+    '<div class="relojG '+r.estado+'" data-guagua="'+d.guagua+'" data-linea="'+
+    escapar(d.linea)+'" data-cambios="'+d.cambios+'" data-buho="'+d.buho+'">'+r.txt+'</div></div>';
+}
 function bloqueMapas(b,base){
   const G=[], F=[];
   const ORD={'mañana':1,'mediodía':2,'tarde':3,'atardecer':4,'noche':5};
@@ -2973,6 +3056,10 @@ function bloqueMapas(b,base){
   if(conCredito.length)
     G.push('<div class="credito-fotos">'+tr('fotoDe')+' '+
       conCredito.map(l=>l.n+': '+l.credito).join(' · ')+'</div>');
+  /* El reloj va DELANTE del mapa: a quien va en guagua lo primero que le hace
+     falta no es dónde está el sitio, es cuánto le queda para volver. */
+  const reloj=relojGuagua();
+  if(reloj) G.push(reloj);
   if(mapa) G.push('<div class="grupo"><i>'+tr('gMapa')+'</i>'+mapa+'</div>');
 
   /* Las fichas, cada una con su punto exacto y sus botones para cambiarla.
@@ -5248,6 +5335,10 @@ const inpF=document.getElementById('fechaLibre'), etDia=document.getElementById(
    pie y el botón del panel— no lo repintaba nadie al cambiar de idioma: se
    quedaba en español para siempre. arranque() solo rehace el hilo. */
 function pintaFijos(){
+  /* El reloj de la última guagua se repinta con todo lo demás al cambiar de
+     idioma. Sin esto se traducía solo, pero en el siguiente tictac: hasta
+     medio minuto en el idioma anterior, que es justo lo que se ve raro. */
+  pintaRelojes();
   const lema=document.getElementById('lemaCab'); if(lema) lema.textContent=tr('lema');
   const et=document.getElementById('etDiaTit');  if(et) et.textContent=tr('etDia');
   const ct=document.getElementById('calTit');    if(ct) ct.textContent=tr('calTit');
@@ -5651,6 +5742,8 @@ function pintaLuz(){
 }
 const saludoHora=pintaLuz();
 setInterval(pintaLuz,120000);
+/* El reloj de la última guagua, mientras el turista lee el plan. */
+setInterval(pintaRelojes,30000);
 
 globalThis.localizar=localizar;globalThis.ubiDesdeCartel=ubiDesdeCartel;
 arranque();

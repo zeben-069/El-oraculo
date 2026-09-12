@@ -70,7 +70,7 @@ prompt.js                     el prompt de Naira (18 KB)
 datos/lugares.js              LUGARES (328 KB)
 datos/restaurantes.js         REST (118 KB)
 datos/eventos.js              EVENTOS · datos/actos.js · datos/bases.js · datos/estampas.js
-datos/titsa-matriz.js         MATRIZ (338 KB) · datos/titsa-regreso.js · datos/ine.js
+datos/titsa-matriz.js         MATRIZ (542 KB) · datos/ine.js
 manifest.webmanifest          para instalar en la pantalla de inicio
 icono.svg / icono-*.png
 img/naira-social.jpg          previsualización al compartir
@@ -84,9 +84,10 @@ netlify/functions/naira.js    proxy a la API (guarda la clave)
 netlify/functions/naira-stream.mjs  el mismo, soltando el texto según llega
 netlify/functions/tiempo.js   AEMET, dos saltos con reintentos
 datos/hitos-historicos.js     46 hitos del itinerario de Santa Cruz
-datos/senderos-anaga.js       7 caminos de Anaga (CARGADO PERO SIN USAR)
-datos/senderos-tenerife.js    225 itinerarios del Cabildo con desnivel
-datos/miradores.js            18 miradores de Santa Cruz
+datos/senderos-anaga.js       7 caminos de Anaga        ┐ EN DISCO, ya NO
+datos/senderos-tenerife.js    225 itinerarios del Cabildo │ se cargan: nadie
+datos/miradores.js            18 miradores de Santa Cruz  │ leía su constante
+datos/titsa-regreso.js        el regreso por corredor     ┘ (159 KB de menos)
 empaquetar.js                 arma el zip que se suelta en Netlify Drop
 probar-aereo.html             prueba en casa qué ortofoto contesta
 fusionar.js                   junta sitios repetidos (ensayo sin tocar nada)
@@ -1156,9 +1157,8 @@ decimales, así que salía «unas 0.8 horas» en vez de «unos 50 minutos».
 
 **Lo que la auditoría dejó sin arreglar a propósito**, porque no es un fallo
 sino una decisión pendiente: las horas de verdad en cada parada, el reloj de
-cuenta atrás de la última guagua —que **ya no está bloqueado por el dato**
-desde que la matriz sale del GTFS: la hora es de verdad y el reloj se puede
-hacer—, y lo de descartar las paradas lejos de la guagua sin coche —eso ya se probó y está apuntado abajo: no mejoraba nada
+cuenta atrás de la última guagua —**hecho el 12 de septiembre**, en cuanto la
+matriz del GTFS dio una hora de verdad; ver abajo—, y lo de descartar las paradas lejos de la guagua sin coche —eso ya se probó y está apuntado abajo: no mejoraba nada
 medible y empeoraba otras cosas—.
 
 ## La matriz de guaguas, rehecha desde el GTFS
@@ -1250,6 +1250,58 @@ aviso de «están en X y duermen en Y, la última guagua sale a las…» estaba
 escrito en español a pelo; va por `avEstanFuera`.
 La matriz pasa de 340 KB a **542 KB**, que es lo que cuestan las combinaciones
 con su parada y su espera. El zip queda en 2,48 MB.
+
+## El reloj de la última guagua, y 159 KB que sobraban
+
+Dos cosas del 12 de septiembre, y la primera hacía falta para la segunda.
+
+**Lo que se dejó de cargar.** `index.html` traía cuatro ficheros de datos cuya
+constante **no la leía nadie**: `SENDEROS_ANAGA`, `MIRADORES`, `SENDEROS_TF` y
+`REGRESO`. Cero apariciones en el motor, en las pruebas y en las herramientas.
+El gordo era `senderos-tenerife.js`, **145 KB** de los 159: el desnivel, el
+largo y la matrícula de un sendero no salen de ahí, están fichados en la propia
+ficha (`sub`, `mts`, `mat`), que es lo que el motor lee; y `cabeceras-senderos.js`
+no lo consume, lo **escribe**. `REGRESO` sobraba desde que la matriz nueva trae
+`ultima` de verdad para los 930 pares.
+Los cuatro **siguen en `datos/`**, a propósito: son la cosecha de unos geojson
+de 14 MB y tirarlos obligaría a volver a bajarlos. Lo que se quita es la
+etiqueta `<script>`. Y como `banco.js` y `empaquetar.js` leen esa lista y no una
+escrita a mano, los dos se enteraron solos: el zip pasa de 125 ficheros a 121 y
+de 2,48 a 2,45 MB.
+
+**Y el reloj de la última guagua.** La auditoría lo dejó apuntado como
+«decisión pendiente», y lo estaba **por el dato, no por la pantalla**: mientras
+la última guagua que teníamos era el búho de las cuatro de la mañana, una
+cuenta atrás habría dicho «le quedan seis horas» a alguien que en realidad
+tenía que correr. Desde que la matriz sale del GTFS la hora es de verdad, así
+que la resta ya se puede enseñar. Va lo primero del bloque del plan, **delante
+del mapa**: a quien va en guagua lo primero que le hace falta no es dónde está
+el sitio, es cuánto le queda para volver.
+Cuatro decisiones, y tres son de las que muerden:
+· **Solo si el plan es para HOY.** La web salta sola a mañana a partir de media
+  tarde, y una cuenta atrás de mañana no es una cuenta atrás: es un número
+  enorme que no significa nada. Los otros días la hora la cuenta el relato.
+· **La hora cruda NO está en el informe.** Vive en `S.ultimaGuagua`, que pone el
+  motor. En el informe iría como un `1529` suelto, y el prompt manda que todas
+  las cifras salgan de ahí: el modelo lo leería como una hora y lo diría mal.
+  Esto no es para contarlo, es para restarlo.
+· **Se apaga ANTES de mirar si llevan coche.** Apagarlo dentro del `if (!coche)`
+  no vale y se vio probándolo: quien pedía un plan en guagua y luego otro en
+  coche se llevaba pegada la cuenta atrás del anterior —«la última guagua a
+  Tegueste», yendo en coche desde Candelaria—. **Una cuenta atrás equivocada es
+  peor que ninguna.**
+· **Y el búho solo si tampoco ha pasado.** Cuando la última ya salió, el reloj
+  ofrece el servicio de noche o dice taxi; ofrecer un búho que también se fue
+  sería la misma mentira de la que va todo esto.
+Tres estados y el color sube con la prisa: verde de sobra, ámbar por debajo de
+hora y media, rojo por debajo de media hora y ahí añade «vayan saliendo». No
+parpadea ni pita: es un dato que se mira de reojo, no una alarma. La cuenta la
+lleva el navegador —el nodo guarda el instante en `data-guagua` y
+`pintaRelojes()` lo repasa cada medio minuto—, así que sigue vivo mientras el
+turista lee el plan, que es justo cuando se le va el tiempo.
+Diez claves nuevas de `tr()` en los tres idiomas (228 en total). Ojo con el
+alemán: abrevia con punto («3 Std. 35 Min.»), así que su frase **no** le añade
+otro — salía «Min..».
 
 ## Trampas conocidas
 
@@ -1382,6 +1434,12 @@ tres minutos** —que serían un salto por encima de la raya del término—, 16
 cambio de guagua, 33 con búho aparte bien contado y 12 minutos de viaje
 mediano. Ese bloque vale porque **con la matriz vieja daba 29 búhos de 62**: se
 comprobó cambiando el fichero y volviéndolo a poner.
+Y cierra vigilando el **reloj de cuenta atrás**, que lee `S.ultimaGuagua` y no el
+informe: **0 relojes que no cuadran** —o sea que el reloj y el relato dicen la
+misma hora, que si no el turista lee dos horas distintas en la misma pantalla— y
+**0 relojes pegados**, que es el fallo que tuvo: apagándolo dentro del
+`if (!coche)` se quedaba encendido al pedir el plan siguiente en coche. Las dos
+comprobaciones se estropearon a propósito para ver que muerden.
 
 Y el último, **el regalo de camino**: barre 124 planes con coche y cuenta en
 cuántos sale un mirador de camino a la primera parada. Referencia: **88
@@ -1450,7 +1508,7 @@ costa a la cumbre y con el centroide ganaba el Observatorio del Teide, a 10 km
 y 2.400 m de altura. Quien sí sabe lo que quiere ver tiene el botón «Prefiero
 elegir el sitio yo».
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 182 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 228 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **La leyenda del mapa también.** Los cuatro rótulos —«Dónde duermen», «La
@@ -1547,6 +1605,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Destaca el lugar del evento y que lleve a la localidad» | 11 sep | El calendario agrupa los actos por sitio, con la localidad en negrita y pulsable al mapa. De paso salieron los actos repetidos: 648 → 571 |
 | «Elegir varios días en el calendario» | 10 sep | El calendario deja marcar la estancia entera y cuenta día por día lo que cae. El plan sigue siendo de un día |
 | Cuatro zips de transporte: el **GTFS de TITSA**, las paradas, las líneas y los itinerarios | 12 sep | El GTFS es el que faltaba: 49.373 viajes con su hora parada a parada. Con él, `matriz.js` rehace la matriz de municipios y **la última guagua de la tarde deja de ser el búho de madrugada** en los 234 pares donde lo era |
+| «Empieza por la limpia y sigue con el reloj» | 12 sep | Fuera los cuatro ficheros de datos que se cargaban sin que nadie los leyera (159 KB), y el reloj de cuenta atrás de la última guagua, que la auditoría había dejado pendiente por falta de dato |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
@@ -1589,15 +1648,13 @@ Lo que sigue **sin usar** de lo suyo, y por qué:
 ## Pendiente
 
 - **Partir `index.html`** en varios ficheros.
-- `datos/senderos-anaga.js` está cargado y no lo usa nadie.
-- `datos/titsa-regreso.js` tampoco lo usa nadie, y ahora además **sobra**: era
-  el único sitio con `ultima_antes_medianoche` y solo cubría dos corredores de
-  origen; la matriz nueva trae ese dato para los 930 pares. Son 6 KB que se
-  bajan para nada. Quitarlo es una línea en `index.html`.
-- `datos/miradores.js` tampoco lo usa nadie, pero no hace falta: de sus 18
-  puntos, 7 están dentro del Palmetum y no son sitios a los que se vaya, y de
-  los 11 restantes **10 ya están en `LUGARES`**. El único que falta es el
-  Mirador de Taborno. No es la mina que parecía.
+- **Los cuatro ficheros que se cargaban sin usarse: quitados el 12 de
+  septiembre.** `senderos-anaga.js`, `miradores.js`, `senderos-tenerife.js` y
+  `titsa-regreso.js` siguen en `datos/` pero ya no los baja el navegador: eran
+  159 KB para nada. Arriba está el porqué de cada uno. De `miradores.js` sigue
+  valiendo lo medido: de sus 18 puntos, 7 están dentro del Palmetum y 10 de los
+  11 restantes ya están en `LUGARES`; el único que falta es el Mirador de
+  Taborno.
 - La pregunta de con quién van sí tiene las tres opciones («Dos adultos»,
   «Familia con niños», «Grupo, sin niños»). Guarda en `S.gente` el **número**
   de personas (2, 4 o 6), no una etiqueta: quien compare con cadenas se lleva

@@ -601,3 +601,17 @@ body[data-luz="noche"] button.abrirPanel:hover{background:#3A3048;color:#EDE6DC}
 body[data-luz="noche"] button.capa[aria-pressed="true"]{background:var(--laurisilva);color:#EDE6DC;border-color:var(--laurisilva)}
 #silueta *{transition:fill .8s ease,opacity .8s ease}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ── EL RELOJ DE LA ÚLTIMA GUAGUA ──
+   Va el primero del bloque del plan, delante del mapa: a quien va en guagua lo
+   primero que le hace falta no es dónde está el sitio, es cuánto le queda para
+   volver. Tres estados, y el color sube con la prisa. No parpadea ni pita: es
+   un dato que se mira de reojo mientras se lee el plan, no una alarma. */
+.relojG{
+  display:block;background:#fff;border:1.5px solid var(--arena);border-left-width:5px;
+  border-radius:15px;padding:10px 13px;box-shadow:var(--sombra);
+  font-size:14.5px;line-height:1.45;color:var(--tea);
+}
+.relojG.ok{border-left-color:var(--laurisilva)}
+.relojG.aviso{border-left-color:var(--malvasia);background:#FDF6E7}
+.relojG.justo,.relojG.ya{border-left-color:var(--cochinilla);background:#FBEDE9;font-weight:600}

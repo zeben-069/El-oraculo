@@ -442,7 +442,8 @@ console.log('\n=== LA VUELTA SIN COCHE ===');
     let x=+m[1]*60+ +m[2]; if(/madrugada|midnight|Mitternacht/.test(t)&&x<12*60) x+=24*60; return x; };
 
   let planes=0, cruzan=0, conDato=0, buhoComoUltima=0, sinDato=0,
-      conCambio=0, conDirecta=0, conBuhoAparte=0, durMala=0, pronto=0;
+      conCambio=0, conDirecta=0, conBuhoAparte=0, durMala=0, pronto=0,
+      relojPegado=0, relojDescuadra=0;
   const durs=[];
   const bases=[...new Set(Object.values(BASES).map(b=>b.m))];
   bases.forEach(base=>{
@@ -473,6 +474,23 @@ console.log('\n=== LA VUELTA SIN COCHE ===');
         durs.push(g.cuanto_se_tarda_min);
         if(g.cuanto_se_tarda_min<3) durMala++;    /* eso no es un viaje, es cruzar la raya */
       }
+      /* El reloj de cuenta atrás lee `S.ultimaGuagua`, que va aparte del
+         informe. Dos cosas que tienen que cuadrar y que no cuadraban:
+         que el reloj diga la MISMA hora que el relato —si no, el turista lee
+         dos horas distintas en la misma pantalla— y que no se quede pegado. */
+      const u=S.ultimaGuagua;
+      if(!u) relojDescuadra++;
+      else if(aMin(g.ultima_salida)!==u.min) relojDescuadra++;
+    });
+    /* Y ahora el mismo día EN COCHE: ahí no hay vuelta en guagua que contar,
+       así que el reloj tiene que apagarse. Se quedaba encendido. */
+    fuera.forEach(l=>{
+      Object.assign(S,{base,coche:true,gente:2,ninos:false,apetece:null,anclaElegida:l.n,
+        comida:null,ahora:null,saltoComida:0,descartados:null,prefTipo:null,
+        fecha:'2026-10-13',idioma:'es',forzarEvento:null,fiestaTodoElDia:null,
+        diaEntero:true,faltaNucleo:null});
+      try{ construir(); }catch(e){ return; }
+      if(S.ultimaGuagua) relojPegado++;
     });
   });
   S.anclaElegida=null;
@@ -485,4 +503,6 @@ console.log('\n=== LA VUELTA SIN COCHE ===');
   console.log('  con búho aparte, bien dicho: '+conBuhoAparte);
   console.log('  sale antes del atardecer  : '+pronto+'   (van como primer aviso)');
   console.log('  duración mediana del viaje: '+(durs.length?durs[durs.length>>1]+' min':'—'));
+  console.log('  EL RELOJ NO CUADRA        : '+relojDescuadra+'   (tiene que ser 0: diría otra hora que el relato)');
+  console.log('  EL RELOJ SE QUEDA PEGADO  : '+relojPegado+'   (tiene que ser 0: con coche no hay guagua que contar)');
 }
