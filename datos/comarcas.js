@@ -110,7 +110,19 @@ const COMARCAS={
  }
 };
 
-/* Los dos que no son un municipio: no van pintados en el mapa, van debajo. */
+/* Los dos que no son un municipio: no van pintados en el mapa, van debajo.
+   Anaga se filtra por su comarca (`co`), que para eso existe. La cumbre NO se
+   puede filtrar solo por corredor: `c` dice CÓMO SE LLEGA, no dónde está, y a
+   las Cañadas se sube por cuatro sitios, así que el Parque Nacional está
+   repartido entre Cumbre, Norte, Suroeste y Sur. Con `c==='Cumbre'` a secas el
+   cartel del Teide se quedaba en 21 fichas y dejaba fuera el Pico Teide, el
+   Roque Cinchado, el Mirador de La Ruleta y el propio Parque Nacional.
+   Por eso lleva además `pico`: latitud, longitud y radio en km desde la cima.
+   Seis kilómetros es la caldera, medido: entran 23 fichas más y las 23 son del
+   parque, ninguna de fuera. Las de posición aproximada NO cuentan para el
+   radio —el Mirador El Frontón, de San Miguel, tiene la coordenada estimada y
+   cae a 3,7 km de la cima, que es donde no está—: una coordenada inventada no
+   puede decidir de qué cartel es una ficha. */
 const SUELTOS={
  "anaga": {
   "rot": "Anaga",
@@ -128,11 +140,23 @@ const SUELTOS={
   "lema": "El volcán y el paisaje lunar",
   "lema_en": "The volcano and the lunar landscape",
   "lema_de": "Der Vulkan und die Mondlandschaft",
-  "corr": "Cumbre"
+  "corr": "Cumbre",
+  "pico": [28.2726, -16.6422, 6]
  }
 };
 
-/* Qué se queda en el otro cartel, por ficha. Los km los mide el motor. */
+/* Qué se queda en el otro cartel, por ficha. Los km los mide el motor contra
+   el centro urbano del pueblo QUE SE PULSÓ, así que si mañana se mueve una
+   ficha el aviso se mueve con ella.
+   Los nombres van escritos porque el aviso tiene que decir algo que el turista
+   reconozca: ordenando por peso salen «Lomo Hurtado» y «Los Valles», que son
+   nombres de tramo de sendero y no le dicen nada a nadie. Se eligen a mano
+   entre los que el motor deja fuera —a más de 6 km del casco y del otro
+   cartel— y Zeben los corrige si se tuercen.
+   Ojo: La Orotava entró aquí el 12 de septiembre, cuando él avisó de que el
+   Teleférico, los Roques de García y Guajara son suyos y no de Vilaflor. Tiene
+   39 fichas a más de 6 km del casco, 20 de ellas en el parque: es el pueblo al
+   que más le hace falta este aviso. */
 const AVISO_CARTEL={
  "Vilaflor de Chasna": {
   "ir": "cumbre",
@@ -140,24 +164,36 @@ const AVISO_CARTEL={
    "Paisaje Lunar de Vilaflor"
   ],
   "lejos": [
+   "Museo Etnográfico Juan Évora",
+   "La Zapatilla de la Reina",
+   "Llano de Ucanca"
+  ]
+ },
+ "La Orotava": {
+  "ir": "cumbre",
+  "lejos": [
+   "Parque Nacional del Teide (Roques de García)",
    "Teleférico del Teide",
-   "Roques de García",
-   "Montaña de Guajara"
+   "Roque Cinchado"
   ]
  },
  "San Cristóbal de La Laguna": {
   "ir": "anaga",
+  "cerca": [
+   "Mirador Cruz del Carmen"
+  ],
   "lejos": [
+   "Chinamada",
    "Taganana",
-   "Benijo",
-   "Chinamada"
+   "Benijo"
   ]
  },
  "Santa Cruz de Tenerife": {
   "ir": "anaga",
   "lejos": [
    "Playa de Las Teresitas",
-   "Playa de Benijo"
+   "Camino de las Vueltas (Taganana)",
+   "Búnker de San Andrés"
   ]
  }
 };

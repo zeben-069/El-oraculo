@@ -62,11 +62,17 @@ const GUIONES = [
             'Otra cosa más tranquila'] },
   /* El camino del mapa de comarcas, que es nuevo desde el 12 de septiembre y
      no lo pisaba ninguno de los siete: los otros eligen el pueblo donde
-     duermen y este elige a dónde ir. Acaba en Vilaflor a propósito, que es el
-     único pueblo con aviso de «eso está en el otro cartel». */
+     duermen y este elige a dónde ir. Pasa por Vilaflor a propósito, que lleva
+     aviso de «eso está en el otro cartel».
+     Ojo con el final: los dos últimos pasos se llaman igual —«Un poco de
+     todo» es la carta del tipo de día Y la de qué comer— y faltaba el
+     segundo. El recorrido daba sus pasos y se quedaba sin plan: tarjetas 0 y
+     sin caja de texto. Parecía que el mapa no armaba el día y lo que pasaba
+     es que nadie había contestado a qué comer. La rota era la prueba. */
   { nombre: 'mapa-comarcas',
     pasos: ['La Laguna', 'Con coche', 'Grupo, sin niños', '?Me da igual',
-            'Quiero ver un sitio concreto', 'Sur', 'Vilaflor', 'Un poco de todo'] },
+            'Quiero ver un sitio concreto', 'Sur', 'Vilaflor', 'Un poco de todo',
+            'Un poco de todo'] },
   { nombre: 'ingles',
     pasos: ['=EN', 'La Laguna', 'With a car', 'Group, no children',
             'A plan for a whole day', '?I do not mind', 'A bit of everything', 'A bit of everything'] },

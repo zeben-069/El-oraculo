@@ -4502,13 +4502,28 @@ async function cambiarComida(){
     {t:tr('comLoQueHaya'),fn:()=>{S.comida=null;S.saltoComida=0;pedirPlan()}}
   ]);
 }
+/* Cuántas fichas ofrece de verdad ese pueblo. Se CUENTA, no se lee de
+   `BASES`: los `lug`/`rest` de ahí se escribieron una vez y se quedaron
+   viejos —los 31 estaban descuadrados el 12 de septiembre, Santa Úrsula
+   decía 2 sitios teniendo 14 y San Miguel decía 0 restaurantes teniendo 6
+   desde `hosteleria.js`—. El filtro es EL MISMO que usa `queApeteceEn()`,
+   que si no el botón promete un número y el día trae otro. Se cachea porque
+   la cuadrícula pinta hasta 31 fichas de una vez. */
+const CUENTAS={};
+function cuentaBase(m){
+  if(CUENTAS[m]==null){
+    const suyo=x=>x.m===m||(x.co||x.m)===m;
+    CUENTAS[m]=LUGARES.filter(suyo).length+REST.filter(suyo).length;
+  }
+  return CUENTAS[m];
+}
 /* Cada municipio con su estampa. Las fotos viven en img/estampas/ como
    ficheros: dentro del HTML en base64 eran 1,1 MB que el navegador tenía que
    descargar y analizar antes de pintar nada. Si falta la imagen, la ficha
    sigue funcionando con el color y el icono. */
 function fichaMunicipio(k,v){
   const e=ESTAMPA[v.m]||null;
-  const n=v.lug+v.rest;
+  const n=cuentaBase(v.m);
   return '<button class="estampa" data-base="'+k+'">'+
     (e? '<span class="lienzo"><img src="'+e.f+'" alt="" loading="lazy" decoding="async"></span>'
       : '<span class="lienzo sin"><span class="ico">🏝</span></span>')+
@@ -4967,10 +4982,22 @@ const ETQ_POS={sur:['32.7%','79.5%'],metropolitana:['80.5%','15.2%'],
   'icoden-daute':['19.9%','44%'],guimar:['60.5%','46.7%'],
   orotava:['43%','38.3%'],acentejo:['57.9%','23%']};
 const comarcaTr=v=>!v?'':(S.idioma==='en'?(v.rot_en||v.rot):S.idioma==='de'?(v.rot_de||v.rot):v.rot);
-/* El cartel usa la MISMA caja que la estampa de un pueblo: 40 y 21 sitios son
+/* UN solo filtro para el cartel, que lo usan la cuenta del botón y el día.
+   Si cada uno contara a su manera, el botón diría un número y el plan traería
+   otras fichas — el mismo cuidado que con `hayCosasEseDia()`.
+   Anaga va por su comarca. La cumbre, por corredor MÁS un radio desde la cima
+   del Teide: `c` dice cómo se llega, no dónde está, y a las Cañadas se sube
+   por cuatro lados. El porqué entero está en `datos/comarcas.js`. */
+function filtroSuelto(v){
+  const p=v.pico;
+  return l=>(v.corr&&l.c===v.corr)||
+    (v.co&&new RegExp(v.co).test(l.co||''))||
+    (!!p&&l.la!=null&&!l.pos_aprox&&km(p[0],p[1],l.la,l.lo)<=p[2]);
+}
+/* El cartel usa la MISMA caja que la estampa de un pueblo: 44 y 40 sitios son
    más que la mitad de los municipios, así que no son botones de segunda. */
 function fichaCartel(k,v){
-  const n=(v.corr?LUGARES.filter(l=>l.c===v.corr):LUGARES.filter(l=>new RegExp(v.co).test(l.co||''))).length;
+  const n=LUGARES.filter(filtroSuelto(v)).length;
   return '<button class="estampa" type="button" data-comarca="'+k+'">'+
     '<span class="lienzo"><img src="'+v.f+'" alt="" loading="lazy" decoding="async"></span>'+
     '<span class="pie"><b>'+comarcaTr(v)+'</b>'+
@@ -4981,7 +5008,7 @@ function fichaCartel(k,v){
    El filtro es el suyo, no el de un municipio. */
 function anclarSuelto(k){
   const v=SUELTOS[k];
-  const filtro=v.corr?(l=>l.c===v.corr):(l=>new RegExp(v.co).test(l.co||''));
+  const filtro=filtroSuelto(v);
   paso('ok','entrada · nivel 2, un cartel','<span class="si">'+v.rot+'</span> no es un municipio, '+
     'así que no hay pueblo que elegir: se ancla en lo mejor que tenga.');
   queApeteceEn(v.rot,filtro);
@@ -4999,33 +5026,46 @@ async function elegirMunicipio(k){
   const lista=v.mun.map(m=>{
     const kb=Object.keys(BASES).find(x=>BASES[x].m===m);
     return [kb,BASES[kb]];
-  }).filter(([kb])=>kb).sort((a,b)=>(b[1].lug+b[1].rest)-(a[1].lug+a[1].rest));
+  }).filter(([kb])=>kb).sort((a,b)=>cuentaBase(b[1].m)-cuentaBase(a[1].m));
   await naira(tr('qZonaDetalle')(comarcaTr(v)),360);
   paso('ok','entrada · nivel 2, el pueblo','Los <span class="am">'+lista.length+
     '</span> municipios de '+v.rot+', cada uno con su estampa.');
   cuadriculaMunicipios(lista,kb=>{
     const m=BASES[kb].m;
     const av=AVISO_CARTEL[m];
-    if(av) avisarDelCartel(av,()=>queApeteceEn(m));
+    if(av) avisarDelCartel(m,av,()=>queApeteceEn(m));
     else queApeteceEn(m);
   },()=>elegirSitio());
 }
 
 /* ── EL AVISO DE «ESO ESTÁ EN EL OTRO CARTEL» ──
-   Idea de Zeben. Quien pulsa Vilaflor, La Laguna o Santa Cruz tiene media
-   comarca lejos del casco, y el ancla busca a 6 km: no se la va a ofrecer.
+   Idea de Zeben. Quien pulsa Vilaflor, La Orotava, La Laguna o Santa Cruz
+   tiene media comarca lejos del casco, y el ancla busca a 6 km: no se la va a
+   ofrecer.
    Es la regla de `lo_hay_pero_lejos_del_pueblo` —no se dice «no hay», se dice
    que lo hay y a cuánto— adelantada al momento en que todavía se puede cambiar
    de idea, y con botón para saltar.
    Los kilómetros NO están escritos: se miden aquí contra el centro urbano de
    `BASES`, que es el mismo punto con el que el motor ancla el día. Si mañana
-   se mueve una ficha, el aviso se mueve con ella. */
-async function avisarDelCartel(av,seguir){
+   se mueve una ficha, el aviso se mueve con ella.
+   Y se miden contra el casco del pueblo QUE SE PULSÓ, que llega por argumento.
+   Antes se sacaba del municipio de la primera ficha de la lista, y eso se
+   rompió solo el día que Zeben avisó de que el Teleférico del Teide no es de
+   Vilaflor: al cambiarle el municipio a la ficha, el aviso de Vilaflor pasaba a
+   medirse desde el casco de La Orotava. Un dato no puede decidir contra qué se
+   compara. */
+async function avisarDelCartel(m,av,seguir){
   const v=SUELTOS[av.ir];
-  const kb=Object.keys(BASES).find(x=>BASES[x].m===(LUGARES.find(l=>l.n===av.lejos[0])||{}).m);
+  const kb=Object.keys(BASES).find(x=>BASES[x].m===m);
   const cen=BASES[kb];
+  /* Se comprueba que la ficha SIGA siendo de ese pueblo. Los nombres están
+     escritos aquí y el municipio vive en el catálogo, así que el día que se
+     corrija uno —y hay 31 en duda contra el Cabildo— el aviso se callaría solo
+     en vez de seguir nombrando algo que ya no es de ahí. Es lo que acaba de
+     pasar con el Teleférico del Teide. */
   const conKm=n=>{const l=LUGARES.find(x=>x.n===n);
-    return (!l||l.la==null||!cen)?null:l.n+' ('+km1(km(cen.la,cen.lo,l.la,l.lo))+' km)';};
+    if(!l||l.la==null||!cen||(l.m!==m&&(l.co||l.m)!==m)) return null;
+    return l.n+' ('+km1(km(cen.la,cen.lo,l.la,l.lo))+' km)';};
   const lejos=(av.lejos||[]).map(conKm).filter(Boolean);
   const cerca=(av.cerca||[]).map(conKm).filter(Boolean);
   if(!lejos.length){ seguir(); return; }
@@ -5034,11 +5074,16 @@ async function avisarDelCartel(av,seguir){
   paso('avi','entrada · lo que se queda en el otro cartel',
     lejos.join(' · ')+' quedan a más de 6 km del casco, así que el ancla no los coge. '+
     'Se dice y se ofrece el salto a <span class="si">'+v.rot+'</span>.');
+  /* El botón va DESPUÉS de que la pregunta siguiente haya pintado, no antes.
+     Puesto antes se veía y se moría: `cartas()` empieza con
+     `acc.replaceChildren()`, así que en cuanto Naira acababa de escribir la
+     pregunta del tipo de día el salto desaparecía de la pantalla. Duraba lo
+     que dura la burbuja y no había manera de llegar a pulsarlo. */
+  await seguir();
   const b=document.createElement('button');
   b.className='opt salto'; b.textContent=tr('irAlCartel')(comarcaTr(v));
   b.onclick=()=>{acc.innerHTML='';burbuja(b.textContent,'yo');anclarSuelto(av.ir)};
   acc.appendChild(b);
-  seguir();
 }
 /* «a, b y c» en el idioma que toque, sin comas de más. */
 const lista=a=>a.length<2?(a[0]||''):a.slice(0,-1).join(', ')+' '+tr('y')+' '+a[a.length-1];

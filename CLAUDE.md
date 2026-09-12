@@ -96,6 +96,8 @@ fusionar.js                   junta sitios repetidos (ensayo sin tocar nada)
 hosteleria.js                 rellena con el registro del Cabildo donde falta comer
 guaguas.js                    le pone a cada ficha su parada de guagua
 matriz.js                     rehace la matriz de TITSA desde el GTFS oficial
+municipios.js                 cruza el municipio de cada ficha con el Cabildo
+municipios-dudosos.md         esa lista, con casillas, para que la mire él
 fotos.js                      la lista de fotos que faltan, y las mete
 fotos-encargo.md              esa lista para encargársela a otro (con reglas)
 fotos-buscar.js               busca candidatas en Commons (se ejecuta en su máquina)
@@ -1376,9 +1378,10 @@ Dos cosas de cómo está hecho, y las dos importan:
   municipio se llama «Vilaflor de Chasna», así que no saltaba nunca.
 Y una corrección a la corazonada de Zeben, que suponía que el Paisaje Lunar se
 le escapaba al botón del Teide: **está a 4,7 km del casco y el ancla busca a 6,
-así que sale eligiendo Vilaflor**. Lo que se queda arriba es el Teleférico
-(10,8), los Roques de García (7,3) y Guajara (6,9), y eso es lo que dice el
-aviso.
+así que sale eligiendo Vilaflor**. Lo que se queda arriba de Vilaflor es el
+Museo Etnográfico Juan Évora, La Zapatilla de la Reina y el Llano de Ucanca.
+(Aquí escribí primero el Teleférico, los Roques de García y Guajara, **y eso
+estaba mal: son de La Orotava**. Lo cazó él. Ver abajo.)
 
 Lo que esto obliga a cambiar debajo:
 · **`queApeteceEn(muni, filtro)`.** Antes miraba SOLO `l.co||l.m`, y con eso
@@ -1397,6 +1400,110 @@ Lo que esto obliga a cambiar debajo:
   con el separador del idioma: «10.8 km» dentro de una frase en español canta.
   Los nombres de comarca se traducen con `comarcaTr()` como los lemas, no por
   `tr()`: son dato, no interfaz.
+
+
+## El municipio de una ficha, y quién lo dice
+
+Zeben leyó el aviso del cartel de Vilaflor y cortó por lo sano: **«Teleférico
+del Teide, Roques de García y Montaña de Guajara NO PERTENECEN A VILAFLOR,
+pertenecen a LA OROTAVA»**. Tenía razón, y de ahí salió todo lo demás.
+
+**Por qué no lo cazaba ninguna prueba.** La comprobación que había era «¿a qué
+casco cae más cerca?», y eso en las Cañadas no dice nada: los 21 sitios del
+corredor Cumbre caen más cerca de Vilaflor, sean de quien sean, porque Vilaflor
+es el único pueblo que sube hasta ahí. El municipio de un punto **no se puede
+deducir de la distancia**, que es la misma lección de las paradas de guagua un
+piso más abajo.
+
+**Dónde sí lo dice el dato.** Los 225 itinerarios del Cabildo traen el campo
+`municipios`, y 159 de ellos pasan por uno solo: esos 159 dan **453 puntos
+testigo** con municipio oficial. `municipios.js` cruza cada ficha con el testigo
+más cercano y canta las discrepancias:
+
+    node municipios.js [metros] [nombres…]          ensayo, no toca nada
+    node municipios.js meter [metros] [nombres…]    las cambia
+    node municipios.js lista [metros]               escribe municipios-dudosos.md
+    node municipios.js meter municipios-dudosos.md  mete las marcadas
+
+Dos cuidados que costaron y que hay que mantener:
+· **Se compara sin acentos ni artículos.** El Cabildo escribe «Vilaflor» y
+  nosotros «Vilaflor de Chasna»: comparando el texto crudo salían falsos
+  positivos a pares.
+· **Al cambiar `m` hay que mover `co` también** si `co` valía lo mismo. Si no,
+  la ficha cambia de municipio y **se sigue enseñando en el pueblo viejo**,
+  porque `queApeteceEn()` acepta el municipio O la comarca.
+
+**Lo que destapó el barrido: 211 discrepancias, 31 a menos de 300 metros.** Las
+lejanas son ruido —un testigo a dos kilómetros no manda—, pero a 300 metros el
+Cabildo está señalando el mismo sitio. Aplicadas de momento **solo las tres que
+él nombró**. Las demás están medidas y a la espera de que las mire, que es la
+regla de la casa: la corazonada se enseña y decide quien vive allí. Para eso
+`node municipios.js lista` escribe **`municipios-dudosos.md`**, con una casilla
+por ficha y la prueba al lado —a cuántos metros queda de qué itinerario— y
+**agrupado por hacia dónde se mueve**: los nidos se leen y se marcan de una vez,
+que verlos sueltos y por orden de metros obliga a reconstruir el mapa treinta
+veces en la cabeza. Lo que no se marque se queda como está. Hay un nido
+gordo en Anaga —Taganana, Benijo, Almáciga, Chamorga, Roque de las Bodegas, el
+Faro, las Casas de Tafada y cuatro ermitas, fichadas en La Laguna y que el
+Cabildo pone en Santa Cruz— y otro en el Teide —Pico Teide, Montaña Blanca, las
+Narices, el Jardín Botánico de El Portillo—.
+
+**Y la corrección rompió dos cosas debajo, las dos por el mismo motivo: había
+datos decidiendo contra qué se comparaba.**
+
+· **El aviso del cartel se medía desde el pueblo equivocado.**
+  `avisarDelCartel()` sacaba el casco contra el que medir del **municipio de la
+  primera ficha de su propia lista**. Mientras el Teleférico fue de Vilaflor eso
+  coincidía; en cuanto pasó a La Orotava, el aviso de Vilaflor empezó a medir
+  desde La Orotava. Ahora el municipio llega **por argumento**, desde el botón
+  que se pulsó. Un dato no puede decidir contra qué se compara.
+· **El cartel del Teide se quedaba en 21 fichas.** Se filtraba por `c==='Cumbre'`
+  y **`c` dice CÓMO SE LLEGA, no dónde está**: a las Cañadas se sube por cuatro
+  lados, así que el Parque Nacional está repartido entre Cumbre, Norte, Suroeste
+  y Sur. Con el corredor a secas quedaban fuera **el Pico Teide, el Roque
+  Cinchado, el Mirador de La Ruleta y la propia ficha del Parque Nacional**.
+  Ahora el cartel lleva además `pico` —la cima y un radio de 6 km— y pasa a
+  **44 fichas**. Medido: entran 23 y **las 23 son del parque, ninguna de fuera**.
+  Dos detalles del radio, que aquí sí se puede usar al contrario que con la
+  «carretera dura»: esto es una caldera, no una carretera, y aun así **las
+  fichas de posición aproximada no cuentan** — el Mirador El Frontón, de San
+  Miguel, tiene la coordenada estimada a dos decimales y cae a 3,7 km de la
+  cima, o sea dentro del parque, donde no está. **Una coordenada inventada no
+  puede decidir de qué cartel es una ficha.**
+  Y el filtro es **uno solo**, `filtroSuelto()`, para la cuenta del botón y para
+  el día: si cada uno contara a su manera, el botón diría un número y el plan
+  traería otras fichas, que es lo que ya obligó a escribir `hayCosasEseDia()`.
+
+**Y el botón de saltar al cartel se veía y se moría.** El aviso pintaba la
+burbuja, colgaba el botón «ir a Cumbre y Teide» y llamaba a la pregunta
+siguiente. Pero `cartas()` empieza con `acc.replaceChildren()`, así que el botón
+duraba lo que tarda Naira en escribir la pregunta del tipo de día y desaparecía:
+no había manera humana de pulsarlo. Ahora se **espera** a que la pregunta esté
+pintada y el botón se cuelga detrás, con las otras opciones.
+Esto lo destapó `probar-web.js` al añadirle el recorrido del mapa, y de paso
+salió que **la prueba estaba rota**: el recorrido acababa en la carta del tipo
+de día y le faltaba contestar a qué comer —las dos cartas se llaman «Un poco de
+todo»—, así que daba sus ocho pasos y se quedaba sin plan. Parecía que el mapa
+no armaba el día. La rota era la prueba, otra vez.
+
+**La Orotava entró en la lista de avisos.** Tiene **39 fichas a más de 6 km del
+casco, 20 de ellas en el parque**, así que es el pueblo al que más le hacía
+falta. El aviso nombra el Parque Nacional del Teide, el Teleférico y el Roque
+Cinchado, que están a 21, 18 y 21 km.
+Y los nombres del aviso **se eligen a mano a propósito**: ordenando por peso
+salían «Lomo Hurtado» y «Los Valles», que son nombres de tramo de sendero y no
+le dicen nada a un turista. Un aviso tiene que nombrar algo que se reconozca.
+
+**Y de paso: los «N sitios» de cada estampa llevaban meses mintiendo.** `BASES`
+guardaba `lug` y `rest` escritos una vez, y el catálogo ha crecido tres veces
+desde entonces: **los 31 municipios estaban descuadrados**. Santa Úrsula decía
+2 sitios teniendo 14, San Miguel decía 0 restaurantes teniendo 6 desde
+`hosteleria.js`, Adeje decía 12 teniendo 34. Ese número sale también en la
+cuadrícula de elegir dónde dormir y **ordena la lista de pueblos de cada
+comarca**, así que estaba ordenando mal. Los dos campos se han quitado de
+`datos/bases.js` y ahora los cuenta `cuentaBase()` del catálogo, con el mismo
+filtro con el que se arma el día. Un número que se escribe a mano se pudre; uno
+que se cuenta, no.
 
 ## Trampas conocidas
 
@@ -1542,7 +1649,7 @@ miradores en el catálogo (41 con posición aproximada), 36% de los planes y
 1,1 km de desvío mediano**. Eran 25 miradores y el 12%, así que este número
 mide sobre todo el catálogo, no el motor.
 
-**Con navegador** — `probar-web.js` con Playwright recorre siete flujos en
+**Con navegador** — `probar-web.js` con Playwright recorre ocho flujos en
 Chrome y captura los errores de consola. Sin argumentos va contra la web
 desplegada; con una URL detrás va contra lo que se le diga, y **eso es lo que
 hay que hacer para probar una rama**: se levanta un servidor de ficheros en el
@@ -1563,6 +1670,11 @@ la rota era ella:
   EVENTOS», que es el que abre el calendario: la prueba en inglés abría el
   calendario y luego se quejaba de no encontrar «With a car». Un paso que
   empieza por `=` se busca ahora **exacto**.
+· **Y dos pasos seguidos pueden llamarse igual.** «Un poco de todo» es la carta
+  del tipo de día y también la de qué comer. Al recorrido del mapa le faltaba
+  la segunda: daba sus ocho pasos y se quedaba sin plan —cero tarjetas y sin
+  caja de texto—, que parece un fallo de la web y es un paso que falta en el
+  guion.
 Y desde el contenedor **siempre** va a haber errores de consola que no son de
 la web: el proxy corta Leaflet y las tipografías de Google por certificado, y
 las funciones de Netlify no existen en un servidor de ficheros. Lo que hay que
@@ -1571,9 +1683,9 @@ caída, el plan salga igual por el narrador local, que es la red de seguridad.
 Referencia: **8 de 8 recorridos completan todos sus pasos, 0 errores de
 JavaScript propios**, y el plan sale con sus fichas y su caja de texto. El
 octavo es `mapa-comarcas` y entra por el camino que ningún otro pisa: los siete
-primeros eligen el pueblo donde DUERMEN, y este elige a dónde IR. Acaba en
-Vilaflor a propósito, que es el único pueblo con aviso de «eso está en el otro
-cartel».
+primeros eligen el pueblo donde DUERMEN, y este elige a dónde IR. Pasa por
+Vilaflor a propósito, que lleva aviso de «eso está en el otro cartel» — y ahí
+cazó que el botón del salto se pintaba y se borraba solo.
 
 Y siempre, antes de dar nada por bueno:
 
@@ -1705,6 +1817,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | Mapa de comarcas de Tenerife (artefacto) | 12 sep | Es ahora la primera pregunta, en vez de las seis fotos de franja. Sus 31 municipios cuadran uno a uno con `BASES` |
 | Los dos carteles de Anaga y la cumbre | 12 sep | `img/comarcas/`. Recortados a 400×225 como las 31 estampas; se pierde el rótulo quemado dentro porque en 16:9 no cabían el pico y el letrero, y el nombre ya lo escribe la tarjeta |
 | «Los municipios, no los lugares» + «un aviso para quien pinche Vilaflor» | 12 sep | El nivel 2 son los pueblos con su estampa, y el aviso de lo que se queda en el otro cartel, con los km medidos |
+| «El Teleférico, los Roques de García y Guajara NO son de Vilaflor, son de La Orotava» | 12 sep | Cierto, y el Cabildo lo confirma. De ahí sale `municipios.js`, que cruza las fichas con los 453 puntos testigo de sus itinerarios: **211 discrepancias, 31 a menos de 300 m**, con un nido en Anaga y otro en el Teide. Aplicadas las tres suyas; las demás, a la espera de que las mire. Y destapó tres cosas debajo: el aviso del cartel medía desde el pueblo equivocado, el cartel del Teide se quedaba en 21 fichas de 44, y los «N sitios» de las 31 estampas estaban descuadrados |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
@@ -2383,6 +2496,42 @@ Lo que sigue **sin usar** de lo suyo, y por qué:
   las letras dentro no vale para tres idiomas.
   Lo publicado se marca en la página y **el navegador lo recuerda**, así que
   volver a abrirla no obliga a acordarse de por dónde iba.
+
+- **Las 31 discrepancias de municipio que faltan por mirar.** `node municipios.js
+  300` las lista con su testigo. Las tres que nombró Zeben ya están aplicadas;
+  estas no se tocan hasta que él las vea, que un municipio no se cambia por una
+  medición. Los dos nidos:
+  · **Anaga**, 13 fichas que tenemos en La Laguna y el Cabildo pone en Santa
+    Cruz: Taganana, Benijo, Almáciga, Chamorga, Roque de las Bodegas, el Faro
+    de Anaga, las Casas de Tafada, el Barranco de Benijo, la Casa Forestal y
+    cuatro ermitas. Si son suyas, cambian de estampa y de aviso, pero **no
+    cambian de cartel**: el de Anaga filtra por `co`, no por `m`.
+  · **El Teide**, 10 fichas a La Orotava: el Pico Teide y Montaña Blanca (hoy
+    en La Guancha), Las Narices y el tramo Teide - Pico Viejo (en Guía de
+    Isora), el Jardín Botánico de El Portillo y Montaña de Guamaso (en Los
+    Realejos), el Alto de Guajara (en Granadilla) y el Llano de Ucanca, La
+    Catedral y la Ermita de las Nieves (en Vilaflor). Aquí tampoco cambia el
+    cartel, que ya las coge por el radio — pero **sí toca el aviso de
+    Vilaflor**, que hoy nombra dos de esas. Ojo con esto: es la misma raya que
+    él acaba de corregir, y **las seis fichas «lejanas» de Vilaflor están todas
+    en duda** —las tres de aquí, y La Zapatilla de la Reina (370 m) y el Roque
+    de la Grieta (1,3 km) si se abre el radio—. Puede que a Vilaflor no le
+    quede ninguna y el aviso desaparezca solo, que para eso comprueba que la
+    ficha siga siendo suya antes de nombrarla.
+  Y ocho sueltas: Arenas Negras y la Ermita de San Francisco de Asís (El Tanque
+  → Garachico), la Ermita de Lourdes (El Tanque → Los Silos), el Barranco de
+  Erques (Adeje → Guía de Isora), Montaña de Sámara (Santiago del Teide → Guía
+  de Isora), el Museo Etnográfico Juan Évora (Vilaflor → Guía de Isora), el
+  Risco de la Fortaleza (Los Realejos → San Juan de la Rambla) y Montaña Negra
+  (La Guancha → San Juan de la Rambla).
+
+- **Mirador El Frontón tiene la coordenada mal.** Es de San Miguel y su nota
+  dice «medianías altas camino a Vilaflor», pero la coordenada —estimada, a dos
+  decimales— cae a **3,7 km de la cima del Teide**, dentro del Parque Nacional y
+  a 9,2 km del casco de Vilaflor. Lleva `pos_aprox`, así que el botón del mapa
+  busca por nombre y nadie va a una chincheta inventada, pero el punto sí mueve
+  el día si la ficha entra en un plan. **No se corrige desde aquí**: una
+  coordenada se pregunta, no se adivina.
 
 - **Búsqueda web: decidido que NO, por ahora.** Rompería el sello de «todo
   sale del informe», que es lo que diferencia a Naira. Y nunca para
