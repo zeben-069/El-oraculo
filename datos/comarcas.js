@@ -153,10 +153,13 @@ const SUELTOS={
    nombres de tramo de sendero y no le dicen nada a nadie. Se eligen a mano
    entre los que el motor deja fuera —a más de 6 km del casco y del otro
    cartel— y Zeben los corrige si se tuercen.
-   Ojo: La Orotava entró aquí el 12 de septiembre, cuando él avisó de que el
-   Teleférico, los Roques de García y Guajara son suyos y no de Vilaflor. Tiene
-   39 fichas a más de 6 km del casco, 20 de ellas en el parque: es el pueblo al
-   que más le hace falta este aviso. */
+   Ojo: esta tabla se movió entera el 12 de septiembre, cuando Zeben repasó las
+   discrepancias con el Cabildo. La Orotava entró —tiene 75 fichas y 27 del
+   parque a más de 6 km del casco, es a quien más le hace falta—, Vilaflor
+   perdió el Llano de Ucanca y La Catedral, y **Taganana y Benijo pasaron de La
+   Laguna a Santa Cruz**, así que cambiaron de aviso los dos: a La Laguna le
+   quedan Chinamada y los caseríos de arriba, y a Santa Cruz le entran los dos
+   nombres que de verdad conoce el turista. */
 const AVISO_CARTEL={
  "Vilaflor de Chasna": {
   "ir": "cumbre",
@@ -166,13 +169,13 @@ const AVISO_CARTEL={
   "lejos": [
    "Museo Etnográfico Juan Évora",
    "La Zapatilla de la Reina",
-   "Llano de Ucanca"
+   "Roque de la Grieta"
   ]
  },
  "La Orotava": {
   "ir": "cumbre",
   "lejos": [
-   "Parque Nacional del Teide (Roques de García)",
+   "Pico Teide",
    "Teleférico del Teide",
    "Roque Cinchado"
   ]
@@ -184,16 +187,16 @@ const AVISO_CARTEL={
   ],
   "lejos": [
    "Chinamada",
-   "Taganana",
-   "Benijo"
+   "Caserío Las Casillas",
+   "Caserío de la Cumbilla"
   ]
  },
  "Santa Cruz de Tenerife": {
   "ir": "anaga",
   "lejos": [
    "Playa de Las Teresitas",
-   "Camino de las Vueltas (Taganana)",
-   "Búnker de San Andrés"
+   "Taganana",
+   "Benijo"
   ]
  }
 };

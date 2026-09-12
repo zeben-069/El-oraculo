@@ -1379,9 +1379,10 @@ Dos cosas de cómo está hecho, y las dos importan:
 Y una corrección a la corazonada de Zeben, que suponía que el Paisaje Lunar se
 le escapaba al botón del Teide: **está a 4,7 km del casco y el ancla busca a 6,
 así que sale eligiendo Vilaflor**. Lo que se queda arriba de Vilaflor es el
-Museo Etnográfico Juan Évora, La Zapatilla de la Reina y el Llano de Ucanca.
+Museo Etnográfico Juan Évora, La Zapatilla de la Reina y el Roque de la Grieta.
 (Aquí escribí primero el Teleférico, los Roques de García y Guajara, **y eso
-estaba mal: son de La Orotava**. Lo cazó él. Ver abajo.)
+estaba mal: son de La Orotava**. Lo cazó él, y detrás salieron veinte más. Ver
+abajo.)
 
 Lo que esto obliga a cambiar debajo:
 · **`queApeteceEn(muni, filtro)`.** Antes miraba SOLO `l.co||l.m`, y con eso
@@ -1435,18 +1436,39 @@ Dos cuidados que costaron y que hay que mantener:
 
 **Lo que destapó el barrido: 211 discrepancias, 31 a menos de 300 metros.** Las
 lejanas son ruido —un testigo a dos kilómetros no manda—, pero a 300 metros el
-Cabildo está señalando el mismo sitio. Aplicadas de momento **solo las tres que
-él nombró**. Las demás están medidas y a la espera de que las mire, que es la
-regla de la casa: la corazonada se enseña y decide quien vive allí. Para eso
+Cabildo está señalando el mismo sitio. Eso no lo decide una medición, así que
 `node municipios.js lista` escribe **`municipios-dudosos.md`**, con una casilla
 por ficha y la prueba al lado —a cuántos metros queda de qué itinerario— y
 **agrupado por hacia dónde se mueve**: los nidos se leen y se marcan de una vez,
 que verlos sueltos y por orden de metros obliga a reconstruir el mapa treinta
-veces en la cabeza. Lo que no se marque se queda como está. Hay un nido
-gordo en Anaga —Taganana, Benijo, Almáciga, Chamorga, Roque de las Bodegas, el
-Faro, las Casas de Tafada y cuatro ermitas, fichadas en La Laguna y que el
-Cabildo pone en Santa Cruz— y otro en el Teide —Pico Teide, Montaña Blanca, las
-Narices, el Jardín Botánico de El Portillo—.
+veces en la cabeza. Lo que no se marque se queda como está.
+
+**Zeben resolvió los dos nidos de una frase.** «Todos los primeros pertenecen a
+Santa Cruz, y los otros puntos esos los puedes unir en Parque Nacional del Teide
+o dejárselos a La Orotava, que está también bien». **23 fichas cambiadas**:
+· **Anaga, 13, de La Laguna a Santa Cruz** — Taganana, Benijo, Almáciga,
+  Chamorga, Roque de las Bodegas, el Faro de Anaga, las Casas de Tafada, el
+  Barranco de Benijo, la Casa Forestal y cuatro ermitas. Ahí `co` **no** se
+  movió, y es lo correcto: es «Anaga norte — Taganana y Benijo», no el nombre de
+  un municipio, así que el cartel de Anaga las sigue cogiendo igual.
+· **El Teide, 10, a La Orotava** — el Pico Teide, Montaña Blanca, Las Narices,
+  el tramo Teide - Pico Viejo, el Jardín Botánico de El Portillo, Montaña de
+  Guamaso, el Alto de Guajara, el Llano de Ucanca, La Catedral y la Ermita de
+  las Nieves.
+De las dos salidas que él daba para el Teide se tomó la segunda. **Unirlas en
+una sola ficha de «Parque Nacional del Teide» habría perdido sitios que el motor
+usa por separado**: el Pico Teide y el Teleférico son dos paradas distintas, con
+su duración, su peso y su aviso, y el remate del día elige entre ellas. Fundir
+solo vale cuando dos fichas son **el mismo sitio contado dos veces**, que es lo
+que hace `fusionar.js`; aquí son sitios distintos dentro del mismo parque.
+
+**Y eso movió los avisos de dos pueblos, no de uno.** Taganana y Benijo eran los
+dos nombres que el aviso de La Laguna usaba, y ahora son de Santa Cruz: se
+fueron con ellos. A La Laguna le quedan Chinamada y los caseríos de arriba —Las
+Casillas y la Cumbilla—, y a Santa Cruz le entran los dos nombres de Anaga que
+el turista de verdad conoce. No hizo falta tocar el código para que no mintiera:
+el aviso comprueba que la ficha siga siendo del pueblo antes de nombrarla.
+Quedan **8 discrepancias sin mirar**, todas sueltas y ninguna de los dos nidos.
 
 **Y la corrección rompió dos cosas debajo, las dos por el mismo motivo: había
 datos decidiendo contra qué se comparaba.**
@@ -1486,10 +1508,10 @@ de día y le faltaba contestar a qué comer —las dos cartas se llaman «Un poc
 todo»—, así que daba sus ocho pasos y se quedaba sin plan. Parecía que el mapa
 no armaba el día. La rota era la prueba, otra vez.
 
-**La Orotava entró en la lista de avisos.** Tiene **39 fichas a más de 6 km del
-casco, 20 de ellas en el parque**, así que es el pueblo al que más le hacía
-falta. El aviso nombra el Parque Nacional del Teide, el Teleférico y el Roque
-Cinchado, que están a 21, 18 y 21 km.
+**La Orotava entró en la lista de avisos.** Con las diez del Teide dentro son
+**75 fichas, y 27 del parque a más de 6 km del casco**: es el pueblo al que más
+le hacía falta. El aviso nombra el Pico Teide, el Teleférico y el Roque
+Cinchado, a 17,5, 18 y 21 km.
 Y los nombres del aviso **se eligen a mano a propósito**: ordenando por peso
 salían «Lomo Hurtado» y «Los Valles», que son nombres de tramo de sendero y no
 le dicen nada a un turista. Un aviso tiene que nombrar algo que se reconozca.
@@ -2497,34 +2519,20 @@ Lo que sigue **sin usar** de lo suyo, y por qué:
   Lo publicado se marca en la página y **el navegador lo recuerda**, así que
   volver a abrirla no obliga a acordarse de por dónde iba.
 
-- **Las 31 discrepancias de municipio que faltan por mirar.** `node municipios.js
-  300` las lista con su testigo. Las tres que nombró Zeben ya están aplicadas;
-  estas no se tocan hasta que él las vea, que un municipio no se cambia por una
-  medición. Los dos nidos:
-  · **Anaga**, 13 fichas que tenemos en La Laguna y el Cabildo pone en Santa
-    Cruz: Taganana, Benijo, Almáciga, Chamorga, Roque de las Bodegas, el Faro
-    de Anaga, las Casas de Tafada, el Barranco de Benijo, la Casa Forestal y
-    cuatro ermitas. Si son suyas, cambian de estampa y de aviso, pero **no
-    cambian de cartel**: el de Anaga filtra por `co`, no por `m`.
-  · **El Teide**, 10 fichas a La Orotava: el Pico Teide y Montaña Blanca (hoy
-    en La Guancha), Las Narices y el tramo Teide - Pico Viejo (en Guía de
-    Isora), el Jardín Botánico de El Portillo y Montaña de Guamaso (en Los
-    Realejos), el Alto de Guajara (en Granadilla) y el Llano de Ucanca, La
-    Catedral y la Ermita de las Nieves (en Vilaflor). Aquí tampoco cambia el
-    cartel, que ya las coge por el radio — pero **sí toca el aviso de
-    Vilaflor**, que hoy nombra dos de esas. Ojo con esto: es la misma raya que
-    él acaba de corregir, y **las seis fichas «lejanas» de Vilaflor están todas
-    en duda** —las tres de aquí, y La Zapatilla de la Reina (370 m) y el Roque
-    de la Grieta (1,3 km) si se abre el radio—. Puede que a Vilaflor no le
-    quede ninguna y el aviso desaparezca solo, que para eso comprueba que la
-    ficha siga siendo suya antes de nombrarla.
-  Y ocho sueltas: Arenas Negras y la Ermita de San Francisco de Asís (El Tanque
-  → Garachico), la Ermita de Lourdes (El Tanque → Los Silos), el Barranco de
-  Erques (Adeje → Guía de Isora), Montaña de Sámara (Santiago del Teide → Guía
-  de Isora), el Museo Etnográfico Juan Évora (Vilaflor → Guía de Isora), el
-  Risco de la Fortaleza (Los Realejos → San Juan de la Rambla) y Montaña Negra
-  (La Guancha → San Juan de la Rambla).
-
+- **Las 8 discrepancias de municipio que quedan por mirar.** `node municipios.js
+  lista 300` las vuelve a escribir en `municipios-dudosos.md` con su casilla.
+  Eran 31: Zeben resolvió los dos nidos —Anaga a Santa Cruz y el Teide a La
+  Orotava, 23 fichas— y estas son las sueltas que nadie ha mirado:
+  Arenas Negras y la Ermita de San Francisco de Asís (El Tanque → Garachico),
+  la Ermita de Lourdes (El Tanque → Los Silos), el Barranco de Erques (Adeje →
+  Guía de Isora), Montaña de Sámara (Santiago del Teide → Guía de Isora), el
+  Museo Etnográfico Juan Évora (Vilaflor → Guía de Isora), el Risco de la
+  Fortaleza (Los Realejos → San Juan de la Rambla) y Montaña Negra (La Guancha
+  → San Juan de la Rambla).
+  Ojo con el Museo Etnográfico Juan Évora: es **lo primero que nombra hoy el
+  aviso de Vilaflor**, así que si resulta ser de Guía de Isora ese aviso se
+  queda con dos nombres —La Zapatilla de la Reina y el Roque de la Grieta— y
+  Vilaflor pasa a tener muy poco que avisar.
 - **Mirador El Frontón tiene la coordenada mal.** Es de San Miguel y su nota
   dice «medianías altas camino a Vilaflor», pero la coordenada —estimada, a dos
   decimales— cae a **3,7 km de la cima del Teide**, dentro del Parque Nacional y
