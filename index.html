@@ -312,7 +312,7 @@ const T={
      frDeManana:'Por la mañana',frDeMediodia:'A mediodía',frDeTarde:'Por la tarde',frDeAtardecer:'Al caer el día',frDeNoche:'De noche',
      holaSolo:'¡Buenas! ',
      elijoYo:'Prefiero elegir el sitio yo',
-     agenda:'¿Qué evento hay hoy?',hoyEs:'hoy',mananaEs:'mañana',deMadrugada:'de madrugada',enMuniBien:(m)=>'En '+m+', muy bien.',abrirMapa:'Abrir en Google Maps',errServidor:(n)=>'el servidor respondió '+n,errSinClave:'no hay clave de API configurada',errCortado:'la respuesta se cortó a mitad',errVacio:'no llegó texto',frecMucha:'muy a menudo, no hace falta mirar el horario',frecMedia:'cada media hora aproximadamente',frecHora:'cada hora aproximadamente',frecPocas:(n)=>'unas '+n+' al día: conviene mirar el horario antes de salir',frecMuyPocas:(n)=>'solo '+n+' al día, así que hay que planificarla',avVueltaPronto:(d,b,h)=>'Ojo con la vuelta: la última guagua de '+d+' hacia '+b+' sale a las '+h+', o sea antes del atardecer. Si se quieren quedar, cuenten con taxi.',avVueltaBuho:(d,b,h,l)=>'Ojo con la vuelta: de '+d+' hacia '+b+' la única salida que tengo apuntada es la de madrugada, a las '+h+'. La última de la tarde no la sé, así que miren el horario de la línea '+l+' en titsa.com antes de subir, o cuenten con taxi.',
+     agenda:'¿Qué evento hay hoy?',hoyEs:'hoy',mananaEs:'mañana',deMadrugada:'de madrugada',enMuniBien:(m)=>'En '+m+', muy bien.',abrirMapa:'Abrir en Google Maps',errServidor:(n)=>'el servidor respondió '+n,errSinClave:'no hay clave de API configurada',errCortado:'la respuesta se cortó a mitad',errVacio:'no llegó texto',frecMucha:'muy a menudo, no hace falta mirar el horario',frecMedia:'cada media hora aproximadamente',frecHora:'cada hora aproximadamente',frecPocas:(n)=>'unas '+n+' al día: conviene mirar el horario antes de salir',frecMuyPocas:(n)=>'solo '+n+' al día, así que hay que planificarla',avEstanFuera:(a,b,h,l)=>'Están en '+a+' y duermen en '+b+'. La última guagua de vuelta sale a las '+h+', '+l+'. Cuenten con eso antes de alargar la tarde.',porLinea:(n)=>'línea '+n,cambiandoEn:(v)=>'cambiando en '+v,avVueltaPronto:(d,b,h)=>'Ojo con la vuelta: la última guagua de '+d+' hacia '+b+' sale a las '+h+', o sea antes del atardecer. Si se quieren quedar, cuenten con taxi.',
      fueraMapa:(k)=>'· fuera del mapa, a '+k+' km',
      qAgenda:(d,n)=>'Hay '+n+' '+(n===1?'cosa apuntada':'cosas apuntadas')+' en los próximos '+d+' días. ¿Le armo el día alrededor de alguna?',
      zSur:'Sur y suroeste',zCumbre:'Cumbre y Teide',
@@ -377,7 +377,7 @@ const T={
      frDeManana:'In the morning',frDeMediodia:'At midday',frDeTarde:'In the afternoon',frDeAtardecer:'As the day ends',frDeNoche:'At night',
      holaSolo:'Hello! ',
      elijoYo:'I would rather pick the place myself',
-     agenda:'What is on today?',hoyEs:'today',mananaEs:'tomorrow',deMadrugada:'after midnight',enMuniBien:(m)=>m+', very good.',abrirMapa:'Open in Google Maps',errServidor:(n)=>'the server answered '+n,errSinClave:'no API key configured',errCortado:'the answer was cut off',errVacio:'no text arrived',frecMucha:'very often, no need to check the timetable',frecMedia:'roughly every half hour',frecHora:'roughly every hour',frecPocas:(n)=>'about '+n+' a day: worth checking the timetable before you go',frecMuyPocas:(n)=>'only '+n+' a day, so it needs planning',avVueltaPronto:(d,b,h)=>'Careful with the way back: the last bus from '+d+' to '+b+' leaves at '+h+', before sunset. If you want to stay on, count on a taxi.',avVueltaBuho:(d,b,h,l)=>'Careful with the way back: from '+d+' to '+b+' the only departure I have is the night bus, at '+h+'. I do not know the last evening one, so check line '+l+' at titsa.com before you set off, or count on a taxi.',
+     agenda:'What is on today?',hoyEs:'today',mananaEs:'tomorrow',deMadrugada:'after midnight',enMuniBien:(m)=>m+', very good.',abrirMapa:'Open in Google Maps',errServidor:(n)=>'the server answered '+n,errSinClave:'no API key configured',errCortado:'the answer was cut off',errVacio:'no text arrived',frecMucha:'very often, no need to check the timetable',frecMedia:'roughly every half hour',frecHora:'roughly every hour',frecPocas:(n)=>'about '+n+' a day: worth checking the timetable before you go',frecMuyPocas:(n)=>'only '+n+' a day, so it needs planning',avEstanFuera:(a,b,h,l)=>'You are in '+a+' and sleeping in '+b+'. The last bus back leaves at '+h+', '+l+'. Bear that in mind before stretching the evening.',porLinea:(n)=>'line '+n,cambiandoEn:(v)=>'changing at '+v,avVueltaPronto:(d,b,h)=>'Careful with the way back: the last bus from '+d+' to '+b+' leaves at '+h+', before sunset. If you want to stay on, count on a taxi.',
      fueraMapa:(k)=>'· off the map, '+k+' km away',
      qAgenda:(d,n)=>'I have '+n+' '+(n===1?'thing':'things')+' on in the next '+d+' days. Shall I build the day around one of them?',
      zSur:'South and south-west',zCumbre:'The summit and Teide',
@@ -442,7 +442,7 @@ const T={
      frDeManana:'Am Vormittag',frDeMediodia:'Mittags',frDeTarde:'Am Nachmittag',frDeAtardecer:'Zum Tagesausklang',frDeNoche:'Abends',
      holaSolo:'Hallo! ',
      elijoYo:'Ich wähle den Ort lieber selbst',
-     agenda:'Was ist heute los?',hoyEs:'heute',mananaEs:'morgen',deMadrugada:'nach Mitternacht',enMuniBien:(m)=>m+', sehr gut.',abrirMapa:'In Google Maps öffnen',errServidor:(n)=>'der Server antwortete '+n,errSinClave:'kein API-Schlüssel konfiguriert',errCortado:'die Antwort brach ab',errVacio:'es kam kein Text an',frecMucha:'sehr oft, Sie müssen nicht in den Fahrplan schauen',frecMedia:'etwa alle halbe Stunde',frecHora:'etwa stündlich',frecPocas:(n)=>'etwa '+n+' am Tag: schauen Sie vorher in den Fahrplan',frecMuyPocas:(n)=>'nur '+n+' am Tag, das muss man planen',avVueltaPronto:(d,b,h)=>'Achtung beim Rückweg: der letzte Bus von '+d+' nach '+b+' fährt um '+h+', also vor Sonnenuntergang. Wenn Sie länger bleiben wollen, rechnen Sie mit einem Taxi.',avVueltaBuho:(d,b,h,l)=>'Achtung beim Rückweg: von '+d+' nach '+b+' habe ich nur die Nachtfahrt um '+h+'. Die letzte Abfahrt am Abend kenne ich nicht: prüfen Sie Linie '+l+' auf titsa.com vor der Fahrt, oder rechnen Sie mit einem Taxi.',
+     agenda:'Was ist heute los?',hoyEs:'heute',mananaEs:'morgen',deMadrugada:'nach Mitternacht',enMuniBien:(m)=>m+', sehr gut.',abrirMapa:'In Google Maps öffnen',errServidor:(n)=>'der Server antwortete '+n,errSinClave:'kein API-Schlüssel konfiguriert',errCortado:'die Antwort brach ab',errVacio:'es kam kein Text an',frecMucha:'sehr oft, Sie müssen nicht in den Fahrplan schauen',frecMedia:'etwa alle halbe Stunde',frecHora:'etwa stündlich',frecPocas:(n)=>'etwa '+n+' am Tag: schauen Sie vorher in den Fahrplan',frecMuyPocas:(n)=>'nur '+n+' am Tag, das muss man planen',avEstanFuera:(a,b,h,l)=>'Sie sind in '+a+' und übernachten in '+b+'. Der letzte Bus zurück fährt um '+h+', '+l+'. Denken Sie daran, bevor der Abend länger wird.',porLinea:(n)=>'Linie '+n,cambiandoEn:(v)=>'Umstieg in '+v,avVueltaPronto:(d,b,h)=>'Achtung beim Rückweg: der letzte Bus von '+d+' nach '+b+' fährt um '+h+', also vor Sonnenuntergang. Wenn Sie länger bleiben wollen, rechnen Sie mit einem Taxi.',
      fueraMapa:(k)=>'· außerhalb der Karte, '+k+' km entfernt',
      qAgenda:(d,n)=>'Ich habe '+n+' '+(n===1?'Sache':'Sachen')+' in den nächsten '+d+' Tagen. Soll ich den Tag darum herum bauen?',
      zSur:'Süden und Südwesten',zCumbre:'Gipfel und Teide',
@@ -1453,10 +1453,12 @@ function construir(){
     if(rr){
       const hh=Math.floor(rr.ultima/60), mm=rr.ultima%60;
       const txt=String(hh%24).padStart(2,'0')+':'+String(mm).padStart(2,'0');
-      R.avisos.unshift('Están en '+BASES[S.aqui].et+' y duermen en '+BASES[S.base].et+
-        '. La última guagua de vuelta sale a las '+txt+
-        (rr.tipo==='trasbordo'?', cambiando en '+rr.via:', línea '+rr.linea)+
-        '. Cuenten con eso antes de alargar la tarde.');
+      /* Este aviso estaba escrito en español a pelo —otra fuga de las que cazó
+         la auditoría, esta se le escapó— y se le enseñaba tal cual a un inglés
+         y a un alemán. Y `via` ya no es un municipio, es la lista de dónde se
+         cambia, que ahora pueden ser dos. */
+      const como = rr.via ? tr('cambiandoEn')(rr.via.join(' · ')) : tr('porLinea')(rr.linea);
+      R.avisos.unshift(tr('avEstanFuera')(BASES[S.aqui].et, BASES[S.base].et, txt, como));
       paso(rr.ultima<19*60?'mal':'avi','están fuera de su base',
         'El navegador los sitúa en <span class="si">'+BASES[S.aqui].et+'</span> y duermen en '+
         BASES[S.base].et+'. Última guagua de vuelta: <span class="am">'+txt+'</span>. Va como primer aviso.');
@@ -1932,63 +1934,59 @@ function construir(){
       regreso={medio:'a pie o guagua urbana',nota:'Se quedan en el mismo municipio: la vuelta no es problema.'};
       paso('ok','regla 4 · el regreso','Todo el plan es dentro de <span class="si">'+base.m+'</span>. Sin problema de vuelta.');
     }else if(r){
-      /* ── LA HORA QUE SE DA NO ES «LA ÚLTIMA», ES LA QUE SE PUEDE PLANIFICAR ──
-         Esto es el fallo más gordo que ha tenido la web y lo cazó una auditoría
-         del 11 de septiembre. `MATRIZ` guarda UNA hora por par de municipios: la
-         salida más tardía del día. Y en **427 de los 850 pares laborables** esa
-         salida es **después de medianoche**, muchas entre las tres y las cinco
-         y media de la mañana. El motor la presentaba tal cual —«la última guagua
-         sale a las 04:09»— y encima añadía «hay guaguas hasta de madrugada, así
-         que la vuelta no aprieta». A alguien sin coche eso lo deja tirado.
-         Aquí no se puede inventar la hora buena: el dato no está. `MATRIZ` trae
-         un solo número por par y `titsa-regreso.js` —que sí tiene
-         `ultima_antes_medianoche`— solo cubre dos corredores de origen. Así que
-         lo que se arregla es **lo que se dice**: si la única salida que tenemos
-         es de madrugada, no se llama «la última guagua», se llama lo que es —una
-         guagua de madrugada— y **se dice que la de la tarde no la sabemos** y
-         que hay que mirar el horario de esa línea. Callarse el número sería
-         peor; darlo como si fuera el de la tarde es lo que estaba mal. */
-      /* ¿Dónde está la raya? A medianoche no: una guagua a las 00:51 es la
-         última de la noche de verdad y se puede coger después de cenar. Lo
-         que engaña es el BÚHO —el servicio de noche de las tres o las cuatro—,
-         porque detrás lleva un agujero: guaguas hasta las diez, nada en seis
-         horas, y luego esa. Quien lea «la última sale a las 04:09» y pierda la
-         de las diez se queda sentado hasta la madrugada.
-         La raya en la **01:30** es un juicio, no un dato: la fuente no dice
-         dónde está el hueco. Con ella, 9 de las 31 bases pasan a contarlo como
-         búho. Si Zeben ve que en su zona la noche llega más tarde, se mueve
-         aquí y ya. */
-      const BUHO=90+24*60;                 /* de la 01:30 en adelante, es búho */
-      const esBuho=r.ultima>=BUHO;
-      /* La hora, a secas. Antes se le pegaba « (de madrugada)» AQUÍ, escrito en
-         español, y viajaba así al inglés y al alemán: es una de las fugas de
-         idioma que cazó la auditoría. Ahora el sufijo va por `tr()` y solo
-         donde hace falta, que en una frase que ya dice «la de madrugada» el
-         paréntesis sobra. */
+      /* ── LA HORA QUE SE DA ES LA QUE SE PUEDE PLANIFICAR ──────────────────
+         El fallo más gordo que ha tenido la web lo cazó la auditoría del 11 de
+         septiembre: `MATRIZ` guardaba UN solo número por par de municipios —la
+         salida más tardía del día— y en 234 de los 850 pares laborables esa
+         salida era una guagua de MADRUGADA, muchas entre las tres y las cinco
+         y media. El motor la presentaba como «la última guagua sale a las
+         04:09» y encima añadía «hay guaguas hasta de madrugada, así que la
+         vuelta no aprieta». A alguien sin coche eso lo deja tirado de noche.
+         Entonces el dato no estaba y el apaño fue callar el número y decir que
+         no lo sabíamos. Ahora **está**: `matriz.js` rehace la matriz desde el
+         GTFS oficial de TITSA —49.373 viajes con su hora parada a parada— y
+         `ultima` es, por construcción, la última salida ANTES de la 01:30. Los
+         234 pares tienen su hora de la tarde y no queda ni uno que solo tenga
+         madrugada. El búho sigue estando, en `buho`, pero con su nombre y
+         contado como lo que es: el servicio de noche, no la guagua de vuelta.
+         Ojo si algún día se toca la raya de la 01:30: está en `matriz.js`, no
+         aquí, porque quien la mueve tiene que rehacer el dato. */
       const txt=m=>{const h=Math.floor(m/60),mi=m%60;return String(h%24).padStart(2,'0')+':'+String(mi).padStart(2,'0')};
+      /* El sufijo « (de madrugada)» va por `tr()`: se escribía en español a
+         pelo y viajaba así al inglés y al alemán. */
       const txtLargo=m=>txt(m)+(m>=24*60?' ('+tr('deMadrugada')+')':'');
+      const cambios=r.cambios||0;
       regreso={medio:'guagua',fuente:'GTFS oficial de TITSA',tipo_dia:tipoDia,
         desde:destMuni,hasta:base.m,
-        /* el nombre del campo dice de qué hora se trata, que es la mitad del
-           arreglo: el modelo leía «ultima_salida» y decía «la última» */
-        ultima_salida:esBuho?null:txtLargo(r.ultima),
-        guagua_de_madrugada:esBuho?txt(r.ultima):null,
-        no_sabemos_la_ultima_de_la_tarde:esBuho||null,
-        como_contarlo_la_vuelta:esBuho
-          ? 'De este trayecto solo tenemos una salida y es DE MADRUGADA: no es la guagua de vuelta normal, es el servicio de noche. NO digas que es «la última guagua» ni que la vuelta no aprieta. Di la hora que es, di claro que la última de la tarde no la sabemos, y mándalos a mirar el horario de esa línea en titsa.com antes de ir.'
-          : 'Esta es la última salida del día para ese trayecto. Dila con su hora y su línea, dentro del plan.',
-        linea:r.linea, con_trasbordo:r.tipo==='trasbordo', cambio_en:r.via||null,
-        segunda_linea:r.linea2||null, espera_trasbordo_min:r.espera||null,
-        /* `llega - ultima` es lo que tarda EL ÚLTIMO viaje del día, que es el
-           más rápido que hay: sin tráfico y con menos paradas. De ahí salían
-           «9 minutos» de La Orotava al Puerto. Con el búho no se da: unos
-           minutos de madrugada animan a salir tarde y no valen para el día. */
-        duracion_del_ultimo_viaje_min:(!esBuho&&r.llega)?r.llega-r.ultima:null,
+        ultima_salida:txtLargo(r.ultima),
+        llega_a:r.llega!=null?txtLargo(r.llega):null,
+        /* `dur` es la MEDIANA del día. Antes se daba `llega - ultima`, que es
+           lo que tarda el ÚLTIMO viaje: el más rápido que hay, sin tráfico y
+           con menos paradas. De ahí salían «9 minutos» de La Orotava al
+           Puerto. */
+        cuanto_se_tarda_min:r.dur||null,
+        linea:r.linea,
+        con_trasbordo:cambios>0, cuantos_cambios:cambios||null,
+        cambio_en:r.via||null, parada_del_cambio:r.paradas||null,
+        lineas_por_orden:r.lineas||null, espera_del_cambio_min:r.esperas||null,
+        /* Cuando la salida más tardía obliga a cambiar de guagua, la última
+           directa va también: casi siempre es mejor consejo salir media hora
+           antes que cambiar de línea a la una y media de la mañana. */
+        y_hay_una_directa: r.directa!=null ? txtLargo(r.directa) : null,
+        directa_llega: r.directa_llega!=null ? txtLargo(r.directa_llega) : null,
+        directa_linea: r.directa_linea||null,
+        /* El búho es un extra, nunca la respuesta. Va con instrucciones para
+           que no se cuente como «la última». */
+        y_de_madrugada: r.buho!=null ? txt(r.buho) : null,
+        madrugada_linea: r.buho_linea||null,
+        como_contarlo_la_vuelta: (cambios>0
+          ? 'Esta es la última salida del día y hay que cambiar de guagua: di dónde se cambia y cuánto se espera. Si hay una directa antes, ofrécela como la opción cómoda.'
+          : 'Esta es la última salida del día para ese trayecto. Dila con su hora y su línea, dentro del plan.')
+          + (r.buho!=null ? ' Lo de madrugada es el servicio de noche, no la guagua de vuelta: menciónalo solo como último recurso y nunca digas que «la vuelta no aprieta».' : ''),
         viajes_dia:r.viajes||null,
         cuantas_al_dia:r.viajes||null,
-        /* Estas cuatro frases se construían en español y viajaban tal cual al
-           relato en inglés y en alemán: «muy a menudo, no hace falta mirar el
-           horario» salía en medio de un plan traducido. Van por `tr()`. */
+        /* Estas frases se construían en español y viajaban tal cual al relato
+           en inglés y en alemán. Van por `tr()`. */
         con_que_frecuencia: r.viajes ? (r.viajes>=120?tr('frecMucha')
           : r.viajes>=60?tr('frecMedia')
           : r.viajes>=25?tr('frecHora')
@@ -1996,19 +1994,18 @@ function construir(){
           : tr('frecMuyPocas')(r.viajes)) : null,
         horarios_exactos:'https://www.titsa.com/index.php/tus-viajes/horarios',
         linea_web: r.linea ? 'https://www.titsa.com/index.php/tus-viajes/horarios?linea='+r.linea : null};
-      const det=r.tipo==='trasbordo'
-        ? 'con cambio en <span class="am">'+r.via+'</span> (línea '+r.linea+' → '+r.linea2+', '+r.espera+' min de espera)'
+      const det=cambios>0
+        ? 'con '+cambios+' cambio'+(cambios>1?'s':'')+' (líneas '+r.lineas.join(' → ')+
+          ', en '+r.paradas.join(' y ')+'; '+r.esperas.join(' y ')+' min de espera)'
         : 'directa en <span class="am">línea '+r.linea+'</span>'+(r.viajes?' ('+r.viajes+' al día)':'');
-      paso((r.ultima<19*60||esBuho)?'mal':'ok','regla 4 · el regreso, del GTFS de TITSA',
+      paso(r.ultima<19*60?'mal':'ok','regla 4 · el regreso, del GTFS de TITSA',
         '<span class="si">'+destMuni+'</span> → <span class="si">'+base.m+'</span>, día '+tipoDia+
-        '. Única salida que tenemos: <span class="am">'+txtLargo(r.ultima)+'</span>, '+det+'.'+
-        (esBuho?'<br><span class="no">Es de MADRUGADA, o sea el servicio de noche. No vale como guagua de vuelta: '+
-                'la de la tarde no la tenemos y se dice.</span>':'')+
+        '. Última salida: <span class="am">'+txtLargo(r.ultima)+'</span>, '+det+'.'+
+        (r.directa!=null?'<br>Directa antes, a las <span class="am">'+txtLargo(r.directa)+'</span> (línea '+r.directa_linea+').':'')+
+        (r.buho!=null?'<br>Y un búho de madrugada a las '+txt(r.buho)+', que NO se cuenta como la última.':'')+
         (r.ultima<19*60?'<br><span class="no">Sale antes del atardecer. Va como primer aviso.</span>':''));
-      /* Los avisos van por `tr()`: se escribían en español a pelo y se le
-         enseñaban tal cual a un inglés y a un alemán. */
+      /* Los avisos van por `tr()`: se escribían en español a pelo. */
       if(r.ultima<19*60) R.avisos.unshift(tr('avVueltaPronto')(destMuni,base.m,txt(r.ultima)));
-      else if(esBuho)    R.avisos.unshift(tr('avVueltaBuho')(destMuni,base.m,txt(r.ultima),r.linea));
     }else{
       regreso={medio:'guagua',fuente:'GTFS oficial de TITSA',hay_combinacion:false,
         desde:destMuni,hasta:base.m,
@@ -2741,7 +2738,7 @@ function dibujarTarjeta(b,base){
      rota justo en los planes más completos. Ahora se mide el hueco real y
      se aprieta el paso si hace falta, sin bajar de lo legible. */
   const MARGEN = 40
-    + ((b.regreso&&(b.regreso.ultima_salida||b.regreso.guagua_de_madrugada))?140:0)
+    + ((b.regreso&&b.regreso.ultima_salida)?140:0)
     + ((b.avisos||[]).length?130:0)
     + (P.length>3?44:0);        /* el «y algo más», que también ocupa */
   const HUECO = (H-96) - y - MARGEN;
@@ -2797,14 +2794,14 @@ function dibujarTarjeta(b,base){
 
   /* la vuelta */
   const g=b.regreso;
-  if(g&&(g.ultima_salida||g.guagua_de_madrugada)){
+  if(g&&g.ultima_salida){
     x.fillStyle=ARE;
     if(x.roundRect){x.beginPath();x.roundRect(72,yy,W-144,116,22);x.fill();}
     else x.fillRect(72,yy,W-144,116);
     x.fillStyle=TEA;x.font='700 24px "Space Mono", monospace';
     x.fillText(tr('tjVuelta'),102,yy+42);
     x.font='600 31px Figtree, system-ui, sans-serif';
-    x.fillText(tr('tjUltima')+' '+(g.ultima_salida||g.guagua_de_madrugada)+
+    x.fillText(tr('tjUltima')+' '+g.ultima_salida+
       (g.con_trasbordo?', '+tr('tjCambio')+' '+g.cambio_en:', '+tr('tjLinea')+' '+g.linea),102,yy+85);
     yy+=140;
   }
@@ -2887,7 +2884,7 @@ function urlCalendario(b,base){
     ', '+b.cerrar_tomando_algo.municipio]);
   lineas.sort((a,c)=>a[0]-c[0]).forEach(x=>L.push('• '+x[1]));
   const g=b.regreso;
-  if(g&&(g.ultima_salida||g.guagua_de_madrugada)) L.push('',tr('tjVuelta')+': '+tr('tjUltima').toLowerCase()+' '+(g.ultima_salida||g.guagua_de_madrugada)+
+  if(g&&g.ultima_salida) L.push('',tr('tjVuelta')+': '+tr('tjUltima').toLowerCase()+' '+g.ultima_salida+
     (g.con_trasbordo?', cambio en '+g.cambio_en:', línea '+g.linea));
   if((b.avisos||[]).length){ L.push('','OJO:'); b.avisos.forEach(a=>L.push('• '+a)); }
   L.push('','Deje el sitio como lo encontró: la basura se baja, no se deja.');
@@ -3341,12 +3338,14 @@ const N={
   nocheEv:(n,h)=>'Ya de noche, si les quedan ganas: '+n+h+'.',
   vueltaNo:(t)=>'La vuelta: ahí no hay guagua que valga la pena. O van en coche o cuentan con taxi'+t+'.',
   vuelta:(h)=>'Para volver: la última guagua sale a las '+h,
-  vueltaTras:(v,l1,l2,e)=>', cambiando en '+v+' de la línea '+l1+' a la '+l2+', con '+e+' minutos de espera.',
+  vueltaTras:(v,ls,e)=>', cambiando en '+v+' (líneas '+ls+'), con '+e+' minutos de espera.',
+  vueltaDirecta:(h,l)=>' Si prefieren no cambiar de guagua, hay una directa a las '+h+' en la línea '+l+'.',
+  vueltaMadrugada:(h)=>' Hay además un búho a las '+h+', pero eso es el servicio de noche, no la guagua de vuelta.',
   vueltaDir:(l)=>' en la línea '+l+', directa.',
   vueltaDur:(m)=>' Son '+m+' minutos de viaje.',
   /* «la vuelta no aprieta» se fue: se decía con una salida de las cuatro de la
      mañana y era justo lo contrario de la verdad. */
-  vueltaBuho:(h)=>'Ojo con la vuelta: de ese trayecto solo tengo apuntada la guagua de madrugada, la de las '+h+'. La última de la tarde no la sé, así que mírenla antes de subir',muchas:' Pasan a menudo, así que no hay que estar pendiente del reloj.',frecuencia:f=>'\nPasan '+f+'.',verHorarios:'\nLos horarios exactos, en la web de TITSA: titsa.com',mismoPueblo:'Todo el plan queda en su municipio, así que hoy no hace falta guagua: se hace andando o con la urbana.',tiempoHoy:r=>'Hoy por ahí: '+r+'. (parte de AEMET)',
+  muchas:' Pasan a menudo, así que no hay que estar pendiente del reloj.',frecuencia:f=>'\nPasan '+f+'.',verHorarios:'\nLos horarios exactos, en la web de TITSA: titsa.com',mismoPueblo:'Todo el plan queda en su municipio, así que hoy no hace falta guagua: se hace andando o con la urbana.',tiempoHoy:r=>'Hoy por ahí: '+r+'. (parte de AEMET)',
   alternativas:(l)=>'Si les apetece cambiar algo, por ahí cerca tienen también '+l+'.',
   alLado1:'Y ahí al lado tienen algo que no le he metido al plan, pero que conviene que sepan:',
   alLado2:'Y ahí al lado tienen dos cosas que no le he metido al plan, pero que están y son bonitas:',
@@ -3422,10 +3421,12 @@ const N={
   nocheEv:(n,h)=>'And at night, if you still have it in you: '+n+h+'.',
   vueltaNo:(t)=>'Getting back: there is no bus worth waiting for. Either drive or budget for a taxi'+t+'.',
   vuelta:(h)=>'To get back: the last bus leaves at '+h,
-  vueltaTras:(v,l1,l2,e)=>', changing at '+v+' from line '+l1+' to '+l2+', with '+e+' minutes to wait.',
+  vueltaTras:(v,ls,e)=>', changing at '+v+' (lines '+ls+'), with '+e+' minutes to wait.',
+  vueltaDirecta:(h,l)=>' If you would rather not change buses, there is a direct one at '+h+' on line '+l+'.',
+  vueltaMadrugada:(h)=>' There is also a night bus at '+h+', but that is the night service, not the way home.',
   vueltaDir:(l)=>' on line '+l+', direct.',
   vueltaDur:(m)=>' It is a '+m+' minute journey.',
-  vueltaBuho:(h)=>'Careful with the way back: for that route the only departure I have is the night bus, at '+h+'. I do not know the last evening one, so check it before you set off',muchas:' They run often, so no need to watch the clock.',frecuencia:f=>'\nThey run '+f+'.',verHorarios:'\nExact timetables at titsa.com',mismoPueblo:'The whole plan stays in your town, so no bus needed today: it is walkable or a short local ride.',tiempoHoy:r=>'Today over there: '+r+'. (AEMET forecast)',
+  muchas:' They run often, so no need to watch the clock.',frecuencia:f=>'\nThey run '+f+'.',verHorarios:'\nExact timetables at titsa.com',mismoPueblo:'The whole plan stays in your town, so no bus needed today: it is walkable or a short local ride.',tiempoHoy:r=>'Today over there: '+r+'. (AEMET forecast)',
   alternativas:(l)=>'If you fancy changing something, nearby you also have '+l+'.',
   alLado1:'And right there you have something I have not put in the plan, but you should know about:',
   alLado2:'And right there you have two things I have not put in the plan, but they are there and they are beautiful:',
@@ -3501,10 +3502,12 @@ const N={
   nocheEv:(n,h)=>'Und abends, wenn Sie noch mögen: '+n+h+'.',
   vueltaNo:(t)=>'Der Rückweg: dort fährt kein brauchbarer Bus. Entweder mit dem Auto oder mit Taxi rechnen'+t+'.',
   vuelta:(h)=>'Für den Rückweg: der letzte Bus fährt um '+h,
-  vueltaTras:(v,l1,l2,e)=>', mit Umstieg in '+v+' von Linie '+l1+' auf '+l2+', '+e+' Minuten Wartezeit.',
+  vueltaTras:(v,ls,e)=>', mit Umstieg in '+v+' (Linien '+ls+'), '+e+' Minuten Wartezeit.',
+  vueltaDirecta:(h,l)=>' Wenn Sie nicht umsteigen möchten: eine Direktfahrt um '+h+' mit Linie '+l+'.',
+  vueltaMadrugada:(h)=>' Es gibt noch eine Nachtfahrt um '+h+', aber das ist der Nachtdienst, nicht der Rückweg.',
   vueltaDir:(l)=>' mit Linie '+l+', direkt.',
   vueltaDur:(m)=>' Die Fahrt dauert '+m+' Minuten.',
-  vueltaBuho:(h)=>'Achtung beim Rückweg: für diese Strecke habe ich nur die Nachtfahrt um '+h+'. Die letzte Abfahrt am Abend kenne ich nicht, prüfen Sie sie vor der Fahrt',muchas:' Sie fahren häufig, Sie müssen also nicht auf die Uhr schauen.',frecuencia:f=>'\nSie fahren '+f+'.',verHorarios:'\nGenaue Fahrpläne auf titsa.com',mismoPueblo:'Der ganze Plan bleibt in Ihrem Ort, heute brauchen Sie keinen Bus: alles zu Fuß oder mit dem Ortsbus.',tiempoHoy:r=>'Heute dort: '+r+'. (AEMET-Vorhersage)',
+  muchas:' Sie fahren häufig, Sie müssen also nicht auf die Uhr schauen.',frecuencia:f=>'\nSie fahren '+f+'.',verHorarios:'\nGenaue Fahrpläne auf titsa.com',mismoPueblo:'Der ganze Plan bleibt in Ihrem Ort, heute brauchen Sie keinen Bus: alles zu Fuß oder mit dem Ortsbus.',tiempoHoy:r=>'Heute dort: '+r+'. (AEMET-Vorhersage)',
   alternativas:(l)=>'Wenn Sie etwas ändern möchten, in der Nähe gibt es auch '+l+'.',
   alLado1:'Und gleich nebenan gibt es etwas, das ich nicht in den Plan genommen habe, das Sie aber wissen sollten:',
   alLado2:'Und gleich nebenan gibt es zwei Dinge, die ich nicht in den Plan genommen habe, die es aber gibt und die schön sind:',
@@ -3584,19 +3587,19 @@ function narrarLocal(b){
     const g0=b.regreso;
     if(g0.medio&&!g0.ultima_salida) t.push(F.mismoPueblo);
     else if(g0.hay_combinacion===false) t.push(F.vueltaNo(g0.taxi_orientativo?' ('+g0.taxi_orientativo+')':''));
-    else if(g0.ultima_salida||g0.guagua_de_madrugada){
-      /* Con el búho NO se dice «la última guagua»: se dice que es la de
-         madrugada y que la de la tarde no la sabemos. Y ahí no va ni la
-         duración ni el «pasan a menudo», que las dos animan a salir tarde. */
-      let c=g0.guagua_de_madrugada
-        ? F.vueltaBuho(g0.guagua_de_madrugada)
-        : F.vuelta(g0.ultima_salida);
-      c+=g0.con_trasbordo?F.vueltaTras(g0.cambio_en,g0.linea,g0.segunda_linea,g0.espera_trasbordo_min)
-                         :F.vueltaDir(g0.linea);
-      if(!g0.guagua_de_madrugada){
-        if(g0.duracion_del_ultimo_viaje_min) c+=F.vueltaDur(g0.duracion_del_ultimo_viaje_min);
-        if(g0.con_que_frecuencia) c+=F.frecuencia(g0.con_que_frecuencia);
-      }
+    else if(g0.ultima_salida){
+      /* Desde que la matriz sale del GTFS, «la última» es de verdad la última
+         de la tarde y se dice como tal. El búho va detrás, como un extra y con
+         su nombre: decirlo primero es lo que dejaba a la gente tirada. */
+      let c=F.vuelta(g0.ultima_salida);
+      c+=g0.con_trasbordo
+        ? F.vueltaTras(g0.cambio_en.join(' · '), g0.lineas_por_orden.join(' → '),
+                       g0.espera_del_cambio_min.join(' + '))
+        : F.vueltaDir(g0.linea);
+      if(g0.cuanto_se_tarda_min) c+=F.vueltaDur(g0.cuanto_se_tarda_min);
+      if(g0.y_hay_una_directa) c+=F.vueltaDirecta(g0.y_hay_una_directa,g0.directa_linea);
+      if(g0.con_que_frecuencia) c+=F.frecuencia(g0.con_que_frecuencia);
+      if(g0.y_de_madrugada) c+=F.vueltaMadrugada(g0.y_de_madrugada);
       c+=F.verHorarios;
       t.push(c);
     }
@@ -4252,8 +4255,10 @@ function compartirEscapada(jornadas){
     if(b.restaurante) L.push('· Comer: '+b.restaurante.nombre+', '+b.restaurante.municipio+
       (b.restaurante.telefono?' — '+b.restaurante.telefono:''));
     const g=b.regreso;
-    if(g&&(g.ultima_salida||g.guagua_de_madrugada))
-      L.push('· Vuelta: '+(g.guagua_de_madrugada?'solo guagua de madrugada, '+g.guagua_de_madrugada:'última guagua '+g.ultima_salida));
+    if(g&&g.ultima_salida)
+      L.push('· Vuelta: última guagua '+g.ultima_salida+
+             (g.con_trasbordo?' con '+g.cuantos_cambios+' cambio'+(g.cuantos_cambios>1?'s':''):'')+
+             (g.y_de_madrugada?' (y un búho a las '+g.y_de_madrugada+')':''));
     L.push('');
   });
   L.push('Naira · guía de Tenerife');

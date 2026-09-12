@@ -421,3 +421,68 @@ console.log('\n=== EL REGALO DE CAMINO ===');
   console.log('  con mirador de camino    : '+con+'   ('+Math.round(100*con/tot)+'%)');
   console.log('  desvío mediano           : '+(desv.length?desv[Math.floor(desv.length/2)]+' km':'—'));
 }
+
+/* ── LA VUELTA SIN COCHE ────────────────────────────────────────────────
+   Este bloque existe por el fallo más gordo que ha tenido la web. `MATRIZ`
+   guardaba UNA hora por par de municipios —la salida más tardía del día— y en
+   234 de los 850 pares laborables esa salida era una guagua de MADRUGADA. El
+   motor la presentaba como «la última guagua sale a las 04:09» y encima decía
+   que la vuelta no apretaba. A alguien sin coche eso lo deja tirado en
+   Buenavista a las once de la noche.
+   Ahora la matriz sale del GTFS oficial (`matriz.js`) y `ultima` es, por
+   construcción, la última ANTES de la 01:30. Lo que se vigila aquí es que
+   siga siendo verdad en el plan de verdad, no solo en el fichero: que a nadie
+   sin coche se le dé una hora de madrugada como «la última», que nadie que
+   cruce de municipio se quede sin dato, y que las duraciones sean de un viaje
+   y no de un salto por encima de la raya del término. */
+console.log('\n=== LA VUELTA SIN COCHE ===');
+{
+  const RAYA=90+24*60;
+  const aMin=t=>{ if(!t) return null; const m=/^(\d\d):(\d\d)/.exec(t); if(!m) return null;
+    let x=+m[1]*60+ +m[2]; if(/madrugada|midnight|Mitternacht/.test(t)&&x<12*60) x+=24*60; return x; };
+
+  let planes=0, cruzan=0, conDato=0, buhoComoUltima=0, sinDato=0,
+      conCambio=0, conDirecta=0, conBuhoAparte=0, durMala=0, pronto=0;
+  const durs=[];
+  const bases=[...new Set(Object.values(BASES).map(b=>b.m))];
+  bases.forEach(base=>{
+    /* se ancla en el sitio de más peso de OTRO municipio cercano, que es lo
+       que obliga a que la vuelta cuente; si no hay, el día se queda en casa */
+    const bm=BASES[base];
+    const fuera=LUGARES.filter(l=>l.la!=null&&l.m!==base&&km(bm.la,bm.lo,l.la,l.lo)<9)
+      .sort((a,b)=>(b.w||0)-(a.w||0)).slice(0,2);
+    fuera.forEach(l=>{
+      Object.assign(S,{base,coche:false,gente:2,ninos:false,apetece:null,anclaElegida:l.n,
+        comida:null,ahora:null,saltoComida:0,descartados:null,prefTipo:null,
+        fecha:'2026-10-13',idioma:'es',forzarEvento:null,fiestaTodoElDia:null,
+        diaEntero:true,faltaNucleo:null});
+      let b; try{ b=construir().brief; }catch(e){ return; }
+      planes++;
+      const g=b.regreso||{};
+      if(!g.desde || g.desde===base) return;      /* el día se quedó en casa */
+      cruzan++;
+      if(!g.ultima_salida){ sinDato++; return; }
+      conDato++;
+      const m=aMin(g.ultima_salida);
+      if(m!=null && m>=RAYA) buhoComoUltima++;
+      if(m!=null && m<19*60) pronto++;
+      if(g.con_trasbordo) conCambio++;
+      if(g.y_hay_una_directa) conDirecta++;
+      if(g.y_de_madrugada) conBuhoAparte++;
+      if(g.cuanto_se_tarda_min!=null){
+        durs.push(g.cuanto_se_tarda_min);
+        if(g.cuanto_se_tarda_min<3) durMala++;    /* eso no es un viaje, es cruzar la raya */
+      }
+    });
+  });
+  S.anclaElegida=null;
+  durs.sort((a,b)=>a-b);
+  console.log('  planes sin coche          : '+planes+'   ·  que cruzan de municipio: '+cruzan);
+  console.log('  con hora de vuelta        : '+conDato+'   ·  SIN DATO: '+sinDato);
+  console.log('  BÚHO DADO COMO «LA ÚLTIMA»: '+buhoComoUltima+'   (tiene que ser 0)');
+  console.log('  VIAJES DE MENOS DE 3 MIN  : '+durMala+'   (tiene que ser 0: sería cruzar la raya del término)');
+  console.log('  con cambio de guagua      : '+conCambio+'   ·  con una directa antes: '+conDirecta);
+  console.log('  con búho aparte, bien dicho: '+conBuhoAparte);
+  console.log('  sale antes del atardecer  : '+pronto+'   (van como primer aviso)');
+  console.log('  duración mediana del viaje: '+(durs.length?durs[durs.length>>1]+' min':'—'));
+}

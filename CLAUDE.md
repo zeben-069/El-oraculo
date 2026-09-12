@@ -92,6 +92,7 @@ probar-aereo.html             prueba en casa qué ortofoto contesta
 fusionar.js                   junta sitios repetidos (ensayo sin tocar nada)
 hosteleria.js                 rellena con el registro del Cabildo donde falta comer
 guaguas.js                    le pone a cada ficha su parada de guagua
+matriz.js                     rehace la matriz de TITSA desde el GTFS oficial
 fotos.js                      la lista de fotos que faltan, y las mete
 fotos-encargo.md              esa lista para encargársela a otro (con reglas)
 fotos-buscar.js               busca candidatas en Commons (se ejecuta en su máquina)
@@ -984,36 +985,21 @@ uno contra el código**, que la web revisada era el zip desplegado y podía tene
 cosas ya arregladas; salieron todos ciertos.
 
 **El peor, y con diferencia: «la última guagua» era un búho de madrugada.**
-`MATRIZ` guarda UNA hora por par de municipios, la salida más tardía del día. Y
-en **427 de los 850 pares laborables** esa salida es después de medianoche,
+`MATRIZ` guardaba UNA hora por par de municipios, la salida más tardía del día.
+Y en **427 de los 850 pares laborables** esa salida era después de medianoche,
 muchas entre las tres y las cinco y media. El motor la presentaba tal cual —«la
 última guagua sale a las 04:09»— y encima añadía «hay guaguas hasta de
 madrugada, así que la vuelta no aprieta». A alguien sin coche eso lo deja
 tirado de noche en Buenavista, que es literalmente lo que decía el informe.
-Aquí **no se puede inventar la hora buena**: el dato no está. `MATRIZ` trae un
-número por par y `titsa-regreso.js` —que sí tiene `ultima_antes_medianoche`—
-solo cubre dos corredores de origen, así que no sirve de sustituto. Lo que se
-arregla es **lo que se dice**:
-· Si la única salida es de madrugada, el informe **no la llama `ultima_salida`**:
-  la llama `guagua_de_madrugada` y añade `no_sabemos_la_ultima_de_la_tarde`. El
-  nombre del campo es la mitad del arreglo, porque el modelo leía «ultima» y
-  decía «la última».
-· Se fue el «la vuelta no aprieta» de los tres idiomas, y el aviso nuevo manda a
-  mirar el horario de esa línea o a contar con taxi.
-· **La raya está en la 01:30, y es un juicio, no un dato.** A medianoche no: una
-  guagua a las 00:51 es la última de la noche de verdad y se coge después de
-  cenar. Lo que engaña es el búho de las tres o las cuatro, porque detrás lleva
-  un agujero de seis horas. Con la raya ahí, **682 de los 2.548 pares** se
-  cuentan como búho. Si en su zona la noche llega más tarde, se mueve la
-  constante `BUHO` y ya.
-· **`duracion_min` era la del último viaje del día**, que es el más rápido que
-  hay: sin tráfico y con menos paradas. De ahí salían «9 minutos» de La Orotava
-  al Puerto. Se llama ahora `duracion_del_ultimo_viaje_min`, el prompt dice lo
-  que es, y **con el búho no se da**: unos minutos de madrugada animan a salir
-  tarde y no valen para el día.
-Y los dos avisos del regreso **se escribían en español a pelo** y se le
-enseñaban tal cual a un inglés y a un alemán. Van por `tr()`, igual que el
-sufijo « (de madrugada)».
+Aquel día **no se podía inventar la hora buena**: el dato no estaba. `MATRIZ`
+traía un número por par y `titsa-regreso.js` —que sí tiene
+`ultima_antes_medianoche`— solo cubre dos corredores de origen. Así que se
+arregló **lo que se decía**: si la única salida era de madrugada, el informe no
+la llamaba `ultima_salida` sino `guagua_de_madrugada`, y añadía
+`no_sabemos_la_ultima_de_la_tarde`. El nombre del campo era la mitad del
+arreglo, porque el modelo leía «ultima» y decía «la última».
+**Y el 12 de septiembre el dato llegó, así que ya no hay que callar nada.**
+Ver abajo, «La matriz de guaguas se rehizo desde el GTFS».
 
 **«Merece la pena» pegado a una exclusión por peligro.** La coletilla de «no lo
 meto en el plan, pero ustedes deciden: aunque sea acercarse a verlo, merece la
@@ -1170,9 +1156,100 @@ decimales, así que salía «unas 0.8 horas» en vez de «unos 50 minutos».
 
 **Lo que la auditoría dejó sin arreglar a propósito**, porque no es un fallo
 sino una decisión pendiente: las horas de verdad en cada parada, el reloj de
-cuenta atrás de la última guagua, y lo de descartar las paradas lejos de la
-guagua sin coche —eso ya se probó y está apuntado abajo: no mejoraba nada
+cuenta atrás de la última guagua —que **ya no está bloqueado por el dato**
+desde que la matriz sale del GTFS: la hora es de verdad y el reloj se puede
+hacer—, y lo de descartar las paradas lejos de la guagua sin coche —eso ya se probó y está apuntado abajo: no mejoraba nada
 medible y empeoraba otras cosas—.
+
+## La matriz de guaguas, rehecha desde el GTFS
+
+Zeben mandó cuatro ficheros —«en estos archivos tienes todo lo relacionado con
+el transporte y con las guaguas en Tenerife, revísalo bien y usa todo lo que
+necesitas»— y dentro venía lo que llevaba semanas faltando: **el GTFS oficial
+de TITSA**, 49.373 viajes con su hora parada a parada, 3.897 paradas y el
+calendario de seis meses. Con eso, la última guagua de la TARDE **se calcula**,
+no se estima, y el apaño de callar el número se va.
+
+Lo hace **`matriz.js`**, que es la herramienta que la matriz nunca tuvo —la
+primera salió una vez de los horarios y no quedó camino para repetirla, el
+mismo error que costó las 215 fichas sin `bus` hasta que se escribió
+`guaguas.js`—:
+
+    node matriz.js /ruta/al/gtfs            ensayo: mide y compara, no escribe
+    node matriz.js /ruta/al/gtfs escribir   reescribe datos/titsa-matriz.js
+
+Lo que cambia en el dato: `ultima` es ahora, **por construcción**, la última
+salida antes de la 01:30, y el búho vive aparte en `buho` con su nombre. De los
+**234 pares laborables que solo tenían madrugada, los 234 tienen ya su hora de
+la tarde**, y no queda **ni uno** en toda la matriz que solo tenga búho. De
+paso, la matriz pasa de 850 pares a **930** y cubre los 850 viejos.
+
+Y cinco decisiones que costaron, cada una de un número absurdo que salió por el
+camino. Ninguna se puede quitar sin que vuelva el suyo:
+
+· **El municipio de una parada no viene en el dato** —ni el GTFS ni el fichero
+  del Cabildo lo traen— así que sale de lo que ya tenemos fichado. Pero **no
+  del punto más cercano a secas**: con eso, la Cruz del Carmen y el Pico del
+  Inglés se iban a Tegueste porque justo al lado hay dos senderos fichados ahí.
+  **Votan los 7 más cercanos**, pesando 1/(km+0,2).
+· **Y aun votando no basta: de un sitio que no conocemos no se dice nada.**
+  Guamasa es de La Laguna y no tenemos nada fichado allí, así que el voto lo
+  decidían vecinos a dos kilómetros y salía Tegueste — y con él «la última
+  guagua de Tegueste a La Laguna es la 01:20», que es la de Guamasa y deja al
+  de Tegueste esperando. La regla que lo cierra: una parada solo vale de
+  **principio o final** si tiene algo fichado de su municipio a menos de 1,2 km.
+  Para **cambiar** de guagua vale cualquiera: ahí no se afirma dónde se está.
+· **El viaje tiene que LLEVAR de un pueblo al otro, no cruzar la raya del
+  término.** Salía «de La Orotava al Puerto, última la 01:27, un minuto de
+  viaje»: una guagua saltando de la última parada de un término a la primera
+  del otro. Cierto y completamente inútil. Ahora entre la parada donde suben y
+  la parada donde bajan tiene que haber el **60% de lo que separa los dos
+  cascos**, que sale del propio dato.
+  Lo que **no** vale es exigir que las paradas estén junto al casco: probado, y
+  se caen 266 pares de golpe. La estación de Adeje es Costa Adeje, a cinco
+  kilómetros del casco, y la de Arona es Los Cristianos. **El pueblo no siempre
+  está donde para la guagua.**
+· **El trasbordo es en la misma parada o en otra a 400 metros, y con espera de
+  entre 10 y 60 minutos.** «En el mismo municipio» no vale —cambiar en Santa
+  Cruz puede ser cruzar la ciudad—, pero la parada exacta tampoco: se caían 74
+  pares, entre ellos todo Arafo, porque la 121 acaba a doscientos metros de
+  donde para la 711. Y el tope de los 60 minutos no es cosmético: sin él, el
+  enlace se daba por bueno contra la salida más tardía de la parada, que muchas
+  veces es el búho de las cuatro, y salía «última a las 23:50» con cuatro horas
+  de plantón en medio.
+· **Se admiten DOS cambios, no uno.** A Tegueste solo se llega por La Laguna,
+  así que desde el Puerto o desde La Guancha hacen falta dos: con uno solo
+  salían horas de la mañana —«la última de La Guancha a Tegueste es la de las
+  06:44»— o el par desaparecía. Tres no se ofrecen: eso ya no es volver a casa.
+· **Cada cambio cuesta 20 minutos al elegir.** La vuelta buena no es la más
+  tardía a secas: salía «la última de Candelaria a Güímar es la 01:15,
+  cambiando en Barranco Hondo con 44 minutos de espera» habiendo una directa a
+  la 01:00. Quince minutos más de tarde no valen un plantón de madrugada en un
+  cruce. Y cuando aun así gana la combinación, **la última directa va también**,
+  en `y_hay_una_directa`, como la opción cómoda.
+
+Dos cosas más que hay que saber:
+· **`dur` es la MEDIANA del día, no la del último viaje.** El último viaje es
+  el más rápido que hay —sin tráfico y con menos paradas— y de ahí salían «9
+  minutos» de La Orotava al Puerto, que fue otro de los avisos de la auditoría.
+· **Un día, un horario.** Para cada tipo de día se coge UNA fecha de verdad del
+  calendario —la de viajes medianos de su grupo, que así ni el 25 de diciembre
+  ni un puente mandan— y sale impresa en la cabecera del fichero. Mezclar
+  varias daría un horario que no existe ningún día. Y como «finde» son sábado y
+  domingo juntos y no tienen el mismo horario, del par se guarda **lo más
+  flojo**: equivocarse por ahí les hace volver antes; al revés los deja tirados.
+
+Lo que esto obliga a cambiar arriba: el informe ya no lleva
+`guagua_de_madrugada` ni `no_sabemos_la_ultima_de_la_tarde` —no hacen falta— y
+sí lleva `cuanto_se_tarda_min`, `cuantos_cambios`, `cambio_en`,
+`parada_del_cambio`, `espera_del_cambio_min`, `y_hay_una_directa` y
+`y_de_madrugada`. El prompt lo explica y el narrador local lo cuenta con
+plantillas nuevas en los tres idiomas. Se fue `avVueltaBuho`, que ya no
+describe nada. Y salió **otra fuga de idioma** que la auditoría no cazó: el
+aviso de «están en X y duermen en Y, la última guagua sale a las…» estaba
+escrito en español a pelo; va por `avEstanFuera`.
+La matriz pasa de 340 KB a **542 KB**, que es lo que cuestan las combinaciones
+con su parada y su espera. El zip queda en 2,48 MB.
 
 ## Trampas conocidas
 
@@ -1296,6 +1373,15 @@ cambian 26 (79%)**. Ojo con ese bloque: tiene que mutar el `EVENTOS` que
 **exporta `banco.js`**, no el que `lote.js` lee del fichero con `eval` — con la
 copia, quitarle las coordenadas no cambia nada y el porcentaje sale 0%, o sea
 que la prueba dice que la mejora no sirve.
+
+Y un bloque de **la vuelta sin coche**, que guarda el fallo más gordo que ha
+tenido la web: arma 62 planes sin coche que cruzan de municipio y comprueba que
+a nadie se le dé una hora de madrugada como «la última». Referencia: **62 con
+hora de vuelta, 0 sin dato, 0 búhos dados como la última y 0 viajes de menos de
+tres minutos** —que serían un salto por encima de la raya del término—, 16 con
+cambio de guagua, 33 con búho aparte bien contado y 12 minutos de viaje
+mediano. Ese bloque vale porque **con la matriz vieja daba 29 búhos de 62**: se
+comprobó cambiando el fichero y volviéndolo a poner.
 
 Y el último, **el regalo de camino**: barre 124 planes con coche y cuenta en
 cuántos sale un mirador de camino a la primera parada. Referencia: **88
@@ -1460,6 +1546,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Quita el compartir, pon iconos y un botón de eventos» | 11 sep | El de compartir llamaba a una función que no existe: fuera, y fuera también el respaldo que la llamaba. 🏖 y 🥾 en las preferencias, y el botón de montar el día alrededor de un evento en el menú y después del plan |
 | «Destaca el lugar del evento y que lleve a la localidad» | 11 sep | El calendario agrupa los actos por sitio, con la localidad en negrita y pulsable al mapa. De paso salieron los actos repetidos: 648 → 571 |
 | «Elegir varios días en el calendario» | 10 sep | El calendario deja marcar la estancia entera y cuenta día por día lo que cae. El plan sigue siendo de un día |
+| Cuatro zips de transporte: el **GTFS de TITSA**, las paradas, las líneas y los itinerarios | 12 sep | El GTFS es el que faltaba: 49.373 viajes con su hora parada a parada. Con él, `matriz.js` rehace la matriz de municipios y **la última guagua de la tarde deja de ser el búho de madrugada** en los 234 pares donde lo era |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
@@ -1469,6 +1556,8 @@ cada uno contra el catálogo:
 | fichero | qué trae | qué se ha hecho |
 |---|---|---|
 | `paradasdeguagua.csv` / `.geojson` | 3.872 paradas **con coordenada** | Se usó una vez para el campo `bus` y **no quedó herramienta**, así que 215 fichas nuevas se quedaron mudas. Cerrado con `guaguas.js`: quedan 4 sitios sin parada, los 4 que no tienen coordenada |
+| `google_transit.zip` (**GTFS de TITSA**) | 49.373 viajes, 3.897 paradas, 1.517 servicios y seis meses de calendario | Es el fichero que le faltaba a la matriz de municipios. Lo lee `matriz.js` y de ahí sale `datos/titsa-matriz.js` entera. El `shapes.txt` (31 MB, el trazado de cada línea) **no se usa**: el mapa dibuja las paradas del día, no el recorrido de la guagua |
+| `lineas-y-horarios.csv` / `.json` | los 182 números de línea con su nombre y su web | **No hace falta aparte**: lo mismo está en `routes.txt` del GTFS, que es de donde se lee |
 | `itinerarios__titsa1.csv` | 225 itinerarios del Cabildo, columnas BIEN puestas | Es `datos/senderos-tenerife.js`. **112 están fichados en `LUGARES` y los 112 cuadran** al metro con este fichero |
 | `itinerarios.geojson` y `itinerarios.geojson_1` | los mismos 225, con el trazado (15 MB cada uno, y son el mismo fichero dos veces) | De aquí solo se sacan los datos, no el trazado: el mapa dibuja las paradas del día, no la línea del sendero. Y **traen las etiquetas corridas** —`itinerario_distancia` contiene la altura máxima—, que es la trampa que ya está apuntada arriba |
 | `diccionariodedatosdeitinerarios.json` | el esquema de esas columnas | Es lo que demuestra que el geojson las trae mal y el csv bien |
@@ -1501,6 +1590,10 @@ Lo que sigue **sin usar** de lo suyo, y por qué:
 
 - **Partir `index.html`** en varios ficheros.
 - `datos/senderos-anaga.js` está cargado y no lo usa nadie.
+- `datos/titsa-regreso.js` tampoco lo usa nadie, y ahora además **sobra**: era
+  el único sitio con `ultima_antes_medianoche` y solo cubría dos corredores de
+  origen; la matriz nueva trae ese dato para los 930 pares. Son 6 KB que se
+  bajan para nada. Quitarlo es una línea en `index.html`.
 - `datos/miradores.js` tampoco lo usa nadie, pero no hace falta: de sus 18
   puntos, 7 están dentro del Palmetum y no son sitios a los que se vaya, y de
   los 11 restantes **10 ya están en `LUGARES`**. El único que falta es el
