@@ -251,6 +251,7 @@ if(typeof L==='undefined'){
 <script src="datos/actos.js"></script>
 <script src="datos/bases.js"></script>
 <script src="datos/estampas.js"></script>
+<script src="datos/comarcas.js"></script>
 <script src="datos/titsa-matriz.js"></script>
 <script src="datos/ine.js"></script>
 <script src="prompt.js"></script>
@@ -294,7 +295,7 @@ const T={
      tjYMas:'y algo más en el plan completo',
      tjDesde:'Desde',tjVuelta:'LA VUELTA',tjOjo:'OJO',tjFirma:'Naira · guía de Tenerife',tjDatos:'hecho con datos abiertos del Cabildo',tjUltima:'Última guagua a las',tjCambio:'cambio en',tjLinea:'línea',tjSubida:'de subida',tjCircular:'circular',tjVueltaCoche:'acaba lejos del inicio',tjPermiso:'CON PERMISO',tjMin:'min',
      catMuseos2:'Museos, cultura y cosas para los críos',catTodo:'Un poco de todo',
-     meDaIgual:'Me da igual — que elija Naira',volverZonas:'Volver a las zonas',verMas:'Ver más…',cambMuni:'Cambiar de municipio',yMas:'Y más…',catNat:'Naturaleza: senderos y miradores',catAgua:'Agua: playas y piscinas naturales',catMuseos:'Museos, cultura y cosas para los días malos',
+     meDaIgual:'Me da igual — que elija Naira',noSonMunicipio:'Y los dos sitios que no son un municipio:',volverMapa:'Volver al mapa',y:'y',avOtroCartel:(l,c)=>'Una cosa antes: '+l+' quedan lejos del casco, así que en un día por el pueblo no entran. Eso lo tengo en «'+c+'», que da para un día entero de por sí.',avSiEntra:(l)=>'Lo que sí entra es '+l+', que está a un paso.',irAlCartel:(c)=>'Llévame a '+c+'',verMas:'Ver más…',cambMuni:'Cambiar de municipio',yMas:'Y más…',catNat:'Naturaleza: senderos y miradores',catAgua:'Agua: playas y piscinas naturales',catMuseos:'Museos, cultura y cosas para los días malos',
      masTranquilo:'Otra cosa más tranquila',prefPlaya:'Prefiero playa o piscina',prefNat:'Prefiero naturaleza',cambComida:'Cambiar dónde comer',mismoEstilo:'Otro sitio, el mismo estilo',comTipica:'Comida típica canaria',comPescado:'Pescado',comLoQueHaya:'Lo que haya bueno',ninguna:'Ninguna, quiero otro plan',volver:'Volver',frMannana:'Por la mañana',frMediodia:'A mediodía, buscando dónde comer',frTarde:'Ya de tarde',frAtardecer:'Al caer el día',hayFiestas:'cosas ese día — armar el plan alrededor',hayFiesta:'cosa ese día — armar el plan alrededor',todoElDia:'todo el día',aquiMismo:'aquí mismo',min:'min',mejorVamos:'Mejor vamos a',
      donde:'¿Dónde se están quedando?',coche:'¿Llevan coche?',si_coche:'Sí, tenemos coche',
      no_coche:'No, vamos en guagua',como:'¿Cómo van? Lo pregunto por lo de los niños, que cambia bastante.',
@@ -307,15 +308,13 @@ const T={
      qNoEsHoy:'Eso es para hoy mismo. Como han elegido otro día, les monto el día entero.',
      qMomento:'¿En qué momento del día están?',
      qZona:'¿Por qué zona de la isla les apetece moverse?',
-     qZonaDetalle:z=>'En '+z+'. ¿Por dónde exactamente?',
+     qZonaDetalle:z=>z+'. ¿Qué pueblo?',
      qQueVer:m=>'En '+m+'. ¿Qué les apetece ver?',
      qMasSitios:m=>'Más sitios de '+m+':',
      qSorpresaHoy:'Va, sin más preguntas. A esta hora yo haría esto:',
      qSorpresaHoyNinos:'Va, sin más preguntas. Con los peques y a esta hora, yo haría esto:',
      qSorpresaDia:'Va, sin más preguntas. Para ese día yo haría esto:',
      qSorpresaDiaNinos:'Va, sin más preguntas. Para ese día y con los peques, yo haría esto:',
-     zNorte:'Norte y valle de La Orotava',zIslaBaja:'Isla Baja (Garachico, Icod, Buenavista)',
-     zMetropolitana:'La Laguna, Santa Cruz y Anaga',zGuimar:'Este y valle de Güímar',
      gSendero:'La ruta del sendero',gBanito:'Para el bañito',qDigame:'Dígame y se lo armo.',
      frDeManana:'Por la mañana',frDeMediodia:'A mediodía',frDeTarde:'Por la tarde',frDeAtardecer:'Al caer el día',frDeNoche:'De noche',
      holaSolo:'¡Buenas! ',
@@ -323,7 +322,6 @@ const T={
      agenda:'¿Qué evento hay hoy?',hoyEs:'hoy',mananaEs:'mañana',deMadrugada:'de madrugada',enMuniBien:(m)=>'En '+m+', muy bien.',abrirMapa:'Abrir en Google Maps',errServidor:(n)=>'el servidor respondió '+n,errSinClave:'no hay clave de API configurada',errCortado:'la respuesta se cortó a mitad',errVacio:'no llegó texto',frecMucha:'muy a menudo, no hace falta mirar el horario',frecMedia:'cada media hora aproximadamente',frecHora:'cada hora aproximadamente',frecPocas:(n)=>'unas '+n+' al día: conviene mirar el horario antes de salir',frecMuyPocas:(n)=>'solo '+n+' al día, así que hay que planificarla',rgTitulo:(m)=>'La última guagua a '+m,rgQuedan:(h,t)=>'Sale a las '+h+'. Le quedan '+t+'.',rgLinea:(l)=>'Línea '+l+'.',rgConCambios:(l,n)=>'Línea '+l+', con '+n+(n>1?' cambios':' cambio')+'.',rgYaSalio:(h)=>'Ya salió, a las '+h+'.',rgBuho:(h)=>'Queda el búho de las '+h+', que es el servicio de noche.',rgTaxi:'De aquí en adelante, taxi.',rgVayanSaliendo:'Vayan saliendo.',rgHM:(h,m)=>h+' h '+m+' min',rgM:(m)=>m+' min',avEstanFuera:(a,b,h,l)=>'Están en '+a+' y duermen en '+b+'. La última guagua de vuelta sale a las '+h+', '+l+'. Cuenten con eso antes de alargar la tarde.',porLinea:(n)=>'línea '+n,cambiandoEn:(v)=>'cambiando en '+v,avVueltaPronto:(d,b,h)=>'Ojo con la vuelta: la última guagua de '+d+' hacia '+b+' sale a las '+h+', o sea antes del atardecer. Si se quieren quedar, cuenten con taxi.',
      fueraMapa:(k)=>'· fuera del mapa, a '+k+' km',
      qAgenda:(d,n)=>'Hay '+n+' '+(n===1?'cosa apuntada':'cosas apuntadas')+' en los próximos '+d+' días. ¿Le armo el día alrededor de alguna?',
-     zSur:'Sur y suroeste',zCumbre:'Cumbre y Teide',
      mapaNo:'El mapa no ha cargado',
      mapaNoTxt:'Sin conexión o con el navegador bloqueando recursos externos. Cada parada de abajo lleva su enlace con la coordenada exacta.',
      imgNo:'No he podido hacer la imagen. Le dejo el plan en texto.',
@@ -359,7 +357,7 @@ const T={
      tjYMas:'and more in the full plan',
      tjDesde:'From',tjVuelta:'GETTING BACK',tjOjo:'HEADS UP',tjFirma:'Naira · your guide to Tenerife',tjDatos:'built on open data from the Cabildo',tjUltima:'Last bus at',tjCambio:'change at',tjLinea:'line',tjSubida:'of climb',tjCircular:'loop',tjVueltaCoche:'ends far from the start',tjPermiso:'PERMIT NEEDED',tjMin:'min',
      catMuseos2:'Museums, culture and things for the kids',catTodo:'A bit of everything',
-     meDaIgual:'I do not mind — Naira can choose',volverZonas:'Back to the areas',verMas:'See more…',cambMuni:'Change municipality',yMas:'And more…',catNat:'Nature: trails and viewpoints',catAgua:'Water: beaches and natural pools',catMuseos:'Museums, culture and things for bad-weather days',
+     meDaIgual:'I do not mind — Naira can choose',noSonMunicipio:'And the two places that are not a municipality:',volverMapa:'Back to the map',y:'and',avOtroCartel:(l,c)=>'One thing first: '+l+' are a long way from the town centre, so a day around the village will not reach them. I keep those under «'+c+'», which is a full day on its own.',avSiEntra:(l)=>'What does fit is '+l+', which is right there.',irAlCartel:(c)=>'Take me to '+c+'',verMas:'See more…',cambMuni:'Change municipality',yMas:'And more…',catNat:'Nature: trails and viewpoints',catAgua:'Water: beaches and natural pools',catMuseos:'Museums, culture and things for bad-weather days',
      masTranquilo:'Something quieter',prefPlaya:'I would rather have beach or pool',prefNat:'I would rather have nature',cambComida:'Change where we eat',mismoEstilo:'Another place, same style',comTipica:'Traditional Canarian food',comPescado:'Fish',comLoQueHaya:'Whatever is good',ninguna:'None, I want a different plan',volver:'Back',frMannana:'In the morning',frMediodia:'Midday, looking for lunch',frTarde:'Already afternoon',frAtardecer:'As the day ends',hayFiestas:'things on that day — build the plan around one',hayFiesta:'thing on that day — build the plan around it',todoElDia:'all day',aquiMismo:'right here',min:'min',mejorVamos:'Better we go to',
      donde:'Where are you staying?',coche:'Do you have a car?',si_coche:'Yes, we have a car',
      no_coche:'No, we use the bus',como:'Who is coming? Travelling with children changes a lot.',
@@ -372,15 +370,13 @@ const T={
      qNoEsHoy:'That one is for today. As you picked another day, I will plan the whole day.',
      qMomento:'What time of day are you at?',
      qZona:'Which part of the island do you fancy moving around?',
-     qZonaDetalle:z=>'In '+z+'. Whereabouts exactly?',
+     qZonaDetalle:z=>z+'. Which town?',
      qQueVer:m=>'In '+m+'. What would you like to see?',
      qMasSitios:m=>'More places in '+m+':',
      qSorpresaHoy:'Right, no more questions. At this hour, this is what I would do:',
      qSorpresaHoyNinos:'Right, no more questions. With the little ones and at this hour, this is what I would do:',
      qSorpresaDia:'Right, no more questions. For that day, this is what I would do:',
      qSorpresaDiaNinos:'Right, no more questions. For that day and with the little ones, this is what I would do:',
-     zNorte:'North and the Orotava valley',zIslaBaja:'Isla Baja (Garachico, Icod, Buenavista)',
-     zMetropolitana:'La Laguna, Santa Cruz and Anaga',zGuimar:'East and the Güímar valley',
      gSendero:'The trail route',gBanito:'For a dip',qDigame:'Tell me and I will put it together.',
      frDeManana:'In the morning',frDeMediodia:'At midday',frDeTarde:'In the afternoon',frDeAtardecer:'As the day ends',frDeNoche:'At night',
      holaSolo:'Hello! ',
@@ -388,7 +384,6 @@ const T={
      agenda:'What is on today?',hoyEs:'today',mananaEs:'tomorrow',deMadrugada:'after midnight',enMuniBien:(m)=>m+', very good.',abrirMapa:'Open in Google Maps',errServidor:(n)=>'the server answered '+n,errSinClave:'no API key configured',errCortado:'the answer was cut off',errVacio:'no text arrived',frecMucha:'very often, no need to check the timetable',frecMedia:'roughly every half hour',frecHora:'roughly every hour',frecPocas:(n)=>'about '+n+' a day: worth checking the timetable before you go',frecMuyPocas:(n)=>'only '+n+' a day, so it needs planning',rgTitulo:(m)=>'Last bus back to '+m,rgQuedan:(h,t)=>'It leaves at '+h+'. You have '+t+' left.',rgLinea:(l)=>'Line '+l+'.',rgConCambios:(l,n)=>'Line '+l+', with '+n+(n>1?' changes':' change')+'.',rgYaSalio:(h)=>'It already left, at '+h+'.',rgBuho:(h)=>'There is still the '+h+' bus, but that is the night service.',rgTaxi:'After that it is a taxi.',rgVayanSaliendo:'Time to head off.',rgHM:(h,m)=>h+' h '+m+' min',rgM:(m)=>m+' min',avEstanFuera:(a,b,h,l)=>'You are in '+a+' and sleeping in '+b+'. The last bus back leaves at '+h+', '+l+'. Bear that in mind before stretching the evening.',porLinea:(n)=>'line '+n,cambiandoEn:(v)=>'changing at '+v,avVueltaPronto:(d,b,h)=>'Careful with the way back: the last bus from '+d+' to '+b+' leaves at '+h+', before sunset. If you want to stay on, count on a taxi.',
      fueraMapa:(k)=>'· off the map, '+k+' km away',
      qAgenda:(d,n)=>'I have '+n+' '+(n===1?'thing':'things')+' on in the next '+d+' days. Shall I build the day around one of them?',
-     zSur:'South and south-west',zCumbre:'The summit and Teide',
      mapaNo:'The map did not load',
      mapaNoTxt:'No connection, or the browser is blocking external resources. Every stop below has its own link with the exact coordinates.',
      imgNo:'I could not make the image. Here is the plan in text.',
@@ -424,7 +419,7 @@ const T={
      tjYMas:'und mehr im vollständigen Plan',
      tjDesde:'Ab',tjVuelta:'DIE RÜCKFAHRT',tjOjo:'ACHTUNG',tjFirma:'Naira · Ihr Reiseführer für Teneriffa',tjDatos:'mit offenen Daten des Cabildo',tjUltima:'Letzter Bus um',tjCambio:'Umstieg in',tjLinea:'Linie',tjSubida:'Anstieg',tjCircular:'Rundweg',tjVueltaCoche:'endet weit vom Start',tjPermiso:'MIT GENEHMIGUNG',tjMin:'Min.',
      catMuseos2:'Museen, Kultur und etwas für die Kinder',catTodo:'Von allem etwas',
-     meDaIgual:'Egal — Naira soll wählen',volverZonas:'Zurück zu den Gebieten',verMas:'Mehr sehen…',cambMuni:'Gemeinde wechseln',yMas:'Und mehr…',catNat:'Natur: Wanderwege und Aussichtspunkte',catAgua:'Wasser: Strände und Naturschwimmbecken',catMuseos:'Museen, Kultur und etwas für schlechte Tage',
+     meDaIgual:'Egal — Naira soll wählen',noSonMunicipio:'Und die zwei Orte, die keine Gemeinde sind:',volverMapa:'Zurück zur Karte',y:'und',avOtroCartel:(l,c)=>'Eins vorweg: '+l+' liegen weit vom Ortskern, ein Tag im Dorf reicht nicht bis dorthin. Das habe ich unter «'+c+'», und das füllt einen ganzen Tag.',avSiEntra:(l)=>'Was aber hineinpasst: '+l+', das liegt gleich nebenan.',irAlCartel:(c)=>'Bring mich nach '+c+'',verMas:'Mehr sehen…',cambMuni:'Gemeinde wechseln',yMas:'Und mehr…',catNat:'Natur: Wanderwege und Aussichtspunkte',catAgua:'Wasser: Strände und Naturschwimmbecken',catMuseos:'Museen, Kultur und etwas für schlechte Tage',
      masTranquilo:'Etwas Ruhigeres',prefPlaya:'Lieber Strand oder Pool',prefNat:'Lieber Natur',cambComida:'Woanders essen',mismoEstilo:'Anderer Ort, gleicher Stil',comTipica:'Kanarische Hausmannskost',comPescado:'Fisch',comLoQueHaya:'Was gerade gut ist',ninguna:'Keine, ich möchte einen anderen Plan',volver:'Zurück',frMannana:'Am Vormittag',frMediodia:'Mittags, auf der Suche nach dem Essen',frTarde:'Schon am Nachmittag',frAtardecer:'Wenn der Tag ausklingt',hayFiestas:'Sachen an dem Tag — den Plan darum herum bauen',hayFiesta:'Sache an dem Tag — den Plan darum herum bauen',todoElDia:'den ganzen Tag',aquiMismo:'gleich hier',min:'Min.',mejorVamos:'Besser wir fahren nach',
      donde:'Wo wohnen Sie?',coche:'Haben Sie ein Auto?',si_coche:'Ja, wir haben ein Auto',
      no_coche:'Nein, wir fahren mit dem Bus',como:'Wer ist dabei? Mit Kindern ändert sich einiges.',
@@ -437,15 +432,13 @@ const T={
      qNoEsHoy:'Das ist für heute. Da Sie einen anderen Tag gewählt haben, plane ich den ganzen Tag.',
      qMomento:'Wie spät ist es bei Ihnen gerade?',
      qZona:'In welcher Gegend der Insel möchten Sie sich bewegen?',
-     qZonaDetalle:z=>'In '+z+'. Wo genau?',
+     qZonaDetalle:z=>z+'. Welcher Ort?',
      qQueVer:m=>'In '+m+'. Was möchten Sie sehen?',
      qMasSitios:m=>'Mehr Orte in '+m+':',
      qSorpresaHoy:'Gut, keine Fragen mehr. Um diese Zeit würde ich das hier machen:',
      qSorpresaHoyNinos:'Gut, keine Fragen mehr. Mit den Kleinen und um diese Zeit würde ich das hier machen:',
      qSorpresaDia:'Gut, keine Fragen mehr. Für diesen Tag würde ich das hier machen:',
      qSorpresaDiaNinos:'Gut, keine Fragen mehr. Für diesen Tag und mit den Kleinen würde ich das hier machen:',
-     zNorte:'Norden und das Orotava-Tal',zIslaBaja:'Isla Baja (Garachico, Icod, Buenavista)',
-     zMetropolitana:'La Laguna, Santa Cruz und Anaga',zGuimar:'Osten und das Güímar-Tal',
      gSendero:'Der Wegverlauf',gBanito:'Zum Baden',qDigame:'Sagen Sie es mir und ich stelle es zusammen.',
      frDeManana:'Am Vormittag',frDeMediodia:'Mittags',frDeTarde:'Am Nachmittag',frDeAtardecer:'Zum Tagesausklang',frDeNoche:'Abends',
      holaSolo:'Hallo! ',
@@ -453,7 +446,6 @@ const T={
      agenda:'Was ist heute los?',hoyEs:'heute',mananaEs:'morgen',deMadrugada:'nach Mitternacht',enMuniBien:(m)=>m+', sehr gut.',abrirMapa:'In Google Maps öffnen',errServidor:(n)=>'der Server antwortete '+n,errSinClave:'kein API-Schlüssel konfiguriert',errCortado:'die Antwort brach ab',errVacio:'es kam kein Text an',frecMucha:'sehr oft, Sie müssen nicht in den Fahrplan schauen',frecMedia:'etwa alle halbe Stunde',frecHora:'etwa stündlich',frecPocas:(n)=>'etwa '+n+' am Tag: schauen Sie vorher in den Fahrplan',frecMuyPocas:(n)=>'nur '+n+' am Tag, das muss man planen',rgTitulo:(m)=>'Der letzte Bus zurück nach '+m,rgQuedan:(h,t)=>'Er fährt um '+h+'. Sie haben noch '+t,rgLinea:(l)=>'Linie '+l+'.',rgConCambios:(l,n)=>'Linie '+l+', mit '+n+(n>1?' Umstiegen':' Umstieg')+'.',rgYaSalio:(h)=>'Er ist schon um '+h+' gefahren.',rgBuho:(h)=>'Es bleibt der Bus um '+h+', aber das ist der Nachtdienst.',rgTaxi:'Danach hilft nur noch ein Taxi.',rgVayanSaliendo:'Machen Sie sich auf den Weg.',rgHM:(h,m)=>h+' Std. '+m+' Min.',rgM:(m)=>m+' Min.',avEstanFuera:(a,b,h,l)=>'Sie sind in '+a+' und übernachten in '+b+'. Der letzte Bus zurück fährt um '+h+', '+l+'. Denken Sie daran, bevor der Abend länger wird.',porLinea:(n)=>'Linie '+n,cambiandoEn:(v)=>'Umstieg in '+v,avVueltaPronto:(d,b,h)=>'Achtung beim Rückweg: der letzte Bus von '+d+' nach '+b+' fährt um '+h+', also vor Sonnenuntergang. Wenn Sie länger bleiben wollen, rechnen Sie mit einem Taxi.',
      fueraMapa:(k)=>'· außerhalb der Karte, '+k+' km entfernt',
      qAgenda:(d,n)=>'Ich habe '+n+' '+(n===1?'Sache':'Sachen')+' in den nächsten '+d+' Tagen. Soll ich den Tag darum herum bauen?',
-     zSur:'Süden und Südwesten',zCumbre:'Gipfel und Teide',
      mapaNo:'Die Karte wurde nicht geladen',
      mapaNoTxt:'Keine Verbindung, oder der Browser blockiert externe Inhalte. Jeder Stopp unten hat seinen eigenen Link mit den genauen Koordinaten.',
      imgNo:'Ich konnte das Bild nicht erstellen. Hier ist der Plan als Text.',
@@ -595,6 +587,10 @@ function actoTr(n){
 }
 
 /* El lema de cada municipio va en las tres lenguas dentro de la propia ficha */
+/* Un decimal con el separador del idioma. En español y en alemán es la coma,
+   y «10.8 km» dentro de una frase en español canta. Los horarios NO pasan por
+   aquí: ahí los números no se tocan nunca. */
+const km1=n=>n.toFixed(1).replace('.', S.idioma==='en'?'.':',');
 const lemaTr=e=>!e?'':(S.idioma==='en'?(e.lema_en||e.lema):S.idioma==='de'?(e.lema_de||e.lema):e.lema)||'';
 /* El horario es texto libre y viene en español («L-J 13:00-18:00 · V y S hasta
    las 24:00 · lunes cerrado»). Se traducen SOLO las palabras: los números no
@@ -794,10 +790,11 @@ function burbuja(txt,quien,extra){
   return d;
 }
 const dormir=ms=>new Promise(r=>setTimeout(r,ms));
-async function naira(txt,pausa){
+async function naira(txt,pausa,clase){
   const t=document.createElement('div');t.className='escribiendo';t.innerHTML='<i></i><i></i><i></i>';
   hilo.appendChild(t);hilo.scrollTop=hilo.scrollHeight;await dormir(pausa||400);t.remove();
-  burbuja(txt,'naira');await dormir(110);
+  const b=burbuja(txt,'naira'); if(clase&&b) b.classList.add(clase);
+  await dormir(110);
 }
 function opciones(lista){
   acc.replaceChildren();
@@ -837,29 +834,10 @@ function cartas(lista,titulo){
   });
   acc.appendChild(caja);
 }
-/* Las zonas de la isla: franjas anchas con el rótulo ENCIMA, sobre un velo
-   oscuro que va de izquierda a derecha. El velo hace falta porque las seis
-   fotos tienen brillos muy distintos —el casco de La Orotava es casi blanco
-   y el monteverde de Anaga casi negro— y un texto claro sin velo se pierde
-   en unas y canta en otras. El rótulo, como todo, sale de tr(). */
-function franjas(lista){
-  acc.replaceChildren(); acc.innerHTML='';
-  const caja=document.createElement('div');
-  caja.className='franjas';
-  caja.innerHTML=lista.map((o,i)=>
-    '<button class="franja" data-i="'+i+'">'+
-      '<img src="img/zonas/'+o.img+'.jpg" alt="" loading="lazy" decoding="async">'+
-      '<span class="velo"></span><span class="rot">'+o.t+'</span></button>').join('');
-  caja.addEventListener('click',e=>{
-    const b=e.target.closest&&e.target.closest('.franja');
-    if(!b) return;
-    const o=lista[+b.getAttribute('data-i')];
-    acc.replaceChildren(); acc.innerHTML='';
-    burbuja(o.t,'yo');
-    o.fn();
-  });
-  acc.appendChild(caja);
-}
+/* `franjas()` y las seis fotos de zona se fueron el 12 de septiembre: la
+   primera pregunta es ahora el mapa de comarcas, que pesa 5 KB en vez de 127
+   y además dice dónde están las cosas. Las fotos siguen en `img/zonas/` por si
+   vuelven a hacer falta, pero ya no se publican. */
 function paso(clase,titulo,html){
   if(hRazon.querySelector('.vacio'))hRazon.innerHTML='';
   const d=document.createElement('div');d.className='paso '+clase;
@@ -4538,7 +4516,7 @@ function fichaMunicipio(k,v){
       (e&&lemaTr(e)?'<span class="lema2">'+lemaTr(e)+'</span>':'')+
       '<span class="cuenta">'+n+' '+tr('nSitios')+'</span></span></button>';
 }
-function cuadriculaMunicipios(lista,alPulsar){
+function cuadriculaMunicipios(lista,alPulsar,volver){
   acc.replaceChildren(); acc.innerHTML='';
   const caja=document.createElement('div');
   caja.className='cuadricula';
@@ -4552,6 +4530,14 @@ function cuadriculaMunicipios(lista,alPulsar){
     alPulsar(k);
   });
   acc.appendChild(caja);
+  /* Desde el mapa hace falta poder volver: la cuadrícula de los 31 del
+     alojamiento no lo lleva porque ahí no hay a dónde volver. */
+  if(volver){
+    const b=document.createElement('button');
+    b.className='opt'; b.textContent=tr('volverMapa');
+    b.onclick=()=>{acc.innerHTML='';volver()};
+    acc.appendChild(b);
+  }
 }
 /* El idioma del enlace. Compartir «…/?lang=en» por WhatsApp es lo que hace
    que el que lo abre lo vea ya en su idioma; sin esto, el enlace llegaba
@@ -4932,41 +4918,130 @@ async function queHora(){
     {t:tr('frAtardecer'),fn:()=>{S.ahora='atardecer';S.anclaElegida=null;queApetece()}}
   ]);
 }
+/* ── LA PRIMERA PREGUNTA: EL MAPA ──────────────────────────────────────
+   Eran seis fotos de franja, bonitas y mudas: una foto de monteverde no dice
+   DÓNDE está Anaga, y eso es justo lo que necesita quien acaba de aterrizar.
+   Ahora es el mapa de las seis comarcas, que además pesa 5 KB contra los 127
+   de las fotos. El porqué de cada decisión está en `datos/comarcas.js`; aquí
+   solo se pinta.
+   Ojo con el orden de pintado: el SVG trae las comarcas de mayor a menor área
+   para que Acentejo, que es una franja finísima, quede encima y gane el toque.
+   No se reordena. */
 async function elegirSitio(){
   await naira(tr('qZona'),360);
-  /* El nombre de la zona sale de tr(): estaba escrito en español a pelo y un
-     inglés leía «Norte y valle de La Orotava». Los corredores, que son lo que
-     usa el motor para calcular tiempos, no se traducen. */
-  const ZONAS=[
-    ['zNorte',        ['Norte'],                  'norte'],
-    ['zIslaBaja',     ['Isla Baja'],              'isla-baja'],
-    ['zMetropolitana',['Metropolitana','Anaga'],  'metropolitana'],
-    ['zGuimar',       ['Este','Valle de Güímar'], 'guimar'],
-    ['zSur',          ['Sur','Suroeste'],         'sur'],
-    ['zCumbre',       ['Cumbre'],                 'cumbre']
-  ];
-  paso('ok','entrada · nivel 1, la zona','Seis zonas. Después el municipio y después el sitio. Así no hay que adivinar de una lista corta.');
-  franjas(ZONAS.map(([clave,corrs,img])=>({t:tr(clave),img,
-    fn:()=>elegirMunicipio(tr(clave),corrs)})));
+  acc.replaceChildren(); acc.innerHTML='';
+  const caja=document.createElement('div');
+  /* Los rótulos son HTML por encima del SVG, no <text> dentro: así no encogen
+     con el mapa y siguen leyéndose en un móvil de 430 px. */
+  caja.innerHTML='<div class="mapa">'+MAPA_SVG+
+    Object.entries(COMARCAS).map(([k,v])=>
+      '<button class="etq" type="button" data-comarca="'+k+'" style="--x:'+ETQ_POS[k][0]+
+      ';--y:'+ETQ_POS[k][1]+'"><span class="etqPunto"></span>'+
+      '<span class="etqLarga">'+comarcaTr(v)+'</span>'+
+      '<span class="etqCorta">'+(v.corto||comarcaTr(v))+'</span></button>').join('')+
+    '</div>'+
+    '<p class="rotSueltos">'+tr('noSonMunicipio')+'</p>'+
+    '<div class="carteles">'+Object.entries(SUELTOS).map(([k,v])=>
+      fichaCartel(k,v)).join('')+'</div>';
+  caja.addEventListener('click',e=>{
+    const t=e.target.closest&&e.target.closest('[data-comarca]');
+    if(!t) return;
+    const k=t.getAttribute('data-comarca');
+    acc.replaceChildren(); acc.innerHTML='';
+    if(SUELTOS[k]){ burbuja(comarcaTr(SUELTOS[k]),'yo'); anclarSuelto(k); return; }
+    burbuja(comarcaTr(COMARCAS[k]),'yo');
+    elegirMunicipio(k);
+  });
+  paso('ok','entrada · nivel 1, el mapa','Seis comarcas y dos carteles aparte. '+
+    'Anaga y la cumbre no son municipios —son un macizo y la parte de arriba de cuatro '+
+    'pueblos—, así que no van pintados: van debajo.');
+  acc.appendChild(caja);
   const b3=document.createElement('button');
   b3.className='opt'; b3.textContent=tr('meDaIgual');
   b3.onclick=()=>{acc.innerHTML='';burbuja(tr('meDaIgual'),'yo');S.anclaElegida=null;queApetece()};
   acc.appendChild(b3);
 }
-
-async function elegirMunicipio(etZona,corrs){
-  const co={};
-  LUGARES.filter(l=>corrs.indexOf(l.c)>=0).forEach(l=>{ const k=l.co||l.m; co[k]=(co[k]||0)+1; });
-  const lista=Object.entries(co).filter(([m,n])=>n>=2).sort((a,b)=>b[1]-a[1]);
-  /* Iba con `toLowerCase()` y salía «En isla baja (garachico, icod,
-     buenavista). ¿Por dónde exactamente?»: son nombres propios. */
-  await naira(tr('qZonaDetalle')(etZona),360);
-  paso('ok','entrada · nivel 2, la comarca',
-    '<span class="am">'+lista.length+'</span> comarcas. Anaga va aparte del casco de La Laguna: '+
-    'Taganana y Bajamar son municipio de La Laguna, pero nadie que pida «ver La Laguna» quiere que le manden a Anaga.');
-  opciones(lista.map(([m,n])=>({t:m+' ('+n+')',fn:()=>queApeteceEn(m)}))
-    .concat([{t:tr('volverZonas'),fn:()=>elegirSitio()}]));
+/* Dónde cae el rótulo de cada comarca, en % del cuadro. Sale del mapa, no del
+   catálogo, así que vive aquí y no en los datos. */
+const ETQ_POS={sur:['32.7%','79.5%'],metropolitana:['80.5%','15.2%'],
+  'icoden-daute':['19.9%','44%'],guimar:['60.5%','46.7%'],
+  orotava:['43%','38.3%'],acentejo:['57.9%','23%']};
+const comarcaTr=v=>!v?'':(S.idioma==='en'?(v.rot_en||v.rot):S.idioma==='de'?(v.rot_de||v.rot):v.rot);
+/* El cartel usa la MISMA caja que la estampa de un pueblo: 40 y 21 sitios son
+   más que la mitad de los municipios, así que no son botones de segunda. */
+function fichaCartel(k,v){
+  const n=(v.corr?LUGARES.filter(l=>l.c===v.corr):LUGARES.filter(l=>new RegExp(v.co).test(l.co||''))).length;
+  return '<button class="estampa" type="button" data-comarca="'+k+'">'+
+    '<span class="lienzo"><img src="'+v.f+'" alt="" loading="lazy" decoding="async"></span>'+
+    '<span class="pie"><b>'+comarcaTr(v)+'</b>'+
+      '<span class="lema2">'+lemaTr(v)+'</span>'+
+      '<span class="cuenta">'+n+' '+tr('nSitios')+'</span></span></button>';
 }
+/* Anaga y la cumbre no tienen pueblos que enseñar: van directos al tipo de día.
+   El filtro es el suyo, no el de un municipio. */
+function anclarSuelto(k){
+  const v=SUELTOS[k];
+  const filtro=v.corr?(l=>l.c===v.corr):(l=>new RegExp(v.co).test(l.co||''));
+  paso('ok','entrada · nivel 2, un cartel','<span class="si">'+v.rot+'</span> no es un municipio, '+
+    'así que no hay pueblo que elegir: se ancla en lo mejor que tenga.');
+  queApeteceEn(v.rot,filtro);
+}
+
+/* ── NIVEL 2: LOS PUEBLOS DE ESA COMARCA, CON SU ESTAMPA ──
+   Antes era una lista de texto con las comarcas del catálogo dentro —«Anaga
+   norte — Taganana y Benijo» colgando de La Laguna—. Lo cazó Zeben: si el mapa
+   es por comarcas, detrás van los PUEBLOS de esa comarca y nada más.
+   La cuadrícula es la misma con la que se elige dónde dormir, sin tocarla. Y
+   sale mejor que antes: en vez de las 31 estampas de golpe, el navegador baja
+   las tres u ocho de esa comarca. */
+async function elegirMunicipio(k){
+  const v=COMARCAS[k];
+  const lista=v.mun.map(m=>{
+    const kb=Object.keys(BASES).find(x=>BASES[x].m===m);
+    return [kb,BASES[kb]];
+  }).filter(([kb])=>kb).sort((a,b)=>(b[1].lug+b[1].rest)-(a[1].lug+a[1].rest));
+  await naira(tr('qZonaDetalle')(comarcaTr(v)),360);
+  paso('ok','entrada · nivel 2, el pueblo','Los <span class="am">'+lista.length+
+    '</span> municipios de '+v.rot+', cada uno con su estampa.');
+  cuadriculaMunicipios(lista,kb=>{
+    const m=BASES[kb].m;
+    const av=AVISO_CARTEL[m];
+    if(av) avisarDelCartel(av,()=>queApeteceEn(m));
+    else queApeteceEn(m);
+  },()=>elegirSitio());
+}
+
+/* ── EL AVISO DE «ESO ESTÁ EN EL OTRO CARTEL» ──
+   Idea de Zeben. Quien pulsa Vilaflor, La Laguna o Santa Cruz tiene media
+   comarca lejos del casco, y el ancla busca a 6 km: no se la va a ofrecer.
+   Es la regla de `lo_hay_pero_lejos_del_pueblo` —no se dice «no hay», se dice
+   que lo hay y a cuánto— adelantada al momento en que todavía se puede cambiar
+   de idea, y con botón para saltar.
+   Los kilómetros NO están escritos: se miden aquí contra el centro urbano de
+   `BASES`, que es el mismo punto con el que el motor ancla el día. Si mañana
+   se mueve una ficha, el aviso se mueve con ella. */
+async function avisarDelCartel(av,seguir){
+  const v=SUELTOS[av.ir];
+  const kb=Object.keys(BASES).find(x=>BASES[x].m===(LUGARES.find(l=>l.n===av.lejos[0])||{}).m);
+  const cen=BASES[kb];
+  const conKm=n=>{const l=LUGARES.find(x=>x.n===n);
+    return (!l||l.la==null||!cen)?null:l.n+' ('+km1(km(cen.la,cen.lo,l.la,l.lo))+' km)';};
+  const lejos=(av.lejos||[]).map(conKm).filter(Boolean);
+  const cerca=(av.cerca||[]).map(conKm).filter(Boolean);
+  if(!lejos.length){ seguir(); return; }
+  await naira(tr('avOtroCartel')(lista(lejos),comarcaTr(v))+
+    (cerca.length?' '+tr('avSiEntra')(lista(cerca)):''),420,'avisa');
+  paso('avi','entrada · lo que se queda en el otro cartel',
+    lejos.join(' · ')+' quedan a más de 6 km del casco, así que el ancla no los coge. '+
+    'Se dice y se ofrece el salto a <span class="si">'+v.rot+'</span>.');
+  const b=document.createElement('button');
+  b.className='opt salto'; b.textContent=tr('irAlCartel')(comarcaTr(v));
+  b.onclick=()=>{acc.innerHTML='';burbuja(b.textContent,'yo');anclarSuelto(av.ir)};
+  acc.appendChild(b);
+  seguir();
+}
+/* «a, b y c» en el idioma que toque, sin comas de más. */
+const lista=a=>a.length<2?(a[0]||''):a.slice(0,-1).join(', ')+' '+tr('y')+' '+a[a.length-1];
 
 /* Elegido el pueblo, se pregunta QUÉ TIPO DE DÍA, no cuál de sus treinta
    sitios. Antes salía la lista de nombres del catálogo —«Museo de Artesanía
@@ -4997,9 +5072,16 @@ const NUCLEO_DIA={
      tiene NADA de esto, que entonces sí hay que decirlo. */
   museos:TIPOS_DIA.museos };
 const COMO_SE_PIDIO={ naturaleza:'cSenderos', playa:'cAgua', museos:'cMuseos' };
-async function queApeteceEn(muni){
+async function queApeteceEn(muni,filtro){
   await naira(tr(S.ninos?'qDiaNinos':'qDia'),380);
-  const pool=LUGARES.filter(l=>(l.co||l.m)===muni&&!l.cerrado&&l.la!=null&&!l.recinto);
+  /* El filtro por defecto acepta el municipio O la comarca del catálogo. Antes
+     miraba SOLO `l.co||l.m`, y con eso pedir «San Cristóbal de La Laguna» dejaba
+     fuera los 28 sitios de Anaga y los 4 de Bajamar, que llevan su propia `co`.
+     Con el municipio dentro, el pool es el término entero y la regla de los
+     6 km del casco sigue decidiendo igual: quien pide La Laguna quiere La
+     Laguna. `filtro` lo usan los dos carteles que no son un municipio. */
+  const suyo = filtro || (l=>l.m===muni||(l.co||l.m)===muni);
+  const pool=LUGARES.filter(l=>suyo(l)&&!l.cerrado&&l.la!=null&&!l.recinto);
   const porPeso=(a,b)=>((b.w||1)-(a.w||1))||((b.fx?1:0)-(a.fx?1:0));
   const elegir=(ap)=>{
     const re=TIPOS_DIA[ap];

@@ -14,10 +14,15 @@
   --laurisilva:#2E5D4B;   /* el monteverde */
   --mar:#2C6E7F;
   --arena:#E8D9BE;
+  --agua:#E3E9E6;       /* el mar del mapa de comarcas */
   --sombra:0 2px 0 rgba(62,43,28,.14);
   --disp:'Fraunces',Georgia,serif;
   --cuerpo:'Figtree',system-ui,sans-serif;
   --mono:'Space Mono',ui-monospace,monospace;
+  /* Las seis comarcas, del verde del norte al dorado del sur: la paleta de
+     arriba bajada de tono, no colores nuevos. */
+  --c-metropolitana:#7FA3A8;--c-acentejo:#7E9B86;--c-orotava:#93A579;
+  --c-icoden-daute:#A8AC77;--c-guimar:#C6A878;--c-sur:#D9BE8E;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -306,28 +311,61 @@ button.estampa .lienzo{
 button.estampa .lienzo img{
   display:block;width:100%;height:100%;object-fit:cover;object-position:center 42%;
 }
-.franjas{display:flex;flex-direction:column;gap:9px;width:100%}
-button.franja{
-  position:relative;display:block;width:100%;padding:0;overflow:hidden;
-  border:1.5px solid var(--tea);border-radius:13px;background:var(--arena);
-  box-shadow:2.5px 2.5px 0 var(--tea);cursor:pointer;
-  transition:transform .11s cubic-bezier(.2,.7,.3,1),box-shadow .11s;
+/* ── EL MAPA DE COMARCAS ──
+   Sustituye a las seis fotos de franja el 12 de septiembre: 5 KB de SVG contra
+   127 de jpg, y encima dice DÓNDE están las cosas, que es lo que una foto de
+   monteverde no hace. Los rótulos son HTML por encima del SVG, no <text>
+   dentro, para que no encojan con el mapa. El porqué de lo demás está en
+   datos/comarcas.js. */
+.mapa{position:relative;aspect-ratio:1000/818;width:100%;overflow:hidden;
+  border:1.5px solid var(--tea);border-radius:13px;background:var(--agua);
+  box-shadow:2.5px 2.5px 0 var(--tea);touch-action:manipulation}
+.lienzoMapa{display:block;width:100%;height:100%}
+.comarca .relleno{fill:var(--f);transition:fill .12s ease-out}
+/* La banda de toque: sin ella Acentejo es demasiado fina para un dedo. */
+.comarca .toque{fill:transparent;stroke:transparent;stroke-width:44;
+  stroke-linejoin:round;pointer-events:all;cursor:pointer}
+.comarca[data-comarca="metropolitana"]{--f:var(--c-metropolitana)}
+.comarca[data-comarca="acentejo"]{--f:var(--c-acentejo)}
+.comarca[data-comarca="orotava"]{--f:var(--c-orotava)}
+.comarca[data-comarca="icoden-daute"]{--f:var(--c-icoden-daute)}
+.comarca[data-comarca="guimar"]{--f:var(--c-guimar)}
+.comarca[data-comarca="sur"]{--f:var(--c-sur)}
+.comarca:active .relleno{fill:var(--malvasia);transition:none}
+.lindes{fill:none;stroke:var(--cal);stroke-width:1.5px;stroke-linejoin:round;
+  vector-effect:non-scaling-stroke;pointer-events:none}
+.costa{fill:none;stroke:var(--tea-suave);stroke-width:1px;stroke-linejoin:round;
+  vector-effect:non-scaling-stroke;opacity:.5;pointer-events:none}
+.etq{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);
+  display:inline-flex;align-items:center;gap:.4em;white-space:nowrap;min-height:32px;
+  padding:.2em .55em;border-radius:9px;cursor:pointer;font-family:var(--cuerpo);
+  font-size:12.5px;font-weight:700;color:var(--tea);background:#fff;
+  border:1.5px solid var(--tea);box-shadow:1.5px 1.5px 0 var(--tea)}
+.etqPunto{width:7px;height:7px;border-radius:50%;background:var(--f);flex:none}
+.etq[data-comarca="metropolitana"]{--f:var(--c-metropolitana)}
+.etq[data-comarca="acentejo"]{--f:var(--c-acentejo)}
+.etq[data-comarca="orotava"]{--f:var(--c-orotava)}
+.etq[data-comarca="icoden-daute"]{--f:var(--c-icoden-daute)}
+.etq[data-comarca="guimar"]{--f:var(--c-guimar)}
+.etq[data-comarca="sur"]{--f:var(--c-sur)}
+.etq:focus-visible{outline:2.5px solid var(--malvasia);outline-offset:2px}
+.etqCorta{display:none}
+/* Acentejo es una franja finísima: el rótulo se aparta y una guía lo ata. */
+.etq[data-comarca="acentejo"]{transform:translate(-50%,-50%) translate(-24%,-118%)}
+.etq[data-comarca="acentejo"]::after{content:"";position:absolute;left:62%;top:100%;
+  width:1.5px;height:15px;background:var(--tea);transform:rotate(-18deg);transform-origin:top}
+@media(max-width:470px){
+  .etq{font-size:11px;min-height:28px;padding:.15em .4em;gap:.28em}
+  .etqLarga{display:none}.etqCorta{display:inline}
 }
-button.franja:hover{transform:translate(-1.5px,-1.5px);box-shadow:4px 4px 0 var(--tea)}
-button.franja:active{transform:translate(2.5px,2.5px);box-shadow:0 0 0 var(--tea)}
-button.franja:focus-visible{outline:2.5px solid var(--malvasia);outline-offset:3px}
-button.franja img{display:block;width:100%;height:auto}
-button.franja .velo{position:absolute;inset:0;
-  background:linear-gradient(90deg,rgba(27,21,18,.62) 0%,rgba(27,21,18,.38) 45%,rgba(27,21,18,.02) 84%)}
-button.franja .rot{
-  position:absolute;left:14px;right:74px;top:50%;transform:translateY(-50%);
-  /* color fijo, NO var(--cal): de noche esa variable se vuelve casi negra
-     (#171214) y el rótulo desaparecía sobre la foto. Aquí siempre hay foto y
-     velo oscuro debajo, así que el texto va claro en los dos temas. */
-  text-align:left;color:#FBF5E9;font-family:var(--disp);font-weight:800;
-  font-size:16px;line-height:1.2;text-shadow:0 1px 3px rgba(0,0,0,.55);
-}
-@media(max-width:420px){button.franja .rot{font-size:15px;left:12px;right:66px}}
+.rotSueltos{margin:13px 0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--tea-suave)}
+.carteles{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+/* El aviso de «eso está en el otro cartel» no es una alarma: es un dato que
+   llega a tiempo. Raya del color del vino, que es lo que Naira ya usa. */
+.b.naira.avisa{border-left:5px solid var(--malvasia)}
+button.opt.salto{background:var(--laurisilva);color:#F6F1E4;border-color:var(--laurisilva)}
+button.opt.salto:hover{background:#26503F}
 .credito-fotos{font-size:10.5px;line-height:1.4;color:var(--tea-suave);margin:8px 2px 0;font-family:var(--mono)}
 body[data-luz="noche"] .credito-fotos{color:#9C8CB0}
 .titulo-cartas{
@@ -584,7 +622,11 @@ body[data-luz="amanecer"]{--cal:#FDF3E4;--arena:#F0DCC4;--cochinilla:#B8503A}
 body[data-luz="dia"]{--cal:#FBF5E9;--arena:#E8D9BE}
 body[data-luz="atardecer"]{--cal:#FBEDDF;--arena:#EBD3B8;--cochinilla:#A63A2A}
 body[data-luz="noche"]{--cal:#171214;--cal-hueso:#211A2C;--tea:#EDE6DC;--tea-suave:#A79BB3;
-  --arena:#3A3048;--sombra:0 2px 0 rgba(0,0,0,.35);--cochinilla:#E08472;--malvasia:#E8B65A}
+  --arena:#3A3048;--sombra:0 2px 0 rgba(0,0,0,.35);--cochinilla:#E08472;--malvasia:#E8B65A;
+  --agua:#101A1B;--c-metropolitana:#3C5A62;--c-acentejo:#40584A;--c-orotava:#4B5840;
+  --c-icoden-daute:#5A5B3C;--c-guimar:#6E5B3B;--c-sur:#7C6743}
+body[data-luz="noche"] .etq{background:#211A2C;border-color:#5B4C6E;box-shadow:1.5px 1.5px 0 #5B4C6E}
+body[data-luz="noche"] .etq[data-comarca="acentejo"]::after{background:#5B4C6E}
 body[data-luz="noche"] .b.naira{background:#211A2C;border-color:#3A3048}
 body[data-luz="noche"] button.opt{background:#211A2C;border-color:#5B4C6E;box-shadow:3px 3px 0 #5B4C6E;color:var(--tea)}
 body[data-luz="noche"] button.opt:hover{background:#2A2137;box-shadow:5px 5px 0 #5B4C6E}

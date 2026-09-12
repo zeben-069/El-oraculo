@@ -39,7 +39,10 @@ const LISTA=['index.html','manifest.webmanifest','netlify.toml',
   .concat(sueltos)
   .concat(fs.readdirSync('img/estampas').map(f=>'img/estampas/'+f))
   .concat(fs.readdirSync('img/cartas').map(f=>'img/cartas/'+f))
-  .concat(fs.readdirSync('img/zonas').map(f=>'img/zonas/'+f))
+  /* `img/zonas` se fue el 12 de septiembre con las seis franjas: la primera
+     pregunta es ahora el mapa de comarcas. Los ficheros siguen en la carpeta,
+     pero no se publican. */
+  .concat(fs.readdirSync('img/comarcas').map(f=>'img/comarcas/'+f))
   .concat(fs.existsSync('img/sitios')?fs.readdirSync('img/sitios').map(f=>'img/sitios/'+f):[]);
 
 const faltan=LISTA.filter(f=>!fs.existsSync(f));

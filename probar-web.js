@@ -60,6 +60,13 @@ const GUIONES = [
     pasos: ['Candelaria', 'Con coche', 'Familia con niños',
             'Un plan para el día entero', '?Me da igual', 'Un poco de todo', 'Un poco de todo',
             'Otra cosa más tranquila'] },
+  /* El camino del mapa de comarcas, que es nuevo desde el 12 de septiembre y
+     no lo pisaba ninguno de los siete: los otros eligen el pueblo donde
+     duermen y este elige a dónde ir. Acaba en Vilaflor a propósito, que es el
+     único pueblo con aviso de «eso está en el otro cartel». */
+  { nombre: 'mapa-comarcas',
+    pasos: ['La Laguna', 'Con coche', 'Grupo, sin niños', '?Me da igual',
+            'Quiero ver un sitio concreto', 'Sur', 'Vilaflor', 'Un poco de todo'] },
   { nombre: 'ingles',
     pasos: ['=EN', 'La Laguna', 'With a car', 'Group, no children',
             'A plan for a whole day', '?I do not mind', 'A bit of everything', 'A bit of everything'] },
@@ -109,6 +116,10 @@ async function main() {
            rota era la prueba. */
         const opcional = paso.startsWith('?');
         const crudo = opcional ? paso.slice(1) : paso;
+        /* Ojo con `=` en los rótulos del mapa: `hasText` compara contra el
+           textContent, y cada chip de comarca lleva DENTRO el rótulo largo y
+           el corto —uno oculto por CSS según el ancho—, así que el de Sur dice
+           «SurSur» y el exacto no casa nunca. Para esos va sin `=`. */
         const exacto = crudo.startsWith('=');
         const busca = exacto ? crudo.slice(1) : crudo;
         const btn = pag.locator('button', {

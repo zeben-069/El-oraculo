@@ -70,13 +70,15 @@ prompt.js                     el prompt de Naira (18 KB)
 datos/lugares.js              LUGARES (328 KB)
 datos/restaurantes.js         REST (118 KB)
 datos/eventos.js              EVENTOS · datos/actos.js · datos/bases.js · datos/estampas.js
+datos/comarcas.js             COMARCAS, SUELTOS, AVISO_CARTEL y el SVG del mapa
 datos/titsa-matriz.js         MATRIZ (542 KB) · datos/ine.js
 manifest.webmanifest          para instalar en la pantalla de inicio
 icono.svg / icono-*.png
 img/naira-social.jpg          previsualización al compartir
 img/estampas/*.jpg            las 31 fotos de municipio (una por ficha)
 img/cartas/*.jpg              los 10 carteles de las preguntas con dibujo
-img/zonas/*.jpg               las 6 franjas de las zonas de la isla
+img/comarcas/*.jpg            los 2 carteles de Anaga y la cumbre
+img/zonas/*.jpg               las 6 franjas de zona (EN DISCO, ya no se publican)
 netlify.toml
 package.json                  SOLO para que las funciones declaren @netlify/blobs
 robots.txt / sitemap.xml      para que Google vea los tres idiomas
@@ -1303,6 +1305,99 @@ Diez claves nuevas de `tr()` en los tres idiomas (228 en total). Ojo con el
 alemán: abrevia con punto («3 Std. 35 Min.»), así que su frase **no** le añade
 otro — salía «Min..».
 
+## La primera pregunta es un mapa
+
+Zeben mandó un mapa de comarcas de Tenerife hecho aparte y encajó de una: los
+**31 municipios que trae son exactamente los 31 de `BASES`**, nombre por nombre
+y con acentos. Cero discrepancias en los dos sentidos. Eso es lo primero que se
+cruzó, y es lo que permitió fiarse del resto.
+
+Lo que sustituye: las seis fotos de franja —Norte, Isla Baja, Metropolitana,
+Güímar, Sur, Cumbre— que eran bonitas y **mudas**. Una foto de monteverde no le
+dice a quien acaba de aterrizar DÓNDE está Anaga, y ese es justo el trabajo de
+la primera pregunta. De paso, 127 KB de jpg pasan a **5 KB de SVG**.
+
+**El mapa no es el corredor, y no se pueden confundir.** El motor agrupa por
+`c` —nueve corredores, hechos para calcular tiempos de viaje— y esto agrupa por
+comarca, que son seis y son las de la isla. «Norte» se reparte entre tres
+comarcas del mapa y «Este» entre otras tres. Son dos ejes distintos y los dos
+valen.
+
+**Y el dibujo es una silueta esquemática.** Lo dice el propio mapa: calibrada
+sobre puntos de costa reales, **no sobre la linde municipal oficial**. Vale para
+elegir, que es un diagrama. **No puede usarse nunca para decidir de qué
+municipio es un punto** — que es exactamente el error del que costó un día
+escapar con las paradas de guagua.
+
+**Detrás del mapa van los PUEBLOS, con su estampa.** Esto lo corrigió Zeben: la
+primera versión enseñaba las comarcas del catálogo, con «Anaga norte — Taganana
+y Benijo» colgando de La Laguna. «Yo no pondría lugares en el desplegable sino
+los municipios». Y tenía razón: si el mapa es por comarcas, detrás van los
+pueblos de esa comarca y nada más. Pulsando el Valle de Güímar salen sus cuatro.
+La cuadrícula es **la misma `cuadriculaMunicipios` con la que se elige dónde
+dormir**, sin tocarla, así que las 31 estampas suyas siguen saliendo — y **mejor
+que antes**: en vez de las 31 de golpe, el navegador baja las tres u ocho de esa
+comarca. Comprobado que los 31 municipios tienen dos sitios o más, así que
+ninguno se cae de la lista.
+
+**Anaga y la cumbre van APARTE, y no pintados.** No son municipios: Anaga es un
+macizo que comparten Santa Cruz y La Laguna, y la cumbre es la parte de arriba
+de cuatro pueblos. Dibujarles una frontera sería inventarla. Van debajo del
+mapa, con su cartel —ilustración de Zeben, en `img/comarcas/`— y en la misma
+caja que las estampas, que **40 y 21 sitios son más que la mitad de los
+municipios**: no son botones de segunda.
+Y hacen falta. Con la lista solo de municipios, Anaga se quedaba **sin puerta**:
+
+| | km del casco de La Laguna |
+|---|---|
+| Anaga norte, Taganana y Benijo | 12,6 |
+| Anaga oeste | 8,6 |
+| Anaga cumbre, Cruz del Carmen | 7,8 |
+
+El ancla busca a 6 km del casco, así que pulsando La Laguna no te manda a
+Taganana jamás. Repasado el catálogo entero: **solo cinco grupos no son un
+municipio y los cinco son Anaga y la costa de Bajamar**. En el resto de la isla
+la comarca y el pueblo son lo mismo, así que la regla de Zeben vale tal cual.
+
+**Y el aviso de «eso está en el otro cartel».** También suyo: «deberíamos hacer
+un aviso para la persona que pinche en el botón de Vilaflor». Quien pulsa
+Vilaflor, La Laguna o Santa Cruz tiene media comarca lejos del casco y el motor
+no se la va a ofrecer. Se le dice, con los kilómetros, y con un botón para
+saltar al cartel. Es la regla de `lo_hay_pero_lejos_del_pueblo` —no se dice «no
+hay», se dice que lo hay y a cuánto— **adelantada al momento en que todavía se
+puede cambiar de idea**.
+Dos cosas de cómo está hecho, y las dos importan:
+· **Los kilómetros NO están escritos en el dato.** En `AVISO_CARTEL` van los
+  NOMBRES de las fichas y la distancia la mide el motor al pintarlo, contra el
+  centro urbano de `BASES`, que es el mismo punto con el que ancla el día. Si
+  mañana se mueve una ficha, el aviso se mueve con ella.
+· **El aviso se engancha al MUNICIPIO, no al rótulo de la tarjeta.** Buscarlo
+  por el rótulo no valía y se vio probándolo: la estampa dice «Vilaflor» y el
+  municipio se llama «Vilaflor de Chasna», así que no saltaba nunca.
+Y una corrección a la corazonada de Zeben, que suponía que el Paisaje Lunar se
+le escapaba al botón del Teide: **está a 4,7 km del casco y el ancla busca a 6,
+así que sale eligiendo Vilaflor**. Lo que se queda arriba es el Teleférico
+(10,8), los Roques de García (7,3) y Guajara (6,9), y eso es lo que dice el
+aviso.
+
+Lo que esto obliga a cambiar debajo:
+· **`queApeteceEn(muni, filtro)`.** Antes miraba SOLO `l.co||l.m`, y con eso
+  pedir «San Cristóbal de La Laguna» dejaba fuera los 28 sitios de Anaga y los
+  4 de Bajamar, que llevan su propia `co`. Ahora acepta el municipio O la
+  comarca, y la regla de los 6 km del casco sigue decidiendo igual. El segundo
+  argumento es para los dos carteles, que no son un municipio.
+· **`cuadriculaMunicipios` acepta un «volver»**, que desde el mapa hace falta y
+  desde la elección del alojamiento no, porque ahí no hay a dónde volver.
+· **`naira()` acepta una clase** para la burbuja del aviso.
+· **`franjas()` se fue entero** con las seis fotos: era su único uso. Con él se
+  van las seis claves `z*` y `volverZonas`. Las fotos siguen en `img/zonas/`
+  pero ya no se publican.
+· Rótulos nuevos: `noSonMunicipio`, `volverMapa`, `avOtroCartel`, `avSiEntra`,
+  `irAlCartel` y una `y` para enlazar listas. Y `km1()`, que escribe el decimal
+  con el separador del idioma: «10.8 km» dentro de una frase en español canta.
+  Los nombres de comarca se traducen con `comarcaTr()` como los lemas, no por
+  `tr()`: son dato, no interfaz.
+
 ## Trampas conocidas
 
 **El ancla del turista pasa por un camino aparte.** Cuando eligen un sitio
@@ -1473,8 +1568,12 @@ la web: el proxy corta Leaflet y las tipografías de Google por certificado, y
 las funciones de Netlify no existen en un servidor de ficheros. Lo que hay que
 mirar es que **no haya ningún error de JavaScript propio** — y que, con la API
 caída, el plan salga igual por el narrador local, que es la red de seguridad.
-Referencia: **7 de 7 recorridos completan todos sus pasos, 0 errores de
-JavaScript propios**, y el plan sale con sus fichas y su caja de texto.
+Referencia: **8 de 8 recorridos completan todos sus pasos, 0 errores de
+JavaScript propios**, y el plan sale con sus fichas y su caja de texto. El
+octavo es `mapa-comarcas` y entra por el camino que ningún otro pisa: los siete
+primeros eligen el pueblo donde DUERMEN, y este elige a dónde IR. Acaba en
+Vilaflor a propósito, que es el único pueblo con aviso de «eso está en el otro
+cartel».
 
 Y siempre, antes de dar nada por bueno:
 
@@ -1498,9 +1597,9 @@ decía a la vez que Bajamar tenía socorristas y que estaba clasificada como
 PELIGROSA. Se resolvió contrastando con el portal oficial de turismo, no
 borrando el aviso.
 
-**Elegir sitio es elegir PUEBLO y TIPO, no un nombre de una lista.** Zona →
-pueblo → qué tipo de día (senderos, playas, museos, un poco de todo), y el
-ancla la pone el motor: el sitio de más peso de ese tipo **a menos de 6 km del
+**Elegir sitio es elegir PUEBLO y TIPO, no un nombre de una lista.** Comarca en
+el mapa → pueblo con su estampa → qué tipo de día (senderos, playas, museos, un
+poco de todo), y el ancla la pone el motor: el sitio de más peso de ese tipo **a menos de 6 km del
 centro urbano** del pueblo. Antes salía la lista de los treinta sitios del
 municipio, y un turista recién llegado no puede elegir lo que no conoce. El
 centro es el de `BASES`, no el centroide de los sitios: La Orotava va de la
@@ -1508,7 +1607,7 @@ costa a la cumbre y con el centroide ganaba el Observatorio del Teide, a 10 km
 y 2.400 m de altura. Quien sí sabe lo que quiere ver tiene el botón «Prefiero
 elegir el sitio yo».
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 228 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 227 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **La leyenda del mapa también.** Los cuatro rótulos —«Dónde duermen», «La
@@ -1522,13 +1621,10 @@ escritas en español a pelo —la zona, el municipio, el momento del día, el
 «sorpréndame»— y un inglés las veía en español. Las que llevan hueco
 (`qZonaDetalle`, `qQueVer`, `qMasSitios`) son funciones: `tr('qQueVer')(muni)`.
 
-**Las zonas van con el rótulo ENCIMA, sobre un velo.** Son franjas anchas y
-bajas, y el rótulo cabe dentro. El velo (un degradado oscuro de izquierda a
-derecha) no es adorno: las seis fotos tienen brillos muy distintos —el casco
-de La Orotava es casi blanco y el monteverde de Anaga casi negro— y un texto
-claro sin velo se pierde en unas y canta en otras. Los nombres de zona
-también salen de `tr()`: estaban escritos en español a pelo. Los corredores,
-que son lo que usa el motor, no se traducen.
+**Las seis franjas de zona se fueron el 12 de septiembre**, y con ellas
+`franjas()` y su velo. La primera pregunta es ahora el mapa de comarcas, arriba.
+Los corredores, que son lo que usa el motor para los tiempos de viaje, siguen
+sin traducirse.
 
 **Los carteles no llevan el rótulo dentro.** Las cuatro preguntas con dibujo
 —coche o guagua, con quién viajan, qué tipo de día y qué apetece comer— se
@@ -1606,6 +1702,9 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Elegir varios días en el calendario» | 10 sep | El calendario deja marcar la estancia entera y cuenta día por día lo que cae. El plan sigue siendo de un día |
 | Cuatro zips de transporte: el **GTFS de TITSA**, las paradas, las líneas y los itinerarios | 12 sep | El GTFS es el que faltaba: 49.373 viajes con su hora parada a parada. Con él, `matriz.js` rehace la matriz de municipios y **la última guagua de la tarde deja de ser el búho de madrugada** en los 234 pares donde lo era |
 | «Empieza por la limpia y sigue con el reloj» | 12 sep | Fuera los cuatro ficheros de datos que se cargaban sin que nadie los leyera (159 KB), y el reloj de cuenta atrás de la última guagua, que la auditoría había dejado pendiente por falta de dato |
+| Mapa de comarcas de Tenerife (artefacto) | 12 sep | Es ahora la primera pregunta, en vez de las seis fotos de franja. Sus 31 municipios cuadran uno a uno con `BASES` |
+| Los dos carteles de Anaga y la cumbre | 12 sep | `img/comarcas/`. Recortados a 400×225 como las 31 estampas; se pierde el rótulo quemado dentro porque en 16:9 no cabían el pico y el letrero, y el nombre ya lo escribe la tarjeta |
+| «Los municipios, no los lugares» + «un aviso para quien pinche Vilaflor» | 12 sep | El nivel 2 son los pueblos con su estampa, y el aviso de lo que se queda en el otro cartel, con los km medidos |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
