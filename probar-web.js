@@ -73,6 +73,15 @@ const GUIONES = [
     pasos: ['La Laguna', 'Con coche', 'Grupo, sin niños', '?Me da igual',
             'Quiero ver un sitio concreto', 'Sur', 'Vilaflor', 'Un poco de todo',
             'Un poco de todo'] },
+  /* La carta de «Tenderete y tradiciones», que es la única que no filtra el
+     catálogo sino que abre el calendario. Vale para los dos días posibles y
+     por eso el «me da igual» va opcional: si ese día hay fiestas se pulsa para
+     salir de la lista, y si no hay, la carta ya ha dicho que no hay nada y ha
+     repintado las cartas debajo. En los dos casos se acaba con un plan. */
+  { nombre: 'tenderete',
+    pasos: ['La Laguna', 'Con coche', 'Grupo, sin niños', 'Un plan para el día entero',
+            '?Me da igual', 'Tenderete y tradiciones', '?Me da igual',
+            'Un poco de todo', 'Un poco de todo'] },
   { nombre: 'ingles',
     pasos: ['=EN', 'La Laguna', 'With a car', 'Group, no children',
             'A plan for a whole day', '?I do not mind', 'A bit of everything', 'A bit of everything'] },

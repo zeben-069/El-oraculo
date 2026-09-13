@@ -913,9 +913,14 @@ Tres cuidados:
   Güímar con niños sale «La Laguna · 2.º Domingo de Feria Infantil · 10:00 ·
   30 min» y no la verbena de las once.
 · **Se ordenan por lo que cuesta llegar**, no por cuántos actos ponen: un
-  programa a cuarenta minutos no es un plan de mañana. Cuatro fiestas y cuatro
-  pueblos como mucho, y siempre el «me da igual, elija usted», que es lo que
-  hacía antes.
+  programa a cuarenta minutos no es un plan de mañana. Y siempre el «me da
+  igual, elija usted», que es lo que hacía antes.
+· **Van TODAS.** Llevaba un tope de cuatro fiestas y cuatro pueblos, y lo quitó
+  Zeben el 13 de septiembre —«si pinchas ahí salgan todas las fiestas»—, que es
+  lo mismo que ya había dicho de `otras_fiestas_de_hoy`. El muro que se temía
+  no existe: medido sobre el calendario entero, el día más cargado tiene **14**
+  entre fiestas y pueblos con programa y la **mediana es 2**; el tope escondía
+  diez pueblos el 6 de septiembre.
 Desde Güímar el 13, con niños, ofrece: la Romería de Benijos (50 min), la feria
 infantil de La Laguna (30), la cabalgata de Tegueste (30), la fiesta del agua
 de Los Realejos (50) y las colchonetas de Adeje (55). Eligiendo La Laguna, el
@@ -1434,33 +1439,44 @@ recreativas—, la misma corrección que en su día hubo que hacerle a «Museos 
 cascos». El núcleo **no** cambia: sigue siendo `/^Sendero$/`, así que el aviso
 de «aquí no hay ni uno fichado» sigue saltando donde toca.
 
-**«Un poco de todo» sube de botón a carta.** Iba de botón de texto debajo de
-las tres, y no por decisión de diseño: era que el único dibujo que había era el
-de la mesa puesta, que es de comida. Con el suyo —el casco, el sendero, el
-charco y los músicos en un solo cuadro— ya dice lo que ofrece. Va en
+**«Un poco de todo» sube de botón a carta, y va la ÚLTIMA.** Iba de botón de
+texto debajo de las tres, y no por decisión de diseño: era que el único dibujo
+que había era el de la mesa puesta, que es de comida. Con el suyo —el casco, el
+sendero, el charco y los músicos en un solo cuadro— ya dice lo que ofrece. Va en
 `dia-de-todo.jpg`, **no en `un-poco-de-todo.jpg`**, que ese es el de la pregunta
 de qué comer y son dos cosas distintas con el mismo nombre.
-Y de paso las cuatro se escriben **una sola vez**, en `CARTAS_DIA`: estaban
-duplicadas en `queApetece()` y en `queApeteceEn()`, y con dos copias el cuarto
-cartel habría entrado en un lado y no en el otro.
+El sitio lo colocó Zeben: «el botón de un poco de todo es el que tiene que estar
+donde está ahora el de tenderete». Y tiene razón por cómo cae la rejilla: con
+cinco cartas y dos columnas **la quinta se queda sola en su fila, centrada**, y
+ahí es donde tiene que ir «elija usted» — no una de las concretas.
+Y de paso las cartas se escriben **una sola vez**, en `CARTAS_DIA`: estaban
+duplicadas en `queApetece()` y en `queApeteceEn()`, y con dos copias un cartel
+nuevo habría entrado en un lado y no en el otro.
 
 **Y «Tenderete y tradiciones» no filtra el catálogo, abre el calendario.** Esta
 es la decisión del día y la tomó él. En las fichas **no hay ninguna etiqueta de
 folclore ni de gastronomía**: montarle un filtro por tipo de sitio prometería
 fiesta y daría un casco histórico, que es literalmente el fallo de «Senderos» en
 Santa Úrsula. Lo que sí hay es el calendario de los 31 municipios, que no
-publica nadie más, así que la carta abre `loQueHayEseDia()` — las fiestas y los
-pueblos con programa de ese día, y elige el turista.
+publica nadie más, así que la carta abre `loQueHayEseDia()` — **todas** las
+fiestas y todos los pueblos con programa de ese día, y el día se arma alrededor
+de la que pulsen.
 Tres cosas que van con eso:
-· **Solo sale los días que hay algo**, con la misma condición y el mismo conteo
-  que el botón 🎉 (`hayCosasEseDia()`). Una carta que lleva a una lista vacía es
-  peor que no tenerla.
-· **Se solapa a propósito.** El día con fiestas ya enseña la lista ANTES de esta
-  pregunta, y aquí se llega diciendo «me da igual». La carta es la segunda
-  oportunidad, no el único camino, y por eso al cerrar la lista vuelve a esta
-  misma pregunta y no al principio.
-· **En `queApeteceEn()` no aparece**, que ahí el pueblo ya está elegido y su
-  programa viaja solo en el informe.
+· **Sale SIEMPRE, también los días vacíos**, y eso es lo contrario de la regla
+  del botón 🎉 —«un botón que lleva a una lista vacía es peor que no tenerlo»—.
+  Va así porque aquí sí hay respuesta que dar, y la dictó él: «si no hay fiesta
+  se dice, ese día que has elegido no hay ningún evento, ¿prefieres un bañito en
+  la playa?, y listo». Callar la carta dejaría al turista sin saber si es que no
+  hay fiestas o si es que Naira no las tiene, y además la rejilla cambiaría de
+  forma de un día para otro.
+· **Y por eso las cartas se pintan aparte de la pregunta**, en
+  `pintaCartasDia()`: al volver del día vacío se repintan **sin** volver a
+  preguntar «¿qué tipo de día?», que el mensaje ya lo pregunta y repetirlo sería
+  no haber escuchado.
+· **En `queApeteceEn()` no aparece**, que ahí el pueblo ya está elegido y
+  ofrecerle las fiestas de toda la isla sería deshacerle la elección; su
+  programa ya viaja solo en el informe. Ese camino se queda con cuatro cartas,
+  que además caen en dos filas de dos y no dejan a nadie solo.
 
 **Y el CSS de la fila impar.** Había una regla para centrar el tercer cartel
 cuando se quedaba solo en la fila de dos columnas; con cinco pasa lo mismo con
@@ -1735,7 +1751,7 @@ miradores en el catálogo (41 con posición aproximada), 36% de los planes y
 1,1 km de desvío mediano**. Eran 25 miradores y el 12%, así que este número
 mide sobre todo el catálogo, no el motor.
 
-**Con navegador** — `probar-web.js` con Playwright recorre ocho flujos en
+**Con navegador** — `probar-web.js` con Playwright recorre nueve flujos en
 Chrome y captura los errores de consola. Sin argumentos va contra la web
 desplegada; con una URL detrás va contra lo que se le diga, y **eso es lo que
 hay que hacer para probar una rama**: se levanta un servidor de ficheros en el
@@ -1766,12 +1782,18 @@ la web: el proxy corta Leaflet y las tipografías de Google por certificado, y
 las funciones de Netlify no existen en un servidor de ficheros. Lo que hay que
 mirar es que **no haya ningún error de JavaScript propio** — y que, con la API
 caída, el plan salga igual por el narrador local, que es la red de seguridad.
-Referencia: **8 de 8 recorridos completan todos sus pasos, 0 errores de
-JavaScript propios**, y el plan sale con sus fichas y su caja de texto. El
-octavo es `mapa-comarcas` y entra por el camino que ningún otro pisa: los siete
-primeros eligen el pueblo donde DUERMEN, y este elige a dónde IR. Pasa por
-Vilaflor a propósito, que lleva aviso de «eso está en el otro cartel» — y ahí
-cazó que el botón del salto se pintaba y se borraba solo.
+Referencia: **9 de 9 recorridos completan todos sus pasos, 0 errores de
+JavaScript propios**, y el plan sale con sus fichas y su caja de texto. Los dos
+últimos entran por caminos que ningún otro pisa:
+· `mapa-comarcas` — los siete primeros eligen el pueblo donde DUERMEN, y este
+  elige a dónde IR. Pasa por Vilaflor a propósito, que lleva aviso de «eso está
+  en el otro cartel», y ahí cazó que el botón del salto se pintaba y se borraba
+  solo.
+· `tenderete` — la carta que abre el calendario en vez de filtrar el catálogo.
+  Está escrito para que valga **los dos días posibles**: el «me da igual» va
+  opcional, así que el día con fiestas sale de la lista por ahí y el día vacío
+  se lo salta, porque la carta ya ha dicho que no hay nada y ha repintado las
+  cartas debajo. En los dos casos se acaba con un plan, que es lo que se mide.
 
 Y siempre, antes de dar nada por bueno:
 
@@ -1805,7 +1827,7 @@ costa a la cumbre y con el centroide ganaba el Observatorio del Teide, a 10 km
 y 2.400 m de altura. Quien sí sabe lo que quiere ver tiene el botón «Prefiero
 elegir el sitio yo».
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 228 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 229 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **La leyenda del mapa también.** Los cuatro rótulos —«Dónde duermen», «La
@@ -1906,7 +1928,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | Los dos carteles de Anaga y la cumbre | 12 sep | `img/comarcas/`. Recortados a 400×225 como las 31 estampas; se pierde el rótulo quemado dentro porque en 16:9 no cabían el pico y el letrero, y el nombre ya lo escribe la tarjeta |
 | «Los municipios, no los lugares» + «un aviso para quien pinche Vilaflor» | 12 sep | El nivel 2 son los pueblos con su estampa, y el aviso de lo que se queda en el otro cartel, con los km medidos |
 | «El Teleférico, los Roques de García y Guajara NO son de Vilaflor, son de La Orotava» | 12 sep | Cierto, y el Cabildo lo confirma. De ahí sale `municipios.js`, que cruza las fichas con los 453 puntos testigo de sus itinerarios: **211 discrepancias, 31 a menos de 300 m**, con un nido en Anaga y otro en el Teide. Aplicadas las tres suyas; las demás, a la espera de que las mire. Y destapó tres cosas debajo: el aviso del cartel medía desde el pueblo equivocado, el cartel del Teide se quedaba en 21 fichas de 44, y los «N sitios» de las 31 estampas estaban descuadrados |
-| Las cinco ilustraciones del tipo de día | 12 sep | `img/cartas/`. Recortadas quitándoles el rótulo quemado dentro. Tres sustituyen a las que había y les dan nombre mejor; «un poco de todo» sube de botón a carta; y «Tenderete y tradiciones» abre el calendario de fiestas, que es el único dato que respalda lo que promete |
+| Las cinco ilustraciones del tipo de día | 12 sep | `img/cartas/`. Recortadas quitándoles el rótulo quemado dentro. Tres sustituyen a las que había y les dan nombre mejor; «un poco de todo» sube de botón a carta y se coloca la última, centrada; y «Tenderete y tradiciones» abre el calendario de fiestas —todas, y si ese día no hay ninguna se dice y se ofrece otra cosa— que es el único dato que respalda lo que promete |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
