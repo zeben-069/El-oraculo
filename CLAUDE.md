@@ -151,7 +151,7 @@ Dentro de `index.html`, como constantes:
   fiestas × sus años) llevan ya `la`/`lo`/`lu`**, colocadas por Zeben con
   `node eventos.js sitios`, y entonces mandan ellas sobre el casco del pueblo.
   Quedan 13 sin colocar, en 6 municipios.
-- `ACTOS` (568) — los actos de 31 programas de fiestas de 16 municipios:
+- `ACTOS` (571) — los actos de 31 programas de fiestas de 16 municipios:
   día, municipio,
   hora, dónde es y `q` («ninos»/«noche»), que dice a quién le sirve. No son
   fiestas: cuelgan de una que ya está en `EVENTOS` y no anclan el día.
@@ -1632,12 +1632,44 @@ sitio de 22 a 19. Comprobado que NO junta lo que no debe: los «Fuegos de la
 Víspera» (00:00) y los «Fuegos del Risco» (23:00) del mismo 14 de septiembre
 siguen siendo dos, que son dos noches distintas y está decidido arriba.
 
-**Lo que NO se pudo arreglar desde aquí, y hace falta él.** Él puso de ejemplo el
-«Desfile de la Pandorga y los Caballitos de Fuego» del 13 en La Laguna. Ese acto
-**no tiene gemelo en el artefacto**: entró por la agenda semanal y es el único
-sitio del catálogo donde aparece. Los 19 que quedan sin sitio son todos así —16
-de La Laguna y 3 de La Orotava—. El sitio **no se inventa**: o lo dice el
-artefacto —y entonces hay que volver a pasarlo— o lo dice quien vive allí.
+**Y aquí me equivoqué yo, que él tenía el dato delante.** Escribí que el «Desfile
+de la Pandorga y los Caballitos de Fuego» del 13 en La Laguna **no tenía gemelo
+en el artefacto** y que por eso había que preguntárselo. Era mentira, y el fallo
+es de los que hay que apuntar: **busqué el gemelo dentro de NUESTROS `ACTOS`, no
+dentro del artefacto**. Zeben mandó la captura y ahí estaba, con su sitio —«Casco
+histórico de La Laguna»—. Él lo dijo tal cual: «rígete 100% a lo que dice el
+artefacto sobre el sitio». Lo que había pasado por debajo: esos 19 entraron por la
+agenda semanal, y cuando llegó el artefacto el cortafuegos de repetidos se quedó
+con la ficha que ya estaba —la de la agenda, sin sitio— y **tiró el sitio del
+gemelo bueno**. O sea que el dato llegó a casa y se perdió en la puerta.
+
+## Volver a pasar el artefacto: `eventos.js artefacto`
+
+    node eventos.js artefacto artefacto.html          ensayo, no toca nada
+    node eventos.js artefacto artefacto.html hazlo    lo aplica
+
+Lee el `const EV = [` del propio artefacto —538 actos, **0 sin sitio**, 15
+municipios, 22 programas— y lo cruza contra `ACTOS`. Lo que hace, por orden de
+cuánto se fía de sí mismo:
+· **Rellena el sitio que falta.** Los 19 tenían gemelo allí —18 exacto y 1 casi—,
+  así que **`ACTOS` se queda en 0 sin sitio**.
+· **Afina el que ya hay cuando el artefacto es más fino**, que es lo que él
+  pidió. De 40 sitios distintos, **32 son el mismo con el municipio detrás**
+  —«Casco histórico» → «Casco histórico de La Laguna»— y esos entran solos. Los
+  8 que difieren de verdad se miran uno a uno: gana **el que afina al otro** —se
+  le quita el municipio al del artefacto, y si uno contiene al otro manda el
+  largo—; si ninguno contiene al otro, **se deja el nuestro y se canta**. Fueron
+  3 y las tres son de redacción, no de sitio: «AA.VV. Brisas del Mar» contra
+  «Asociación de Vecinos Brisas del Mar» (dos veces) y «Diversos espacios» contra
+  «Distintos espacios».
+· **Mete los actos que no teníamos**, con `clasificaActo()` puesto por las reglas
+  de hoy. Fueron **3**: la celebración eucarística y el Descendimiento del 9, la
+  recepción de la representación del Rey del 14 —las dos en La Laguna— y el
+  partido de solteros contra casados de Los Abrigos.
+`ACTOS` pasa de **568 a 571**. El cruce se hace por municipio —normalizado, sin
+acentos, sin artículos y quitando «Villa de» y «San Cristóbal de»—, fecha y
+nombre (exacto o el 80% de las palabras del más corto), que es la misma atadura
+que `parecidos` y por la misma razón: sin ella, dos misas del mismo día se juntan.
 
 ## Cuántos son, y el número que nadie había dicho
 
@@ -1985,9 +2017,9 @@ de una parada, y el plan sin coche se separa más del plan con coche.
 Y cierra con los **actos**: por cada día y municipio con programa cargado,
 un plan con niños y otro sin ellos —380 planes—. Lo que se vigila ahí no es la
 dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: de los
-**568 actos cargados** (63 marcados de niños, 170 de noche, 335 sin marcar),
-**801 ofrecidos** y **0 ofrecidos a quien no toca**. Ese cero es la prueba de
-toda la regla; los 483 «sin clasificar y ofrecido» ya NO son un fallo, que
+**571 actos cargados** (63 marcados de niños, 170 de noche, 338 sin marcar),
+**802 ofrecidos** y **0 ofrecidos a quien no toca**. Ese cero es la prueba de
+toda la regla; los 482 «sin clasificar y ofrecido» ya NO son un fallo, que
 desde que `q` dice solo si es de niños, lo que no está marcado va a los
 adultos y eso es lo normal.
 
@@ -2239,7 +2271,8 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Más que dónde duerme podemos poner ¿de dónde sale?» | 13 sep | El paso 2 deja de preguntar por la cama y pregunta por el punto de partida, con el botón de la ubicación debajo del mapa. `localizar()` lleva ahora a dónde seguir y a dónde volver, que desde ahí no son lo mismo |
 | «¿Dónde metemos el botón de ahora mismo / día entero / varios días?» + «¿falta el de los muñequitos?» | 13 sep | Las tres puertas del «cuándo» se juntan en una fila de chips debajo del calendario, que es la misma pregunta que la fecha; el hilo se queda en cinco pasos. Y los muñequitos ganan un contador opcional: el número inventado de las cartas (2, 4, 6) deja de viajar al informe como si lo hubieran dicho ellos. De paso salió que «Sorpréndame» pisaba la respuesta del paso 1 |
 | «Elegir los días en el calendario, máximo 3» + «el tiempo debajo» + «el contador no se ve» | 13 sep | El calendario pasa a decidir el CUÁNDO él solo —un día es un plan, dos o tres son la escapada— y los tres chips se van enteros; en su hueco va el parte de AEMET, vacío si no contesta. Y el contador de personas sube ENCIMA de las cartas: medido en un móvil, caía a 865 px por debajo de lo que se ve. De paso, la escapada dejaba de respetar el tipo de día del paso 1 |
-| «El tenderete por municipio con las estampas» + «rígete al artefacto en el sitio» + «quita las imágenes de las personas» | 13 sep | El tenderete pasa a dos niveles con la cuadrícula de estampas que ya existía. De los 22 actos sin sitio, los 22 venían de la agenda pegada a mano: `eventos.js cruzadas` destapa el punto ciego de la hora y junta 3 (571 → 568); los 19 que quedan no tienen gemelo en el artefacto y hay que preguntarlos. Y las tres cartas de «con quién viajan» se van enteras: 140 KB menos y `personas` deja de ser una cifra nuestra en ningún caso |
+| «El tenderete por municipio con las estampas» + «rígete al artefacto en el sitio» + «quita las imágenes de las personas» | 13 sep | El tenderete pasa a dos niveles con la cuadrícula de estampas que ya existía. De los 22 actos sin sitio, los 22 venían de la agenda pegada a mano: `eventos.js cruzadas` destapa el punto ciego de la hora y junta 3 (571 → 568); y los 19 que quedaban los cierra `eventos.js artefacto`, que **ahí sí estaban** —yo había buscado el gemelo en nuestros propios actos y no en el artefacto—: 19 sitios rellenados, 32 afinados, 3 actos nuevos (568 → **571**) y **0 sin sitio**. Y las tres cartas de «con quién viajan» se van enteras: 140 KB menos y `personas` deja de ser una cifra nuestra en ningún caso |
+| El artefacto de las cartas otra vez, la captura del sitio de la Pandorga y las tres ilustraciones | 13 sep | La captura le daba la razón: el sitio estaba en el artefacto y yo lo había buscado en el sitio equivocado. De ahí sale `eventos.js artefacto`, que vuelve a pasarlo entero: **19 sitios rellenados —`ACTOS` se queda en 0 sin sitio—, 32 afinados con el municipio detrás, 3 que no cuadran y se cantan, y 3 actos nuevos** (568 → 571). Las tres ilustraciones son **las mismas de ayer** —byte a byte— y los rótulos ya decían lo suyo, así que no había nada que recortar |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si

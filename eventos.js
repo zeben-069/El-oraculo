@@ -880,6 +880,98 @@ function cruzadas(hazlo){
   console.log('hecho. Pasa ahora: node lote.js');
 }
 
+/* ── EL ARTEFACTO MANDA EN EL SITIO ─────────────────────────────────────
+   Zeben: «rígete 100% a lo que dice el artefacto sobre el sitio, porque tienes
+   dos que no ponen sitio y en el artefacto sí lo pone», y mandó el enlace.
+   Tenía razón y mi primera respuesta estaba mal: busqué el gemelo **dentro de
+   nuestros propios actos** —o sea, una fila repetida— y no dentro del artefacto.
+   Abierto el artefacto, sus **538 actos traen sitio el 100%** y los 19 que
+   nosotros teníamos mudos están ahí, con el suyo. El «Desfile de la Pandorga y
+   los Caballitos de Fuego» es «Casco histórico de La Laguna», tal cual él decía.
+   Lo que pasó: esos 19 entraron por la agenda semanal, y cuando llegó el
+   artefacto el cortafuegos de repetidos los vio con el mismo nombre y se quedó
+   con el que ya estaba — que era el que NO trae sitio.
+
+       node eventos.js artefacto artefacto.html          ensayo
+       node eventos.js artefacto artefacto.html hazlo    lo mete
+
+   Tres reglas, y la tercera es la que costó:
+   · **Se emparejan por municipio y día**, y dentro por nombre: igual, o con el
+     80% de las palabras del más corto dentro del otro. El municipio se compara
+     sin acentos ni artículos y quitando «Villa de», que el artefacto escribe
+     «Villa de Arico» y nosotros «Arico».
+   · **Si no tenemos sitio, se coge el suyo.** Sin discusión: es el dato que
+     falta y él lo tiene.
+   · **Y si los dos tienen sitio, gana EL QUE AFINA AL OTRO.** Medido sobre los
+     568: 40 no coinciden, pero **32 son solo el municipio pegado detrás** —«El
+     Tablado» contra «El Tablado, Güímar»—, que no es una discrepancia. De los 8
+     que quedan, en 3 el nuestro es más fino —«Plaza de Los Abrigos» contra «Los
+     Abrigos, Granadilla de Abona»— y en 2 lo es el suyo —«Playa de El Tablado»
+     contra «El Tablado»—. Coger el del artefacto a ciegas habría EMPEORADO
+     tres. Así que: quitado el municipio, si uno contiene al otro gana el que
+     contiene; si no se parecen en nada, se deja el nuestro y se canta. */
+function delArtefacto(fichero,hazlo){
+  const F='datos/actos.js';
+  const txt=fs.readFileSync(F,'utf8');
+  const A=eval(txt+';ACTOS');
+  const html=fs.readFileSync(fichero,'utf8');
+  const i=html.indexOf('const EV = ['), j=html.indexOf('\n];',i);
+  if(i<0||j<0) return console.log('en '+fichero+' no está el «const EV = [» del artefacto.');
+  const EV=eval(html.slice(i+11,j+2));
+  const muni=m=>norm(m).replace(/^(villa de|ciudad de|san cristobal de )/,'').replace(/^(la|el|los|las) /,'').trim();
+  const pal=s=>new Set(norm(s).split(' ').filter(w=>w.length>3));
+  const casa=(a,e)=>{
+    if(muni(a.m)!==muni(e.m)||a.f!==e.d) return false;
+    if(norm(a.n)===norm(e.t)) return true;
+    const pa=pal(a.n), pb=pal(e.t);
+    const [ch,g]=pa.size<=pb.size?[pa,pb]:[pb,pa];
+    if(ch.size<2) return false;
+    let n=0; ch.forEach(w=>{ if(g.has(w)) n++; });
+    return n/ch.size>=0.8;
+  };
+  /* el sitio del artefacto sin el municipio de detrás, para poder comparar */
+  const pelado=(p,m)=>norm(p).replace(new RegExp('[ ,]+'+muni(m)+'$'),'')
+    .replace(/[ ,]+(de abona|del norte|de la rambla|de chasna|de tenerife|de isora)$/,'').trim();
+
+  const puestos=[], cambiados=[], dudosos=[];
+  A.forEach(a=>{
+    const e=EV.find(x=>casa(a,x)); if(!e||!e.p) return;
+    if(!a.lu||!String(a.lu).trim()){ a.lu=e.p; puestos.push({a,e}); return; }
+    const mio=norm(a.lu), suyo=pelado(e.p,e.m);
+    if(mio===suyo||mio.indexOf(suyo)>=0) return;      /* el nuestro afina: se queda */
+    if(norm(e.p).indexOf(mio)>=0){ const antes=a.lu; a.lu=e.p; cambiados.push({a,antes,e}); return; }
+    dudosos.push({a,e});
+  });
+  /* Y los que el artefacto tiene y nosotros no */
+  const nuevos=EV.filter(e=>!A.some(a=>casa(a,e))).map(e=>{
+    const b=Object.values(BASES).find(x=>muni(x.m)===muni(e.m));
+    const o={f:e.d,n:e.t,m:(b&&b.m)||e.m,c:(b&&b.c)||null,fr:franjaDe(e.h),
+      h:e.h||'',lu:e.p,fi:e.f,of:'Artefacto «Fiestas de Tenerife» de Cowork · lagenda.org'};
+    const q=clasificaActo(o.n,o.h); if(q) o.q=q;
+    if(!o.h) delete o.h;
+    return o;
+  });
+
+  console.log('=== EL SITIO, SEGÚN EL ARTEFACTO ===');
+  console.log('\nactos del artefacto: '+EV.length+'  ·  de los nuestros: '+A.length);
+  console.log('\nSITIO QUE FALTABA, puesto: '+puestos.length);
+  puestos.forEach(x=>console.log('   · '+x.a.f+' '+(x.a.h||'--')+'  '+x.a.n.slice(0,44)+'  →  '+x.a.lu));
+  console.log('\nSITIO AFINADO por el artefacto: '+cambiados.length);
+  cambiados.forEach(x=>console.log('   · '+x.a.n.slice(0,44)+'\n       '+x.antes+'  →  '+x.a.lu));
+  console.log('\nNO CUADRAN, y se deja el nuestro: '+dudosos.length);
+  dudosos.forEach(x=>console.log('   · '+x.a.f+' '+x.a.n.slice(0,42)+
+    '\n       nuestro:   '+x.a.lu+'\n       artefacto: '+x.e.p));
+  console.log('\nACTOS QUE NO TENÍAMOS: '+nuevos.length);
+  nuevos.forEach(o=>console.log('   · '+o.f+' '+(o.h||'--')+'  '+o.m+' · '+o.n.slice(0,46)+'  →  '+o.lu));
+  const total=A.concat(nuevos);
+  console.log('\nactos antes: '+A.length+'  ·  entran: '+nuevos.length+'  ·  quedan: '+total.length);
+  if(!hazlo) return console.log('\nesto es un ensayo. «node eventos.js artefacto '+fichero+' hazlo» para hacerlo.');
+  total.sort((a,b)=>a.f<b.f?-1:a.f>b.f?1:(a.h||'')<(b.h||'')?-1:1);
+  fs.writeFileSync(F,txt.slice(0,txt.indexOf('const ACTOS='))+'const ACTOS='+
+    JSON.stringify(total,null,0).replace(/\},\{/g,'},\n{')+';\n');
+  console.log('hecho. Pasa ahora: node lote.js');
+}
+
 const arg=process.argv[2];
 if(!arg||arg==='pegar') pagina();
 else if(arg==='actos') meterActos(process.argv[3],process.argv[4]);
@@ -889,6 +981,7 @@ else if(arg==='parecidos'){
   const x=process.argv[3];
   if(x&&x!=='hazlo') quitarMarcados(x); else duplicados(x==='hazlo',true);
 }
+else if(arg==='artefacto') delArtefacto(process.argv[3],process.argv[4]==='hazlo');
 else if(arg==='cruzadas') cruzadas(process.argv[3]==='hazlo');
 else if(arg==='repetidas') repetidas(process.argv[3]==='hazlo');
 else if(arg==='en-el-programa') enElPrograma(process.argv[3]);
