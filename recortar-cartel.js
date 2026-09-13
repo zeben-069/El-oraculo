@@ -12,11 +12,14 @@
        node recortar-cartel.js entrada.png img/cartas/senderos.jpg [más pares…]
 
    CÓMO ENCUENTRA EL CORTE. Nada está escrito a mano: el borde del cartel sale
-   de las filas y columnas con muchos píxeles oscuros, y la banda del rótulo es
-   **la primera fila, bajando desde 300 px por debajo del borde, en la que más
-   del 60% del ancho interior es blanco**. Se corta por encima de ella, se toma
-   el cuadrado más grande que quepa, centrado, y se guarda a 360 px al 82%,
-   que es el tamaño de las otras cartas.
+   de las filas y columnas con muchos píxeles oscuros, y la banda del rótulo se
+   busca **por dos caminos**, cortando por encima del que salga más arriba:
+   la franja de lado a lado —más del 60% del ancho interior en blanco— y **la
+   caja centrada dentro del dibujo**, que es como venían «CON COCHE» y «EN
+   GUAGUA» y que la primera versión no veía: el corte se iba al pie de abajo y
+   el texto se quedaba quemado dentro. Luego se toma el cuadrado más grande que
+   quepa, centrado, y se guarda a 360 px al 82%, que es el tamaño de las otras
+   cartas.
 
    Se hace con Chromium y un canvas porque en el contenedor no hay ni PIL ni
    ImageMagick. Es el mismo camino con el que se abren los `.mht` de Zeben.
@@ -42,13 +45,64 @@ for(let i=0;i<a.length;i+=2) pares.push([a[i],a[i+1]]);
    const top=filas.findIndex(n=>n>c.width*0.25);
    const left=cols.findIndex(n=>n>c.height*0.06);
    let right=c.width-1; while(right>0&&cols[right]<=c.height*0.06) right--;
-   /* La banda del rótulo: la primera fila, bajando desde top+300, en la que
-      más del 60% del ancho interior es blanco. Es el rectángulo con el texto
-      quemado; se corta POR ENCIMA. */
+   /* LA BANDA DEL RÓTULO, por dos caminos, y se corta por encima del que salga
+      más arriba. Hicieron falta los dos porque los carteles vienen de dos
+      maneras y la primera versión solo veía una:
+      · **De lado a lado** — la primera fila, bajando desde top+300, en la que
+        más del 60% del ancho interior es blanco. Es el pie blanco del cartel.
+      · **Una caja centrada** — el rótulo puede ir DENTRO del dibujo, en un
+        recuadro blanco de media anchura («CON COCHE», «EN GUAGUA»). Ahí la
+        regla del 60% no lo ve, y el corte se iba al pie de abajo dejando el
+        texto quemado dentro. Se busca el tramo blanco seguido más largo de
+        cada fila: vale si pasa del 25% del ancho interior y está centrado.
+        Y para no confundirlo con una nube o con el cielo, dentro de esos dos
+        bordes tiene que seguir habiendo blanco 40 de las 60 filas siguientes:
+        una caja tiene los lados rectos y una nube no. */
+   const tramoBlanco=(j)=>{
+     let mejor=[0,-1,-1], a=-1;
+     for(let i=left+20;i<right-20;i++){
+       if(blanco(P(i,j))){ if(a<0) a=i; }
+       else { if(a>=0 && i-a>mejor[0]) mejor=[i-a,a,i]; a=-1; }
+     }
+     if(a>=0 && right-20-a>mejor[0]) mejor=[right-20-a,a,right-20];
+     return mejor;
+   };
    let rotulo=null;
    for(let j=top+300;j<c.height;j++){
      let n=0,t=0; for(let i=left+20;i<right-20;i+=3){t++; if(blanco(P(i,j)))n++;}
      if(n/t>0.60){ rotulo=j; break; }
+   }
+   const ancho=right-left, centro=(left+right)/2;
+   for(let j=top+300;j<(rotulo||c.height);j++){
+     const [w,a,b]=tramoBlanco(j);
+     if(w<ancho*0.25) continue;
+     if(Math.abs((a+b)/2-centro)>ancho*0.14) continue;
+     /* Y aquí está la vuelta que costó: **el texto del rótulo parte el tramo
+        blanco**, así que exigir que el tramo seguido aguante 25 filas no vale
+        —en «CON COCHE» las letras dejan la fila en menos del 15%—. Lo que se
+        mide es **cuánto blanco hay DENTRO de la caja**, entre sus dos bordes:
+        una fila de la banda pasa del 55% aunque lleve letras, y una nube no
+        mantiene los mismos bordes 60 filas seguidas. */
+     let dentro=0;
+     for(let k=j;k<j+60&&k<c.height;k++){
+       let n=0,t=0; for(let i=a;i<b;i+=3){t++; if(blanco(P(i,k)))n++;}
+       if(n/t>0.55) dentro++;
+     }
+     if(dentro>=40){
+       /* Y una vez encontrada, **hay que subir hasta su borde de arriba**. La
+          fila que dispara no es la primera de la caja: las de en medio llevan
+          las letras y no pasan el corte, así que salta la de debajo del texto
+          y cortar ahí dejaría media banda dentro. Se sube mientras siga
+          habiendo blanco entre los dos bordes; encima de la caja está el
+          dibujo —el coche, la guagua— y ahí se para solo. */
+       let arriba=j;
+       while(arriba>top+300){
+         let n=0,t=0; for(let i=a;i<b;i+=3){t++; if(blanco(P(i,arriba-1)))n++;}
+         if(n/t<0.35) break;
+         arriba--;
+       }
+       rotulo=arriba; break;
+     }
    }
    const t0=top+14, x0=left+14, x1=right-14, y1=(rotulo||c.height)-6;
    const lado=Math.min(x1-x0, y1-t0);

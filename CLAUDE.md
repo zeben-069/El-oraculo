@@ -1818,6 +1818,42 @@ el de la comida, y `dia-de-todo.jpg` el del tipo de día. Renombrarlo ahora solo
 serviría para que el día que alguien mire la carpeta se equivoque de otra
 manera.
 
+## Y las dos de coche o guagua, que rompieron la herramienta
+
+Zeben: «ahora cambia también las dos de con coche y en guagua». Con estas van
+**nueve carteles suyos en dos días**, y aquí el recorte salió mal a la primera:
+el cartel volvió con **«CON COCHE» quemado dentro**, en su banda blanca.
+
+**Por qué no lo vio `recortar-cartel.js`.** Buscaba «la primera fila en la que
+más del 60% del ancho interior es blanco», y eso describe **el pie blanco del
+cartel**, que va de lado a lado. En estos dos el rótulo va **dentro del dibujo,
+en una caja centrada de media anchura**: ninguna fila suya llega al 60%, así que
+el corte se iba al pie de abajo y la banda se quedaba en la ilustración. Ahora
+la banda se busca por **dos caminos** y manda el que salga más arriba.
+
+Y la caja costó dos vueltas más, las dos por lo mismo — **lo que rompe la
+medida es el propio texto del rótulo**:
+· Primero se pidió que el tramo blanco seguido aguantara 25 filas con los
+  mismos bordes, para no confundir la caja con una nube. No salta nunca: en
+  «CON COCHE» **las letras parten el tramo**, y una fila de en medio se queda
+  por debajo del 15% del ancho. Lo que sí vale es medir **cuánto blanco hay
+  DENTRO de la caja**, entre sus dos bordes: pasa del 55% aunque lleve letras, y
+  una nube no mantiene los mismos bordes sesenta filas seguidas.
+· Y aun así cortaba a mitad de banda, porque **la fila que dispara no es la
+  primera de la caja**: las de en medio llevan el texto y no pasan el corte, así
+  que salta la de debajo. Hay que **subir hasta el borde de arriba**, mientras
+  siga habiendo blanco entre los dos bordes; encima de la caja está el coche o
+  la guagua y ahí se para solo.
+Comprobado que esto **no toca lo que ya estaba bien**: repasados los siete
+carteles de los que se tiene el original, los cinco anteriores salen **byte a
+byte idénticos** a los publicados. El detector nuevo solo añade.
+
+**Los rótulos no cambian.** Sus carteles dicen «En coche» y «En guagua», pero el
+de la izquierda ya se llama «Con coche» —que es lo que pone su propia banda— y
+el de la derecha es **«Sin coche, en guagua»** a propósito: la pregunta es
+«¿llevan coche?» y ese rótulo la contesta. Quitarle el «sin coche» dejaría las
+dos tarjetas diciendo en qué se va y ninguna diciendo qué se está eligiendo.
+
 ## El municipio de una ficha, y quién lo dice
 
 Zeben leyó el aviso del cartel de Vilaflor y cortó por lo sano: **«Teleférico
@@ -2222,9 +2258,10 @@ pintan con `cartas()`, y el rótulo va
 DEBAJO, sacado de `tr()`. Los carteles originales traían el texto incrustado
 y en español: así no valían en inglés ni en alemán. Se recortaron por el
 círculo, y si se añaden más hay que hacer lo mismo — los cinco del tipo de día
-del 12 de septiembre y los dos de qué comer del 13 venían otra vez con el
-título quemado dentro, que van ya tres tandas: para eso está
-`recortar-cartel.js`. Los de «con quién viajan»
+del 12 de septiembre y los cuatro del 13 —qué comer, y coche o guagua— venían
+otra vez con el título quemado dentro, que van ya cuatro tandas: para eso está
+`recortar-cartel.js`, y los dos últimos le hicieron falta aprender a ver la
+banda **cuando es una caja centrada dentro del dibujo**. Los de «con quién viajan»
 son apaisados y con forma de bocadillo: van uno por fila, con `ancho:true`, y
 se pintan con `object-fit:contain` sobre el color del fondo, porque
 recortarlos por el centro les cortaría el pico.
@@ -2307,6 +2344,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | «El tenderete por municipio con las estampas» + «rígete al artefacto en el sitio» + «quita las imágenes de las personas» | 13 sep | El tenderete pasa a dos niveles con la cuadrícula de estampas que ya existía. De los 22 actos sin sitio, los 22 venían de la agenda pegada a mano: `eventos.js cruzadas` destapa el punto ciego de la hora y junta 3 (571 → 568); y los 19 que quedaban los cierra `eventos.js artefacto`, que **ahí sí estaban** —yo había buscado el gemelo en nuestros propios actos y no en el artefacto—: 19 sitios rellenados, 32 afinados, 3 actos nuevos (568 → **571**) y **0 sin sitio**. Y las tres cartas de «con quién viajan» se van enteras: 140 KB menos y `personas` deja de ser una cifra nuestra en ningún caso |
 | El artefacto de las cartas otra vez, la captura del sitio de la Pandorga y las tres ilustraciones | 13 sep | La captura le daba la razón: el sitio estaba en el artefacto y yo lo había buscado en el sitio equivocado. De ahí sale `eventos.js artefacto`, que vuelve a pasarlo entero: **19 sitios rellenados —`ACTOS` se queda en 0 sin sitio—, 32 afinados con el municipio detrás, 3 que no cuadran y se cantan, y 3 actos nuevos** (568 → 571). Las tres ilustraciones son **las mismas de ayer** —byte a byte— y los rótulos ya decían lo suyo, así que no había nada que recortar |
 | Los dos carteles de qué comer | 13 sep | «Te pongo dos carteles, uno para comida típica y quita el que está puesto, y otro para de todo un poco». Recortados con `recortar-cartel.js`, que otra vez traían el título quemado dentro. Y su nombre deshace una colisión vieja: la carta de comer pasa a llamarse **«De todo un poco»** y deja de ser el mismo texto que la del tipo de día, que es la trampa con la que ya había tropezado `probar-web.js` |
+| Los dos carteles de coche y guagua | 13 sep | `img/cartas/`. Y aquí `recortar-cartel.js` se quedó corto: su rótulo va en una **caja centrada dentro del dibujo**, no en una franja de lado a lado, así que el corte se iba al pie y «CON COCHE» se quedaba quemado dentro. La herramienta busca ahora la banda por dos caminos y sube hasta su borde de arriba — los cinco carteles anteriores salen byte a byte idénticos, o sea que solo añade |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
