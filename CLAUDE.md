@@ -1410,6 +1410,76 @@ Lo que esto obliga a cambiar debajo:
 
 
 
+
+## El hilo, en cinco pasos
+
+Zeben lo puso en orden el 13 de septiembre: «1 qué te apetece · 2 luego
+elegimos la comarca y los municipios · 3 con coche o en guagua · 4 cuántos son
+· 5 lo que les apetece comer. Y listo».
+
+Antes empezaba por **dónde duermen** —una cuadrícula de 31 estampas— y el tipo
+de día se preguntaba al final, justo antes del plan. **El cambio no es
+cosmético: lo primero que se pregunta es ahora lo que el turista trae en la
+cabeza.** Quien abre la web quiere una playa o un sendero; el hotel es lo que ya
+sabe y lo que menos le apetece teclear. Y de paso el hilo pasa de siete
+respuestas a cinco, porque el menú y la pregunta de «¿qué plan hacemos?» se
+caen del camino.
+
+**El paso 2 es el mapa de comarcas, eligiendo CAMA.** El mapa ya existía, pero
+para elegir a dónde IR. Ahora hace las dos cosas y **no son la misma**, así que
+`elegirSitio(comoBase)` cambia tres cosas cuando se elige dónde dormir:
+· **No salen los dos carteles.** En «Anaga» y en «la cumbre» no se duerme: no
+  son municipios y no tienen centro en `BASES`.
+· **No salta el aviso de «eso está en el otro cartel».** Ese aviso habla de lo
+  que el ancla del día no va a coger, y no tiene nada que ver con dónde se tiene
+  la cama: se puede dormir en La Laguna y subir a Chinamada igual.
+· **No hay «me da igual».** Dormir se duerme en algún sitio.
+
+**Lo que hubo que mover debajo, y que es donde estaba el trabajo de verdad:**
+
+· **`hayCosasEseDia()` y `programasDelDia()` funcionan sin cama y sin saber con
+  quién viajan.** La carta de «Tenderete» es ahora la PRIMERA pregunta, y ahí no
+  hay ni alojamiento ni personas. Sin cama **no se dan los minutos de viaje**
+  —no se inventan— y la lista se ordena por cuántos actos pone cada pueblo, que
+  es lo único que los distingue cuando no se sabe desde dónde se sale. Y sin
+  saber con quién viajan, `programasDelDia(f, null)` **no filtra por `q`**:
+  filtrar ahí por una suposición le enseñaría a una familia el programa de dos
+  adultos. Se le enseña el pueblo entero y ya se recorta al armar el día.
+· **`anclarEn()` salió de dentro de `queApeteceEn()`.** Eligiendo un pueblo con
+  programa desde la lista de fiestas no se puede preguntar el tipo de día,
+  porque **esa es la pregunta en la que se está**. Así que se ancla y se sigue.
+· **`loQueHayEseDia(volver, sigue)` gana un segundo argumento.** Sin `sigue` se
+  arma el plan ahí mismo, que es lo de siempre desde el menú y desde después del
+  plan. Con `sigue` solo se apunta lo elegido y el hilo continúa.
+· **`menuPrincipal()` se cae del camino de ida**, y no había otra: todas sus
+  opciones —la escapada, la agenda, la ruta histórica, «estoy por aquí ahora»—
+  necesitan la cama, el coche y cuántos son.
+
+**Y ahí salió un botón que llevaba meses sin salir.** El menú solo se alcanza
+ahora por «volver al menú», el último botón de después del plan… que iba el
+décimo de una lista cortada a siete, **o sea que no aparecía nunca**. Lo cazó
+`probar-web.js` buscándolo y no encontrándolo. Mientras el menú estaba en el
+camino de ida daba igual; desde que el hilo acaba en el plan, esa es la única
+puerta. Ahora **el séptimo sitio está reservado** para él y lo que se cae es el
+último botón variable, no la salida.
+
+**Y «Sorpréndame» se adelanta a la pregunta de cuántos son.** Vivía en el menú,
+y el menú ya no está delante. Se cuelga de ese paso y no de otro porque **es el
+primer momento en que el motor tiene todo lo que necesita**: cama, coche y
+personas. Ahí ya se puede armar un día sin preguntar nada más, que es
+exactamente lo que ese botón promete.
+
+**Lo que se quedó sin usar y se fue:** `listo()` y sus dos frases (`listo_c`,
+`listo_s`), y `listaMunicipios()` con su `qMunicipio` — esa ya estaba muerta
+antes, sin que nadie la llamara. Tres claves menos en los tres idiomas: 226.
+
+**Y los nueve recorridos de `probar-web.js` hubo que darles la vuelta enteros**,
+que empezaban todos por el pueblo. Dos trampas de la prueba que muerden aquí:
+el chip de la comarca lleva dentro el rótulo largo y el corto, así que su texto
+es «Área MetropolitanaMetrop.» y hay que buscarlo sin exigir exacto; y «Un poco
+de todo» es la carta del tipo de día **y** la de qué comer, o sea el primer paso
+y el último del mismo guion.
+
 ## Las cinco cartas del tipo de día
 
 Zeben mandó cinco ilustraciones nuevas —charcos y playas, senderos y
@@ -1789,11 +1859,17 @@ JavaScript propios**, y el plan sale con sus fichas y su caja de texto. Los dos
   elige a dónde IR. Pasa por Vilaflor a propósito, que lleva aviso de «eso está
   en el otro cartel», y ahí cazó que el botón del salto se pintaba y se borraba
   solo.
-· `tenderete` — la carta que abre el calendario en vez de filtrar el catálogo.
-  Está escrito para que valga **los dos días posibles**: el «me da igual» va
-  opcional, así que el día con fiestas sale de la lista por ahí y el día vacío
-  se lo salta, porque la carta ya ha dicho que no hay nada y ha repintado las
-  cartas debajo. En los dos casos se acaba con un plan, que es lo que se mide.
+· `tenderete` — la carta que abre el calendario en vez de filtrar el catálogo,
+  y que desde el 13 de septiembre es la PRIMERA pregunta: ahí todavía no hay
+  cama, así que la lista va sin minutos de viaje. Está escrito para que valga
+  **los dos días posibles**: el «me da igual» va opcional, así que el día con
+  fiestas sale de la lista por ahí y el día vacío se lo salta, porque la carta
+  ya ha dicho que no hay nada y ha repintado las cartas debajo. En los dos
+  casos se acaba con un plan, que es lo que se mide.
+Y una trampa más, que salió al darle la vuelta al hilo:
+· **El chip de la comarca lleva DENTRO el rótulo largo y el corto**, así que su
+  texto es «Área MetropolitanaMetrop.» y hay que buscarlo sin exigir exacto —
+  es la misma trampa que el `=EN` del idioma, por el otro lado.
 
 Y siempre, antes de dar nada por bueno:
 
@@ -1817,9 +1893,9 @@ decía a la vez que Bajamar tenía socorristas y que estaba clasificada como
 PELIGROSA. Se resolvió contrastando con el portal oficial de turismo, no
 borrando el aviso.
 
-**Elegir sitio es elegir PUEBLO y TIPO, no un nombre de una lista.** Comarca en
-el mapa → pueblo con su estampa → qué tipo de día (senderos, playas, museos, un
-poco de todo), y el ancla la pone el motor: el sitio de más peso de ese tipo **a menos de 6 km del
+**Elegir sitio es elegir TIPO y PUEBLO, no un nombre de una lista.** Qué tipo
+de día (senderos, playas, museos, tenderete, un poco de todo) → comarca en el
+mapa → pueblo con su estampa, y el ancla la pone el motor: el sitio de más peso de ese tipo **a menos de 6 km del
 centro urbano** del pueblo. Antes salía la lista de los treinta sitios del
 municipio, y un turista recién llegado no puede elegir lo que no conoce. El
 centro es el de `BASES`, no el centroide de los sitios: La Orotava va de la
@@ -1827,7 +1903,7 @@ costa a la cumbre y con el centroide ganaba el Observatorio del Teide, a 10 km
 y 2.400 m de altura. Quien sí sabe lo que quiere ver tiene el botón «Prefiero
 elegir el sitio yo».
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 229 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 226 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **La leyenda del mapa también.** Los cuatro rótulos —«Dónde duermen», «La
@@ -1928,6 +2004,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | Los dos carteles de Anaga y la cumbre | 12 sep | `img/comarcas/`. Recortados a 400×225 como las 31 estampas; se pierde el rótulo quemado dentro porque en 16:9 no cabían el pico y el letrero, y el nombre ya lo escribe la tarjeta |
 | «Los municipios, no los lugares» + «un aviso para quien pinche Vilaflor» | 12 sep | El nivel 2 son los pueblos con su estampa, y el aviso de lo que se queda en el otro cartel, con los km medidos |
 | «El Teleférico, los Roques de García y Guajara NO son de Vilaflor, son de La Orotava» | 12 sep | Cierto, y el Cabildo lo confirma. De ahí sale `municipios.js`, que cruza las fichas con los 453 puntos testigo de sus itinerarios: **211 discrepancias, 31 a menos de 300 m**, con un nido en Anaga y otro en el Teide. Aplicadas las tres suyas; las demás, a la espera de que las mire. Y destapó tres cosas debajo: el aviso del cartel medía desde el pueblo equivocado, el cartel del Teide se quedaba en 21 fichas de 44, y los «N sitios» de las 31 estampas estaban descuadrados |
+| «El orden sería: 1 qué te apetece, 2 la comarca y los municipios, 3 coche o guagua, 4 cuántos son, 5 qué comer» | 13 sep | El hilo entero dado la vuelta. Lo primero que se pregunta es lo que el turista trae en la cabeza, no dónde duerme. El mapa de comarcas pasa a elegir CAMA —sin los dos carteles y sin el aviso—, el menú se cae del camino y «Sorpréndame» se cuelga de la pregunta de cuántos son. De paso salió que «volver al menú» llevaba meses sin caber en la lista de después del plan |
 | Las cinco ilustraciones del tipo de día | 12 sep | `img/cartas/`. Recortadas quitándoles el rótulo quemado dentro. Tres sustituyen a las que había y les dan nombre mejor; «un poco de todo» sube de botón a carta y se coloca la última, centrada; y «Tenderete y tradiciones» abre el calendario de fiestas —todas, y si ese día no hay ninguna se dice y se ofrece otra cosa— que es el único dato que respalda lo que promete |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 

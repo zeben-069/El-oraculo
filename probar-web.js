@@ -40,51 +40,59 @@ const CARPETA = './capturas';
    fallando siete de siete recorridos como si la web estuviera rota, cuando la
    web estaba perfecta. Si vuelven a cambiar los rótulos, hay que cambiarlos
    aquí: los de la interfaz salen todos de la tabla `T` de `index.html`. */
+/* Los guiones, en el orden que puso Zeben el 13 de septiembre:
+   1 qué le apetece · 2 comarca y municipio · 3 coche o guagua · 4 cuántos son
+   · 5 qué comer. Antes empezaban por el pueblo donde duermen y acababan en el
+   tipo de día, así que TODOS hubo que darles la vuelta.
+   Ojo con dos cosas de la propia prueba, que ya están apuntadas en CLAUDE.md y
+   aquí muerden otra vez:
+   · el chip de la comarca lleva DENTRO el rótulo largo y el corto, así que su
+     texto es «MetropolitanaMetrop.» y hay que buscarlo sin exigir exacto;
+   · «Un poco de todo» es la carta del tipo de día Y la de qué comer, o sea el
+     primer paso y el último del mismo guion. */
 const GUIONES = [
   { nombre: 'plan-basico-coche-pareja',
-    pasos: ['La Laguna', 'Con coche', 'Grupo, sin niños', 'Un plan para el día entero',
-            '?Me da igual', 'Un poco de todo', 'Un poco de todo'] },
+    pasos: ['Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
+            'Grupo, sin niños', 'Un poco de todo'] },
   { nombre: 'con-ninos-playa',
-    pasos: ['Candelaria', 'Con coche', 'Familia con niños',
-            'Un plan para el día entero', '?Me da igual', 'Charcos y playas', 'Comida típica'] },
+    pasos: ['Charcos y playas', 'Güímar', 'Candelaria', 'Con coche',
+            'Familia con niños', 'Comida típica'] },
   { nombre: 'sin-coche',
-    pasos: ['Puerto de la Cruz', 'Sin coche, en guagua', 'Grupo, sin niños',
-            'Un plan para el día entero', '?Me da igual', 'Un poco de todo', 'Un poco de todo'] },
+    pasos: ['Senderos y naturaleza', 'Valle de La Orotava', 'Puerto de la Cruz',
+            'Sin coche, en guagua', 'Grupo, sin niños', 'Un poco de todo'] },
+  /* «Sorpréndame» ya no vive en el menú —el menú se fue del camino—, sino
+     colgado de la pregunta de cuántos son, que es el primer momento en que el
+     motor tiene cama, coche y personas. */
   { nombre: 'sorpresa',
-    pasos: ['Tegueste', 'Con coche', 'Familia con niños',
-            'Sorpréndame — con el tiempo que queda'] },
+    pasos: ['Un poco de todo', 'Metropolitana', 'Tegueste', 'Con coche',
+            'Sorpréndame'] },
   { nombre: 'ajustar-parada',
-    pasos: ['La Laguna', 'Con coche', 'Grupo, sin niños', 'Un plan para el día entero',
-            '?Me da igual', 'Un poco de todo', 'Un poco de todo', 'Esta no'] },
+    pasos: ['Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
+            'Grupo, sin niños', 'Un poco de todo', 'Esta no'] },
   { nombre: 'mas-tranquilo',
-    pasos: ['Candelaria', 'Con coche', 'Familia con niños',
-            'Un plan para el día entero', '?Me da igual', 'Un poco de todo', 'Un poco de todo',
-            'Otra cosa más tranquila'] },
-  /* El camino del mapa de comarcas, que es nuevo desde el 12 de septiembre y
-     no lo pisaba ninguno de los siete: los otros eligen el pueblo donde
-     duermen y este elige a dónde ir. Pasa por Vilaflor a propósito, que lleva
-     aviso de «eso está en el otro cartel».
-     Ojo con el final: los dos últimos pasos se llaman igual —«Un poco de
-     todo» es la carta del tipo de día Y la de qué comer— y faltaba el
-     segundo. El recorrido daba sus pasos y se quedaba sin plan: tarjetas 0 y
-     sin caja de texto. Parecía que el mapa no armaba el día y lo que pasaba
-     es que nadie había contestado a qué comer. La rota era la prueba. */
+    pasos: ['Un poco de todo', 'Güímar', 'Candelaria', 'Con coche',
+            'Familia con niños', 'Un poco de todo', 'Otra cosa más tranquila'] },
+  /* El camino del mapa eligiendo A DÓNDE IR, que es otra cosa que elegir dónde
+     dormir: se llega por «prefiero elegir el sitio yo», ya con el plan hecho.
+     Pasa por Vilaflor a propósito, que lleva aviso de «eso está en el otro
+     cartel» — y ahí cazó que el botón del salto se pintaba y se borraba solo. */
   { nombre: 'mapa-comarcas',
-    pasos: ['La Laguna', 'Con coche', 'Grupo, sin niños', '?Me da igual',
-            'Quiero ver un sitio concreto', 'Sur', 'Vilaflor', 'Un poco de todo',
-            'Un poco de todo'] },
-  /* La carta de «Tenderete y tradiciones», que es la única que no filtra el
-     catálogo sino que abre el calendario. Vale para los dos días posibles y
-     por eso el «me da igual» va opcional: si ese día hay fiestas se pulsa para
-     salir de la lista, y si no hay, la carta ya ha dicho que no hay nada y ha
-     repintado las cartas debajo. En los dos casos se acaba con un plan. */
+    pasos: ['Un poco de todo', 'Sur', 'Arona', 'Con coche', 'Grupo, sin niños',
+            'Un poco de todo', 'Volver al menú', 'Quiero ver un sitio concreto',
+            'Sur', 'Vilaflor', 'Un poco de todo', 'Un poco de todo'] },
+  /* La carta que abre el calendario en vez de filtrar el catálogo, y que ahora
+     es la PRIMERA pregunta: ahí todavía no hay cama, así que la lista va sin
+     minutos de viaje. Está escrito para que valga los dos días posibles — el
+     «me da igual» va opcional, así que el día con fiestas sale de la lista por
+     ahí y el día vacío se lo salta, porque la carta ya ha dicho que no hay
+     nada y ha repintado las cartas debajo. */
   { nombre: 'tenderete',
-    pasos: ['La Laguna', 'Con coche', 'Grupo, sin niños', 'Un plan para el día entero',
-            '?Me da igual', 'Tenderete y tradiciones', '?Me da igual',
-            'Un poco de todo', 'Un poco de todo'] },
+    pasos: ['Tenderete y tradiciones', '?Me da igual', 'Un poco de todo',
+            'Metropolitana', 'La Laguna', 'Con coche', 'Grupo, sin niños',
+            'Un poco de todo'] },
   { nombre: 'ingles',
-    pasos: ['=EN', 'La Laguna', 'With a car', 'Group, no children',
-            'A plan for a whole day', '?I do not mind', 'A bit of everything', 'A bit of everything'] },
+    pasos: ['=EN', 'A bit of everything', 'Metropolitan', 'La Laguna',
+            'With a car', 'Group, no children', 'A bit of everything'] },
 ];
 
 async function main() {

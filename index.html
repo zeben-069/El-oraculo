@@ -304,7 +304,6 @@ const T={
      qDiaNinos:'¿Qué tipo de día les apetece? Con niños cambia bastante la cosa.',
      qComida:'Una cosa antes: ¿les apetece algo en concreto para comer?',
      qOtroSitio:'¿Les busco otro sitio o cambiamos de tipo de comida?',
-     qMunicipio:'Dígame el municipio y le monto el día desde ahí.',
      qNoEsHoy:'Eso es para hoy mismo. Como han elegido otro día, les monto el día entero.',
      qMomento:'¿En qué momento del día están?',
      qZona:'¿Por qué zona de la isla les apetece moverse?',
@@ -343,8 +342,6 @@ const T={
      cConCoche:'Con coche',cSinCoche:'Sin coche, en guagua',
      cTenderete:'Tenderete y tradiciones',sinFiestas:'Pues mire, ese día no hay ninguna fiesta ni programa por la isla — y si la hubiera, se la diría. ¿Un bañito en la playa entonces, o le apetece otra cosa?',cSenderos:'Senderos y naturaleza',cAgua:'Charcos y playas',cMuseos:'Museos y casco histórico',cTodo:'Un poco de todo',cTipica:'Comida típica',cDeTodo:'Un poco de todo',
      dos:'Dos adultos',familia:'Familia con niños',grupo:'Grupo, sin niños',
-     listo_c:'Perfecto, con coche tienen la isla entera. ¿Por dónde tiramos?',
-     listo_s:'Perfecto. Sin coche también se hacen cosas buenas, solo hay que atar la vuelta. ¿Por dónde tiramos?',
      plan:'Un plan para el día entero',sitio:'Quiero ver un sitio concreto',
      ahora:'Estoy por aquí ahora, ¿qué hago?',cambiar:'Cambiar el día o el alojamiento',
      hola:'Soy <b>Naira</b>, de aquí de toda la vida. Le monto el día como se lo montaría a un primo que viene de fuera: sin colas tontas y comiendo bien. ',compartir:'Compartir este plan',otro_muni:'Ese no es, cambiar de municipio',
@@ -366,7 +363,6 @@ const T={
      qDiaNinos:'What kind of day do you fancy? With children it changes quite a lot.',
      qComida:'One thing first: do you fancy anything in particular to eat?',
      qOtroSitio:'Shall I find you another place, or shall we change the kind of food?',
-     qMunicipio:'Tell me the town and I will build the day from there.',
      qNoEsHoy:'That one is for today. As you picked another day, I will plan the whole day.',
      qMomento:'What time of day are you at?',
      qZona:'Which part of the island do you fancy moving around?',
@@ -405,8 +401,6 @@ const T={
      cConCoche:'With a car',cSinCoche:'By bus',
      cTenderete:'Fiestas and local traditions',sinFiestas:"Well now, there's no fiesta and no programme anywhere on the island that day — and if there were, I'd tell you. A dip at the beach, then, or would you rather something else?",cSenderos:'Trails and nature',cAgua:'Pools and beaches',cMuseos:'Museums and old towns',cTodo:'A bit of everything',cTipica:'Local food',cDeTodo:'A bit of everything',
      dos:'Two adults',familia:'Family with children',grupo:'Group, no children',
-     listo_c:'With a car the whole island is yours. Where shall we start?',
-     listo_s:'No car is fine, we just need to sort the way back. Where shall we start?',
      plan:'A plan for a whole day',sitio:'I want to see somewhere specific',
      ahora:'I am out already — what now?',cambiar:'Change the day or where I am staying',
      hola:'I am <b>Naira</b>, born and raised here. I will plan your day the way I would for a cousin coming to visit: no silly queues and eating well. ',compartir:'Share this plan',otro_muni:'Wrong one — change town',
@@ -428,7 +422,6 @@ const T={
      qDiaNinos:'Was für ein Tag soll es werden? Mit Kindern ändert das einiges.',
      qComida:'Eins noch: Haben Sie Lust auf etwas Bestimmtes zum Essen?',
      qOtroSitio:'Soll ich Ihnen ein anderes Lokal suchen, oder wechseln wir die Küche?',
-     qMunicipio:'Sagen Sie mir die Gemeinde, dann baue ich den Tag von dort aus.',
      qNoEsHoy:'Das ist für heute. Da Sie einen anderen Tag gewählt haben, plane ich den ganzen Tag.',
      qMomento:'Wie spät ist es bei Ihnen gerade?',
      qZona:'In welcher Gegend der Insel möchten Sie sich bewegen?',
@@ -467,8 +460,6 @@ const T={
      cConCoche:'Mit Auto',cSinCoche:'Mit dem Bus',
      cTenderete:'Fiestas und Traditionen',sinFiestas:'Also, an dem Tag gibt es auf der ganzen Insel keine Fiesta und kein Programm — und wenn es eins gäbe, würde ich es Ihnen sagen. Dann vielleicht ein Bad am Strand, oder lieber etwas anderes?',cSenderos:'Wanderwege und Natur',cAgua:'Meerbecken und Strände',cMuseos:'Museen und Altstädte',cTodo:'Von allem etwas',cTipica:'Typisch kanarisch',cDeTodo:'Von allem etwas',
      dos:'Zwei Erwachsene',familia:'Familie mit Kindern',grupo:'Gruppe, ohne Kinder',
-     listo_c:'Mit Auto gehört Ihnen die ganze Insel. Womit fangen wir an?',
-     listo_s:'Ohne Auto geht auch viel, wir müssen nur den Rückweg klären. Womit fangen wir an?',
      plan:'Ein Plan für einen ganzen Tag',sitio:'Ich möchte einen bestimmten Ort sehen',
      ahora:'Ich bin schon unterwegs — was jetzt?',cambiar:'Tag oder Unterkunft ändern',
      hola:'Ich bin <b>Naira</b>, hier geboren und aufgewachsen. Ich plane Ihren Tag so, wie ich ihn für einen Cousin aus dem Ausland planen würde: ohne sinnlose Warteschlangen und mit gutem Essen. ',compartir:'Diesen Plan teilen',otro_muni:'Falsch — Ort ändern',
@@ -4487,11 +4478,17 @@ function planB(brief){
   if(S.apetece!=='naturaleza') L.push({t:'🥾 '+tr('prefNat'),fn:()=>{S.apetece='naturaleza';S.faltaNucleo=null;pedirPlan()}});
   L.push({t:tr('cambComida'),fn:()=>cambiarComida()});
   L.push({t:tr('ajustar'),fn:()=>{S.ahora=null;queApetece()}});
-  L.push({t:tr('otroDia'),fn:()=>otroDia()});
-  /* Siete y no seis: con el botón nuevo de los eventos, seis dejaba fuera
-     «prefiero naturaleza», que es justo uno de los dos que Zeben quería que se
-     vieran mejor. Más de siete ya es una lista que nadie lee. */
-  opciones(L.slice(0,7));
+  /* Siete botones, y el SÉPTIMO está reservado: «volver al menú».
+     Antes iba el último de una lista de diez cortada a siete, o sea que **no
+     salía nunca** — lo cazó `probar-web.js` el 13 de septiembre, buscándolo y
+     no encontrándolo. Mientras el menú estaba en el camino de ida daba igual;
+     desde que el hilo son cinco pasos y acaba en el plan, el menú **solo se
+     alcanza por aquí**, y con él la escapada de varios días, la agenda, la
+     ruta histórica, «estoy por aquí ahora» y cambiar de municipio. Así que su
+     sitio no se sortea con los demás: se reserva.
+     Los seis de arriba siguen siendo los de siempre; el que se cae ahora es el
+     último variable, no la única puerta de salida. */
+  opciones(L.slice(0,6).concat([{t:tr('otroDia'),fn:()=>otroDia()}]));
 }
 async function cambiarComida(){
   await naira(tr('qOtroSitio'),340);
@@ -4566,20 +4563,39 @@ function cuadriculaMunicipios(lista,alPulsar,volver){
   }catch(e){}
 })();
 
+/* ── EL HILO, EN CINCO PASOS ──
+   El orden lo puso Zeben el 13 de septiembre: «1 qué te apetece, 2 luego
+   elegimos la comarca y los municipios, 3 con coche o en guagua, 4 cuántos
+   son, 5 lo que les apetece comer, y listo».
+   Antes empezaba por dónde duermen y acababa preguntando el tipo de día justo
+   antes del plan. El cambio no es cosmético: **lo primero que se pregunta es
+   lo que el turista tiene en la cabeza**, no un dato de logística. Quien abre
+   la web quiere una playa o un sendero; el hotel es lo que ya sabe y lo que
+   menos le apetece teclear.
+   Lo que hubo que mover debajo, y está explicado en cada sitio:
+   · `hayCosasEseDia()` y `programasDelDia()` funcionan **sin cama y sin saber
+     con quién viajan**, porque «Tenderete» es ahora la primera pregunta.
+   · `anclarEn()` salió de dentro de `queApeteceEn()`: desde la lista de
+     fiestas hay que anclar en un pueblo sin volver a preguntar el tipo de día.
+   · `elegirSitio(true)` es el mapa eligiendo CAMA, sin los dos carteles y sin
+     el aviso del otro cartel.
+   · `menuPrincipal()` ya no está en el camino: todas sus opciones necesitan la
+     cama, el coche y cuántos son, así que vive donde siempre pudo vivir —
+     detrás del plan, por «otro día». Lo único que se adelanta es
+     «Sorpréndame», que va colgado de la pregunta de cuántos son, que es el
+     primer momento en que el motor tiene todo lo que necesita. */
 async function arranque(){
   hilo.innerHTML='';acc.innerHTML='';
   /* «Buenas noches» ya es el saludo: encadenarle «¡Buenas!» sonaba a robot
      saludando dos veces. Si hay saludo por la hora, se usa ese; si no, el
      suelto. */
-  await naira((saludoHora?tr(saludoHora)+'. ':tr('holaSolo'))+tr('hola')+tr('donde'),260);
-  const todos=Object.entries(BASES).sort((a,b)=>a[1].et.localeCompare(b[1].et,'es'));
-  paso('ok','alojamiento','Los <span class="am">'+todos.length+'</span> municipios, cada uno con su estampa. Se elige por la imagen, no por una lista.');
-  cuadriculaMunicipios(todos,k=>{S.base=k;pCoche()});
-}
-async function listaMunicipios(){
-  await naira(tr('qMunicipio'),330);
-  const resto=Object.entries(BASES).sort((a,b)=>a[1].et.localeCompare(b[1].et));
-  opciones(resto.map(([k,v])=>({t:v.et,fn:()=>{S.base=k;pCoche()}})));
+  await naira((saludoHora?tr(saludoHora)+'. ':tr('holaSolo'))+tr('hola')+tr('qDia'),260);
+  paso('ok','paso 1 · qué les apetece',
+    'Lo primero que se pregunta es lo que el turista trae en la cabeza, no dónde duerme. '+
+    'La quinta carta —las fiestas del día— sale también aquí, y aquí todavía no hay cama: '+
+    'por eso la lista va sin minutos de viaje.');
+  pintaCartasDia(ap=>{S.apetece=ap;S.faltaNucleo=null;elegirSitio(true);},
+                 ()=>abrirFiestas(()=>elegirSitio(true)));
 }
 async function pCoche(){
   const b=BASES[S.base];
@@ -4595,19 +4611,25 @@ async function pCoche(){
   ],tr('tCoche'));
   const b2=document.createElement('button');
   b2.className='opt'; b2.textContent='↩ '+tr('otro_muni');
-  b2.onclick=()=>{acc.innerHTML='';arranque()};
+  b2.onclick=()=>{acc.innerHTML='';elegirSitio(true)};
   acc.appendChild(b2);
 }
 async function pGente(){await naira(tr('como'),360);
+  const sigue=()=>preguntaComida();
   cartas([
-    {t:tr('dos'),    img:'dos-adultos',ancho:true,fn:()=>{S.gente=2;S.ninos=false;listo()}},
-    {t:tr('familia'),img:'familia',    ancho:true,fn:()=>{S.gente=4;S.ninos=true;listo()}},
-    {t:tr('grupo'),  img:'grupo',      ancho:true,fn:()=>{S.gente=6;S.ninos=false;listo()}}
+    {t:tr('dos'),    img:'dos-adultos',ancho:true,fn:()=>{S.gente=2;S.ninos=false;sigue()}},
+    {t:tr('familia'),img:'familia',    ancho:true,fn:()=>{S.gente=4;S.ninos=true;sigue()}},
+    {t:tr('grupo'),  img:'grupo',      ancho:true,fn:()=>{S.gente=6;S.ninos=false;sigue()}}
   ],tr('tGente'));
-}
-async function listo(){
-  await naira(S.coche?tr('listo_c'):tr('listo_s'),360);
-  menuPrincipal();
+  /* «Sorpréndame» se cuelga aquí y no antes porque este es el PRIMER momento
+     en que el motor tiene lo que necesita —cama, coche y cuántos son—. Antes
+     vivía en el menú, y el menú ya no está en el camino. Se queda con lo que
+     resta de hoy, que es lo que siempre ha hecho. */
+  const b=document.createElement('button');
+  b.className='opt'; b.textContent='✨ '+tr('sorpresa');
+  b.onclick=()=>{acc.innerHTML='';burbuja(b.textContent,'yo');
+    S.gente=S.gente||2; S.ninos=!!S.ninos; sorprender();};
+  acc.appendChild(b);
 }
 /* ============ LAS FIESTAS DE ESE DÍA ============
    Hasta ahora el motor elegía él solo qué fiesta anclaba el día, y el turista
@@ -4942,8 +4964,18 @@ async function queHora(){
    Ojo con el orden de pintado: el SVG trae las comarcas de mayor a menor área
    para que Acentejo, que es una franja finísima, quede encima y gane el toque.
    No se reordena. */
-async function elegirSitio(){
-  await naira(tr('qZona'),360);
+/* El mapa de comarcas vale para las DOS preguntas de pueblo que tiene la web,
+   y no son la misma:
+   · `comoBase` — dónde DUERMEN. Es el paso 2 del hilo desde el 13 de
+     septiembre, y sustituye a la cuadrícula de 31 estampas que era la primera
+     pregunta. Aquí NO van los dos carteles —en «Anaga» y en «la cumbre» no se
+     duerme, no son municipios y no tienen centro en `BASES`— ni el aviso de
+     «eso está en el otro cartel», que habla de lo que el ancla no va a coger y
+     no tiene nada que ver con dónde se tiene la cama.
+   · sin `comoBase` — a dónde IR. Es «prefiero elegir el sitio yo», del menú, y
+     ahí sí van los carteles y el aviso, que es para lo que se escribieron. */
+async function elegirSitio(comoBase){
+  await naira(comoBase?tr('donde'):tr('qZona'),360);
   acc.replaceChildren(); acc.innerHTML='';
   const caja=document.createElement('div');
   /* Los rótulos son HTML por encima del SVG, no <text> dentro: así no encogen
@@ -4955,9 +4987,9 @@ async function elegirSitio(){
       '<span class="etqLarga">'+comarcaTr(v)+'</span>'+
       '<span class="etqCorta">'+(v.corto||comarcaTr(v))+'</span></button>').join('')+
     '</div>'+
-    '<p class="rotSueltos">'+tr('noSonMunicipio')+'</p>'+
-    '<div class="carteles">'+Object.entries(SUELTOS).map(([k,v])=>
-      fichaCartel(k,v)).join('')+'</div>';
+    (comoBase?'':'<p class="rotSueltos">'+tr('noSonMunicipio')+'</p>'+
+      '<div class="carteles">'+Object.entries(SUELTOS).map(([k,v])=>
+        fichaCartel(k,v)).join('')+'</div>');
   caja.addEventListener('click',e=>{
     const t=e.target.closest&&e.target.closest('[data-comarca]');
     if(!t) return;
@@ -4965,16 +4997,20 @@ async function elegirSitio(){
     acc.replaceChildren(); acc.innerHTML='';
     if(SUELTOS[k]){ burbuja(comarcaTr(SUELTOS[k]),'yo'); anclarSuelto(k); return; }
     burbuja(comarcaTr(COMARCAS[k]),'yo');
-    elegirMunicipio(k);
+    elegirMunicipio(k,comoBase);
   });
-  paso('ok','entrada · nivel 1, el mapa','Seis comarcas y dos carteles aparte. '+
-    'Anaga y la cumbre no son municipios —son un macizo y la parte de arriba de cuatro '+
-    'pueblos—, así que no van pintados: van debajo.');
+  paso('ok',comoBase?'paso 2 · la comarca donde duermen':'entrada · nivel 1, el mapa',
+    comoBase?'Las seis comarcas de la isla. Los dos carteles —Anaga y la cumbre— no salen aquí: no son municipios y en ellos no se duerme.'
+      :'Seis comarcas y dos carteles aparte. Anaga y la cumbre no son municipios —son un macizo y la parte de arriba de cuatro pueblos—, así que no van pintados: van debajo.');
   acc.appendChild(caja);
-  const b3=document.createElement('button');
-  b3.className='opt'; b3.textContent=tr('meDaIgual');
-  b3.onclick=()=>{acc.innerHTML='';burbuja(tr('meDaIgual'),'yo');S.anclaElegida=null;queApetece()};
-  acc.appendChild(b3);
+  /* El «me da igual» solo vale eligiendo a dónde ir. Durmiendo hay que dormir
+     en algún sitio, así que ahí no se ofrece. */
+  if(!comoBase){
+    const b3=document.createElement('button');
+    b3.className='opt'; b3.textContent=tr('meDaIgual');
+    b3.onclick=()=>{acc.innerHTML='';burbuja(tr('meDaIgual'),'yo');S.anclaElegida=null;queApetece()};
+    acc.appendChild(b3);
+  }
 }
 /* Dónde cae el rótulo de cada comarca, en % del cuadro. Sale del mapa, no del
    catálogo, así que vive aquí y no en los datos. */
@@ -5021,7 +5057,7 @@ function anclarSuelto(k){
    La cuadrícula es la misma con la que se elige dónde dormir, sin tocarla. Y
    sale mejor que antes: en vez de las 31 estampas de golpe, el navegador baja
    las tres u ocho de esa comarca. */
-async function elegirMunicipio(k){
+async function elegirMunicipio(k,comoBase){
   const v=COMARCAS[k];
   const lista=v.mun.map(m=>{
     const kb=Object.keys(BASES).find(x=>BASES[x].m===m);
@@ -5031,11 +5067,12 @@ async function elegirMunicipio(k){
   paso('ok','entrada · nivel 2, el pueblo','Los <span class="am">'+lista.length+
     '</span> municipios de '+v.rot+', cada uno con su estampa.');
   cuadriculaMunicipios(lista,kb=>{
+    if(comoBase){ S.base=kb; pCoche(); return; }
     const m=BASES[kb].m;
     const av=AVISO_CARTEL[m];
     if(av) avisarDelCartel(m,av,()=>queApeteceEn(m));
     else queApeteceEn(m);
-  },()=>elegirSitio());
+  },()=>elegirSitio(comoBase));
 }
 
 /* ── EL AVISO DE «ESO ESTÁ EN EL OTRO CARTEL» ──
@@ -5117,8 +5154,12 @@ const NUCLEO_DIA={
      tiene NADA de esto, que entonces sí hay que decirlo. */
   museos:TIPOS_DIA.museos };
 const COMO_SE_PIDIO={ naturaleza:'cSenderos', playa:'cAgua', museos:'cMuseos' };
-async function queApeteceEn(muni,filtro){
-  await naira(tr(S.ninos?'qDiaNinos':'qDia'),380);
+/* Anclar el día en un pueblo, SIN preguntar nada. Estaba dentro de
+   `queApeteceEn()` como la función `elegir()`, y hubo que sacarlo el 13 de
+   septiembre: desde la carta de «Tenderete» se elige un pueblo con programa
+   cuando la pregunta del tipo de día ES la pregunta en la que se está, así que
+   ahí no se puede volver a preguntar — solo anclar y seguir. */
+function anclarEn(muni,ap,filtro){
   /* El filtro por defecto acepta el municipio O la comarca del catálogo. Antes
      miraba SOLO `l.co||l.m`, y con eso pedir «San Cristóbal de La Laguna» dejaba
      fuera los 28 sitios de Anaga y los 4 de Bajamar, que llevan su propia `co`.
@@ -5128,7 +5169,7 @@ async function queApeteceEn(muni,filtro){
   const suyo = filtro || (l=>l.m===muni||(l.co||l.m)===muni);
   const pool=LUGARES.filter(l=>suyo(l)&&!l.cerrado&&l.la!=null&&!l.recinto);
   const porPeso=(a,b)=>((b.w||1)-(a.w||1))||((b.fx?1:0)-(a.fx?1:0));
-  const elegir=(ap)=>{
+  {
     const re=TIPOS_DIA[ap];
     const dentro=re?pool.filter(l=>re.test(l.tipo||'')):pool.slice();
     let hay=dentro.length?dentro:pool.slice();
@@ -5209,9 +5250,11 @@ async function queApeteceEn(muni,filtro){
           : 'De '+pool.length+' sitios del pueblo, <span class="am">'+
             hay.length+'</span> son de lo que pidieron; el día se arma alrededor de '+
             '<span class="si">'+(l?l.n:'—')+'</span>, el de más peso.'));
-    preguntaComida();
-  };
-  cartas(CARTAS_DIA(elegir),tr('tDia'));
+  }
+}
+async function queApeteceEn(muni,filtro){
+  await naira(tr(S.ninos?'qDiaNinos':'qDia'),380);
+  cartas(CARTAS_DIA(ap=>{anclarEn(muni,ap,filtro);preguntaComida();}),tr('tDia'));
   [[tr('elijoYo'),()=>elegirLugar(muni)],
    [tr('cambMuni'),()=>elegirSitio()]].forEach(([et,fn])=>{
     const b=document.createElement('button');
@@ -5289,10 +5332,15 @@ async function sorprender(){
 function programasDelDia(f,conNinos){
   if(typeof actosDe!=='function') return [];
   /* el mismo filtro que el motor: con niños, solo lo que el nombre dice que
-     es de niños; sin ellos, todo lo demás */
-  const vale=a=>conNinos?a.q==='ninos':a.q!=='ninos';
+     es de niños; sin ellos, todo lo demás.
+     Y `null` quiere decir «todavía no sé con quién viajan», que es lo que pasa
+     desde el 13 de septiembre: la primera pregunta es qué les apetece y la de
+     cuántos son viene tres pasos después. Filtrar ahí por una suposición sería
+     enseñarle a una familia el programa de dos adultos; sin filtro, se le
+     enseña el pueblo entero y ya se recorta al armar el día. */
+  const vale=a=>conNinos==null?true:(conNinos?a.q==='ninos':a.q!=='ninos');
   const utiles=actosDe(f).filter(a=>vale(a)&&
-    !(conNinos&&a.h&&(a.h>='23:00'||a.h<'07:00')));
+    !(conNinos===true&&a.h&&(a.h>='23:00'||a.h<'07:00')));
   const g={};
   utiles.forEach(a=>{ (g[a.m]=g[a.m]||[]).push(a); });
   return Object.keys(g).map(m=>({m:m,
@@ -5303,8 +5351,12 @@ function programasDelDia(f,conNinos){
    y el orden se hacen UNA vez: si cada uno lo calculara a su manera, el botón
    diría un número y la lista enseñaría otro. */
 function hayCosasEseDia(){
-  const f=S.fecha, base=BASES[S.base];
-  if(!base) return {evs:[],progs:[],total:0};
+  const f=S.fecha, base=BASES[S.base]||null;
+  /* Antes se rendía sin base —`if(!base) return vacío`— y eso valía cuando lo
+     primero que se preguntaba era dónde duermen. Ya no: la carta de
+     «Tenderete» es la PRIMERA pregunta y ahí no hay cama todavía. Sin base no
+     se pueden dar los minutos de viaje, así que no se dan; lo demás sale
+     igual, que las fiestas de ese día no dependen de dónde duerma nadie. */
   /* Las de noche van al final: arman el remate, no el día. Misma regla que
      `construir()`. */
   const evs=EVENTOS.filter(e=>e.f===f)
@@ -5313,14 +5365,23 @@ function hayCosasEseDia(){
   /* Un pueblo con fiesta ya sale por la fiesta: ofrecerlo dos veces es ruido.
      Y se ordenan por lo que cuesta llegar, que es lo que de verdad decide: un
      programa a cuarenta minutos no es un plan de mañana. */
-  const progs=programasDelDia(f,!!S.ninos)
+  const progs=programasDelDia(f,S.gente==null?null:!!S.ninos)
     .filter(p=>!conFiesta[p.m]&&BASES[p.m])
-    .map(p=>Object.assign(p,{min:minutosA(base,(BASES[p.m]||{}).corr)}))
-    .sort((a,b)=>a.min-b.min);
+    .map(p=>Object.assign(p,{min:base?minutosA(base,(BASES[p.m]||{}).corr):null}))
+    /* Con cama, por lo que cuesta llegar. Sin ella, por cuántos actos ponen,
+       que es lo único que distingue un pueblo de otro cuando no se sabe desde
+       dónde se sale. */
+    .sort((a,b)=>base?(a.min-b.min):(b.actos.length-a.actos.length));
   return {evs:evs, progs:progs, total:evs.length+progs.length};
 }
-async function loQueHayEseDia(volver){
-  const base=BASES[S.base];
+/* `volver` es lo que hace el «me da igual»; `sigue` es lo que se hace DESPUÉS
+   de elegir una. Sin `sigue` se arma el plan ahí mismo, que es lo de siempre
+   —desde el menú y desde después del plan ya está todo preguntado—. Con
+   `sigue` solo se apunta lo elegido y el hilo continúa, que es lo que hace
+   falta desde el 13 de septiembre: esta lista es ahora la PRIMERA pregunta y
+   detrás quedan el pueblo, el coche, cuántos son y la comida. */
+async function loQueHayEseDia(volver,sigue){
+  const base=BASES[S.base]||null;
   const {evs,progs}=hayCosasEseDia();
   if(!evs.length&&!progs.length) return false;
 
@@ -5340,18 +5401,25 @@ async function loQueHayEseDia(volver){
   evs.forEach(e=>{
     const todoDia=esFiestaDeTodoElDia(e);
     const cuando=todoDia?tr('todoElDia'):(e.h?e.h:e.fr);
-    const lejos=(e.m===base.m)?tr('aquiMismo'):minutosA(base,e.c)+' '+tr('min');
-    L.push({t:iconoFiesta(e.n)+' '+e.n+' · '+e.m+'\n'+cuando+' · '+lejos,
+    /* Sin cama no hay minutos que dar, y no se inventan. */
+    const lejos=!base?'':(e.m===base.m?tr('aquiMismo'):minutosA(base,e.c)+' '+tr('min'));
+    L.push({t:iconoFiesta(e.n)+' '+e.n+' · '+e.m+'\n'+cuando+(lejos?' · '+lejos:''),
       fn:()=>{ S.anclaElegida=null; S.ahora=null;
-        S.forzarEvento=e.n; S.fiestaTodoElDia=todoDia?e.n:null; pedirPlan(); }});
+        S.forzarEvento=e.n; S.fiestaTodoElDia=todoDia?e.n:null;
+        if(sigue){ S.apetece=S.apetece||'todo'; sigue(); } else pedirPlan(); }});
   });
   progs.forEach(p=>{
     const a=p.actos[0], n=p.actos.length;
-    const lejos=(p.m===base.m)?tr('aquiMismo'):p.min+' '+tr('min');
+    const lejos=!base?'':(p.m===base.m?tr('aquiMismo'):p.min+' '+tr('min'));
     L.push({t:'🎉 '+p.m+'\n'+a.n.slice(0,52)+(a.h?' · '+a.h:'')+
-        (n>1?' · +'+(n-1):'')+' · '+lejos,
+        (n>1?' · +'+(n-1):'')+(lejos?' · '+lejos:''),
       fn:()=>{ S.forzarEvento=null; S.fiestaTodoElDia=null;
-        S.anclaElegida=null; S.ahora=null; queApeteceEn(p.m); }});
+        S.anclaElegida=null; S.ahora=null;
+        /* Con `sigue` no se puede preguntar el tipo de día —es la pregunta en
+           la que estamos—, así que se ancla directamente en ese pueblo con
+           «un poco de todo» y el hilo continúa. */
+        if(sigue){ S.apetece=S.apetece||'todo'; anclarEn(p.m,S.apetece); sigue(); }
+        else queApeteceEn(p.m); }});
   });
   /* «Me da igual» vuelve por donde se vino: desde el flujo del día entero
      sigue preguntando el tipo, y desde el plan ya hecho vuelve al plan en vez
@@ -5395,10 +5463,10 @@ async function queApetece(){
    volver a preguntar: quien pulsa «Tenderete» un día sin nada se lleva el
    «ese día no hay ninguna fiesta, ¿un bañito?» y las cartas otra vez debajo.
    Repetirle «¿qué tipo de día?» ahí sería no haberle escuchado. */
-function pintaCartasDia(){
+function pintaCartasDia(fn,fiestas){
   cartas(CARTAS_DIA(
-    ap=>{S.apetece=ap;S.faltaNucleo=null;preguntaComida()},
-    abrirFiestas
+    fn||(ap=>{S.apetece=ap;S.faltaNucleo=null;preguntaComida()}),
+    fiestas||abrirFiestas
   ),tr('tDia'));
 }
 /* ── LA CARTA DE «TENDERETE Y TRADICIONES» ──
@@ -5414,14 +5482,15 @@ function pintaCartasDia(){
    hay nada por la isla y se le ofrece otra cosa. Callar la carta dejaría al
    turista sin saber si es que no hay fiestas o si es que Naira no las tiene, y
    además la rejilla cambiaría de forma de un día para otro. */
-async function abrirFiestas(){
-  if(await loQueHayEseDia(()=>queApetece())) return;
+async function abrirFiestas(sigue){
+  if(await loQueHayEseDia(sigue?(()=>{acc.innerHTML='';arranque()}):(()=>queApetece()),sigue)) return;
   paso('avi','tenderete, y ese día no hay nada',
     'El <span class="am">'+S.fecha+'</span> no hay ninguna fiesta en '+EVENTOS.length+
     ' fichadas ni programa cargado en ningún pueblo. Se dice —callarlo parecería '+
     'que Naira no las tiene— y se vuelve a ofrecer el resto.');
   await naira(tr('sinFiestas'),380);
-  pintaCartasDia();
+  if(sigue) pintaCartasDia(ap=>{S.apetece=ap;S.faltaNucleo=null;sigue();},()=>abrirFiestas(sigue));
+  else pintaCartasDia();
 }
 /* Las cartas del tipo de día, en un solo sitio: se pintan igual desde el
    camino principal y desde el de «elijo yo el pueblo», y estaban escritas dos
@@ -5448,9 +5517,28 @@ async function preguntaComida(){
      lo usa quien lo pide escribiendo— y el botón de «cambiar dónde comer»
      lo mantiene. */
   cartas([
-    {t:tr('cTipica'),img:'comida-tipica',  fn:()=>{S.comida='canaria';pedirPlan()}},
-    {t:tr('cDeTodo'),img:'un-poco-de-todo',fn:()=>{S.comida=null;pedirPlan()}}
+    {t:tr('cTipica'),img:'comida-tipica',  fn:()=>{S.comida='canaria';armarDia()}},
+    {t:tr('cDeTodo'),img:'un-poco-de-todo',fn:()=>{S.comida=null;armarDia()}}
   ],tr('tComida'));
+}
+/* El final de los cinco pasos. Es lo que hacía `planDelDia()` menos las dos
+   preguntas que ya están contestadas: pone el día entero, y si es hoy y pasan
+   de las cuatro salta a mañana y lo dice, que un día completo ya no cabe en lo
+   que queda. */
+async function armarDia(){
+  S.descartados=null; S.prefTipo=null; S.ritmo=null; S.ahora=null; S.diaEntero=true;
+  const hoy=(new Date()).toISOString().slice(0,10);
+  const h=new Date().getHours();
+  if(S.fecha===hoy && h>=16){
+    const man=new Date(new Date(hoy+'T12:00:00').getTime()+86400000).toISOString().slice(0,10);
+    S.fecha=man; pintaDia();
+    const inp=document.getElementById('fechaLibre'); if(inp) inp.value=man;
+    paso('ok','paso 5 · y hoy ya no cabe',
+      'Son las <span class="am">'+String(h).padStart(2,'0')+':00</span>. Un día entero ya no cabe en lo que '+
+      'queda de hoy, así que se salta a <span class="si">mañana</span> y se arma completo.');
+    await naira(tr('planManana'),380);
+  }
+  pedirPlan();
 }
 function otroDia(){hilo.innerHTML='';naira(tr('qDigame'),260).then(()=>menuPrincipal())}
 function reiniciar(){S.base=S.coche=S.gente=S.anclaElegida=S.comida=S.apetece=S.ahora=S.faltaNucleo=null;S.diaEntero=false;
