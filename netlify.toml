@@ -47,9 +47,42 @@
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
 
-# Iconos e imagen de compartir: no cambian casi nunca, que se cacheen.
+# LAS IMÁGENES SE REEMPLAZAN CON EL MISMO NOMBRE, y esto lo teníamos mal.
+# Aquí ponía una semana para todo `/img/*`, y el razonamiento —«no cambian casi
+# nunca»— era cierto de los iconos y falso de las ilustraciones: cada vez que
+# Zeben manda un cartel nuevo se guarda encima del viejo, con su nombre. Así
+# que soltaba el zip, abría la web y seguía viendo el de antes, y desde aquí no
+# hay manera de verlo: el zip estaba bien.
+# La regla: **lo que puede cambiar sin cambiar de nombre, se pregunta siempre**.
+# Es un 304 de nada, y son nueve carteles y la estampa del pueblo que se mire.
+# Se nombran las carpetas UNA A UNA y no `/img/*` a propósito: con dos reglas
+# que casen con el mismo fichero, Netlify las junta y acaba mandando dos
+# `Cache-Control` — y entonces quién gana depende del navegador. Ninguna regla
+# de aquí pisa a otra.
 [[headers]]
-  for = "/img/*"
+  for = "/img/cartas/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/img/estampas/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/img/comarcas/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/img/sitios/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Esta sí: la imagen de compartir no se toca, y quien la pide son los previos
+# de WhatsApp, no la web.
+[[headers]]
+  for = "/img/naira-social.jpg"
   [headers.values]
     Cache-Control = "public, max-age=604800"
 

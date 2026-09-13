@@ -808,6 +808,20 @@ function opciones(lista){
   lista.forEach(o=>{const b=document.createElement('button');b.className='opt';b.textContent=o.t;
     b.onclick=()=>{acc.innerHTML='';burbuja(o.t,'yo');o.fn()};acc.appendChild(b)});
 }
+/* NUESTRAS IMÁGENES LLEVAN VERSIÓN, y esto viene de un fallo que costó tres
+   zips. `netlify.toml` pedía guardar `/img/*` **una semana**, y las
+   ilustraciones se reemplazan CON EL MISMO NOMBRE: Zeben soltaba el zip con
+   los carteles nuevos, abría la web y seguía viendo los viejos, sin manera de
+   notarlo desde aquí. La cabecera ya está arreglada —ahora se pregunta
+   siempre—, pero eso solo vale para quien no tenga la semana empezada. Cambiar
+   la URL sí vale para todos: una caché guardada con otra dirección no le sirve
+   a nadie.
+   Se sube `VIMG` cuando se reemplace una imagen por otra con el mismo nombre.
+   Lo que entra con un nombre nuevo —una foto de sitio, un municipio— no lo
+   necesita: su URL ya es distinta. */
+const VIMG='13s';
+const vImg=u=>u+(u.indexOf('?')<0?'?v=':'&v=')+VIMG;
+
 /* Lo mismo que opciones(), pero con cartel. Se usa donde la pregunta se
    entiende mejor de un vistazo: qué tipo de día y qué apetece comer. El
    rótulo va DEBAJO y sale de tr(), no dentro del dibujo: los carteles
@@ -828,7 +842,7 @@ function cartas(lista,titulo){
   caja.className='cartas'+(anchos?' anchas':'');
   caja.innerHTML=lista.map((o,i)=>
     '<button class="carta'+(o.ancho?' ancha':'')+'" data-i="'+i+'">'+
-      '<span class="lamina"><img src="img/cartas/'+o.img+'.jpg" alt="" loading="lazy" decoding="async"></span>'+
+      '<span class="lamina"><img src="'+vImg('img/cartas/'+o.img+'.jpg')+'" alt="" loading="lazy" decoding="async"></span>'+
       '<span class="rotulo">'+o.t+'</span></button>').join('');
   caja.addEventListener('click',e=>{
     const b=e.target.closest&&e.target.closest('.carta');
@@ -3295,7 +3309,7 @@ function marco(item,tipo,orden){
   const est = (item&&!item.foto&&AEREO_INUTIL.test(tipo||(item&&item.tipo)||'')&&item.m&&ESTAMPA[item.m])
               ? ESTAMPA[item.m].f : null;
   const aereo = (item&&!item.foto&&!est&&item.la!=null) ? miniAerea(item.la,item.lo) : null;
-  const fondo = (item&&item.foto) ? 'background-image:url('+item.foto+')'
+  const fondo = (item&&item.foto) ? 'background-image:url('+vImg(item.foto)+')'
               : est                ? 'background-image:url('+est+')'
               : aereo              ? 'background-image:url('+aereo+')'
               : '';
@@ -4552,7 +4566,7 @@ function fichaMunicipio(k,v,cuenta){
   const e=ESTAMPA[v.m]||null;
   const pie=cuenta?cuenta(v.m):cuentaBase(v.m)+' '+tr('nSitios');
   return '<button class="estampa" data-base="'+k+'">'+
-    (e? '<span class="lienzo"><img src="'+e.f+'" alt="" loading="lazy" decoding="async"></span>'
+    (e? '<span class="lienzo"><img src="'+vImg(e.f)+'" alt="" loading="lazy" decoding="async"></span>'
       : '<span class="lienzo sin"><span class="ico">🏝</span></span>')+
     '<span class="pie"><b>'+v.et+'</b>'+
       (e&&lemaTr(e)?'<span class="lema2">'+lemaTr(e)+'</span>':'')+
@@ -5139,7 +5153,7 @@ function filtroSuelto(v){
 function fichaCartel(k,v){
   const n=LUGARES.filter(filtroSuelto(v)).length;
   return '<button class="estampa" type="button" data-comarca="'+k+'">'+
-    '<span class="lienzo"><img src="'+v.f+'" alt="" loading="lazy" decoding="async"></span>'+
+    '<span class="lienzo"><img src="'+vImg(v.f)+'" alt="" loading="lazy" decoding="async"></span>'+
     '<span class="pie"><b>'+comarcaTr(v)+'</b>'+
       '<span class="lema2">'+lemaTr(v)+'</span>'+
       '<span class="cuenta">'+n+' '+tr('nSitios')+'</span></span></button>';

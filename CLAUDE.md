@@ -1854,6 +1854,56 @@ el de la derecha es **«Sin coche, en guagua»** a propósito: la pregunta es
 «¿llevan coche?» y ese rótulo la contesta. Quitarle el «sin coche» dejaría las
 dos tarjetas diciendo en qué se va y ninguna diciendo qué se está eligiendo.
 
+## Y los carteles nuevos no se veían: la caché era nuestra
+
+Zeben, después de soltar el zip: **«no se ha cambiado ninguna de las últimas que
+hemos hablado»**. Y el zip estaba bien —comprobado fichero a fichero, las nueve
+ilustraciones dentro y byte a byte iguales a las del disco—. Lo que fallaba
+estaba escrito en `netlify.toml` desde hace semanas:
+
+    [[headers]]
+      for = "/img/*"
+      Cache-Control = "public, max-age=604800"
+
+**Una semana de caché para todo `/img/*`.** El comentario de al lado decía
+«iconos e imagen de compartir: no cambian casi nunca», y eso era cierto de los
+iconos y **falso de las ilustraciones**: cada cartel que manda Zeben se guarda
+**encima del viejo, con su mismo nombre**, así que para el navegador la URL es
+la misma de siempre y ni siquiera vuelve a preguntar. Soltaba el zip nuevo y
+seguía viendo el cartel de antes.
+
+**Y esto es lo peor del fallo: desde aquí no se ve.** Todas las pruebas pasan,
+el zip lleva lo que tiene que llevar, el servidor de ficheros local sirve la
+imagen nueva —porque en local no hay cabeceras de Netlify— y los recorridos de
+Playwright arrancan con el navegador vacío. **La caché solo muerde en el sitio
+publicado y solo a quien ya estuvo antes**, que es exactamente el único que lo
+prueba. Tres zips seguidos dando por hecho algo que no llegaba.
+
+Se arregla por los dos lados, que hacen falta los dos:
+· **La cabecera, que es el arreglo de fondo.** La regla es **lo que puede
+  cambiar sin cambiar de nombre, se pregunta siempre**: `cartas`, `estampas`,
+  `comarcas` y `sitios` pasan a `max-age=0, must-revalidate`. Es un 304 de nada
+  y son nueve carteles y la estampa del pueblo que se mire. La semana se queda
+  solo donde de verdad no cambia: el icono de la app y `naira-social.jpg`, que
+  además la piden los previos de WhatsApp y no la web.
+  Y las carpetas se nombran **una a una, no con `/img/*`**: con dos reglas que
+  casen con el mismo fichero Netlify las junta y acaba mandando dos
+  `Cache-Control`, y entonces quién gana depende del navegador.
+· **La versión en la URL, que es lo que lo arregla HOY.** La cabecera nueva solo
+  vale para quien no tenga ya la semana empezada; a Zeben, que la tiene, no le
+  serviría de nada. Cambiar la URL sí: una caché guardada con otra dirección no
+  le sirve a nadie. `vImg()` le pone `?v=VIMG` a las cuatro cosas que pedimos de
+  `img/` —los carteles, las estampas, los dos carteles de comarca y las fotos de
+  sitio—. **Se sube `VIMG` cuando se reemplace una imagen por otra con el mismo
+  nombre**; lo que entra con un nombre nuevo no lo necesita, que su URL ya es
+  distinta.
+
+La lección, que es de las que valen para lo próximo: **una imagen que se
+reemplaza con el mismo nombre no llega sola**. Y la de debajo: cuando Zeben dice
+que no ve un cambio que aquí está probado, **el siguiente sitio donde mirar es
+lo que hay entre el zip y su pantalla** —la caché, el despliegue, la fecha de lo
+publicado—, no el código otra vez.
+
 ## El municipio de una ficha, y quién lo dice
 
 Zeben leyó el aviso del cartel de Vilaflor y cortó por lo sano: **«Teleférico
@@ -2345,6 +2395,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | El artefacto de las cartas otra vez, la captura del sitio de la Pandorga y las tres ilustraciones | 13 sep | La captura le daba la razón: el sitio estaba en el artefacto y yo lo había buscado en el sitio equivocado. De ahí sale `eventos.js artefacto`, que vuelve a pasarlo entero: **19 sitios rellenados —`ACTOS` se queda en 0 sin sitio—, 32 afinados con el municipio detrás, 3 que no cuadran y se cantan, y 3 actos nuevos** (568 → 571). Las tres ilustraciones son **las mismas de ayer** —byte a byte— y los rótulos ya decían lo suyo, así que no había nada que recortar |
 | Los dos carteles de qué comer | 13 sep | «Te pongo dos carteles, uno para comida típica y quita el que está puesto, y otro para de todo un poco». Recortados con `recortar-cartel.js`, que otra vez traían el título quemado dentro. Y su nombre deshace una colisión vieja: la carta de comer pasa a llamarse **«De todo un poco»** y deja de ser el mismo texto que la del tipo de día, que es la trampa con la que ya había tropezado `probar-web.js` |
 | Los dos carteles de coche y guagua | 13 sep | `img/cartas/`. Y aquí `recortar-cartel.js` se quedó corto: su rótulo va en una **caja centrada dentro del dibujo**, no en una franja de lado a lado, así que el corte se iba al pie y «CON COCHE» se quedaba quemado dentro. La herramienta busca ahora la banda por dos caminos y sube hasta su borde de arriba — los cinco carteles anteriores salen byte a byte idénticos, o sea que solo añade |
+| «No se ha cambiado ninguna de las últimas» | 13 sep | El zip estaba bien y las nueve ilustraciones dentro: lo que fallaba era **nuestra caché**. `netlify.toml` pedía guardar `/img/*` una semana y los carteles se reemplazan con el mismo nombre, así que su navegador no volvía a pedirlos. Arreglado por los dos lados: la cabecera pasa a preguntar siempre en las carpetas que cambian, y `vImg()` le pone versión a la URL, que es lo único que sirve a quien ya tiene la semana empezada |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
