@@ -1501,42 +1501,74 @@ exactamente lo que ese botón promete.
 `listo_s`), y `listaMunicipios()` con su `qMunicipio` — esa ya estaba muerta
 antes, sin que nadie la llamara. Tres claves menos en los tres idiomas: 226.
 
-## El «cuándo» va con el calendario, no en el hilo
+## El «cuándo» lo dice el calendario, y nada más
 
-Zeben: «¿dónde metemos el botón para: si quieres un plan ahora mismo (usando la
-hora que es), un plan para un día entero, o un plan para varios días?». La
-pregunta era buena porque las tres existían y estaban **mal repartidas**:
+Esto tuvo dos vueltas en el mismo día, y la segunda la dio Zeben con una frase
+que quita trabajo en vez de añadirlo: **«creo que nos quitaríamos un problema
+si en el calendario pudieras elegir los días, poniendo un máximo de 3 días»**.
 
-| | qué es | dónde vivía |
-|---|---|---|
-| ahora mismo | `sorprender()`, el reloj recorta | un botón de texto colgado del paso 4, debajo de los muñequitos |
-| el día entero | `armarDia()` | **no se elegía**: era el final automático del hilo |
-| varios días | `pedirDias()` → `escapada()` | en el menú, que desde que el hilo se dio la vuelta solo se alcanza por «volver al menú» **después** de un plan |
+La primera vuelta fue juntar las tres puertas —«ahora mismo», «el día entero» y
+«varios días»— en una fila de chips debajo del calendario, porque estaban
+repartidas por tres sitios que no se hablaban: un botón colgado del paso de los
+muñequitos, el final automático del hilo y el menú, que solo se alcanza después
+de un plan. Eso era mejor que antes, pero seguía preguntando el CUÁNDO **dos
+veces**: una en la fecha y otra en los chips.
 
-**Y las tres son la misma pregunta: PARA CUÁNDO.** Que es exactamente la del
-calendario. Así que van ahí, en una fila de chips debajo de él, y no en el hilo:
-el hilo se queda en sus cinco pasos y sigue acabando en un plan, que es lo que
-él pidió con «y listo». Lo eligió él de las dos opciones que se le plantearon.
-Tres cosas que se siguen de esa colocación y que no se pueden quitar:
-· **«Ahora mismo» solo se pinta si el día elegido es hoy y son menos de las
-  ocho.** Para un día de dentro de tres semanas no significa nada, y es la regla
-  de siempre —un botón que no lleva a ningún sitio es peor que no tenerlo—. Y si
-  estaba elegido y se cambia la fecha en el calendario, **se cae solo** a «el día
-  entero»: probado, el chip desaparece y la selección se mueve sola.
-· **Es un ajuste, no un paso.** No habla en el hilo ni pide confirmación: se
-  apunta en el panel y lo lee `armarDia()` al final, que ahora se bifurca en tres.
-· **Y se vuelve a comprobar al final**, que entre pulsar el chip y contestar las
-  cinco preguntas pueden pasar diez minutos y la fecha puede haber cambiado.
+**La segunda vuelta es la buena: solo pregunta el calendario.** Se marca un día
+y es un plan de un día; se marcan dos o tres y es la escapada. Los tres chips se
+fueron enteros, con sus cuatro claves de `tr()`, y `armarDia()` se quedó con tres
+ramas que salen todas del mismo sitio:
+· **Dos o tres días marcados** → la escapada, y **sin preguntar cuántos**, que
+  ya lo han dicho en la rejilla. `pedirDias()` sobra en el camino de ida; sigue
+  en el menú, que es otra puerta y ahí sí hay que preguntarlo.
+· **Un día que es HOY** → el reloj recorta, que es exactamente lo que él llamaba
+  «un plan ahora mismo, usando la hora que es».
+· **Un día que no es hoy** → el día entero.
+Y con eso se cae una cosa que estaba mal y no lo parecía: **el salto automático
+a mañana**. Si son las seis de la tarde y han elegido HOY en el calendario,
+saltar solo al día siguiente es no haberles hecho caso. Ahora se planifica lo
+que queda; si no queda nada, el motor ya lo dice por su cuenta.
 
-**Y ahí salió un fallo que había metido el propio reordenado: «Sorpréndame» se
-cargaba la respuesta del paso 1.** `sorprender()` hacía
-`S.apetece = S.ninos ? 'todo' : (h>=17 ? 'todo' : 'naturaleza')` — o sea, elegía
-él el tipo de día. Eso era correcto cuando vivía en el menú y nadie había
-preguntado nada; desde que el hilo **empieza** preguntándolo, era darle senderos
-a quien acababa de pulsar la carta de las playas, y sin decírselo. Ahora solo
-elige si `S.apetece` está vacío. El botón colgado del paso 4 se fue con él: era
-la segunda puerta a lo mismo, que es el fallo del que ya avisa «los dos botones
-de arriba hacían lo mismo».
+**El rango, y por qué esta vez sí vale.** Ya se puso una vez y lo quitó él:
+«elegir varios días y no hacer nada no vale para nada, para eso mejor
+quitarlo». Tenía razón entonces —enseñaba una lista más larga y nada más— y la
+tiene ahora, que es al revés: el rango **es** lo que decide el plan. Tres reglas,
+y las tres existen para que no haya manera de quedarse en un estado raro:
+· Pulsar un día **posterior** al elegido, a uno o dos de distancia, estira.
+· Pulsar el mismo, uno anterior, o uno a más de tres días, **empieza de cero**
+  en ese día.
+· El tope son **tres**. Cuatro días seguidos ya no es una escapada, y el motor
+  solo sabe sembrar tres zonas sin repetirse.
+`S.fecha` sigue siendo **el primer día y lo único que lee el motor**; `S.dias`
+solo se suma en `finDeRango()`. Por eso nada de lo que ya funcionaba se entera
+de que hay rango. Y **cambiar la fecha por cualquier otro camino lo deshace**:
+sin eso, quien saltara a la fecha de una fiesta se llevaba pegados los tres días
+del rango anterior y acababa con una escapada que no había pedido.
+
+**Y de paso, el mismo fallo que tenía «Sorpréndame», un piso más abajo.**
+`planVariosDias()` repartía los tipos de día él solo —`d===0?'todo':…`—, así que
+la escapada le daba «un poco de todo» a quien acababa de pulsar la carta de las
+playas. Ahora **el primer día es el que pidieron** y los otros dos varían, que
+de eso va una escapada.
+
+## El parte del tiempo, en el hueco que dejaron los chips
+
+También suyo, y en la misma frase: «entonces podríamos poner debajo del
+calendario un iconito con el tiempo en la capital, por ejemplo». El sitio estaba
+libre justo porque los chips se habían ido.
+La maquinaria ya existía entera —`pedirTiempo()` y la función `tiempo.js` de
+AEMET— y solo se usaba para el plan. Tres decisiones:
+· **No se inventa nada.** Si AEMET no contesta —o no hay clave, o se abre desde
+  un servidor de ficheros— el hueco se queda **vacío** y `:empty` lo esconde
+  entero. Un sol dibujado por si acaso es peor que no decir nada. Comprobado
+  aquí, que desde el contenedor la función no existe: no se pinta ni un icono.
+· **Empieza por la capital y se muda con ellos.** Mientras no se sabe de dónde
+  salen, el parte es el de Santa Cruz **y lo dice**; en cuanto eligen su pueblo
+  en el paso 2, pasa a ser el suyo. Un parte sin decir de dónde es no vale.
+· **El icono sale del parte**, del texto del cielo que manda AEMET y de la
+  probabilidad de lluvia, no de una corazonada. Y si entre que se pide y que
+  llega han cambiado de día o de pueblo, **no se pinta**: sería enseñar el
+  tiempo de otro sitio.
 
 ## Cuántos son, y el número que nadie había dicho
 
@@ -1552,9 +1584,17 @@ cosmético**: las tres cartas guardaban un número **inventado** —«dos adulto
 Eso es la regla de la casa rota por dentro: **no se inventan datos**.
 
 El arreglo tiene dos mitades y hacen falta las dos:
-· **El contador**, debajo de las tres cartas y **opcional**: adultos y niños con
+· **El contador**, **encima** de las tres cartas y opcional: adultos y niños con
   sus `−`/`+` y un «Seguimos». Quien pulsa una carta sigue yendo **de un toque**,
   exactamente como antes, que si no el paso 4 pasa de un gesto a cuatro.
+  **Encima y no debajo, y eso no es una preferencia de diseño: puesto debajo,
+  Zeben no lo vio y lo dio por no hecho** —«siguen saliendo las imágenes sin
+  contar los niños o los adultos»—. Medido en un móvil de 390×844, caía a
+  **865 px por debajo de lo que se ve**, porque las tres cartas de «con quién
+  viajan» son apaisadas y van una por fila. Lo que hay que bajar media pantalla
+  para encontrar, no existe. La lección es vieja y es la del `.mht`: **una cosa
+  nueva se mira en un móvil antes de darla por hecha**, que aquí la prueba del
+  navegador la pulsaba perfectamente por selector y no se enteró de nada.
 · **Y sobre todo, lo que se manda.** Si no lo han dicho, `personas` **NO va** al
   informe: va **`van`**, que es lo único que de verdad contestaron —«dos
   adultos», «una familia con niños», «un grupo, sin niños»—. El número solo viaja
@@ -1566,7 +1606,7 @@ solo acusa de no caber cuando el número es suyo, y el narrador local deja de
 soltar «llamen antes, que siendo 4 conviene» a quien no ha dicho que son cuatro.
 Medido en el navegador: por carta sale `personas:null, van:"una familia con
 niños"`; por el contador con 4 y 1, `personas:5, van:null`.
-Ocho claves nuevas de `tr()` en los tres idiomas: **234**.
+Ocho claves nuevas de `tr()` en los tres idiomas.
 
 **Y los nueve recorridos de `probar-web.js` hubo que darles la vuelta enteros**,
 que empezaban todos por el pueblo. Dos trampas de la prueba que muerden aquí:
@@ -1916,7 +1956,7 @@ miradores en el catálogo (41 con posición aproximada), 36% de los planes y
 1,1 km de desvío mediano**. Eran 25 miradores y el 12%, así que este número
 mide sobre todo el catálogo, no el motor.
 
-**Con navegador** — `probar-web.js` con Playwright recorre diez flujos en
+**Con navegador** — `probar-web.js` con Playwright recorre doce flujos en
 Chrome y captura los errores de consola. Sin argumentos va contra la web
 desplegada; con una URL detrás va contra lo que se le diga, y **eso es lo que
 hay que hacer para probar una rama**: se levanta un servidor de ficheros en el
@@ -1947,7 +1987,7 @@ la web: el proxy corta Leaflet y las tipografías de Google por certificado, y
 las funciones de Netlify no existen en un servidor de ficheros. Lo que hay que
 mirar es que **no haya ningún error de JavaScript propio** — y que, con la API
 caída, el plan salga igual por el narrador local, que es la red de seguridad.
-Referencia: **10 de 10 recorridos completan todos sus pasos, 0 errores de
+Referencia: **12 de 12 recorridos completan todos sus pasos, 0 errores de
 JavaScript propios**, y el plan sale con sus fichas y su caja de texto. Los dos
 últimos entran por caminos que ningún otro pisa:
 · `mapa-comarcas` — los siete primeros eligen el pueblo donde DUERMEN, y este
@@ -1961,17 +2001,31 @@ JavaScript propios**, y el plan sale con sus fichas y su caja de texto. Los dos
   fiestas sale de la lista por ahí y el día vacío se lo salta, porque la carta
   ya ha dicho que no hay nada y ha repintado las cartas debajo. En los dos
   casos se acaba con un plan, que es lo que se mide.
-· `ahora-mismo` — el chip de la cabecera, que **va opcional**: solo se pinta si
-  el día elegido es hoy y son menos de las ocho, y la prueba corre con la fecha
-  y la hora de hoy. De noche no existe, y eso no es un fallo de la web.
+· `hoy-con-lo-que-queda` — la prueba corre con la fecha de hoy y sin tocarla, o
+  sea que TODOS los recorridos van por esa rama: el reloj recorta el día. Lo
+  que se mide es que salga plan igual a cualquier hora a la que se ejecute.
+· `dia-futuro-entero` y `rango-escapada` — las otras dos ramas del «cuándo», que
+  ningún otro recorrido pisa: un día del mes que viene da el día entero, y dos
+  días seguidos dan la escapada sin preguntar cuántos.
 · `cuantos-son` — el otro camino del paso 4: en vez de pulsar una carta se tocan
   los `+` y se sale por «Seguimos». Existe porque ese botón es **el único que
   escribe `personas`** en el informe; por las cartas va `van` y el número no
   viaja.
-Y una trampa más, que salió al darle la vuelta al hilo:
+Y tres trampas más, que salieron al darle la vuelta al hilo y al meter el
+calendario en los recorridos:
 · **El chip de la comarca lleva DENTRO el rótulo largo y el corto**, así que su
   texto es «Área MetropolitanaMetrop.» y hay que buscarlo sin exigir exacto —
   es la misma trampa que el `=EN` del idioma, por el otro lado.
+· **Un paso que empieza por `@` es un SELECTOR CSS**, no un rótulo. Hace falta
+  para el calendario y solo para él: sus días son números sueltos —un «3» casa
+  con cualquier botón que lleve un tres— y el botón que lo abre lleva dentro la
+  fecha y el número de eventos, así que cambia cada día.
+· **Y los botones se buscan con `button:visible`.** El calendario cerrado NO se
+  quita del DOM, solo se oculta, así que sus chips de pueblo siguen ahí: sin el
+  `:visible`, «La Laguna» casaba antes con el chip oculto del pie del calendario
+  que con la estampa del municipio, y el paso se quedaba esperando a que algo
+  invisible se hiciera visible. O sea, fallaba un recorrido que la web hacía
+  perfectamente. **La rota era la prueba**, otra vez — y van unas cuantas.
 
 Y siempre, antes de dar nada por bueno:
 
@@ -2005,7 +2059,7 @@ costa a la cumbre y con el centroide ganaba el Observatorio del Teide, a 10 km
 y 2.400 m de altura. Quien sí sabe lo que quiere ver tiene el botón «Prefiero
 elegir el sitio yo».
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 234 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 231 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **La leyenda del mapa también.** Los cuatro rótulos —«Dónde duermen», «La
@@ -2110,6 +2164,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | Las cinco ilustraciones del tipo de día | 12 sep | `img/cartas/`. Recortadas quitándoles el rótulo quemado dentro. Tres sustituyen a las que había y les dan nombre mejor; «un poco de todo» sube de botón a carta y se coloca la última, centrada; y «Tenderete y tradiciones» abre el calendario de fiestas —todas, y si ese día no hay ninguna se dice y se ofrece otra cosa— que es el único dato que respalda lo que promete |
 | «Más que dónde duerme podemos poner ¿de dónde sale?» | 13 sep | El paso 2 deja de preguntar por la cama y pregunta por el punto de partida, con el botón de la ubicación debajo del mapa. `localizar()` lleva ahora a dónde seguir y a dónde volver, que desde ahí no son lo mismo |
 | «¿Dónde metemos el botón de ahora mismo / día entero / varios días?» + «¿falta el de los muñequitos?» | 13 sep | Las tres puertas del «cuándo» se juntan en una fila de chips debajo del calendario, que es la misma pregunta que la fecha; el hilo se queda en cinco pasos. Y los muñequitos ganan un contador opcional: el número inventado de las cartas (2, 4, 6) deja de viajar al informe como si lo hubieran dicho ellos. De paso salió que «Sorpréndame» pisaba la respuesta del paso 1 |
+| «Elegir los días en el calendario, máximo 3» + «el tiempo debajo» + «el contador no se ve» | 13 sep | El calendario pasa a decidir el CUÁNDO él solo —un día es un plan, dos o tres son la escapada— y los tres chips se van enteros; en su hueco va el parte de AEMET, vacío si no contesta. Y el contador de personas sube ENCIMA de las cartas: medido en un móvil, caía a 865 px por debajo de lo que se ve. De paso, la escapada dejaba de respetar el tipo de día del paso 1 |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si

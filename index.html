@@ -154,14 +154,12 @@ if(typeof L==='undefined'){
     <input type="date" id="fechaLibre" min="2026-08-01" max="2027-12-31" hidden>
   </div>
   <div class="calendario" id="calendario" hidden></div>
-  <!-- El «cuándo» va aquí y no en el hilo, y es la misma razón por la que la
-       fecha está aquí: las tres opciones —ahora mismo, el día entero, varios
-       días— son la MISMA pregunta que el calendario, la de cuándo. Y quien
-       decide si «ahora mismo» existe es la fecha: para un día de dentro de tres
-       semanas no significa nada, así que ese chip solo se pinta si el día
-       elegido es hoy y queda día. Con esto el hilo se queda en sus cinco pasos
-       y sigue acabando en un plan. -->
-  <div class="cuando" id="cuando"></div>
+  <!-- Aquí vivieron un día los tres chips de «ahora mismo / día entero /
+       varios días», y duraron poco: en cuanto el calendario dejó elegir hasta
+       tres días seguidos, los tres sobraban —la fecha ya dice cuándo—. El
+       hueco lo ocupa el parte del tiempo, que era lo que Zeben quería ver ahí.
+       Si AEMET no contesta, esto se queda vacío y no se pinta nada. -->
+  <div class="tiempoCab" id="tiempoCab"></div>
   <div class="idiomas" id="idiomas"></div>
 </header>
 
@@ -346,7 +344,7 @@ const T={
      capCama:'Dónde duermen',gRemate:'Para rematar',capRuta:'La ruta del día',capComer:'Dónde comer',capAgua:'Para el bañito',
      fotoDe:'Fotos:',
      tGente:'¿Con quién viajan?',
-     cuTit:'El plan:',cuAhora:'Ahora mismo',cuDia:'El día entero',cuDias:'Varios días',
+     calRango:'Para varios días, pulse también el último: hasta 3 seguidos.',
      gExacto:'¿Cuántos son exactamente? (opcional)',gAdultos:'adultos',gNinos:'niños',gSeguimos:'Seguimos',
      tCoche:'¿Coche o guagua?',
      cConCoche:'Con coche',cSinCoche:'Sin coche, en guagua',
@@ -407,7 +405,7 @@ const T={
      capCama:'Where you sleep',gRemate:'To round it off',capRuta:'The day\'s route',capComer:'Where to eat',capAgua:'For a swim',
      fotoDe:'Photos:',
      tGente:'Who is travelling?',
-     cuTit:'The plan:',cuAhora:'Right now',cuDia:'The whole day',cuDias:'Several days',
+     calRango:'For several days, tap the last one too: up to 3 in a row.',
      gExacto:'Exactly how many are you? (optional)',gAdultos:'adults',gNinos:'children',gSeguimos:'Carry on',
      tCoche:'Car or bus?',
      cConCoche:'With a car',cSinCoche:'By bus',
@@ -468,7 +466,7 @@ const T={
      capCama:'Wo Sie schlafen',gRemate:'Zum Abschluss',capRuta:'Die Route des Tages',capComer:'Wo essen',capAgua:'Zum Baden',
      fotoDe:'Fotos:',
      tGente:'Wer reist mit?',
-     cuTit:'Der Plan:',cuAhora:'Jetzt gleich',cuDia:'Der ganze Tag',cuDias:'Mehrere Tage',
+     calRango:'Für mehrere Tage auch den letzten antippen: bis zu 3 am Stück.',
      gExacto:'Wie viele genau? (optional)',gAdultos:'Erwachsene',gNinos:'Kinder',gSeguimos:'Weiter',
      tCoche:'Auto oder Bus?',
      cConCoche:'Mit Auto',cSinCoche:'Mit dem Bus',
@@ -682,7 +680,7 @@ function horarioTr(h){
 }
 
 /* ===================== ESTADO ===================== */
-let S={fecha:(new Date()).toISOString().slice(0,10),base:null,coche:null,gente:null,verif:false,ultimoBrief:null,prompt:PROMPT_BASE,anclaElegida:null,comida:null,ninos:false,apetece:null,ahora:null,saltoComida:0,idioma:'es',aqui:null};
+let S={fecha:(new Date()).toISOString().slice(0,10),base:null,coche:null,gente:null,verif:false,ultimoBrief:null,prompt:PROMPT_BASE,anclaElegida:null,comida:null,ninos:false,apetece:null,ahora:null,saltoComida:0,idioma:'es',aqui:null,dias:1};
 const hilo=document.getElementById('hilo'),acc=document.getElementById('acciones');
 const hRazon=document.getElementById('hRazon'),jsonBrief=document.getElementById('jsonBrief'),listaAudit=document.getElementById('listaAudit');
 const txtPrompt=document.getElementById('txtPrompt');
@@ -4209,8 +4207,12 @@ function planVariosDias(dias){
     S.saltoComida=d;                      /* que no repita restaurante */
     /* El primer día se empieza suave: acaban de llegar o vienen de viaje.
        El del medio es el de más trote. El último, cerca y sin prisa. */
-    S.apetece = dias>=3 ? (d===0?'todo' : d===1?'naturaleza' : 'playa')
-                        : (d===0?'todo' : 'naturaleza');
+    /* El PRIMER día es el que pidieron en el paso 1, si lo pidieron: desde que
+       el hilo empieza por «qué le apetece», machacarlo aquí era darle museos a
+       quien acababa de pulsar la carta de las playas — el mismo fallo que tenía
+       `sorprender()`. Los otros días sí varían, que de eso va una escapada. */
+    S.apetece = d===0 ? (guardado.apetece||'todo')
+              : dias>=3 ? (d===1?'naturaleza':'playa') : 'naturaleza';
     S._yaVistos=usados;                   /* que no repita sitio de otro día */
     S._yaComido=comidos;
     let r=null;
@@ -4621,6 +4623,7 @@ async function arranque(){
 }
 async function pCoche(){
   const b=BASES[S.base];
+  pintaTiempoCab();   /* ya se sabe de dónde salen: el parte pasa a ser el suyo */
   /* «En Puerto de la Cruz, muy bien.» estaba escrito en español a pelo, así
      que un inglés leía «En Puerto de la Cruz, muy bien. Do you have a car?»
      —y es el PRIMER mensaje después de su primera decisión—. Va por `tr()`. */
@@ -4660,6 +4663,11 @@ async function pGente(){await naira(tr('como'),360);
     {t:tr('familia'),img:'familia',    ancho:true,fn:()=>elige(4,true ,'una familia con niños')},
     {t:tr('grupo'),  img:'grupo',      ancho:true,fn:()=>elige(6,false,'un grupo, sin niños')}
   ],tr('tGente'));
+  /* El contador va ENCIMA de las cartas, y eso no es una preferencia de
+     diseño: puesto debajo, Zeben no lo vio y lo dio por no hecho. Medido en un
+     móvil de 390×844, caía a 865 px por debajo de lo que se ve, porque las tres
+     cartas de «con quién viajan» son apaisadas y van una por fila. Lo que hay
+     que bajar media pantalla para encontrar, no existe. */
   let ad=2, ni=0;
   const caja=document.createElement('div');
   caja.className='contador';
@@ -4692,7 +4700,7 @@ async function pGente(){await naira(tr('como'),360);
     else if(p==='n-') ni=Math.max(0,ni-1); else if(p==='n+') ni=Math.min(10,ni+1);
     pinta();
   });
-  acc.appendChild(caja);
+  acc.insertBefore(caja, acc.firstChild);
 }
 /* ============ LAS FIESTAS DE ESE DÍA ============
    Hasta ahora el motor elegía él solo qué fiesta anclaba el día, y el turista
@@ -5619,45 +5627,44 @@ async function preguntaComida(){
     {t:tr('cDeTodo'),img:'un-poco-de-todo',fn:()=>{S.comida=null;armarDia()}}
   ],tr('tComida'));
 }
-/* El final de los cinco pasos, y lo único que mira del ajuste de arriba.
-   Los tres caminos salen de aquí y no de tres botones sueltos, que es lo que
-   evita el fallo de siempre: dos puertas a lo mismo que acaban dando cosas
-   distintas. */
+/* El final de los cinco pasos, y LO ÚNICO QUE MIRA ES EL CALENDARIO. Los tres
+   botones de «ahora mismo / día entero / varios días» estuvieron aquí un día y
+   se fueron: la fecha ya lo dice todo, y preguntarlo dos veces es la puerta de
+   siempre a que las dos respuestas no coincidan.
+   · Dos o tres días marcados en el calendario → la escapada, y sin preguntar
+     cuántos, que ya lo han dicho ahí.
+   · Un día que es HOY → el reloj recorta, que es lo que él llamaba «un plan
+     ahora mismo, usando la hora que es».
+   · Un día que no es hoy → el día entero. */
 async function armarDia(){
   S.descartados=null; S.prefTipo=null; S.ritmo=null;
-  /* Varios días: la escapada ya sabe todo lo que necesita —cama, coche y
-     cuántos son—, así que lo único que falta es cuántos. */
-  if(S.cuando==='dias'){ S.ahora=null; S.diaEntero=true; pedirDias(); return; }
-  /* Ahora mismo: el reloj recorta. Se vuelve a comprobar que siga siendo hoy,
-     que entre elegir el chip y acabar las preguntas pueden pasar diez minutos
-     y la fecha se puede haber cambiado en el calendario. */
-  if(S.cuando==='ahora'&&quedaDiaHoy()){
-    const h=new Date().getHours();
+  if(S.dias>1){
+    S.ahora=null; S.diaEntero=true;
+    paso('ok','paso 5 · '+S.dias+' días seguidos',
+      'Lo marcaron en el calendario, del <span class="si">'+S.fecha+'</span> al '+
+      '<span class="si">'+finDeRango()+'</span>, así que no hay que preguntar cuántos.');
+    escapada(S.dias); return;
+  }
+  const hoy=(new Date()).toISOString().slice(0,10);
+  const h=new Date().getHours();
+  /* Hoy: se planifica lo que queda, sin saltar a mañana. Saltar por su cuenta
+     al día siguiente cuando han elegido HOY en el calendario sería no haberles
+     hecho caso; si lo que queda no da para nada, el motor lo dice solo. */
+  if(S.fecha===hoy){
     S.ahora=(h>=19)?'atardecer':(h>=16)?'tarde':(h>=13)?'mediodia':null;
-    S.diaEntero=false;
-    paso('ok','paso 5 · con lo que queda de hoy',
-      'Son las <span class="am">'+String(h).padStart(2,'0')+':00</span>, así que se planifica '+
-      'solo lo que resta del día. El tipo de día es el que pidieron en el paso 1.');
-    await naira(tr(S.ninos?'qSorpresaHoyNinos':'qSorpresaHoy'),380);
+    S.diaEntero=(S.ahora===null);
+    paso('ok','paso 5 · hoy, con lo que queda',
+      'Son las <span class="am">'+String(h).padStart(2,'0')+':00</span> y el día elegido es hoy, '+
+      'así que se planifica con la hora que es. El tipo de día es el que pidieron en el paso 1.');
+    if(S.ahora) await naira(tr(S.ninos?'qSorpresaHoyNinos':'qSorpresaHoy'),380);
     pedirPlan(); return;
   }
   S.ahora=null; S.diaEntero=true;
-  const hoy=(new Date()).toISOString().slice(0,10);
-  const h=new Date().getHours();
-  if(S.fecha===hoy && h>=16){
-    const man=new Date(new Date(hoy+'T12:00:00').getTime()+86400000).toISOString().slice(0,10);
-    S.fecha=man; pintaDia();
-    const inp=document.getElementById('fechaLibre'); if(inp) inp.value=man;
-    paso('ok','paso 5 · y hoy ya no cabe',
-      'Son las <span class="am">'+String(h).padStart(2,'0')+':00</span>. Un día entero ya no cabe en lo que '+
-      'queda de hoy, así que se salta a <span class="si">mañana</span> y se arma completo.');
-    await naira(tr('planManana'),380);
-  }
   pedirPlan();
 }
 function otroDia(){hilo.innerHTML='';naira(tr('qDigame'),260).then(()=>menuPrincipal())}
 function reiniciar(){S.base=S.coche=S.gente=S.anclaElegida=S.comida=S.apetece=S.ahora=S.faltaNucleo=null;S.diaEntero=false;
-  S.cuando=null;S.genteExacta=false;pintaCuando();
+  S.genteExacta=false;
   S.ninos=false;S.saltoComida=0;
   /* los descartes son de ESE plan: si no se limpian, alguien que dijo «esta
      no» a una playa en marzo no volvería a verla nunca */
@@ -5903,7 +5910,11 @@ function pintaCalendario(){
     const iso=isoDe(a,m,d), evs=fiestasDe(iso), acs=actosDe(iso);
     const fuera=iso<min||iso>max;
     const cl=['calD'];
+    /* El rango: el primero manda y los otros uno o dos van marcados más flojo.
+       `S.fecha` sigue siendo el primer día y es lo único que lee el motor, así
+       que nada de lo que ya funcionaba se entera de que hay rango. */
     if(iso===S.fecha) cl.push('sel');
+    else if(S.dias>1&&iso>S.fecha&&iso<=finDeRango()) cl.push('enRango');
     if(iso===hoy) cl.push('hoy');
     if(evs.length) cl.push('conFiesta');
     else if(acs.length) cl.push('conActo');   /* hay programa, pero la fiesta es otro día */
@@ -5921,7 +5932,7 @@ function pintaCalendario(){
     h+='<button class="'+cl.join(' ')+'" data-dia="'+iso+'"'+(fuera?' disabled':'')+'>'+
        '<span class="nd">'+d+'</span>'+marca+'</button>';
   }
-  h+='</div><p class="calPista">'+tr('calPista')+'</p>';
+  h+='</div><p class="calPista">'+tr('calPista')+'<br>'+tr('calRango')+'</p>';
 
   /* lo que hay el día elegido: es para lo que existe el calendario */
   const hoyEvs=fiestasDe(S.fecha), hoyAct=actosDe(S.fecha);
@@ -6003,6 +6014,21 @@ function atarCal(caja,a,m){
   caja.querySelectorAll('.calD').forEach(b=>b.onclick=()=>{
     const iso=b.getAttribute('data-dia');
     calMuniAbierto=null;             /* otro día, otro programa */
+    /* EL RANGO, de hasta tres días. La primera vez que se puso, el rango no
+       hacía nada —solo enseñaba una lista más larga— y lo quitó Zeben: «elegir
+       varios días y no hacer nada no vale para nada». Ahora SÍ hace: dos o tres
+       días seguidos son la escapada, y por eso desaparecen los tres botones de
+       «ahora mismo / día entero / varios días». La pregunta de cuándo se
+       contesta una sola vez, en el calendario, que es donde vive la fecha.
+       Tres reglas, y las tres son para que no haya manera de quedarse a medias:
+       · Pulsar un día POSTERIOR al elegido, a uno o dos de distancia, estira.
+       · Pulsar el mismo, uno anterior, o uno a más de tres días, empieza de
+         cero en ese día. Nunca hay un estado raro del que no se pueda salir.
+       · El tope son tres. Cuatro días seguidos ya no es una escapada, es un
+         viaje, y el motor solo sabe sembrar tres zonas sin repetirse. */
+    const dif=Math.round((new Date(iso+'T12:00:00')-new Date(S.fecha+'T12:00:00'))/86400000);
+    if(S.dias===1 && dif>=1 && dif<=2){ S.dias=dif+1; pintaCalendario(); pintaDia(); return; }
+    S.dias=1;
     /* se escribe en el <input> y se avisa como si lo hubiera tocado una
        persona: así el motor se entera por el mismo sitio de siempre */
     inpF.value=iso;
@@ -6020,48 +6046,54 @@ function abreCalendario(abrir){
   bot.setAttribute('aria-expanded',String(ab));
 }
 
-/* ── EL «CUÁNDO»: AHORA MISMO, EL DÍA ENTERO O VARIOS DÍAS ──────────────
-   Las tres puertas existían y estaban mal repartidas: «ahora mismo» era un
-   botón de texto colgado del paso de los muñequitos, «el día entero» no se
-   elegía —era el final automático del hilo— y «varios días» vivía en el menú,
-   que desde que el hilo se dio la vuelta solo se alcanza por «volver al menú»
-   después de un plan. Y son la misma pregunta: PARA CUÁNDO.
-   Por eso van con el calendario y no en el hilo. Dos cosas que se siguen de
-   ahí y que no se pueden tocar sin traerlas de vuelta:
-   · **«Ahora mismo» solo se pinta si el día elegido es hoy y queda día.** Para
-     un día de dentro de tres semanas no significa nada, y es la regla de
-     siempre: un botón que no lleva a ningún sitio es peor que no tenerlo. Si
-     estaba elegido y se cambia la fecha, se cae solo a «el día entero».
-   · **Es un ajuste, no un paso.** No habla en el hilo ni pide confirmación: se
-     apunta en el panel y lo lee `armarDia()` al final. El hilo sigue siendo
-     cinco preguntas y sigue acabando en un plan. */
-const CUANDOS=[{k:'ahora',ic:'⏱',t:'cuAhora'},{k:'dia',ic:'☀️',t:'cuDia'},{k:'dias',ic:'🗓',t:'cuDias'}];
-/* ¿El día elegido es hoy y sobra algo de día? A partir de las ocho lo que
-   queda no da ni para una parada, así que ahí «ahora mismo» tampoco se ofrece. */
-function quedaDiaHoy(){
-  return S.fecha===(new Date()).toISOString().slice(0,10) && new Date().getHours()<20;
+/* ── EL PARTE DEL TIEMPO, DEBAJO DEL CALENDARIO ────────────────────────
+   Aquí estuvieron los tres chips de «ahora mismo / día entero / varios días»,
+   y se fueron enteros: desde que el calendario deja marcar hasta tres días
+   seguidos, la pregunta de CUÁNDO se contesta una sola vez y en un solo sitio.
+   Lo que queda es lo que pidió Zeben para ese hueco: «un iconito con el tiempo
+   en la capital, por ejemplo».
+   Tres cosas de cómo está hecho:
+   · **No se inventa nada.** Si AEMET no contesta —o no hay clave, o se abre
+     desde un servidor de ficheros— el hueco se queda VACÍO y no se pinta ni un
+     icono. Un sol dibujado por si acaso es peor que no decir nada.
+   · **Empieza por la capital y se muda con ellos.** Mientras no se sabe de
+     dónde salen, el parte es el de Santa Cruz y lo dice; en cuanto eligen su
+     pueblo en el paso 2, pasa a ser el suyo, que es el que le sirve.
+   · **El icono sale del parte, no de una corazonada**: del texto del cielo que
+     manda AEMET y de la probabilidad de lluvia. */
+const CIELOS=[[/despejado|soleado/i,'☀️'],[/poco nub|intervalos|nubes altas/i,'🌤'],
+  [/muy nub|cubierto/i,'☁️'],[/torment/i,'⛈'],[/llovizna|lluvia|chubasc/i,'🌧'],
+  [/niebla|bruma|calima/i,'🌫'],[/nieve/i,'❄️']];
+function iconoCielo(t,lluvia){
+  for(const [re,ic] of CIELOS) if(t&&re.test(t)) return ic;
+  return lluvia>=35?'🌧':'🌤';
 }
-function pintaCuando(){
-  const c=document.getElementById('cuando'); if(!c) return;
-  if(S.cuando==='ahora'&&!quedaDiaHoy()) S.cuando=null;
-  const sel=S.cuando||'dia';
-  c.innerHTML='<span class="cuTit">'+tr('cuTit')+'</span>'+
-    CUANDOS.filter(x=>x.k!=='ahora'||quedaDiaHoy())
-      .map(x=>'<button type="button" class="chipC'+(sel===x.k?' sel':'')+'" data-cuando="'+x.k+'">'+
-        x.ic+' '+tr(x.t)+'</button>').join('');
+let tiempoCabPedido=null;
+async function pintaTiempoCab(){
+  const c=document.getElementById('tiempoCab'); if(!c) return;
+  const muni=(S.base&&BASES[S.base]&&BASES[S.base].m)||'Santa Cruz de Tenerife';
+  const llave=muni+'|'+S.fecha;
+  if(tiempoCabPedido===llave&&c.innerHTML) return;   /* ya está pedido y pintado */
+  tiempoCabPedido=llave;
+  const t=await pedirTiempo(muni,S.fecha);
+  /* Entre que se pidió y que llegó pueden haber cambiado de día o de pueblo:
+     pintar entonces sería enseñar el parte de otro sitio. */
+  if(tiempoCabPedido!==llave) return;
+  if(!t||(t.max==null&&!t.cielo)){ c.innerHTML=''; return; }
+  const et=(BASES[S.base]&&BASES[S.base].et)||'Santa Cruz';
+  c.innerHTML='<span class="tcIc">'+iconoCielo(t.cielo,t.prob_lluvia)+'</span>'+
+    (t.max!=null?'<b>'+t.max+'°</b>':'')+
+    (t.min!=null?'<i>'+t.min+'°</i>':'')+
+    '<span class="tcMu">'+et+'</span>'+
+    (t.prob_lluvia>=35?'<span class="tcLl">'+t.prob_lluvia+'%</span>':'');
 }
-document.addEventListener('click',function(e){
-  const b=e.target.closest&&e.target.closest('[data-cuando]');
-  if(!b) return;
-  S.cuando=b.getAttribute('data-cuando');
-  pintaCuando();
-  paso('ok','el plan, para cuándo', S.cuando==='ahora'
-    ? 'Con lo que queda de hoy: el reloj recorta el día.'
-    : S.cuando==='dias' ? 'Varios días seguidos. Al acabar las preguntas se elige cuántos.'
-    : 'El día entero, de la mañana al atardecer, sin recortar por el reloj.');
-});
+/* El último día del rango, que es el único sitio donde se suma S.dias. */
+function finDeRango(){
+  return new Date(new Date(S.fecha+'T12:00:00').getTime()+(S.dias-1)*86400000)
+    .toISOString().slice(0,10);
+}
 function pintaDia(){
-  pintaCuando();
+  pintaTiempoCab();
   const d=diaSemana(S.fecha);
   const ev=EVENTOS.filter(e=>e.f===S.fecha).concat(actosDe(S.fecha));
   /* El día de la semana lo escribe el navegador en el idioma elegido, igual
@@ -6082,7 +6114,10 @@ function pintaDia(){
   const caja=document.getElementById('calendario');
   if(caja&&!caja.hidden) pintaCalendario();
 }
-inpF.addEventListener('change',e=>{ S.fecha=e.target.value; pintaDia(); if(S.base) otroDia(); });
+/* Cambiar la fecha por cualquier camino deshace el rango. Si no, quien saltara
+   a la fecha de una fiesta se llevaba pegados los tres días del rango anterior
+   y acababa con una escapada que nadie había pedido. */
+inpF.addEventListener('change',e=>{ S.fecha=e.target.value; S.dias=1; pintaDia(); if(S.base) otroDia(); });
 (function(){
   const bot=document.getElementById('btnCal');
   if(bot) bot.onclick=()=>abreCalendario();

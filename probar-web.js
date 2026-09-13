@@ -60,19 +60,35 @@ const GUIONES = [
   { nombre: 'sin-coche',
     pasos: ['Senderos y naturaleza', 'Valle de La Orotava', 'Puerto de la Cruz',
             'Sin coche, en guagua', 'Grupo, sin niños', 'Un poco de todo'] },
-  /* «Ahora mismo» dejó de ser un botón colgado del paso de los muñequitos y es
-     un chip de la cabecera, al lado del calendario: el hilo se recorre entero
-     igual y lo único que cambia es que al final el reloj recorta el día.
-     El chip va OPCIONAL porque solo se pinta si el día elegido es hoy y son
-     menos de las ocho, y esta prueba corre con la fecha y la hora de hoy: de
-     noche no existe, y eso no es un fallo de la web. */
-  { nombre: 'ahora-mismo',
-    pasos: ['?Ahora mismo', 'Un poco de todo', 'Metropolitana', 'Tegueste',
+  /* «Ahora mismo» ya no es un botón de ningún sitio: lo dice el calendario.
+     La prueba corre con la fecha de hoy y sin tocarla, así que este recorrido
+     ES el de hoy —el reloj recorta el día— y lo que se mide es que salga plan
+     igual a cualquier hora a la que se ejecute. */
+  { nombre: 'hoy-con-lo-que-queda',
+    pasos: ['Un poco de todo', 'Metropolitana', 'Tegueste',
             'Con coche', 'Grupo, sin niños', 'Un poco de todo'] },
   /* El contador de cuántos son, que es el otro camino del paso 4: en vez de
      pulsar una carta se tocan los +/− y se sale por «Seguimos». Este recorrido
      existe porque ese botón es el único que escribe `personas` en el informe;
      por las cartas va `van` y el número no viaja. */
+  /* El calendario mandando el «cuándo», que son los dos caminos que el resto
+     de recorridos no pisa: todos corren con la fecha de hoy, o sea que todos
+     van por la rama de «hoy, con lo que queda». Estos dos van por las otras.
+     · un día FUTURO —el primero del mes que viene— da el día entero;
+     · dos días seguidos dan la escapada, sin preguntar cuántos. */
+  /* Ojo con el `@#btnCal` del final: hay que CERRAR el calendario antes de
+     seguir el hilo. Con él abierto, «La Laguna» casa antes con el chip de su
+     programa en el pie del calendario que con la estampa del municipio, y el
+     recorrido se va por otro lado sin decir nada. Es la trampa de los dos
+     botones que se llaman igual, otra vez. */
+  { nombre: 'dia-futuro-entero',
+    pasos: ['@#btnCal', '@button.calNav[data-mes="1"]', '@.calRej .calD:not([disabled])',
+            '@#btnCal', 'Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
+            'Grupo, sin niños', 'Un poco de todo'] },
+  { nombre: 'rango-escapada',
+    pasos: ['@#btnCal', '@.calD.sel ~ .calD', '@#btnCal',
+            'Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
+            'Grupo, sin niños', 'Un poco de todo'] },
   { nombre: 'cuantos-son',
     pasos: ['Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
             '=+', '=+', 'Seguimos', 'Un poco de todo'] },
@@ -154,8 +170,21 @@ async function main() {
            el corto —uno oculto por CSS según el ancho—, así que el de Sur dice
            «SurSur» y el exacto no casa nunca. Para esos va sin `=`. */
         const exacto = crudo.startsWith('=');
-        const busca = exacto ? crudo.slice(1) : crudo;
-        const btn = pag.locator('button', {
+        /* Y un paso que empieza por «@» es un SELECTOR CSS, no un rótulo. Hace
+           falta para el calendario y solo para él: sus días son números sueltos
+           —un «3» casa con cualquier botón que lleve un tres— y el botón que lo
+           abre lleva dentro la fecha y el número de eventos, así que cambia
+           cada día. Buscarlos por texto es justo la trampa del `=EN` que ya
+           está apuntada arriba, por el otro lado. */
+        const porSel = crudo.startsWith('@');
+        const busca = exacto ? crudo.slice(1) : porSel ? crudo.slice(1) : crudo;
+        /* `button:visible` y no `button`: el calendario cerrado NO se quita del
+           DOM, solo se oculta, así que sus chips de pueblo siguen ahí. Sin el
+           `:visible`, «La Laguna» casaba antes con el chip oculto del pie del
+           calendario que con la estampa del municipio, y el paso se quedaba
+           esperando a que algo invisible se hiciera visible — o sea, fallaba
+           un recorrido que la web hacía perfectamente. */
+        const btn = porSel ? pag.locator(busca).first() : pag.locator('button:visible', {
           hasText: exacto ? new RegExp('^\\s*' + busca.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*$') : busca
         }).first();
         try {

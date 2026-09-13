@@ -56,24 +56,26 @@ header.cab{position:relative;padding:30px 0 0;text-align:center}
   letter-spacing:-.012em;
 }
 .barra{display:flex;gap:7px;flex-wrap:wrap;align-items:center;justify-content:center;margin:20px 0 4px}
-/* La fila del «cuándo», debajo del calendario. Va con la letra de máquina y
-   en pequeño a propósito: es un ajuste al lado de la fecha, no una pregunta
-   del hilo — si compitiera con el calendario, taparía lo que de verdad se
-   viene a mirar, que son las fiestas del día. */
-.cuando{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:center;margin:8px 0 2px}
-.cuando:empty{display:none}
+/* El rótulo pequeño de máquina, que usan el contador de personas y el parte
+   del tiempo. Estaba dentro del bloque de los chips del «cuándo», que se fue. */
 .cuTit{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;
   color:var(--tea-suave);margin-right:2px}
-button.chipC{background:transparent;color:var(--tea-suave);border:1.5px solid rgba(62,43,28,.22);
-  border-radius:999px;padding:5px 12px;font-family:var(--cuerpo);font-size:12.5px;cursor:pointer}
-button.chipC:hover{border-color:var(--tea);color:var(--tea)}
-button.chipC.sel{background:var(--tea);border-color:var(--tea);color:var(--cal);font-weight:700}
-button.chipC:focus-visible{outline:2.5px solid var(--malvasia);outline-offset:2px}
+/* El parte del tiempo, debajo del calendario. Ocupa el hueco que dejaron los
+   tres chips, y **se queda vacío si AEMET no contesta**: `:empty` lo esconde
+   entero, así que no hay ni un icono dibujado por si acaso. */
+.tiempoCab{display:flex;gap:7px;align-items:baseline;justify-content:center;margin:8px 0 2px;
+  font-family:var(--cuerpo);font-size:13px;color:var(--tea-suave)}
+.tiempoCab:empty{display:none}
+.tiempoCab .tcIc{font-size:17px;line-height:1}
+.tiempoCab b{font-family:var(--mono);font-size:15px;color:var(--tea)}
+.tiempoCab i{font-style:normal;font-family:var(--mono);font-size:12px;opacity:.75}
+.tiempoCab .tcMu{font-size:12px}
+.tiempoCab .tcLl{font-size:11.5px;color:var(--mar);font-weight:700}
 /* El contador de los muñequitos, debajo de las tres cartas. Va discreto a
    propósito: es opcional, y quien pulsa una carta tiene que seguir yendo de un
    toque sin sentir que se deja algo sin rellenar. */
 .contador{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;
-  margin-top:6px;padding-top:14px;border-top:1px solid rgba(62,43,28,.14)}
+  margin-bottom:4px;padding-bottom:14px;border-bottom:1px solid rgba(62,43,28,.14)}
 .contador .cuTit{width:100%;text-align:center;margin:0 0 2px}
 .cuenta2{display:inline-flex;align-items:center;gap:7px;border:1.5px solid rgba(62,43,28,.22);
   border-radius:999px;padding:4px 6px 4px 12px}
@@ -85,6 +87,10 @@ button.chipC:focus-visible{outline:2.5px solid var(--malvasia);outline-offset:2p
 .cuenta2 button:hover{filter:brightness(.95)}
 .cuenta2 button:focus-visible{outline:2.5px solid var(--malvasia);outline-offset:2px}
 button.okGente{flex:0 0 auto}
+/* Los días de en medio y el último del rango: marcados, pero MÁS FLOJO que el
+   primero. El primero es el que manda —es `S.fecha`, el único que lee el
+   motor— y con los tres iguales no se sabía por dónde empieza la escapada. */
+.calD.enRango{background:var(--arena);color:var(--tea);font-weight:700}
 .idiomas{display:flex;gap:0;justify-content:center;margin:14px 0 2px;border:2px solid var(--tea);border-radius:999px;overflow:hidden;width:max-content;margin-left:auto;margin-right:auto}
 button.idi{background:transparent;border:0;padding:8px 20px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--tea-suave);cursor:pointer;transition:.12s}
 button.idi:hover{background:var(--cal-hueso)}
