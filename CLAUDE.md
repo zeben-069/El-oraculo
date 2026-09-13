@@ -715,6 +715,9 @@ de camino al coche vale igual para dos adultos. Se buscan a 2,5 km de la
 informe dice junto a cuál en `junto_a`. Mirando solo la última, un día que
 acababa en La Esperanza se quedaba sin remate teniendo cuatro heladerías a
 400 m de la parada de la mañana.
+Y **«de vuelta» se mide por desvío, no en línea recta desde casa** — ver abajo,
+«El remate volvía sobre sus pasos»: con la regla vieja el día bajaba de Punta
+del Hidalgo a Bajamar y remataba otra vez en Punta del Hidalgo.
 
 ---
 
@@ -1904,6 +1907,93 @@ que no ve un cambio que aquí está probado, **el siguiente sitio donde mirar es
 lo que hay entre el zip y su pantalla** —la caché, el despliegue, la fecha de lo
 publicado—, no el código otra vez.
 
+## El remate volvía sobre sus pasos, y el «radar de kilómetros» que no hacía falta
+
+Zeben mandó tres capturas de un plan suyo —La Laguna, coche, con niños, playa—
+y el diagnóstico era de los buenos: **«genial, pero te manda a bañarte a la
+Punta, comes en la Cofradía de La Punta, luego te manda para Bajamar y acabas
+echando un dulce en La Caseta, que está otra vez en la Punta del Hidalgo. Me
+parece un poco engorroso»**. Y de ahí sacó una segunda cosa, que es otra
+distinta y más de fondo.
+
+**Lo primero era un fallo, y estaba medido en un minuto.** `deVuelta()` decidía
+si un remate «queda de camino a casa» mirando **la línea recta desde casa**: solo
+exigía que el remate no quedara más de 1,5 km más lejos del alojamiento que la
+última parada. La Caseta está a 9,1 km del casco de La Laguna y las piscinas de
+Bajamar a 8,2 — **0,9 km más lejos, así que pasaba el filtro**. Pero el rodeo de
+verdad son **2,7 km**: se sale de Bajamar, se vuelve a subir a la Punta y se da
+la vuelta otra vez. Eso en línea recta no se ve.
+
+Y la regla buena ya estaba escrita en esta casa, dos veces: **los restaurantes y
+el regalo de ida se miden por DESVÍO** —lo que se alarga el viaje por pasar—, no
+en línea recta. Al remate no se le había aplicado. Ahora sí, con tope de **2 km
+con coche y 1 sin** (andando, un rodeo cuesta el doble).
+Medido sobre **237 remates** de 31 bases × 4 días × coche y guagua:
+
+| | antes | ahora |
+|---|---|---|
+| desvío mediano | 0,3 km | 0,2 km |
+| **desvío máximo** | **7,2 km** | **1,8 km** |
+| remates ofrecidos | 237 | 207 (87%) |
+
+O sea que **casi todos estaban bien y lo que había era una cola**: un helado a
+siete kilómetros de rodeo. Y no se pierden 30 remates: el motor elige **otro más
+cerca**, que para eso la lista estaba ordenada. En el plan suyo, La Caseta
+desaparece y el día remata en el propio casco de La Laguna, de camino.
+
+**Y lo segundo no era un fallo, era una intuición suya — correcta en el
+síntoma y equivocada en la causa.** «Varios de los que he probado están cerca de
+la zona de salida, y eso me parece a veces un poco conservador. Deberíamos poner
+un botón de plan *cerca de tu zona* y otro de *plan en la periferia*, o un radar
+de kilómetros».
+Tiene razón en que es conservador. **Pero el radar de kilómetros no habría hecho
+nada**, y eso es lo que hay que entender antes de tocar esto. Medido sobre 93
+días con coche:
+
+| | |
+|---|---|
+| radio que el motor ya permite | **18 km** |
+| la parada más lejana de casa, mediana | **4,8 km** |
+| días que no pasan de 8 km | **91 de 93 (98%)** |
+| sitios a menos de 8 km de La Laguna | 70 |
+| **sitios entre 8 y 18 km, dentro del radio y a los que el día no llega** | **119** |
+
+El radio **le sobra al motor por todos lados**. Lo que aprieta el día son las
+penalizaciones —1,4 por km desde la parada anterior, el doble en la última
+franja, y el tirón de volver a casa—, y esas están ahí a propósito: son las que
+evitaron los días de Bajamar con Torviscas a 65 km. Subir el radio deja el día
+igual de apretado y en el mismo sitio; bajar las penalizaciones trae de vuelta
+el peor fallo que ha tenido el motor.
+
+**Lo que sí mueve el día es mover su CENTRO DE GRAVEDAD**, y esa maquinaria ya
+está entera: es la que usa la fiesta que manda, la que usa «prefiero elegir el
+sitio yo» y la que usa la escapada cuando un día repite corredor. Así que el
+botón **no toca ningún radio**: ancla el día en otra zona y deja que las mismas
+reglas lo aprieten allí. Sale un día igual de compacto, pero en Candelaria o en
+el Puerto — que es literalmente lo que él describió.
+`zonasDeAlLado()` coge el mejor sitio de cada corredor que no sea el de casa ni
+el del plan que ya está en pantalla, a **60 minutos con coche y 50 sin** —los
+números de la escapada, no unos nuevos—, y el botón sale después del plan, que
+es cuando uno ya ha visto lo que le han montado. Rota: pulsarlo dos veces lleva
+a dos zonas distintas.
+Desde La Laguna pidiendo playa ofrece Candelaria (20 min), Las Teresitas (30),
+El Puertito de Güímar (30), Playa del Socorro (35) y La Tejita (45).
+Tres cosas que costaron:
+· **Respeta el paso 1.** Si pidieron playa, la zona se elige por su mejor
+  **playa**; si en esa zona no hay de lo suyo, esa zona no se ofrece. Prometer
+  «otra zona» y dar un museo es el fallo de «Senderos» en Santa Úrsula otra vez.
+· **El botón dice el PUEBLO, no el corredor.** «Suroeste» no le dice nada a
+  nadie —ni a Zeben, que habla de «pal Puerto, pa Candelaria»— y encima los
+  corredores no se traducen. Con una excepción que salió probándolo: desde La
+  Laguna, **Anaga es otro corredor y media hora de viaje pero su municipio es La
+  Laguna**, así que el botón decía «un día por San Cristóbal de La Laguna», o sea
+  por tu propio pueblo. Cuando el municipio es el de casa manda la comarca,
+  recortada por la raya: «Anaga norte».
+· **El tope de botones pasa de 6 a 7 variables**, que es el mismo ajuste que ya
+  hubo que hacer cuando entró el del evento: con el de la zona, seis dejaba fuera
+  «prefiero naturaleza» y «cambiar dónde comer» los días que además hay fiesta.
+  El octavo sitio sigue siendo el reservado de «volver al menú».
+
 ## El municipio de una ficha, y quién lo dice
 
 Zeben leyó el aviso del cartel de Vilaflor y cortó por lo sano: **«Teleférico
@@ -2168,11 +2258,12 @@ comprobaciones se estropearon a propósito para ver que muerden.
 
 Y el último, **el regalo de camino**: barre 124 planes con coche y cuenta en
 cuántos sale un mirador de camino a la primera parada. Referencia: **88
-miradores en el catálogo (41 con posición aproximada), 36% de los planes y
-1,1 km de desvío mediano**. Eran 25 miradores y el 12%, así que este número
+miradores en el catálogo (41 con posición aproximada), 35% de los planes y
+1,1 km de desvío mediano**. Era 36% antes de apretar el desvío del remate, que
+comparte candidatos con él. Eran 25 miradores y el 12%, así que este número
 mide sobre todo el catálogo, no el motor.
 
-**Con navegador** — `probar-web.js` con Playwright recorre trece flujos en
+**Con navegador** — `probar-web.js` con Playwright recorre catorce flujos en
 Chrome y captura los errores de consola. Sin argumentos va contra la web
 desplegada; con una URL detrás va contra lo que se le diga, y **eso es lo que
 hay que hacer para probar una rama**: se levanta un servidor de ficheros en el
@@ -2206,7 +2297,7 @@ la web: el proxy corta Leaflet y las tipografías de Google por certificado, y
 las funciones de Netlify no existen en un servidor de ficheros. Lo que hay que
 mirar es que **no haya ningún error de JavaScript propio** — y que, con la API
 caída, el plan salga igual por el narrador local, que es la red de seguridad.
-Referencia: **13 de 13 recorridos completan todos sus pasos, 0 errores de
+Referencia: **14 de 14 recorridos completan todos sus pasos, 0 errores de
 JavaScript propios**, y el plan sale con sus fichas y su caja de texto. Los dos
 últimos entran por caminos que ningún otro pisa:
 · `mapa-comarcas` — los siete primeros eligen el pueblo donde DUERMEN, y este
@@ -2230,6 +2321,10 @@ JavaScript propios**, y el plan sale con sus fichas y su caja de texto. Los dos
   cartas es el ÚNICO camino: sube dos adultos y comprueba que sale el número que
   se ha marcado. Y `con-ninos-playa` sube dos por el otro contador, que es lo que
   enciende `S.ninos` desde que no hay una carta que lo diga.
+· `otra-zona` — el botón de «llévame más lejos», que ningún otro pisa: arma el
+  día, y desde el plan lo manda entero a otra zona. El paso NO va opcional a
+  propósito: desde La Laguna con coche siempre hay zona que ofrecer —Candelaria
+  a 20 minutos—, así que si un día no está, es que algo se rompió.
 · `tenderete-por-pueblo` — el tenderete entrando por la ESTAMPA del municipio,
   que es el camino nuevo. Sus tres primeros pasos van opcionales a propósito,
   que la prueba corre con la fecha de hoy y el día manda: si no hay nada se
@@ -2396,6 +2491,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | Los dos carteles de qué comer | 13 sep | «Te pongo dos carteles, uno para comida típica y quita el que está puesto, y otro para de todo un poco». Recortados con `recortar-cartel.js`, que otra vez traían el título quemado dentro. Y su nombre deshace una colisión vieja: la carta de comer pasa a llamarse **«De todo un poco»** y deja de ser el mismo texto que la del tipo de día, que es la trampa con la que ya había tropezado `probar-web.js` |
 | Los dos carteles de coche y guagua | 13 sep | `img/cartas/`. Y aquí `recortar-cartel.js` se quedó corto: su rótulo va en una **caja centrada dentro del dibujo**, no en una franja de lado a lado, así que el corte se iba al pie y «CON COCHE» se quedaba quemado dentro. La herramienta busca ahora la banda por dos caminos y sube hasta su borde de arriba — los cinco carteles anteriores salen byte a byte idénticos, o sea que solo añade |
 | «No se ha cambiado ninguna de las últimas» | 13 sep | El zip estaba bien y las nueve ilustraciones dentro: lo que fallaba era **nuestra caché**. `netlify.toml` pedía guardar `/img/*` una semana y los carteles se reemplazan con el mismo nombre, así que su navegador no volvía a pedirlos. Arreglado por los dos lados: la cabecera pasa a preguntar siempre en las carpetas que cambian, y `vImg()` le pone versión a la URL, que es lo único que sirve a quien ya tiene la semana empezada |
+| Tres capturas de un plan suyo: «acabas echando un dulce en La Caseta, que está otra vez en la Punta» | 13 sep | Dos cosas. El remate medía «de vuelta a casa» **en línea recta** y no por desvío, que es la regla que esta casa ya aplica a los restaurantes y al regalo de ida: de 7,2 km de rodeo máximo a 1,8. Y su idea del «radar de kilómetros» llevó a medir que **el radio no es lo que aprieta** —18 km permitidos y el 98% de los días no pasa de 8—, así que el botón de «llévame más lejos» no toca el radio: **mueve el centro del día** a otra zona y deja que las mismas reglas lo aprieten allí |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si

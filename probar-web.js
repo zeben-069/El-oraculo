@@ -130,6 +130,16 @@ const GUIONES = [
     pasos: ['Tenderete y tradiciones', '?@#acciones .estampa', '?@#acciones .opt',
             '?Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
             'Seguimos', 'De todo un poco'] },
+  /* El botón de «llévame más lejos», que es el camino nuevo del 13 de
+     septiembre y no lo pisa ningún otro: se arma el día, se lee, y desde el
+     plan se manda el día entero a otra zona. Va detrás de un plan hecho, así
+     que mide las dos cosas — que el botón exista y que lo que sale detrás sea
+     otro plan con sus fichas. Desde La Laguna con coche siempre hay zona que
+     ofrecer (Candelaria a 20 min), así que el paso NO va opcional: si un día
+     no está, es que algo se rompió. */
+  { nombre: 'otra-zona',
+    pasos: ['Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
+            'Seguimos', 'De todo un poco', 'Llévame más lejos'] },
   { nombre: 'ingles',
     pasos: ['=EN', 'A bit of everything', 'Metropolitan', 'La Laguna',
             'With a car', 'Carry on', 'A little of everything'] },

@@ -302,7 +302,7 @@ const T={
      tjDesde:'Desde',tjVuelta:'LA VUELTA',tjOjo:'OJO',tjFirma:'Naira · guía de Tenerife',tjDatos:'hecho con datos abiertos del Cabildo',tjUltima:'Última guagua a las',tjCambio:'cambio en',tjLinea:'línea',tjSubida:'de subida',tjCircular:'circular',tjVueltaCoche:'acaba lejos del inicio',tjPermiso:'CON PERMISO',tjMin:'min',
      catMuseos2:'Museos, cultura y cosas para los críos',catTodo:'Un poco de todo',
      meDaIgual:'Me da igual — que elija Naira',noSonMunicipio:'Y los dos sitios que no son un municipio:',volverMapa:'Volver al mapa',y:'y',avOtroCartel:(l,c)=>'Una cosa antes: '+l+' quedan lejos del casco, así que en un día por el pueblo no entran. Eso lo tengo en «'+c+'», que da para un día entero de por sí.',avSiEntra:(l)=>'Lo que sí entra es '+l+', que está a un paso.',irAlCartel:(c)=>'Llévame a '+c+'',verMas:'Ver más…',cambMuni:'Cambiar de municipio',yMas:'Y más…',catNat:'Naturaleza: senderos y miradores',catAgua:'Agua: playas y piscinas naturales',catMuseos:'Museos, cultura y cosas para los días malos',
-     masTranquilo:'Otra cosa más tranquila',prefPlaya:'Prefiero playa o piscina',prefNat:'Prefiero naturaleza',cambComida:'Cambiar dónde comer',mismoEstilo:'Otro sitio, el mismo estilo',comTipica:'Comida típica canaria',comPescado:'Pescado',comLoQueHaya:'Lo que haya bueno',ninguna:'Ninguna, quiero otro plan',volver:'Volver',frMannana:'Por la mañana',frMediodia:'A mediodía, buscando dónde comer',frTarde:'Ya de tarde',frAtardecer:'Al caer el día',hayFiestas:'cosas ese día — armar el plan alrededor',hayFiesta:'cosa ese día — armar el plan alrededor',todoElDia:'todo el día',aquiMismo:'aquí mismo',min:'min',mejorVamos:'Mejor vamos a',
+     masTranquilo:'Otra cosa más tranquila',otraZona:(z,m)=>'Llévame más lejos: un día por '+z+' ('+m+' min)',prefPlaya:'Prefiero playa o piscina',prefNat:'Prefiero naturaleza',cambComida:'Cambiar dónde comer',mismoEstilo:'Otro sitio, el mismo estilo',comTipica:'Comida típica canaria',comPescado:'Pescado',comLoQueHaya:'Lo que haya bueno',ninguna:'Ninguna, quiero otro plan',volver:'Volver',frMannana:'Por la mañana',frMediodia:'A mediodía, buscando dónde comer',frTarde:'Ya de tarde',frAtardecer:'Al caer el día',hayFiestas:'cosas ese día — armar el plan alrededor',hayFiesta:'cosa ese día — armar el plan alrededor',todoElDia:'todo el día',aquiMismo:'aquí mismo',min:'min',mejorVamos:'Mejor vamos a',
      donde:'¿De dónde sale? Dígame el pueblo donde duermen, o use su ubicación y salimos de donde estén.',coche:'¿Llevan coche?',si_coche:'Sí, tenemos coche',
      no_coche:'No, vamos en guagua',como:'¿Cómo van? Lo pregunto por lo de los niños, que cambia bastante.',
      tDia:'¿Qué tipo de día?',tComida:'¿Y para comer?',
@@ -364,7 +364,7 @@ const T={
      tjDesde:'From',tjVuelta:'GETTING BACK',tjOjo:'HEADS UP',tjFirma:'Naira · your guide to Tenerife',tjDatos:'built on open data from the Cabildo',tjUltima:'Last bus at',tjCambio:'change at',tjLinea:'line',tjSubida:'of climb',tjCircular:'loop',tjVueltaCoche:'ends far from the start',tjPermiso:'PERMIT NEEDED',tjMin:'min',
      catMuseos2:'Museums, culture and things for the kids',catTodo:'A bit of everything',
      meDaIgual:'I do not mind — Naira can choose',noSonMunicipio:'And the two places that are not a municipality:',volverMapa:'Back to the map',y:'and',avOtroCartel:(l,c)=>'One thing first: '+l+' are a long way from the town centre, so a day around the village will not reach them. I keep those under «'+c+'», which is a full day on its own.',avSiEntra:(l)=>'What does fit is '+l+', which is right there.',irAlCartel:(c)=>'Take me to '+c+'',verMas:'See more…',cambMuni:'Change municipality',yMas:'And more…',catNat:'Nature: trails and viewpoints',catAgua:'Water: beaches and natural pools',catMuseos:'Museums, culture and things for bad-weather days',
-     masTranquilo:'Something quieter',prefPlaya:'I would rather have beach or pool',prefNat:'I would rather have nature',cambComida:'Change where we eat',mismoEstilo:'Another place, same style',comTipica:'Traditional Canarian food',comPescado:'Fish',comLoQueHaya:'Whatever is good',ninguna:'None, I want a different plan',volver:'Back',frMannana:'In the morning',frMediodia:'Midday, looking for lunch',frTarde:'Already afternoon',frAtardecer:'As the day ends',hayFiestas:'things on that day — build the plan around one',hayFiesta:'thing on that day — build the plan around it',todoElDia:'all day',aquiMismo:'right here',min:'min',mejorVamos:'Better we go to',
+     masTranquilo:'Something quieter',otraZona:(z,m)=>'Take me further: a day around '+z+' ('+m+' min)',prefPlaya:'I would rather have beach or pool',prefNat:'I would rather have nature',cambComida:'Change where we eat',mismoEstilo:'Another place, same style',comTipica:'Traditional Canarian food',comPescado:'Fish',comLoQueHaya:'Whatever is good',ninguna:'None, I want a different plan',volver:'Back',frMannana:'In the morning',frMediodia:'Midday, looking for lunch',frTarde:'Already afternoon',frAtardecer:'As the day ends',hayFiestas:'things on that day — build the plan around one',hayFiesta:'thing on that day — build the plan around it',todoElDia:'all day',aquiMismo:'right here',min:'min',mejorVamos:'Better we go to',
      donde:'Where are you setting off from? Tell me the town where you are staying, or use your location and we start from where you are.',coche:'Do you have a car?',si_coche:'Yes, we have a car',
      no_coche:'No, we use the bus',como:'Who is coming? Travelling with children changes a lot.',
      tDia:'What kind of day?',tComida:'And to eat?',
@@ -426,7 +426,7 @@ const T={
      tjDesde:'Ab',tjVuelta:'DIE RÜCKFAHRT',tjOjo:'ACHTUNG',tjFirma:'Naira · Ihr Reiseführer für Teneriffa',tjDatos:'mit offenen Daten des Cabildo',tjUltima:'Letzter Bus um',tjCambio:'Umstieg in',tjLinea:'Linie',tjSubida:'Anstieg',tjCircular:'Rundweg',tjVueltaCoche:'endet weit vom Start',tjPermiso:'MIT GENEHMIGUNG',tjMin:'Min.',
      catMuseos2:'Museen, Kultur und etwas für die Kinder',catTodo:'Von allem etwas',
      meDaIgual:'Egal — Naira soll wählen',noSonMunicipio:'Und die zwei Orte, die keine Gemeinde sind:',volverMapa:'Zurück zur Karte',y:'und',avOtroCartel:(l,c)=>'Eins vorweg: '+l+' liegen weit vom Ortskern, ein Tag im Dorf reicht nicht bis dorthin. Das habe ich unter «'+c+'», und das füllt einen ganzen Tag.',avSiEntra:(l)=>'Was aber hineinpasst: '+l+', das liegt gleich nebenan.',irAlCartel:(c)=>'Bring mich nach '+c+'',verMas:'Mehr sehen…',cambMuni:'Gemeinde wechseln',yMas:'Und mehr…',catNat:'Natur: Wanderwege und Aussichtspunkte',catAgua:'Wasser: Strände und Naturschwimmbecken',catMuseos:'Museen, Kultur und etwas für schlechte Tage',
-     masTranquilo:'Etwas Ruhigeres',prefPlaya:'Lieber Strand oder Pool',prefNat:'Lieber Natur',cambComida:'Woanders essen',mismoEstilo:'Anderer Ort, gleicher Stil',comTipica:'Kanarische Hausmannskost',comPescado:'Fisch',comLoQueHaya:'Was gerade gut ist',ninguna:'Keine, ich möchte einen anderen Plan',volver:'Zurück',frMannana:'Am Vormittag',frMediodia:'Mittags, auf der Suche nach dem Essen',frTarde:'Schon am Nachmittag',frAtardecer:'Wenn der Tag ausklingt',hayFiestas:'Sachen an dem Tag — den Plan darum herum bauen',hayFiesta:'Sache an dem Tag — den Plan darum herum bauen',todoElDia:'den ganzen Tag',aquiMismo:'gleich hier',min:'Min.',mejorVamos:'Besser wir fahren nach',
+     masTranquilo:'Etwas Ruhigeres',otraZona:(z,m)=>'Weiter weg: ein Tag rund um '+z+' ('+m+' Min.)',prefPlaya:'Lieber Strand oder Pool',prefNat:'Lieber Natur',cambComida:'Woanders essen',mismoEstilo:'Anderer Ort, gleicher Stil',comTipica:'Kanarische Hausmannskost',comPescado:'Fisch',comLoQueHaya:'Was gerade gut ist',ninguna:'Keine, ich möchte einen anderen Plan',volver:'Zurück',frMannana:'Am Vormittag',frMediodia:'Mittags, auf der Suche nach dem Essen',frTarde:'Schon am Nachmittag',frAtardecer:'Wenn der Tag ausklingt',hayFiestas:'Sachen an dem Tag — den Plan darum herum bauen',hayFiesta:'Sache an dem Tag — den Plan darum herum bauen',todoElDia:'den ganzen Tag',aquiMismo:'gleich hier',min:'Min.',mejorVamos:'Besser wir fahren nach',
      donde:'Von wo starten Sie? Sagen Sie mir den Ort, wo Sie übernachten, oder nutzen Sie Ihren Standort.',coche:'Haben Sie ein Auto?',si_coche:'Ja, wir haben ein Auto',
      no_coche:'Nein, wir fahren mit dem Bus',como:'Wer ist dabei? Mit Kindern ändert sich einiges.',
      tDia:'Was für ein Tag?',tComida:'Und zum Essen?',
@@ -1813,12 +1813,30 @@ function construir(){
   const ultParada=paradas.filter(p=>p.la!=null).slice(-1)[0]||null;
   const dCasaUlt=(ultParada&&base.la!=null)?km(base.la,base.lo,ultParada.la,ultParada.lo):null;
   const RADIO_REMATE=S.coche?8:2;
-  /* de vuelta: ni más lejos de casa que la última parada, ni un rodeo */
+  /* «DE VUELTA» SE MIDE POR DESVÍO, NO POR LÍNEA RECTA DESDE CASA. Lo cazó
+     Zeben en un plan suyo: el día iba a Punta del Hidalgo, comía allí, bajaba
+     a las piscinas de Bajamar… y remataba con un dulce en La Caseta, **que
+     está otra vez en Punta del Hidalgo**. «Me parece un poco engorroso», y
+     tenía razón.
+     Por qué pasaba: la regla vieja solo miraba que el remate no quedara más de
+     1,5 km más lejos de casa que la última parada. La Caseta está a 9,1 km del
+     casco de La Laguna y Bajamar a 8,2 — 0,9 km más lejos, así que pasaba. Pero
+     **el rodeo de verdad son 2,7 km**: se sale de Bajamar, se vuelve a subir a
+     la Punta y se da la vuelta otra vez. Medido en línea recta desde casa eso
+     no se ve; medido como desvío, canta.
+     Es exactamente la regla que esta casa ya aplica en los restaurantes y en el
+     regalo de ida —«medido por DESVÍO, lo que se alarga el viaje por pasar»— y
+     que aquí no se había aplicado. Medido sobre 237 remates: la mediana ya era
+     de 0,3 km, o sea que casi todos estaban bien; lo que había era una cola de
+     hasta **7,2 km de rodeo** por un helado.
+     Sin coche el tope es la mitad: un rodeo andando no cuesta lo mismo. */
+  const TOPE_RODEO=S.coche?2:1;
   const deVuelta=x=>{
     if(!ultParada||x.la==null) return false;
     if(km(ultParada.la,ultParada.lo,x.la,x.lo)>RADIO_REMATE) return false;
     if(dCasaUlt==null||base.la==null) return true;
-    return km(base.la,base.lo,x.la,x.lo)<=dCasaUlt+1.5;
+    return km(ultParada.la,ultParada.lo,x.la,x.lo)
+         + km(x.la,x.lo,base.la,base.lo) - dCasaUlt <= TOPE_RODEO;
   };
   const tiposSitio={
     mirador:['Mirador'],
@@ -4481,6 +4499,52 @@ async function gracias(b,nota){
   planB(b);
 }
 
+/* ── «LLÉVAME MÁS LEJOS» ───────────────────────────────────────────────
+   Zeben: «para mí, que soy de aquí de La Laguna, un día me puedes dar un plan
+   cerca de Santa Cruz, Radazul, Bajamar, que está en nada con el coche; y otro
+   día abrimos la mano y nos vamos pal Puerto, o pa Candelaria, o Güímar.
+   Deberíamos poner un botón de plan cerca de tu zona y otro de plan en la
+   periferia, o un radar de kilómetros».
+   **Y el radar de kilómetros NO habría hecho nada, que es lo que hay que
+   entender antes de tocar esto.** Medido sobre 93 días con coche: el motor ya
+   permite 18 km de radio y **el 98% de los días no pasa de 8**; la parada más
+   lejana de casa está en una mediana de 4,8 km. Desde La Laguna hay 70 sitios a
+   menos de 8 km y **119 más entre 8 y 18**, todos dentro del radio y a los que
+   el día no llega nunca. O sea que lo que aprieta no es el radio: son las
+   penalizaciones —1,4 por km desde la parada anterior, el doble en la última
+   franja y el tirón de volver a casa—, que están ahí a propósito y son las que
+   hacen que el día no se disperse. Subir el radio deja el día igual de
+   apretado y en el mismo sitio; bajar las penalizaciones da días de 40 km.
+   Lo que SÍ mueve el día es **mover su centro de gravedad**, que es la
+   maquinaria que ya existe y que usan la fiesta que manda y «prefiero elegir el
+   sitio yo». Así que el botón no toca ningún radio: **ancla el día en otra zona
+   y deja que las mismas reglas lo aprieten allí**. Sale un día igual de
+   compacto, pero en el Puerto o en Candelaria — que es literalmente lo que él
+   pidió.
+   Es lo mismo que hace la escapada cuando un día repite corredor, y por eso se
+   usan sus números —60 minutos con coche, 50 sin— en vez de inventar otros.
+   Se descarta el corredor de casa Y el del plan que ya está en pantalla: el
+   botón promete otra zona. */
+function zonasDeAlLado(brief){
+  const bs=BASES[S.base]; if(!bs||bs.la==null) return [];
+  const fuera={}; fuera[bs.c]=1; if(brief&&brief.corredor) fuera[brief.corredor]=1;
+  const tope=S.coche?60:50;
+  const re=TIPOS_DIA[S.apetece];
+  const mejor={};
+  LUGARES.forEach(l=>{
+    if(l.la==null||l.cerrado||l.recinto||(l.w||1)<3) return;
+    if(fuera[l.c]||minutosA(bs,l.c)>tope) return;
+    /* Se respeta lo que pidieron en el paso 1: quien pulsó la carta de las
+       playas no quiere que «otra zona» le devuelva un museo. Si en esa zona no
+       hay de lo suyo, esa zona no se ofrece — antes que prometer y no dar. */
+    if(re&&!re.test(l.tipo||'')) return;
+    if(!mejor[l.c]||(l.w||1)>(mejor[l.c].w||1)) mejor[l.c]=l;
+  });
+  return Object.keys(mejor)
+    .sort((a,b)=>minutosA(bs,a)-minutosA(bs,b))
+    .map(z=>({zona:z,sitio:mejor[z],min:minutosA(bs,z)}));
+}
+
 function planB(brief){
   const L=[
     {t:tr('calendario'),fn:()=>{window.open(urlCalendario(brief,BASES[S.base]),'_blank','noopener');planB(brief)}},
@@ -4514,6 +4578,32 @@ function planB(brief){
   /* Con icono, que en una lista de seis botones todos iguales el ojo no tiene
      dónde agarrarse. El emoji va FUERA de tr(): un 🏖 es lo mismo en los tres
      idiomas y meterlo en la tabla sería repetirlo tres veces para nada. */
+  /* El de la zona va aquí, con los de preferencia: es de la misma familia
+     —«esto no, otra cosa»— y se pulsa con el plan ya leído. Rota, así que
+     pulsarlo dos veces lleva a dos zonas distintas y no a la misma. */
+  {
+    const zz=zonasDeAlLado(brief);
+    if(zz.length){
+      const z=zz[(S.saltoZona||0)%zz.length];
+      /* El botón dice el PUEBLO, no el corredor. «Suroeste» o «Este» no le
+         dicen nada a un turista —ni a Zeben, que habla de «pal Puerto, pa
+         Candelaria, Güímar»—, y encima los corredores no se traducen. El
+         municipio del sitio que va a anclar el día sí se reconoce.
+         Con una excepción que se vio probándolo: desde La Laguna la zona de
+         Anaga es **otro corredor y media hora de viaje**, pero su municipio es
+         La Laguna, así que el botón decía «un día por San Cristóbal de La
+         Laguna» — o sea, un día por tu propio pueblo. Cuando el municipio es el
+         de casa manda la comarca del catálogo, recortada por la raya: «Anaga
+         norte». Que además es el nombre con el que se conoce. */
+      const dondeEs = z.sitio.m===S.base
+        ? String(z.sitio.co||z.sitio.n).split(/\s+[—-]\s+/)[0]
+        : z.sitio.m;
+      L.push({t:'🚗 '+tr('otraZona')(dondeEs,z.min),fn:()=>{
+        S.saltoZona=(S.saltoZona||0)+1;
+        S.anclaElegida=z.sitio.n; S.faltaNucleo=null; S.forzarEvento=null;
+        pedirPlan();}});
+    }
+  }
   if(S.apetece!=='playa') L.push({t:'🏖 '+tr('prefPlaya'),fn:()=>{S.apetece='playa';S.faltaNucleo=null;pedirPlan()}});
   if(S.apetece!=='naturaleza') L.push({t:'🥾 '+tr('prefNat'),fn:()=>{S.apetece='naturaleza';S.faltaNucleo=null;pedirPlan()}});
   L.push({t:tr('cambComida'),fn:()=>cambiarComida()});
@@ -4528,7 +4618,11 @@ function planB(brief){
      sitio no se sortea con los demás: se reserva.
      Los seis de arriba siguen siendo los de siempre; el que se cae ahora es el
      último variable, no la única puerta de salida. */
-  opciones(L.slice(0,6).concat([{t:tr('otroDia'),fn:()=>otroDia()}]));
+  /* Siete variables, no seis. Es el mismo ajuste que ya hubo que hacer cuando
+     entró el botón del evento: con el de la zona, seis dejaba fuera «prefiero
+     naturaleza» y «cambiar dónde comer» los días que además hay fiesta. El
+     octavo sitio sigue siendo el reservado de arriba. */
+  opciones(L.slice(0,7).concat([{t:tr('otroDia'),fn:()=>otroDia()}]));
 }
 async function cambiarComida(){
   await naira(tr('qOtroSitio'),340);
