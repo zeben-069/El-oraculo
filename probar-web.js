@@ -53,24 +53,26 @@ const CARPETA = './capturas';
 const GUIONES = [
   { nombre: 'plan-basico-coche-pareja',
     pasos: ['Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
-            'Grupo, sin niños', 'Un poco de todo'] },
+            'Seguimos', 'Un poco de todo'] },
   { nombre: 'con-ninos-playa',
     pasos: ['Charcos y playas', 'Güímar', 'Candelaria', 'Con coche',
-            'Familia con niños', 'Comida típica'] },
+            '@[data-p="n+"]', '@[data-p="n+"]', 'Seguimos', 'Comida típica'] },
   { nombre: 'sin-coche',
     pasos: ['Senderos y naturaleza', 'Valle de La Orotava', 'Puerto de la Cruz',
-            'Sin coche, en guagua', 'Grupo, sin niños', 'Un poco de todo'] },
+            'Sin coche, en guagua', 'Seguimos', 'Un poco de todo'] },
   /* «Ahora mismo» ya no es un botón de ningún sitio: lo dice el calendario.
      La prueba corre con la fecha de hoy y sin tocarla, así que este recorrido
      ES el de hoy —el reloj recorta el día— y lo que se mide es que salga plan
      igual a cualquier hora a la que se ejecute. */
   { nombre: 'hoy-con-lo-que-queda',
     pasos: ['Un poco de todo', 'Metropolitana', 'Tegueste',
-            'Con coche', 'Grupo, sin niños', 'Un poco de todo'] },
-  /* El contador de cuántos son, que es el otro camino del paso 4: en vez de
-     pulsar una carta se tocan los +/− y se sale por «Seguimos». Este recorrido
-     existe porque ese botón es el único que escribe `personas` en el informe;
-     por las cartas va `van` y el número no viaja. */
+            'Con coche', 'Seguimos', 'Un poco de todo'] },
+  /* El contador de cuántos son, que desde que se fueron las tres cartas es el
+     ÚNICO camino del paso 4. Aquí se suben dos adultos —cuatro en total— para
+     comprobar que sale el número que se ha marcado: `personas` en el informe es
+     siempre lo que dicen ellos, nunca una cifra nuestra. Y el de con niños
+     —`con-ninos-playa`— sube dos por el otro contador, que es lo que enciende
+     `S.ninos` desde que no hay una carta que lo diga. */
   /* El calendario mandando el «cuándo», que son los dos caminos que el resto
      de recorridos no pisa: todos corren con la fecha de hoy, o sea que todos
      van por la rama de «hoy, con lo que queda». Estos dos van por las otras.
@@ -84,26 +86,26 @@ const GUIONES = [
   { nombre: 'dia-futuro-entero',
     pasos: ['@#btnCal', '@button.calNav[data-mes="1"]', '@.calRej .calD:not([disabled])',
             '@#btnCal', 'Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
-            'Grupo, sin niños', 'Un poco de todo'] },
+            'Seguimos', 'Un poco de todo'] },
   { nombre: 'rango-escapada',
     pasos: ['@#btnCal', '@.calD.sel ~ .calD', '@#btnCal',
             'Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
-            'Grupo, sin niños', 'Un poco de todo'] },
+            'Seguimos', 'Un poco de todo'] },
   { nombre: 'cuantos-son',
     pasos: ['Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
             '=+', '=+', 'Seguimos', 'Un poco de todo'] },
   { nombre: 'ajustar-parada',
     pasos: ['Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
-            'Grupo, sin niños', 'Un poco de todo', 'Esta no'] },
+            'Seguimos', 'Un poco de todo', 'Esta no'] },
   { nombre: 'mas-tranquilo',
     pasos: ['Un poco de todo', 'Güímar', 'Candelaria', 'Con coche',
-            'Familia con niños', 'Un poco de todo', 'Otra cosa más tranquila'] },
+            '@[data-p="n+"]', '@[data-p="n+"]', 'Seguimos', 'Un poco de todo', 'Otra cosa más tranquila'] },
   /* El camino del mapa eligiendo A DÓNDE IR, que es otra cosa que elegir dónde
      dormir: se llega por «prefiero elegir el sitio yo», ya con el plan hecho.
      Pasa por Vilaflor a propósito, que lleva aviso de «eso está en el otro
      cartel» — y ahí cazó que el botón del salto se pintaba y se borraba solo. */
   { nombre: 'mapa-comarcas',
-    pasos: ['Un poco de todo', 'Sur', 'Arona', 'Con coche', 'Grupo, sin niños',
+    pasos: ['Un poco de todo', 'Sur', 'Arona', 'Con coche', 'Seguimos',
             'Un poco de todo', 'Volver al menú', 'Quiero ver un sitio concreto',
             'Sur', 'Vilaflor', 'Un poco de todo', 'Un poco de todo'] },
   /* La carta que abre el calendario en vez de filtrar el catálogo, y que ahora
@@ -114,11 +116,22 @@ const GUIONES = [
      nada y ha repintado las cartas debajo. */
   { nombre: 'tenderete',
     pasos: ['Tenderete y tradiciones', '?Me da igual', 'Un poco de todo',
-            'Metropolitana', 'La Laguna', 'Con coche', 'Grupo, sin niños',
+            'Metropolitana', 'La Laguna', 'Con coche', 'Seguimos',
             'Un poco de todo'] },
+  /* Y el tenderete entrando POR EL PUEBLO, que es el camino nuevo: la estampa
+     del municipio y, si ese pueblo tiene más de una cosa, la lista de dentro.
+     Los tres primeros pasos van opcionales a propósito, que esta prueba corre
+     con la fecha de hoy y el día manda: si no hay nada se repintan las cartas
+     y entra por «Un poco de todo»; si el pueblo tiene una sola cosa se entra
+     solo y no hay lista que pulsar. En los tres casos se acaba con un plan,
+     que es lo que se mide. */
+  { nombre: 'tenderete-por-pueblo',
+    pasos: ['Tenderete y tradiciones', '?@#acciones .estampa', '?@#acciones .opt',
+            '?Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
+            'Seguimos', 'Un poco de todo'] },
   { nombre: 'ingles',
     pasos: ['=EN', 'A bit of everything', 'Metropolitan', 'La Laguna',
-            'With a car', 'Group, no children', 'A bit of everything'] },
+            'With a car', 'Carry on', 'A bit of everything'] },
 ];
 
 async function main() {

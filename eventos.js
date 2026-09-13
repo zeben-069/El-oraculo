@@ -799,6 +799,87 @@ function meterSitios(fichero){
   console.log('\nhecho: '+tocadas+' fichas con sitio propio. Pasa ahora: node lote.js');
 }
 
+/* ── LOS QUE SE ESCAPABAN POR LA HORA ───────────────────────────────────
+   Zeben, probándolo: «rígete 100% a lo que dice el artefacto sobre el sitio,
+   porque tienes dos que no ponen sitio y en el artefacto sí lo pone».
+   Medido: de los 571 actos hay **22 sin sitio y los 22 vienen de la agenda
+   semanal pegada a mano**; los 389 del artefacto traen sitio el 100%. O sea
+   que él tiene razón en el fondo: donde falta el dato es porque entró por la
+   otra puerta.
+   Y había un punto ciego que lo tapaba: `duplicados()` y `sospechosos()`
+   comparan con la clave `pueblo|día|HORA`, y **la hora es justo en lo que las
+   dos fuentes no coinciden** — la Cabalgata de La Orotava es «21:00» en la
+   agenda y «20:00» en el artefacto, la Fiesta del agua «19:30» y «11:00». Al
+   exigirla, los repetidos que de verdad importan eran invisibles.
+   Esta pasada quita la hora de la clave, y para no abrir la puerta a juntar
+   dos actos legítimos del mismo día pone tres ataduras en su lugar:
+   · **Fuentes distintas.** Dentro de un mismo programa repetir es normal —hay
+     tres domingos de feria infantil— y dos misas el mismo día en el mismo
+     pueblo son dos misas. Esto solo mira agenda-contra-artefacto.
+   · **Un nombre entero dentro del otro**, la misma regla de `parecidos`, no un
+     porcentaje: «Feria de Artesanía» y «Feria del Motor» comparten dos de tres
+     palabras y son dos ferias.
+   · **Tres palabras de mínimo**, una más que `parecidos`, porque sin la hora
+     la atadura es más floja y «Santa misa» no puede bastar.
+   Y gana el del artefacto por la regla de siempre —`ganador()` cuenta el sitio
+   doble—, así que **la hora que queda es la suya**, que es lo que él pidió. */
+function cruzadas(hazlo){
+  const F='datos/actos.js';
+  const txt=fs.readFileSync(F,'utf8');
+  const A=eval(txt+';ACTOS');
+  /* «La otra fuente» no es solo el artefacto: hay TRES puertas y dos traen
+     sitio —el artefacto y los programas recogidos de lagenda—. La que no lo
+     trae es una sola, la agenda semanal pegada a mano, así que la regla se
+     escribe por ahí: agenda contra cualquier otra. Escribirlo al revés dejaba
+     fuera la Fiesta del agua de La Orotava, cuyo gemelo bueno viene de los
+     programas y no del artefacto. */
+  const deAgenda=a=>/agenda semanal/i.test(a.of||'');
+  const dentro=(x,y)=>{
+    const a1=norm(x), b1=norm(y);
+    const [corto,largo]=a1.length<=b1.length?[a1,b1]:[b1,a1];
+    /* Un nombre que es PREFIJO exacto del otro con doce caracteres ya es la
+       atadura fuerte de `duplicados` —«Cabalgata de las Fiestas» dentro de
+       «Cabalgata de las Fiestas con Reinas y Damas…»—, y ahí no hacen falta
+       tres palabras: un pueblo no hace dos cabalgatas el mismo día. */
+    if(corto.length>=12&&largo.indexOf(corto)===0) return true;
+    const px=palabrasDe(x), py=palabrasDe(y);
+    const [c,g]=px.size<=py.size?[px,py]:[py,px];
+    if(c.size<3) return false;
+    let ok=true; c.forEach(w=>{ if(!g.has(w)) ok=false; });
+    return ok;
+  };
+  const fuera=new Set(), juntados=[];
+  A.forEach((a,i)=>{
+    if(fuera.has(i)) return;
+    A.forEach((b,j)=>{
+      if(j<=i||fuera.has(j)) return;
+      if(a.m!==b.m||a.f!==b.f) return;
+      if(a.h&&b.h&&a.h===b.h) return;        /* esos ya los coge `parecidos` */
+      if(deAgenda(a)===deAgenda(b)) return;   /* una de agenda y otra no */
+      if(!dentro(a.n,b.n)) return;
+      const ganaA=ganador(a,b);
+      const g=ganaA?a:b, p=ganaA?b:a;
+      Object.keys(p).forEach(k=>{ if(g[k]==null||g[k]==='') g[k]=p[k]; });
+      const q=clasificaActo(g.n,g.h);
+      if(q) g.q=q; else delete g.q;
+      fuera.add(ganaA?j:i);
+      juntados.push({queda:g,cae:p});
+    });
+  });
+  console.log('=== EL MISMO ACTO POR DOS FUENTES, CON HORAS DISTINTAS ===');
+  if(!juntados.length) return console.log('ninguno.');
+  juntados.forEach(x=>console.log('\n· '+x.queda.m+' · '+x.queda.f+
+    '\n    queda: '+(x.queda.h||'--')+'  '+x.queda.n.slice(0,68)+
+    '\n           → '+(x.queda.lu||'(sin sitio)')+
+    '\n    cae:   '+(x.cae.h||'--')+'  '+x.cae.n.slice(0,68)));
+  const limpio=A.filter((a,i)=>!fuera.has(i));
+  console.log('\nactos antes: '+A.length+'  ·  se van: '+fuera.size+'  ·  quedan: '+limpio.length);
+  if(!hazlo) return console.log('\nesto es un ensayo. «node eventos.js cruzadas hazlo» para hacerlo.');
+  fs.writeFileSync(F,txt.slice(0,txt.indexOf('const ACTOS='))+'const ACTOS='+
+    JSON.stringify(limpio,null,0).replace(/\},\{/g,'},\n{')+';\n');
+  console.log('hecho. Pasa ahora: node lote.js');
+}
+
 const arg=process.argv[2];
 if(!arg||arg==='pegar') pagina();
 else if(arg==='actos') meterActos(process.argv[3],process.argv[4]);
@@ -808,6 +889,7 @@ else if(arg==='parecidos'){
   const x=process.argv[3];
   if(x&&x!=='hazlo') quitarMarcados(x); else duplicados(x==='hazlo',true);
 }
+else if(arg==='cruzadas') cruzadas(process.argv[3]==='hazlo');
 else if(arg==='repetidas') repetidas(process.argv[3]==='hazlo');
 else if(arg==='en-el-programa') enElPrograma(process.argv[3]);
 else if(arg==='sitios') paginaSitios();

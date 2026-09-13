@@ -76,7 +76,7 @@ manifest.webmanifest          para instalar en la pantalla de inicio
 icono.svg / icono-*.png
 img/naira-social.jpg          previsualización al compartir
 img/estampas/*.jpg            las 31 fotos de municipio (una por ficha)
-img/cartas/*.jpg              los 12 carteles de las preguntas con dibujo
+img/cartas/*.jpg              los 9 carteles de las preguntas con dibujo
 img/comarcas/*.jpg            los 2 carteles de Anaga y la cumbre
 img/zonas/*.jpg               las 6 franjas de zona (EN DISCO, ya no se publican)
 netlify.toml
@@ -151,7 +151,7 @@ Dentro de `index.html`, como constantes:
   fiestas × sus años) llevan ya `la`/`lo`/`lu`**, colocadas por Zeben con
   `node eventos.js sitios`, y entonces mandan ellas sobre el casco del pueblo.
   Quedan 13 sin colocar, en 6 municipios.
-- `ACTOS` (571) — los actos de 31 programas de fiestas de 16 municipios:
+- `ACTOS` (568) — los actos de 31 programas de fiestas de 16 municipios:
   día, municipio,
   hora, dónde es y `q` («ninos»/«noche»), que dice a quién le sirve. No son
   fiestas: cuelgan de una que ya está en `EVENTOS` y no anclan el día.
@@ -1570,6 +1570,75 @@ AEMET— y solo se usaba para el plan. Tres decisiones:
   llega han cambiado de día o de pueblo, **no se pinta**: sería enseñar el
   tiempo de otro sitio.
 
+## El tenderete va por PUEBLOS, con sus estampas
+
+Zeben, probándolo: «lo bueno sería que funcionara como el artefacto de Cowork y
+que los pusiera por municipio, y lo que la persona elija; puedes aprovechar las
+imágenes de los 31 municipios que ya tenemos creadas».
+Y es **la misma corrección que ya se le había hecho al pie del calendario** —«ponlo
+separado por municipios, más que una lista entera de eventos que puede ser muy
+pesado»— que aquí no se había aplicado: un día grande daba catorce botones de
+texto seguidos, y el turista no está eligiendo entre catorce fiestas, **está
+eligiendo a dónde va**.
+Ahora son dos niveles: la cuadrícula de los pueblos que tienen algo ese día, con
+su estampa, y dentro lo que hay en cada uno.
+· **La cuadrícula es la MISMA `cuadriculaMunicipios`** de elegir pueblo, sin
+  tocarla, así que las 31 estampas valen aquí tal cual y no hay una segunda
+  manera de pintar un municipio que mantener. Lo único que se le añadió es un
+  cuarto argumento opcional, `cuenta`, que cambia SOLO la línea de abajo: al
+  elegir pueblo dice «N sitios» y aquí «2 eventos». **La tarjeta tiene que decir
+  lo que promete el sitio desde el que se pulsa.**
+· **Si solo hay un pueblo, se entra solo. Y si en ese pueblo solo hay una cosa,
+  tampoco se pregunta**: la estampa ya era la elección. Las dos reglas estaban
+  ya escritas en el pie del calendario y son por lo mismo — pedir un toque para
+  enseñar lo único que hay es un toque de más.
+· Dentro del pueblo el nombre del municipio **sale del rótulo, no de cada
+  botón**: repetir «· Candelaria» en las dos fiestas de Candelaria, debajo de
+  una cabecera que ya dice Candelaria, es ruido.
+
+## El mismo acto por dos fuentes, con horas distintas
+
+Zeben: «rígete 100% a lo que dice el artefacto sobre el sitio, porque tienes dos
+que no ponen sitio y en el artefacto sí lo pone». Medido, y tiene razón en el
+fondo: de los 571 actos había **22 sin sitio y los 22 venían de la agenda
+semanal pegada a mano**; los 389 del artefacto lo traen **el 100%**, y los 129 de
+los programas de lagenda también. Donde falta el dato es porque entró por la
+única puerta que no lo trae.
+
+**Y había un punto ciego que lo tapaba.** `duplicados()` y `sospechosos()`
+comparan con la clave `pueblo|día|HORA`, y **la hora es justo en lo que las dos
+fuentes no coinciden**: la Cabalgata de La Orotava es «21:00» en la agenda y
+«20:00» en el artefacto; la Fiesta del agua, «19:30» y «11:00». Al exigirla, los
+repetidos que de verdad importan eran invisibles.
+`node eventos.js cruzadas` quita la hora de la clave, y para no abrir la puerta a
+juntar dos actos legítimos del mismo día pone tres ataduras en su lugar:
+· **Fuentes distintas** — dentro de un mismo programa repetir es normal, y dos
+  misas el mismo día en el mismo pueblo son dos misas. Y «la otra fuente» no es
+  solo el artefacto: hay TRES puertas y dos traen sitio, así que la regla se
+  escribe por la que no lo trae —agenda contra cualquier otra—. Escribirlo al
+  revés dejaba fuera la Fiesta del agua, cuyo gemelo bueno viene de los
+  programas y no del artefacto.
+· **Un nombre entero dentro del otro**, no un porcentaje, que es la regla ya
+  calibrada de `parecidos`.
+· **Tres palabras de mínimo** — una más que `parecidos`, porque sin la hora la
+  atadura es más floja y «Santa misa» no puede bastar— **o un prefijo exacto de
+  doce caracteres**, que es la atadura fuerte de `duplicados`: «Cabalgata de las
+  Fiestas» dentro de «Cabalgata de las Fiestas con Reinas y Damas…», y ahí no
+  hacen falta tres palabras porque un pueblo no hace dos cabalgatas el mismo día.
+Fueron **3**, las tres de La Orotava, y gana el que trae sitio por la regla de
+siempre —`ganador()` cuenta el sitio doble—, **así que la hora que queda es la de
+la fuente buena**, que es lo que él pidió. `ACTOS` pasa de 571 a **568** y los sin
+sitio de 22 a 19. Comprobado que NO junta lo que no debe: los «Fuegos de la
+Víspera» (00:00) y los «Fuegos del Risco» (23:00) del mismo 14 de septiembre
+siguen siendo dos, que son dos noches distintas y está decidido arriba.
+
+**Lo que NO se pudo arreglar desde aquí, y hace falta él.** Él puso de ejemplo el
+«Desfile de la Pandorga y los Caballitos de Fuego» del 13 en La Laguna. Ese acto
+**no tiene gemelo en el artefacto**: entró por la agenda semanal y es el único
+sitio del catálogo donde aparece. Los 19 que quedan sin sitio son todos así —16
+de La Laguna y 3 de La Orotava—. El sitio **no se inventa**: o lo dice el
+artefacto —y entonces hay que volver a pasarlo— o lo dice quien vive allí.
+
 ## Cuántos son, y el número que nadie había dicho
 
 Zeben, en la misma pregunta: «¿falta hacer también el botón de los muñequitos o
@@ -1583,30 +1652,30 @@ cosmético**: las tres cartas guardaban un número **inventado** —«dos adulto
   que no entran todos en un permiso de tres. Por una cifra que nadie dijo.
 Eso es la regla de la casa rota por dentro: **no se inventan datos**.
 
-El arreglo tiene dos mitades y hacen falta las dos:
-· **El contador**, **encima** de las tres cartas y opcional: adultos y niños con
-  sus `−`/`+` y un «Seguimos». Quien pulsa una carta sigue yendo **de un toque**,
-  exactamente como antes, que si no el paso 4 pasa de un gesto a cuatro.
-  **Encima y no debajo, y eso no es una preferencia de diseño: puesto debajo,
-  Zeben no lo vio y lo dio por no hecho** —«siguen saliendo las imágenes sin
-  contar los niños o los adultos»—. Medido en un móvil de 390×844, caía a
-  **865 px por debajo de lo que se ve**, porque las tres cartas de «con quién
-  viajan» son apaisadas y van una por fila. Lo que hay que bajar media pantalla
-  para encontrar, no existe. La lección es vieja y es la del `.mht`: **una cosa
-  nueva se mira en un móvil antes de darla por hecha**, que aquí la prueba del
-  navegador la pulsaba perfectamente por selector y no se enteró de nada.
-· **Y sobre todo, lo que se manda.** Si no lo han dicho, `personas` **NO va** al
-  informe: va **`van`**, que es lo único que de verdad contestaron —«dos
-  adultos», «una familia con niños», «un grupo, sin niños»—. El número solo viaja
-  cuando lo escribieron ellos. El prompt lo explica y dice qué hacer con cada
-  caso: con `van`, decir el tope del permiso y que lo miren, **sin afirmar** que
-  no entran todos.
-Los dos consumidores del número se guardaron igual: el aviso de aforo del panel
-solo acusa de no caber cuando el número es suyo, y el narrador local deja de
-soltar «llamen antes, que siendo 4 conviene» a quien no ha dicho que son cuatro.
-Medido en el navegador: por carta sale `personas:null, van:"una familia con
-niños"`; por el contador con 4 y 1, `personas:5, van:null`.
-Ocho claves nuevas de `tr()` en los tres idiomas.
+El arreglo tuvo dos vueltas, y en la segunda las cartas se fueron enteras.
+· **Primero el contador**, puesto debajo de las tres cartas. Zeben no lo vio y
+  lo dio por no hecho —«siguen saliendo las imágenes sin contar los niños o los
+  adultos»—: medido en un móvil de 390×844, caía a **865 px por debajo de lo que
+  se ve**, porque las tres cartas de «con quién viajan» son apaisadas y van una
+  por fila. Lo que hay que bajar media pantalla para encontrar, no existe. La
+  lección es la del `.mht`: **una cosa nueva se mira en un móvil antes de darla
+  por hecha**, que aquí la prueba del navegador la pulsaba perfectamente por
+  selector y no se enteró de nada.
+· **Y luego se fueron las cartas**, que lo propuso él: «si ya pones una casilla
+  para que marques cuántas personas son, podríamos quitar las imágenes y
+  aligeramos peso». Tiene razón por dos motivos, y el segundo pesa más:
+  **las tres cartas no decían nada que el contador no diga mejor** —«grupo sin
+  niños» es 6 adultos y 0 niños, y además el contador dice las que no cabían: una
+  familia de tres, o dos adultos con un niño—; y **el número deja de ser inventado
+  NUNCA, no «casi nunca»**. Sin cartas, `personas` va siempre y es siempre suyo:
+  se fue `van`, se fue su párrafo del prompt, se fue la rama del aviso de aforo
+  que no podía afirmar nada y se fueron cuatro claves de `tr()`. Un camino menos
+  que mantener. De peso, **140 KB** de las tres ilustraciones.
+  Sigue siendo **un toque** para el caso normal: viene con 2 adultos y 0 niños
+  puestos y se pulsa «Seguimos».
+Los dos consumidores del número vuelven a poder fiarse de él: el aviso de aforo
+del panel ya puede afirmar que no entran todos, y el narrador local vuelve a
+decir «llamen antes, que siendo 4 conviene» sabiendo que son cuatro.
 
 **Y los nueve recorridos de `probar-web.js` hubo que darles la vuelta enteros**,
 que empezaban todos por el pueblo. Dos trampas de la prueba que muerden aquí:
@@ -1916,8 +1985,8 @@ de una parada, y el plan sin coche se separa más del plan con coche.
 Y cierra con los **actos**: por cada día y municipio con programa cargado,
 un plan con niños y otro sin ellos —380 planes—. Lo que se vigila ahí no es la
 dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: de los
-**571 actos cargados** (66 marcados de niños, 170 de noche, 335 sin marcar),
-**811 ofrecidos** y **0 ofrecidos a quien no toca**. Ese cero es la prueba de
+**568 actos cargados** (63 marcados de niños, 170 de noche, 335 sin marcar),
+**801 ofrecidos** y **0 ofrecidos a quien no toca**. Ese cero es la prueba de
 toda la regla; los 483 «sin clasificar y ofrecido» ya NO son un fallo, que
 desde que `q` dice solo si es de niños, lo que no está marcado va a los
 adultos y eso es lo normal.
@@ -1956,7 +2025,7 @@ miradores en el catálogo (41 con posición aproximada), 36% de los planes y
 1,1 km de desvío mediano**. Eran 25 miradores y el 12%, así que este número
 mide sobre todo el catálogo, no el motor.
 
-**Con navegador** — `probar-web.js` con Playwright recorre doce flujos en
+**Con navegador** — `probar-web.js` con Playwright recorre trece flujos en
 Chrome y captura los errores de consola. Sin argumentos va contra la web
 desplegada; con una URL detrás va contra lo que se le diga, y **eso es lo que
 hay que hacer para probar una rama**: se levanta un servidor de ficheros en el
@@ -1987,7 +2056,7 @@ la web: el proxy corta Leaflet y las tipografías de Google por certificado, y
 las funciones de Netlify no existen en un servidor de ficheros. Lo que hay que
 mirar es que **no haya ningún error de JavaScript propio** — y que, con la API
 caída, el plan salga igual por el narrador local, que es la red de seguridad.
-Referencia: **12 de 12 recorridos completan todos sus pasos, 0 errores de
+Referencia: **13 de 13 recorridos completan todos sus pasos, 0 errores de
 JavaScript propios**, y el plan sale con sus fichas y su caja de texto. Los dos
 últimos entran por caminos que ningún otro pisa:
 · `mapa-comarcas` — los siete primeros eligen el pueblo donde DUERMEN, y este
@@ -2007,10 +2076,15 @@ JavaScript propios**, y el plan sale con sus fichas y su caja de texto. Los dos
 · `dia-futuro-entero` y `rango-escapada` — las otras dos ramas del «cuándo», que
   ningún otro recorrido pisa: un día del mes que viene da el día entero, y dos
   días seguidos dan la escapada sin preguntar cuántos.
-· `cuantos-son` — el otro camino del paso 4: en vez de pulsar una carta se tocan
-  los `+` y se sale por «Seguimos». Existe porque ese botón es **el único que
-  escribe `personas`** en el informe; por las cartas va `van` y el número no
-  viaja.
+· `cuantos-son` — el contador del paso 4, que desde que se fueron las tres
+  cartas es el ÚNICO camino: sube dos adultos y comprueba que sale el número que
+  se ha marcado. Y `con-ninos-playa` sube dos por el otro contador, que es lo que
+  enciende `S.ninos` desde que no hay una carta que lo diga.
+· `tenderete-por-pueblo` — el tenderete entrando por la ESTAMPA del municipio,
+  que es el camino nuevo. Sus tres primeros pasos van opcionales a propósito,
+  que la prueba corre con la fecha de hoy y el día manda: si no hay nada se
+  repintan las cartas, y si el pueblo tiene una sola cosa se entra solo y no hay
+  lista que pulsar.
 Y tres trampas más, que salieron al darle la vuelta al hilo y al meter el
 calendario en los recorridos:
 · **El chip de la comarca lleva DENTRO el rótulo largo y el corto**, así que su
@@ -2059,7 +2133,7 @@ costa a la cumbre y con el centroide ganaba el Observatorio del Teide, a 10 km
 y 2.400 m de altura. Quien sí sabe lo que quiere ver tiene el botón «Prefiero
 elegir el sitio yo».
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 231 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 230 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **La leyenda del mapa también.** Los cuatro rótulos —«Dónde duermen», «La
@@ -2078,8 +2152,8 @@ escritas en español a pelo —la zona, el municipio, el momento del día, el
 Los corredores, que son lo que usa el motor para los tiempos de viaje, siguen
 sin traducirse.
 
-**Los carteles no llevan el rótulo dentro.** Las cuatro preguntas con dibujo
-—coche o guagua, con quién viajan, qué tipo de día y qué apetece comer— se
+**Los carteles no llevan el rótulo dentro.** Las tres preguntas con dibujo
+—coche o guagua, qué tipo de día y qué apetece comer— se
 pintan con `cartas()`, y el rótulo va
 DEBAJO, sacado de `tr()`. Los carteles originales traían el texto incrustado
 y en español: así no valían en inglés ni en alemán. Se recortaron por el
@@ -2165,6 +2239,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Más que dónde duerme podemos poner ¿de dónde sale?» | 13 sep | El paso 2 deja de preguntar por la cama y pregunta por el punto de partida, con el botón de la ubicación debajo del mapa. `localizar()` lleva ahora a dónde seguir y a dónde volver, que desde ahí no son lo mismo |
 | «¿Dónde metemos el botón de ahora mismo / día entero / varios días?» + «¿falta el de los muñequitos?» | 13 sep | Las tres puertas del «cuándo» se juntan en una fila de chips debajo del calendario, que es la misma pregunta que la fecha; el hilo se queda en cinco pasos. Y los muñequitos ganan un contador opcional: el número inventado de las cartas (2, 4, 6) deja de viajar al informe como si lo hubieran dicho ellos. De paso salió que «Sorpréndame» pisaba la respuesta del paso 1 |
 | «Elegir los días en el calendario, máximo 3» + «el tiempo debajo» + «el contador no se ve» | 13 sep | El calendario pasa a decidir el CUÁNDO él solo —un día es un plan, dos o tres son la escapada— y los tres chips se van enteros; en su hueco va el parte de AEMET, vacío si no contesta. Y el contador de personas sube ENCIMA de las cartas: medido en un móvil, caía a 865 px por debajo de lo que se ve. De paso, la escapada dejaba de respetar el tipo de día del paso 1 |
+| «El tenderete por municipio con las estampas» + «rígete al artefacto en el sitio» + «quita las imágenes de las personas» | 13 sep | El tenderete pasa a dos niveles con la cuadrícula de estampas que ya existía. De los 22 actos sin sitio, los 22 venían de la agenda pegada a mano: `eventos.js cruzadas` destapa el punto ciego de la hora y junta 3 (571 → 568); los 19 que quedan no tienen gemelo en el artefacto y hay que preguntarlos. Y las tres cartas de «con quién viajan» se van enteras: 140 KB menos y `personas` deja de ser una cifra nuestra en ningún caso |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si

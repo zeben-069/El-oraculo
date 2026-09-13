@@ -343,13 +343,14 @@ const T={
      gComer:'Dónde comer — elijan ustedes',
      capCama:'Dónde duermen',gRemate:'Para rematar',capRuta:'La ruta del día',capComer:'Dónde comer',capAgua:'Para el bañito',
      fotoDe:'Fotos:',
-     tGente:'¿Con quién viajan?',
+     
      calRango:'Para varios días, pulse también el último: hasta 3 seguidos.',
+     qEnEsePueblo:m=>'En '+m+', ¿a cuál le monto el día?',volverPueblos:'↩ Ver otros pueblos',elPrograma:'Programa del día',
      gExacto:'¿Cuántos son exactamente? (opcional)',gAdultos:'adultos',gNinos:'niños',gSeguimos:'Seguimos',
      tCoche:'¿Coche o guagua?',
      cConCoche:'Con coche',cSinCoche:'Sin coche, en guagua',
      cTenderete:'Tenderete y tradiciones',sinFiestas:'Pues mire, ese día no hay ninguna fiesta ni programa por la isla — y si la hubiera, se la diría. ¿Un bañito en la playa entonces, o le apetece otra cosa?',cSenderos:'Senderos y naturaleza',cAgua:'Charcos y playas',cMuseos:'Museos y casco histórico',cTodo:'Un poco de todo',cTipica:'Comida típica',cDeTodo:'Un poco de todo',
-     dos:'Dos adultos',familia:'Familia con niños',grupo:'Grupo, sin niños',
+     
      plan:'Un plan para el día entero',sitio:'Quiero ver un sitio concreto',
      ahora:'Estoy por aquí ahora, ¿qué hago?',cambiar:'Cambiar el día o el alojamiento',
      hola:'Soy <b>Naira</b>, de aquí de toda la vida. Le monto el día como se lo montaría a un primo que viene de fuera: sin colas tontas y comiendo bien. ',compartir:'Compartir este plan',otro_muni:'Ese no es, cambiar de municipio',
@@ -404,13 +405,14 @@ const T={
      gComer:'Where to eat — you choose',
      capCama:'Where you sleep',gRemate:'To round it off',capRuta:'The day\'s route',capComer:'Where to eat',capAgua:'For a swim',
      fotoDe:'Photos:',
-     tGente:'Who is travelling?',
+     
      calRango:'For several days, tap the last one too: up to 3 in a row.',
+     qEnEsePueblo:m=>'In '+m+', which one shall I build the day around?',volverPueblos:'↩ See other towns',elPrograma:'The day\u2019s programme',
      gExacto:'Exactly how many are you? (optional)',gAdultos:'adults',gNinos:'children',gSeguimos:'Carry on',
      tCoche:'Car or bus?',
      cConCoche:'With a car',cSinCoche:'By bus',
      cTenderete:'Fiestas and local traditions',sinFiestas:"Well now, there's no fiesta and no programme anywhere on the island that day — and if there were, I'd tell you. A dip at the beach, then, or would you rather something else?",cSenderos:'Trails and nature',cAgua:'Pools and beaches',cMuseos:'Museums and old towns',cTodo:'A bit of everything',cTipica:'Local food',cDeTodo:'A bit of everything',
-     dos:'Two adults',familia:'Family with children',grupo:'Group, no children',
+     
      plan:'A plan for a whole day',sitio:'I want to see somewhere specific',
      ahora:'I am out already — what now?',cambiar:'Change the day or where I am staying',
      hola:'I am <b>Naira</b>, born and raised here. I will plan your day the way I would for a cousin coming to visit: no silly queues and eating well. ',compartir:'Share this plan',otro_muni:'Wrong one — change town',
@@ -465,13 +467,14 @@ const T={
      gComer:'Wo essen — Sie wählen',
      capCama:'Wo Sie schlafen',gRemate:'Zum Abschluss',capRuta:'Die Route des Tages',capComer:'Wo essen',capAgua:'Zum Baden',
      fotoDe:'Fotos:',
-     tGente:'Wer reist mit?',
+     
      calRango:'Für mehrere Tage auch den letzten antippen: bis zu 3 am Stück.',
+     qEnEsePueblo:m=>'Worum soll ich den Tag in '+m+' herum bauen?',volverPueblos:'↩ Andere Orte ansehen',elPrograma:'Programm des Tages',
      gExacto:'Wie viele genau? (optional)',gAdultos:'Erwachsene',gNinos:'Kinder',gSeguimos:'Weiter',
      tCoche:'Auto oder Bus?',
      cConCoche:'Mit Auto',cSinCoche:'Mit dem Bus',
      cTenderete:'Fiestas und Traditionen',sinFiestas:'Also, an dem Tag gibt es auf der ganzen Insel keine Fiesta und kein Programm — und wenn es eins gäbe, würde ich es Ihnen sagen. Dann vielleicht ein Bad am Strand, oder lieber etwas anderes?',cSenderos:'Wanderwege und Natur',cAgua:'Meerbecken und Strände',cMuseos:'Museen und Altstädte',cTodo:'Von allem etwas',cTipica:'Typisch kanarisch',cDeTodo:'Von allem etwas',
-     dos:'Zwei Erwachsene',familia:'Familie mit Kindern',grupo:'Gruppe, ohne Kinder',
+     
      plan:'Ein Plan für einen ganzen Tag',sitio:'Ich möchte einen bestimmten Ort sehen',
      ahora:'Ich bin schon unterwegs — was jetzt?',cambiar:'Tag oder Unterkunft ändern',
      hola:'Ich bin <b>Naira</b>, hier geboren und aufgewachsen. Ich plane Ihren Tag so, wie ich ihn für einen Cousin aus dem Ausland planen würde: ohne sinnlose Warteschlangen und mit gutem Essen. ',compartir:'Diesen Plan teilen',otro_muni:'Falsch — Ort ändern',
@@ -2059,10 +2062,10 @@ function construir(){
              S.gente es el número de personas (2, 4 o 6), así que la rama estaba
              muerta. Comparando los números también salta el caso de la familia
              de cuatro con tope de tres, que la versión anterior no miraba. */
-          /* Y solo se afirma que no entran cuando el número lo dijeron ellos:
-             con el de la carta —2, 4 o 6— esto acusaba de no caber a una
-             familia de tres en un permiso de tres. */
-          (S.genteExacta&&S.gente>p.res_max
+          /* El número lo dicen ellos en el contador, así que esto ya se puede
+             afirmar: con el de las tres cartas —2, 4 o 6— acusaba de no caber
+             a una familia de tres en un permiso de tres. */
+          (S.gente>p.res_max
             ? '<span class="no">Son '+S.gente+' y el tope es '+p.res_max+': no entran todos.</span>'
             : 'Sin el permiso no se entra.')
         : 'Este sitio necesita reserva previa. Sin ella no se entra.');
@@ -2189,12 +2192,11 @@ function construir(){
     '</span>.<br>Los actos que no se supieron clasificar no se ofrecen a nadie.');
 
   const brief={
-    /* `personas` solo si lo dijeron ellos en el contador. Si eligieron una
-       carta, lo que va es `van` —lo único que contestaron—, que el prompt
-       compara el número con el tope de los permisos y no se puede decir «no
-       entran todos» por una cifra que hemos supuesto nosotros. */
-    fecha:f,dia_semana:DIAS[ds],alojamiento:base.et,coche:S.coche,
-    personas:S.genteExacta?S.gente:null, van:S.genteExacta?null:(S.van||null),
+    /* `personas` es SIEMPRE lo que dijeron ellos en el contador: desde que se
+       fueron las tres cartas no hay otra manera de contestar, así que la cifra
+       nunca es una suposición nuestra y se puede comparar con el tope de un
+       permiso sin miedo. */
+    fecha:f,dia_semana:DIAS[ds],alojamiento:base.et,coche:S.coche,personas:S.gente,
     /* El informe solo llevaba la fecha DEL PLAN, así que Naira no sabía si eso
        era hoy, mañana o dentro de tres semanas, ni qué hora era al hablar. Por
        eso no decía «salgan ya» ni «a estas horas el mercado está cerrado». */
@@ -3715,7 +3717,7 @@ function narrarLocal(b){
     if(r.clasificacion&&/registrado|registered|eingetragen/i.test(r.clasificacion)) c+=F.registrado;
     else if(r.clasificacion) c+=F.noRegistrado;
     if(r.nota) c+=' '+r.nota+'.';
-    if(r.telefono&&b.personas) c+=F.llamen(r.telefono,b.personas);
+    if(r.telefono) c+=F.llamen(r.telefono,b.personas);
     if(r.nota_extra) c+=' '+r.nota_extra+'.';
     if(r.ojo) c+=F.aviso+r.ojo+'.';
     t.push(c);
@@ -4542,21 +4544,25 @@ function cuentaBase(m){
    ficheros: dentro del HTML en base64 eran 1,1 MB que el navegador tenía que
    descargar y analizar antes de pintar nada. Si falta la imagen, la ficha
    sigue funcionando con el color y el icono. */
-function fichaMunicipio(k,v){
+/* `cuenta` es opcional y cambia SOLO la línea de abajo. Eligiendo pueblo dice
+   «N sitios», que es lo que se va a ver allí; en la lista de fiestas del día
+   dice cuántas cosas hay ese día, porque desde ahí eso es lo que se elige. La
+   tarjeta tiene que decir lo que promete el sitio desde el que se pulsa. */
+function fichaMunicipio(k,v,cuenta){
   const e=ESTAMPA[v.m]||null;
-  const n=cuentaBase(v.m);
+  const pie=cuenta?cuenta(v.m):cuentaBase(v.m)+' '+tr('nSitios');
   return '<button class="estampa" data-base="'+k+'">'+
     (e? '<span class="lienzo"><img src="'+e.f+'" alt="" loading="lazy" decoding="async"></span>'
       : '<span class="lienzo sin"><span class="ico">🏝</span></span>')+
     '<span class="pie"><b>'+v.et+'</b>'+
       (e&&lemaTr(e)?'<span class="lema2">'+lemaTr(e)+'</span>':'')+
-      '<span class="cuenta">'+n+' '+tr('nSitios')+'</span></span></button>';
+      '<span class="cuenta">'+pie+'</span></span></button>';
 }
-function cuadriculaMunicipios(lista,alPulsar,volver){
+function cuadriculaMunicipios(lista,alPulsar,volver,cuenta){
   acc.replaceChildren(); acc.innerHTML='';
   const caja=document.createElement('div');
   caja.className='cuadricula';
-  caja.innerHTML=lista.map(([k,v])=>fichaMunicipio(k,v)).join('');
+  caja.innerHTML=lista.map(([k,v])=>fichaMunicipio(k,v,cuenta)).join('');
   caja.addEventListener('click',e=>{
     const b=e.target.closest&&e.target.closest('.estampa');
     if(!b) return;
@@ -4646,28 +4652,25 @@ async function pCoche(){
    más que el tope, dilo antes que nada»). O sea que a una familia de tres se le
    podía decir que no entran todos en un permiso de tres, por un número que
    nadie había dicho. Eso es la regla de la casa rota por dentro.
-   El arreglo tiene dos mitades y hacen falta las dos:
-   · **El contador**, debajo de las cartas y opcional. Quien pulsa una carta
-     sigue yendo de un toque, exactamente como antes.
-   · **Y lo que se manda.** Si no lo han dicho, `personas` NO va: va `van`, que
-     es lo único que de verdad contestaron —dos adultos, familia, grupo—. El
-     número solo viaja cuando lo escribieron ellos. */
+   **Y las tres cartas se fueron.** Zeben: «si ya pones una casilla para que
+   marques cuántas personas son, podríamos quitar las imágenes y aligeramos
+   peso». Tiene razón por dos motivos, y el segundo pesa más que el primero:
+   · **Las tres cartas no decían nada que el contador no diga mejor.** «Grupo,
+     sin niños» es 6 adultos y 0 niños; «familia con niños», 2 y 2. El contador
+     las expresa todas, y además las que no cabían: una familia de tres, o dos
+     adultos con un niño.
+   · **Y el número deja de ser inventado NUNCA, no «casi nunca».** Mientras las
+     cartas estaban, la mitad de la gente contestaba con ellas y el informe
+     tenía que mandar `van` en vez de `personas`, con el prompt explicando el
+     caso. Sin cartas, `personas` va siempre y es siempre suyo: se va `van`, se
+     va su párrafo del prompt y se va la rama del aviso de aforo que no podía
+     afirmar nada. Un camino menos que mantener.
+   De peso, 140 KB de las tres ilustraciones (`dos-adultos`, `familia`,
+   `grupo`), que además eran apaisadas y se comían la pantalla de un móvil.
+   Sigue siendo UN toque para el caso normal: viene con 2 adultos y 0 niños
+   puestos, y se pulsa «Seguimos». */
 async function pGente(){await naira(tr('como'),360);
   const sigue=()=>preguntaComida();
-  const elige=(n,ninos,van)=>{S.gente=n;S.ninos=ninos;S.van=van;S.genteExacta=false;
-    paso('ok','paso 4 · cuántos son','Van <span class="si">'+van+'</span>. No han dicho el número, '+
-      'así que al informe va lo que contestaron y no una cifra inventada.');
-    sigue();};
-  cartas([
-    {t:tr('dos'),    img:'dos-adultos',ancho:true,fn:()=>elige(2,false,'dos adultos')},
-    {t:tr('familia'),img:'familia',    ancho:true,fn:()=>elige(4,true ,'una familia con niños')},
-    {t:tr('grupo'),  img:'grupo',      ancho:true,fn:()=>elige(6,false,'un grupo, sin niños')}
-  ],tr('tGente'));
-  /* El contador va ENCIMA de las cartas, y eso no es una preferencia de
-     diseño: puesto debajo, Zeben no lo vio y lo dio por no hecho. Medido en un
-     móvil de 390×844, caía a 865 px por debajo de lo que se ve, porque las tres
-     cartas de «con quién viajan» son apaisadas y van una por fila. Lo que hay
-     que bajar media pantalla para encontrar, no existe. */
   let ad=2, ni=0;
   const caja=document.createElement('div');
   caja.className='contador';
@@ -4685,7 +4688,7 @@ async function pGente(){await naira(tr('como'),360);
     const ok=e.target.closest&&e.target.closest('.okGente');
     if(ok){
       acc.innerHTML='';
-      S.gente=ad+ni; S.ninos=ni>0; S.van=null; S.genteExacta=true;
+      S.gente=ad+ni; S.ninos=ni>0;
       burbuja(ad+' '+tr('gAdultos')+(ni?' · '+ni+' '+tr('gNinos'):''),'yo');
       paso('ok','paso 4 · cuántos son','Lo han dicho ellos: <span class="si">'+ad+'</span> adultos y '+
         '<span class="si">'+ni+'</span> niños. Ese número sí puede compararse con el tope de un permiso.');
@@ -4700,7 +4703,7 @@ async function pGente(){await naira(tr('como'),360);
     else if(p==='n-') ni=Math.max(0,ni-1); else if(p==='n+') ni=Math.min(10,ni+1);
     pinta();
   });
-  acc.insertBefore(caja, acc.firstChild);
+  acc.appendChild(caja);
 }
 /* ============ LAS FIESTAS DE ESE DÍA ============
    Hasta ahora el motor elegía él solo qué fiesta anclaba el día, y el turista
@@ -5504,12 +5507,13 @@ async function loQueHayEseDia(volver,sigue){
      programa, y la mediana es 2 — o sea que el muro que se temía no existe, y
      recortar a cuatro escondía diez pueblos el 6 de septiembre. */
   const L=[];
+  const opcionesDe=(m)=>L.filter(x=>x.m===m);
   evs.forEach(e=>{
     const todoDia=esFiestaDeTodoElDia(e);
     const cuando=todoDia?tr('todoElDia'):(e.h?e.h:e.fr);
     /* Sin cama no hay minutos que dar, y no se inventan. */
     const lejos=!base?'':(e.m===base.m?tr('aquiMismo'):minutosA(base,e.c)+' '+tr('min'));
-    L.push({t:iconoFiesta(e.n)+' '+e.n+' · '+e.m+'\n'+cuando+(lejos?' · '+lejos:''),
+    L.push({m:e.m, t:iconoFiesta(e.n)+' '+e.n+'\n'+cuando+(lejos?' · '+lejos:''),
       fn:()=>{ S.anclaElegida=null; S.ahora=null;
         S.forzarEvento=e.n; S.fiestaTodoElDia=todoDia?e.n:null;
         if(sigue){ S.apetece=S.apetece||'todo'; sigue(); } else pedirPlan(); }});
@@ -5517,8 +5521,8 @@ async function loQueHayEseDia(volver,sigue){
   progs.forEach(p=>{
     const a=p.actos[0], n=p.actos.length;
     const lejos=!base?'':(p.m===base.m?tr('aquiMismo'):p.min+' '+tr('min'));
-    L.push({t:'🎉 '+p.m+'\n'+a.n.slice(0,52)+(a.h?' · '+a.h:'')+
-        (n>1?' · +'+(n-1):'')+(lejos?' · '+lejos:''),
+    L.push({m:p.m, t:'🎉 '+tr('elPrograma')+' · '+n+'\n'+a.n.slice(0,52)+(a.h?' · '+a.h:'')+
+        (lejos?' · '+lejos:''),
       fn:()=>{ S.forzarEvento=null; S.fiestaTodoElDia=null;
         S.anclaElegida=null; S.ahora=null;
         /* Con `sigue` no se puede preguntar el tipo de día —es la pregunta en
@@ -5530,9 +5534,47 @@ async function loQueHayEseDia(volver,sigue){
   /* «Me da igual» vuelve por donde se vino: desde el flujo del día entero
      sigue preguntando el tipo, y desde el plan ya hecho vuelve al plan en vez
      de tirarlo y empezar de nuevo. */
-  L.push({t:tr('meDaIgual'),fn:()=>{S.forzarEvento=null;S.fiestaTodoElDia=null;
-    if(volver) volver(); else queApetece();}});
-  opciones(L);
+  const meDaIgual={t:tr('meDaIgual'),fn:()=>{S.forzarEvento=null;S.fiestaTodoElDia=null;
+    if(volver) volver(); else queApetece();}};
+
+  /* ── Y esto va POR PUEBLOS, con la estampa de cada uno ──
+     Zeben, probándolo: «lo bueno sería que funcionara como el artefacto de
+     Cowork y que los pusiera por municipio, y lo que la persona elija; puedes
+     aprovechar las imágenes de los 31 municipios que ya tenemos creadas».
+     Y es la misma corrección que ya se le hizo al pie del calendario —«ponlo
+     separado por municipios, más que una lista entera de eventos que puede ser
+     muy pesado»—, que aquí no se había aplicado: un día grande daba catorce
+     botones de texto seguidos, y el turista no está eligiendo entre catorce
+     fiestas, está eligiendo A DÓNDE VA.
+     La cuadrícula es la MISMA `cuadriculaMunicipios` de elegir pueblo, sin
+     tocarla, así que las 31 estampas suyas valen aquí tal cual y no hay una
+     segunda manera de pintar un municipio que mantener.
+     Dos reglas, las dos ya escritas en el pie del calendario y por lo mismo:
+     · **Si solo hay un pueblo, se entra solo**: pedir un toque para enseñar lo
+       único que hay es un toque de más.
+     · **Y si en ese pueblo solo hay una cosa, tampoco se pregunta**: la
+       estampa ya era la elección. */
+  const pueblos=[];
+  L.forEach(x=>{ if(x.m&&pueblos.indexOf(x.m)<0) pueblos.push(x.m); });
+  const dentroDe=(m)=>{
+    const suyas=opcionesDe(m);
+    if(suyas.length===1) return suyas[0].fn();
+    naira(tr('qEnEsePueblo')(m),300).then(()=>
+      opciones(suyas.concat([{t:tr('volverPueblos'),fn:()=>nivelPueblos()}])));
+  };
+  const nivelPueblos=()=>{
+    if(pueblos.length===1) return dentroDe(pueblos[0]);
+    /* La cuenta de la estampa no es «N sitios» aquí, es cuántas cosas hay ese
+       día en ese pueblo: la tarjeta tiene que decir lo que promete el sitio
+       desde el que se pulsa. */
+    cuadriculaMunicipios(pueblos.filter(m=>BASES[m]).map(m=>[m,BASES[m]]),
+      m=>dentroDe(m), null, m=>opcionesDe(m).length+' '+tr(opcionesDe(m).length===1?'evento':'eventos'));
+    const b=document.createElement('button');
+    b.className='opt'; b.textContent=meDaIgual.t;
+    b.onclick=()=>{acc.innerHTML='';meDaIgual.fn()};
+    acc.appendChild(b);
+  };
+  nivelPueblos();
   return true;
 }
 
@@ -5664,7 +5706,7 @@ async function armarDia(){
 }
 function otroDia(){hilo.innerHTML='';naira(tr('qDigame'),260).then(()=>menuPrincipal())}
 function reiniciar(){S.base=S.coche=S.gente=S.anclaElegida=S.comida=S.apetece=S.ahora=S.faltaNucleo=null;S.diaEntero=false;
-  S.genteExacta=false;
+
   S.ninos=false;S.saltoComida=0;
   /* los descartes son de ESE plan: si no se limpian, alguien que dijo «esta
      no» a una playa en marzo no volvería a verla nunca */
