@@ -198,6 +198,9 @@ body[data-luz="noche"] .calPie{border-top-color:#3A3048}
 @keyframes latir{50%{opacity:0}}
 .invitaUbi{display:flex;flex-direction:column;align-items:center;gap:9px;font-family:var(--cuerpo);
   font-size:14px;color:var(--tea);line-height:1.4;text-align:center}
+/* Debajo del mapa del paso 2 va como una opción más, pero no es un botón de
+   la lista: se separa con un filete para que se lea como «o bien esto». */
+.acciones > .invitaUbi{margin-top:6px;padding-top:14px;border-top:1px solid rgba(62,43,28,.14)}
 button.btnUbi{background:var(--laurisilva);color:var(--cal);border:0;border-radius:999px;
   padding:9px 20px;font-family:var(--cuerpo);font-size:14px;font-weight:700;cursor:pointer}
 button.btnUbi:hover{filter:brightness(1.12)}

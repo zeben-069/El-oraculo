@@ -1425,15 +1425,43 @@ sabe y lo que menos le apetece teclear. Y de paso el hilo pasa de siete
 respuestas a cinco, porque el menú y la pregunta de «¿qué plan hacemos?» se
 caen del camino.
 
-**El paso 2 es el mapa de comarcas, eligiendo CAMA.** El mapa ya existía, pero
-para elegir a dónde IR. Ahora hace las dos cosas y **no son la misma**, así que
-`elegirSitio(comoBase)` cambia tres cosas cuando se elige dónde dormir:
+**El paso 2 es el mapa de comarcas, y no pregunta dónde duermen: pregunta DE
+DÓNDE SALEN.** El mapa ya existía, pero para elegir a dónde IR. Ahora hace las
+dos cosas y **no son la misma**, así que `elegirSitio(comoBase)` cambia tres
+cosas cuando se elige el punto de partida:
 · **No salen los dos carteles.** En «Anaga» y en «la cumbre» no se duerme: no
   son municipios y no tienen centro en `BASES`.
 · **No salta el aviso de «eso está en el otro cartel».** Ese aviso habla de lo
-  que el ancla del día no va a coger, y no tiene nada que ver con dónde se tiene
-  la cama: se puede dormir en La Laguna y subir a Chinamada igual.
-· **No hay «me da igual».** Dormir se duerme en algún sitio.
+  que el ancla del día no va a coger, y no tiene nada que ver con de dónde se
+  sale: se puede dormir en La Laguna y subir a Chinamada igual.
+· **No hay «me da igual».** De algún sitio hay que salir.
+
+**Y el matiz del rótulo lo puso Zeben, que no es un matiz.** «Más que dónde
+duerme podemos poner ¿de dónde sale? Ahí aparecería lo de la comarca y el botón
+de la ubicación para un plan más personalizado». La cama es una suposición: a
+media mañana el turista no está en el hotel, está en la calle de un pueblo, y el
+día se le arma desde donde esté. Así que el paso 2 pregunta `donde` con otro
+texto —«¿De dónde sale? Dígame el pueblo donde duermen, o use su ubicación y
+salimos de donde estén»— y **debajo del mapa va el botón de la ubicación**, el
+mismo que hasta ahora solo asomaba en el menú.
+Tres decisiones de cómo está puesto, y las tres muerden:
+· **Va DEBAJO del mapa, no en su lugar.** Quien todavía no ha llegado a la isla,
+  o no quiere dar el permiso, tiene que poder elegir su pueblo igual. Se separa
+  con un filete para que se lea como «o bien esto» y no como un botón más de la
+  lista.
+· **`localizar()` gana a dónde seguir Y a dónde volver, y son dos argumentos
+  distintos a propósito.** Desde el menú lo que sigue es la hora, y si la
+  ubicación falla, también. Desde el paso 2 lo que sigue es el coche, pero si
+  falla **hay que volver al mapa**: ahí todavía no hay punto de partida, y
+  mandarlo a la hora dejaría el día sin de dónde salir. Con un solo argumento,
+  negar el permiso te dejaba sin base y sin manera de ponerla. Probado en los
+  tres finales: el bueno lleva a «¿Llevan coche?», y el «no, elijo yo» y el
+  permiso denegado devuelven el mapa con su botón.
+· **Sin argumentos hace exactamente lo de antes**, que el cartel del menú sigue
+  ahí y no tenía por qué enterarse.
+Y como la ubicación escribe `S.aqui` además de `S.base`, el cartel del menú
+—que solo asoma `si(!S.aqui)`— deja de repetir la pregunta a quien ya la
+contestó.
 
 **Lo que hubo que mover debajo, y que es donde estaba el trabajo de verdad:**
 
@@ -2006,6 +2034,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | «El Teleférico, los Roques de García y Guajara NO son de Vilaflor, son de La Orotava» | 12 sep | Cierto, y el Cabildo lo confirma. De ahí sale `municipios.js`, que cruza las fichas con los 453 puntos testigo de sus itinerarios: **211 discrepancias, 31 a menos de 300 m**, con un nido en Anaga y otro en el Teide. Aplicadas las tres suyas; las demás, a la espera de que las mire. Y destapó tres cosas debajo: el aviso del cartel medía desde el pueblo equivocado, el cartel del Teide se quedaba en 21 fichas de 44, y los «N sitios» de las 31 estampas estaban descuadrados |
 | «El orden sería: 1 qué te apetece, 2 la comarca y los municipios, 3 coche o guagua, 4 cuántos son, 5 qué comer» | 13 sep | El hilo entero dado la vuelta. Lo primero que se pregunta es lo que el turista trae en la cabeza, no dónde duerme. El mapa de comarcas pasa a elegir CAMA —sin los dos carteles y sin el aviso—, el menú se cae del camino y «Sorpréndame» se cuelga de la pregunta de cuántos son. De paso salió que «volver al menú» llevaba meses sin caber en la lista de después del plan |
 | Las cinco ilustraciones del tipo de día | 12 sep | `img/cartas/`. Recortadas quitándoles el rótulo quemado dentro. Tres sustituyen a las que había y les dan nombre mejor; «un poco de todo» sube de botón a carta y se coloca la última, centrada; y «Tenderete y tradiciones» abre el calendario de fiestas —todas, y si ese día no hay ninguna se dice y se ofrece otra cosa— que es el único dato que respalda lo que promete |
+| «Más que dónde duerme podemos poner ¿de dónde sale?» | 13 sep | El paso 2 deja de preguntar por la cama y pregunta por el punto de partida, con el botón de la ubicación debajo del mapa. `localizar()` lleva ahora a dónde seguir y a dónde volver, que desde ahí no son lo mismo |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
