@@ -154,6 +154,14 @@ if(typeof L==='undefined'){
     <input type="date" id="fechaLibre" min="2026-08-01" max="2027-12-31" hidden>
   </div>
   <div class="calendario" id="calendario" hidden></div>
+  <!-- El «cuándo» va aquí y no en el hilo, y es la misma razón por la que la
+       fecha está aquí: las tres opciones —ahora mismo, el día entero, varios
+       días— son la MISMA pregunta que el calendario, la de cuándo. Y quien
+       decide si «ahora mismo» existe es la fecha: para un día de dentro de tres
+       semanas no significa nada, así que ese chip solo se pinta si el día
+       elegido es hoy y queda día. Con esto el hilo se queda en sus cinco pasos
+       y sigue acabando en un plan. -->
+  <div class="cuando" id="cuando"></div>
   <div class="idiomas" id="idiomas"></div>
 </header>
 
@@ -338,6 +346,8 @@ const T={
      capCama:'Dónde duermen',gRemate:'Para rematar',capRuta:'La ruta del día',capComer:'Dónde comer',capAgua:'Para el bañito',
      fotoDe:'Fotos:',
      tGente:'¿Con quién viajan?',
+     cuTit:'El plan:',cuAhora:'Ahora mismo',cuDia:'El día entero',cuDias:'Varios días',
+     gExacto:'¿Cuántos son exactamente? (opcional)',gAdultos:'adultos',gNinos:'niños',gSeguimos:'Seguimos',
      tCoche:'¿Coche o guagua?',
      cConCoche:'Con coche',cSinCoche:'Sin coche, en guagua',
      cTenderete:'Tenderete y tradiciones',sinFiestas:'Pues mire, ese día no hay ninguna fiesta ni programa por la isla — y si la hubiera, se la diría. ¿Un bañito en la playa entonces, o le apetece otra cosa?',cSenderos:'Senderos y naturaleza',cAgua:'Charcos y playas',cMuseos:'Museos y casco histórico',cTodo:'Un poco de todo',cTipica:'Comida típica',cDeTodo:'Un poco de todo',
@@ -397,6 +407,8 @@ const T={
      capCama:'Where you sleep',gRemate:'To round it off',capRuta:'The day\'s route',capComer:'Where to eat',capAgua:'For a swim',
      fotoDe:'Photos:',
      tGente:'Who is travelling?',
+     cuTit:'The plan:',cuAhora:'Right now',cuDia:'The whole day',cuDias:'Several days',
+     gExacto:'Exactly how many are you? (optional)',gAdultos:'adults',gNinos:'children',gSeguimos:'Carry on',
      tCoche:'Car or bus?',
      cConCoche:'With a car',cSinCoche:'By bus',
      cTenderete:'Fiestas and local traditions',sinFiestas:"Well now, there's no fiesta and no programme anywhere on the island that day — and if there were, I'd tell you. A dip at the beach, then, or would you rather something else?",cSenderos:'Trails and nature',cAgua:'Pools and beaches',cMuseos:'Museums and old towns',cTodo:'A bit of everything',cTipica:'Local food',cDeTodo:'A bit of everything',
@@ -456,6 +468,8 @@ const T={
      capCama:'Wo Sie schlafen',gRemate:'Zum Abschluss',capRuta:'Die Route des Tages',capComer:'Wo essen',capAgua:'Zum Baden',
      fotoDe:'Fotos:',
      tGente:'Wer reist mit?',
+     cuTit:'Der Plan:',cuAhora:'Jetzt gleich',cuDia:'Der ganze Tag',cuDias:'Mehrere Tage',
+     gExacto:'Wie viele genau? (optional)',gAdultos:'Erwachsene',gNinos:'Kinder',gSeguimos:'Weiter',
      tCoche:'Auto oder Bus?',
      cConCoche:'Mit Auto',cSinCoche:'Mit dem Bus',
      cTenderete:'Fiestas und Traditionen',sinFiestas:'Also, an dem Tag gibt es auf der ganzen Insel keine Fiesta und kein Programm — und wenn es eins gäbe, würde ich es Ihnen sagen. Dann vielleicht ein Bad am Strand, oder lieber etwas anderes?',cSenderos:'Wanderwege und Natur',cAgua:'Meerbecken und Strände',cMuseos:'Museen und Altstädte',cTodo:'Von allem etwas',cTipica:'Typisch kanarisch',cDeTodo:'Von allem etwas',
@@ -2047,7 +2061,10 @@ function construir(){
              S.gente es el número de personas (2, 4 o 6), así que la rama estaba
              muerta. Comparando los números también salta el caso de la familia
              de cuatro con tope de tres, que la versión anterior no miraba. */
-          (S.gente>p.res_max
+          /* Y solo se afirma que no entran cuando el número lo dijeron ellos:
+             con el de la carta —2, 4 o 6— esto acusaba de no caber a una
+             familia de tres en un permiso de tres. */
+          (S.genteExacta&&S.gente>p.res_max
             ? '<span class="no">Son '+S.gente+' y el tope es '+p.res_max+': no entran todos.</span>'
             : 'Sin el permiso no se entra.')
         : 'Este sitio necesita reserva previa. Sin ella no se entra.');
@@ -2174,7 +2191,12 @@ function construir(){
     '</span>.<br>Los actos que no se supieron clasificar no se ofrecen a nadie.');
 
   const brief={
-    fecha:f,dia_semana:DIAS[ds],alojamiento:base.et,coche:S.coche,personas:S.gente,
+    /* `personas` solo si lo dijeron ellos en el contador. Si eligieron una
+       carta, lo que va es `van` —lo único que contestaron—, que el prompt
+       compara el número con el tope de los permisos y no se puede decir «no
+       entran todos» por una cifra que hemos supuesto nosotros. */
+    fecha:f,dia_semana:DIAS[ds],alojamiento:base.et,coche:S.coche,
+    personas:S.genteExacta?S.gente:null, van:S.genteExacta?null:(S.van||null),
     /* El informe solo llevaba la fecha DEL PLAN, así que Naira no sabía si eso
        era hoy, mañana o dentro de tres semanas, ni qué hora era al hablar. Por
        eso no decía «salgan ya» ni «a estas horas el mercado está cerrado». */
@@ -3695,7 +3717,7 @@ function narrarLocal(b){
     if(r.clasificacion&&/registrado|registered|eingetragen/i.test(r.clasificacion)) c+=F.registrado;
     else if(r.clasificacion) c+=F.noRegistrado;
     if(r.nota) c+=' '+r.nota+'.';
-    if(r.telefono) c+=F.llamen(r.telefono,b.personas);
+    if(r.telefono&&b.personas) c+=F.llamen(r.telefono,b.personas);
     if(r.nota_extra) c+=' '+r.nota_extra+'.';
     if(r.ojo) c+=F.aviso+r.ojo+'.';
     t.push(c);
@@ -4614,22 +4636,63 @@ async function pCoche(){
   b2.onclick=()=>{acc.innerHTML='';elegirSitio(true)};
   acc.appendChild(b2);
 }
+/* ── CUÁNTOS SON ────────────────────────────────────────────────────────
+   Las tres cartas guardaban un número INVENTADO —«dos adultos» 2, «familia» 4,
+   «grupo» 6— y ese número no se quedaba dentro: viajaba al informe como
+   `personas` y el prompt manda compararlo con el tope de los permisos («si son
+   más que el tope, dilo antes que nada»). O sea que a una familia de tres se le
+   podía decir que no entran todos en un permiso de tres, por un número que
+   nadie había dicho. Eso es la regla de la casa rota por dentro.
+   El arreglo tiene dos mitades y hacen falta las dos:
+   · **El contador**, debajo de las cartas y opcional. Quien pulsa una carta
+     sigue yendo de un toque, exactamente como antes.
+   · **Y lo que se manda.** Si no lo han dicho, `personas` NO va: va `van`, que
+     es lo único que de verdad contestaron —dos adultos, familia, grupo—. El
+     número solo viaja cuando lo escribieron ellos. */
 async function pGente(){await naira(tr('como'),360);
   const sigue=()=>preguntaComida();
+  const elige=(n,ninos,van)=>{S.gente=n;S.ninos=ninos;S.van=van;S.genteExacta=false;
+    paso('ok','paso 4 · cuántos son','Van <span class="si">'+van+'</span>. No han dicho el número, '+
+      'así que al informe va lo que contestaron y no una cifra inventada.');
+    sigue();};
   cartas([
-    {t:tr('dos'),    img:'dos-adultos',ancho:true,fn:()=>{S.gente=2;S.ninos=false;sigue()}},
-    {t:tr('familia'),img:'familia',    ancho:true,fn:()=>{S.gente=4;S.ninos=true;sigue()}},
-    {t:tr('grupo'),  img:'grupo',      ancho:true,fn:()=>{S.gente=6;S.ninos=false;sigue()}}
+    {t:tr('dos'),    img:'dos-adultos',ancho:true,fn:()=>elige(2,false,'dos adultos')},
+    {t:tr('familia'),img:'familia',    ancho:true,fn:()=>elige(4,true ,'una familia con niños')},
+    {t:tr('grupo'),  img:'grupo',      ancho:true,fn:()=>elige(6,false,'un grupo, sin niños')}
   ],tr('tGente'));
-  /* «Sorpréndame» se cuelga aquí y no antes porque este es el PRIMER momento
-     en que el motor tiene lo que necesita —cama, coche y cuántos son—. Antes
-     vivía en el menú, y el menú ya no está en el camino. Se queda con lo que
-     resta de hoy, que es lo que siempre ha hecho. */
-  const b=document.createElement('button');
-  b.className='opt'; b.textContent='✨ '+tr('sorpresa');
-  b.onclick=()=>{acc.innerHTML='';burbuja(b.textContent,'yo');
-    S.gente=S.gente||2; S.ninos=!!S.ninos; sorprender();};
-  acc.appendChild(b);
+  let ad=2, ni=0;
+  const caja=document.createElement('div');
+  caja.className='contador';
+  const pinta=()=>{
+    caja.innerHTML='<span class="cuTit">'+tr('gExacto')+'</span>'+
+      [['a',tr('gAdultos'),ad],['n',tr('gNinos'),ni]].map(([k,rot,v])=>
+        '<span class="cuenta2"><b>'+rot+'</b>'+
+        '<button type="button" data-p="'+k+'-" aria-label="−">−</button>'+
+        '<i>'+v+'</i>'+
+        '<button type="button" data-p="'+k+'+" aria-label="+">+</button></span>').join('')+
+      '<button type="button" class="opt okGente">'+tr('gSeguimos')+'</button>';
+  };
+  pinta();
+  caja.addEventListener('click',e=>{
+    const ok=e.target.closest&&e.target.closest('.okGente');
+    if(ok){
+      acc.innerHTML='';
+      S.gente=ad+ni; S.ninos=ni>0; S.van=null; S.genteExacta=true;
+      burbuja(ad+' '+tr('gAdultos')+(ni?' · '+ni+' '+tr('gNinos'):''),'yo');
+      paso('ok','paso 4 · cuántos son','Lo han dicho ellos: <span class="si">'+ad+'</span> adultos y '+
+        '<span class="si">'+ni+'</span> niños. Ese número sí puede compararse con el tope de un permiso.');
+      sigue(); return;
+    }
+    const b=e.target.closest&&e.target.closest('[data-p]');
+    if(!b) return;
+    const p=b.getAttribute('data-p');
+    /* Un adulto como mínimo: un plan para cero personas no existe. Y un techo,
+       que el contador no es para apuntar una excursión de colegio. */
+    if(p==='a-') ad=Math.max(1,ad-1); else if(p==='a+') ad=Math.min(12,ad+1);
+    else if(p==='n-') ni=Math.max(0,ni-1); else if(p==='n+') ni=Math.min(10,ni+1);
+    pinta();
+  });
+  acc.appendChild(caja);
 }
 /* ============ LAS FIESTAS DE ESE DÍA ============
    Hasta ahora el motor elegía él solo qué fiesta anclaba el día, y el turista
@@ -5325,8 +5388,13 @@ async function sorprender(){
   /* Si piden un día futuro, se planifica el día entero: no tiene sentido
      darles media tarde para dentro de dos semanas. */
   S.ahora = esHoy ? ((h>=19)?'atardecer' : (h>=16)?'tarde' : (h>=13)?'mediodia' : null) : null;
-  S.apetece = S.ninos ? 'todo' : (h>=17 ? 'todo' : 'naturaleza');
-  S.comida = null; S.anclaElegida=null; S.saltoComida=0; S.diaEntero=false;
+  /* Solo se elige el tipo de día si NADIE lo ha dicho. Desde que el hilo
+     empieza preguntándolo, pisarlo aquí era darle senderos a quien acababa de
+     pulsar la carta de las playas — y sin decírselo. Desde el menú, que es de
+     donde se llama hoy, `S.apetece` puede venir de un plan anterior y entonces
+     manda ese, que es lo que el turista ya dijo. */
+  if(!S.apetece) S.apetece = S.ninos ? 'todo' : (h>=17 ? 'todo' : 'naturaleza');
+  S.comida = S.comida||null; S.anclaElegida=null; S.saltoComida=0; S.diaEntero=false;
   paso('ok','sorpréndame', esHoy
     ? 'Sin preguntas: es hoy y son las <span class="am">'+h+':00</span>, así que se planifica lo que queda del día.'
     : 'Sin preguntas: la fecha elegida <span class="am">no es hoy</span>, así que se planifica el día entero, no lo que queda de este.');
@@ -5551,12 +5619,29 @@ async function preguntaComida(){
     {t:tr('cDeTodo'),img:'un-poco-de-todo',fn:()=>{S.comida=null;armarDia()}}
   ],tr('tComida'));
 }
-/* El final de los cinco pasos. Es lo que hacía `planDelDia()` menos las dos
-   preguntas que ya están contestadas: pone el día entero, y si es hoy y pasan
-   de las cuatro salta a mañana y lo dice, que un día completo ya no cabe en lo
-   que queda. */
+/* El final de los cinco pasos, y lo único que mira del ajuste de arriba.
+   Los tres caminos salen de aquí y no de tres botones sueltos, que es lo que
+   evita el fallo de siempre: dos puertas a lo mismo que acaban dando cosas
+   distintas. */
 async function armarDia(){
-  S.descartados=null; S.prefTipo=null; S.ritmo=null; S.ahora=null; S.diaEntero=true;
+  S.descartados=null; S.prefTipo=null; S.ritmo=null;
+  /* Varios días: la escapada ya sabe todo lo que necesita —cama, coche y
+     cuántos son—, así que lo único que falta es cuántos. */
+  if(S.cuando==='dias'){ S.ahora=null; S.diaEntero=true; pedirDias(); return; }
+  /* Ahora mismo: el reloj recorta. Se vuelve a comprobar que siga siendo hoy,
+     que entre elegir el chip y acabar las preguntas pueden pasar diez minutos
+     y la fecha se puede haber cambiado en el calendario. */
+  if(S.cuando==='ahora'&&quedaDiaHoy()){
+    const h=new Date().getHours();
+    S.ahora=(h>=19)?'atardecer':(h>=16)?'tarde':(h>=13)?'mediodia':null;
+    S.diaEntero=false;
+    paso('ok','paso 5 · con lo que queda de hoy',
+      'Son las <span class="am">'+String(h).padStart(2,'0')+':00</span>, así que se planifica '+
+      'solo lo que resta del día. El tipo de día es el que pidieron en el paso 1.');
+    await naira(tr(S.ninos?'qSorpresaHoyNinos':'qSorpresaHoy'),380);
+    pedirPlan(); return;
+  }
+  S.ahora=null; S.diaEntero=true;
   const hoy=(new Date()).toISOString().slice(0,10);
   const h=new Date().getHours();
   if(S.fecha===hoy && h>=16){
@@ -5572,6 +5657,7 @@ async function armarDia(){
 }
 function otroDia(){hilo.innerHTML='';naira(tr('qDigame'),260).then(()=>menuPrincipal())}
 function reiniciar(){S.base=S.coche=S.gente=S.anclaElegida=S.comida=S.apetece=S.ahora=S.faltaNucleo=null;S.diaEntero=false;
+  S.cuando=null;S.genteExacta=false;pintaCuando();
   S.ninos=false;S.saltoComida=0;
   /* los descartes son de ESE plan: si no se limpian, alguien que dijo «esta
      no» a una playa en marzo no volvería a verla nunca */
@@ -5934,7 +6020,48 @@ function abreCalendario(abrir){
   bot.setAttribute('aria-expanded',String(ab));
 }
 
+/* ── EL «CUÁNDO»: AHORA MISMO, EL DÍA ENTERO O VARIOS DÍAS ──────────────
+   Las tres puertas existían y estaban mal repartidas: «ahora mismo» era un
+   botón de texto colgado del paso de los muñequitos, «el día entero» no se
+   elegía —era el final automático del hilo— y «varios días» vivía en el menú,
+   que desde que el hilo se dio la vuelta solo se alcanza por «volver al menú»
+   después de un plan. Y son la misma pregunta: PARA CUÁNDO.
+   Por eso van con el calendario y no en el hilo. Dos cosas que se siguen de
+   ahí y que no se pueden tocar sin traerlas de vuelta:
+   · **«Ahora mismo» solo se pinta si el día elegido es hoy y queda día.** Para
+     un día de dentro de tres semanas no significa nada, y es la regla de
+     siempre: un botón que no lleva a ningún sitio es peor que no tenerlo. Si
+     estaba elegido y se cambia la fecha, se cae solo a «el día entero».
+   · **Es un ajuste, no un paso.** No habla en el hilo ni pide confirmación: se
+     apunta en el panel y lo lee `armarDia()` al final. El hilo sigue siendo
+     cinco preguntas y sigue acabando en un plan. */
+const CUANDOS=[{k:'ahora',ic:'⏱',t:'cuAhora'},{k:'dia',ic:'☀️',t:'cuDia'},{k:'dias',ic:'🗓',t:'cuDias'}];
+/* ¿El día elegido es hoy y sobra algo de día? A partir de las ocho lo que
+   queda no da ni para una parada, así que ahí «ahora mismo» tampoco se ofrece. */
+function quedaDiaHoy(){
+  return S.fecha===(new Date()).toISOString().slice(0,10) && new Date().getHours()<20;
+}
+function pintaCuando(){
+  const c=document.getElementById('cuando'); if(!c) return;
+  if(S.cuando==='ahora'&&!quedaDiaHoy()) S.cuando=null;
+  const sel=S.cuando||'dia';
+  c.innerHTML='<span class="cuTit">'+tr('cuTit')+'</span>'+
+    CUANDOS.filter(x=>x.k!=='ahora'||quedaDiaHoy())
+      .map(x=>'<button type="button" class="chipC'+(sel===x.k?' sel':'')+'" data-cuando="'+x.k+'">'+
+        x.ic+' '+tr(x.t)+'</button>').join('');
+}
+document.addEventListener('click',function(e){
+  const b=e.target.closest&&e.target.closest('[data-cuando]');
+  if(!b) return;
+  S.cuando=b.getAttribute('data-cuando');
+  pintaCuando();
+  paso('ok','el plan, para cuándo', S.cuando==='ahora'
+    ? 'Con lo que queda de hoy: el reloj recorta el día.'
+    : S.cuando==='dias' ? 'Varios días seguidos. Al acabar las preguntas se elige cuántos.'
+    : 'El día entero, de la mañana al atardecer, sin recortar por el reloj.');
+});
 function pintaDia(){
+  pintaCuando();
   const d=diaSemana(S.fecha);
   const ev=EVENTOS.filter(e=>e.f===S.fecha).concat(actosDe(S.fecha));
   /* El día de la semana lo escribe el navegador en el idioma elegido, igual

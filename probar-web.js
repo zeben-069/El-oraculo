@@ -60,12 +60,22 @@ const GUIONES = [
   { nombre: 'sin-coche',
     pasos: ['Senderos y naturaleza', 'Valle de La Orotava', 'Puerto de la Cruz',
             'Sin coche, en guagua', 'Grupo, sin niños', 'Un poco de todo'] },
-  /* «Sorpréndame» ya no vive en el menú —el menú se fue del camino—, sino
-     colgado de la pregunta de cuántos son, que es el primer momento en que el
-     motor tiene cama, coche y personas. */
-  { nombre: 'sorpresa',
-    pasos: ['Un poco de todo', 'Metropolitana', 'Tegueste', 'Con coche',
-            'Sorpréndame'] },
+  /* «Ahora mismo» dejó de ser un botón colgado del paso de los muñequitos y es
+     un chip de la cabecera, al lado del calendario: el hilo se recorre entero
+     igual y lo único que cambia es que al final el reloj recorta el día.
+     El chip va OPCIONAL porque solo se pinta si el día elegido es hoy y son
+     menos de las ocho, y esta prueba corre con la fecha y la hora de hoy: de
+     noche no existe, y eso no es un fallo de la web. */
+  { nombre: 'ahora-mismo',
+    pasos: ['?Ahora mismo', 'Un poco de todo', 'Metropolitana', 'Tegueste',
+            'Con coche', 'Grupo, sin niños', 'Un poco de todo'] },
+  /* El contador de cuántos son, que es el otro camino del paso 4: en vez de
+     pulsar una carta se tocan los +/− y se sale por «Seguimos». Este recorrido
+     existe porque ese botón es el único que escribe `personas` en el informe;
+     por las cartas va `van` y el número no viaja. */
+  { nombre: 'cuantos-son',
+    pasos: ['Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
+            '=+', '=+', 'Seguimos', 'Un poco de todo'] },
   { nombre: 'ajustar-parada',
     pasos: ['Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
             'Grupo, sin niños', 'Un poco de todo', 'Esta no'] },

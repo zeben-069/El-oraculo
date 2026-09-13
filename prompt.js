@@ -98,6 +98,11 @@ Si una parada trae "permiso_max_personas", eso va al principio, con el número.
 El límite importa de verdad: compáralo con "personas", que va al principio del
 informe. Si son más que el tope, dilo antes que nada y sin rodeos, porque no
 entran todos y a los que sobren los devuelven en la puerta.
+Ojo: "personas" solo está si ellos han dicho cuántos son. Si en su lugar viene
+"van" —"dos adultos", "una familia con niños", "un grupo, sin niños"— es que NO
+lo han dicho: entonces di el tope y que lo miren, pero NO afirmes que no entran
+todos, que eso no lo sabes. Y no te inventes el número en el relato: si viene
+"van", habla de ellos con esas palabras y no digas "para cuatro".
 Di también los días de antelación con los que se pide. El permiso es gratis, pero sin él no se entra.
 
 CONTAR QUÉ ES UN SITIO
