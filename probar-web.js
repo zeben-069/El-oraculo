@@ -140,6 +140,16 @@ const GUIONES = [
   { nombre: 'otra-zona',
     pasos: ['Un poco de todo', 'Metropolitana', 'La Laguna', 'Con coche',
             'Seguimos', 'De todo un poco', 'Llévame más lejos'] },
+  /* El programa del día dentro de la ficha de la fiesta. El paso va OPCIONAL a
+     propósito: la prueba corre con la fecha de hoy y el botón solo sale si ese
+     día el pueblo del ancla tiene programa cargado — que es la regla de siempre,
+     un botón a una lista vacía es peor que no tenerlo. Lo que se mide es que
+     cuando está, se pulsa y el plan sigue en pantalla: se despliega dentro, no
+     rehace nada. */
+  { nombre: 'programa-en-la-ficha',
+    pasos: ['Tenderete y tradiciones', '?Me da igual', 'Un poco de todo',
+            'Metropolitana', 'La Laguna', 'Sin coche, en guagua', 'Seguimos',
+            'De todo un poco', '?Ver el programa del día'] },
   { nombre: 'ingles',
     pasos: ['=EN', 'A bit of everything', 'Metropolitan', 'La Laguna',
             'With a car', 'Carry on', 'A little of everything'] },

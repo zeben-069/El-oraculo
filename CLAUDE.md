@@ -1994,6 +1994,93 @@ Tres cosas que costaron:
   «prefiero naturaleza» y «cambiar dónde comer» los días que además hay fiesta.
   El octavo sitio sigue siendo el reservado de «volver al menú».
 
+## Tres capturas más: el mismo plan tres veces, las guaguas mudas y la fiesta que no se pulsa
+
+Zeben probó el hilo entero desde su móvil y sacó tres cosas de un tirón. Las
+tres eran ciertas y las tres tenían causa distinta.
+
+**«He puesto 3 veces la misma combinación y 3 veces el mismo plan».** Literal:
+la semilla del motor sale **solo de la fecha** —`f.split('-').reduce(...)`—, así
+que con la misma cama, el mismo tipo de día y el mismo día el resultado es
+idéntico. Comprobado llamando a `construir()` tres veces seguidas: las mismas
+dos paradas y el mismo restaurante.
+Y esa estabilidad **no es un descuido**, es lo que hace que recargar la web te
+devuelva TU plan, el que ya habías leído. Lo que faltaba era distinguir dos
+cosas que no son la misma: **la primera vez** que se pide una combinación, el
+plan de siempre; **pedirla otra vez sin cambiar nada**, eso es «dame otro», y
+ahí repetir es no haber escuchado.
+Lo resuelve `construirConVariedad()` con una huella de lo que el turista ha
+elegido —fecha, cama, tipo de día, coche, niños, comida, ancla—. Si la de ahora
+es la misma que la de antes, las paradas ya vistas entran como `_yaVistos`, que
+es **el mecanismo que ya usa la escapada** para no repetir sitio de un día a
+otro, y la comida rota un puesto. Desde La Laguna sin coche y con niños:
+
+| | el día que sale |
+|---|---|
+| 1.ª vez | Museo de la Ciencia y el Cosmos · Mercado de La Laguna — Patio Canario |
+| 2.ª vez | Museo Histórico Militar · Mirador de Vistabella — Kon·Tiki |
+| 3.ª vez | Ermita de San Diego del Monte · Museo LM Arte — Rincón Lagunero |
+
+Dos cuidados, y los dos costaron:
+· **Lo visto se ACUMULA**, no se guarda solo el último plan. Guardando uno, la
+  tercera vez se vetaba el segundo y volvía el primero: un bucle de dos. La
+  huella se vacía sola en cuanto cambian algo de la pregunta.
+· **Red de seguridad.** En un pueblo con pocas fichas, vetar lo de antes puede
+  dejar el día en una parada. Si sale con menos de dos, se rehace **sin veto**,
+  se devuelve el de siempre y **se olvida lo vetado** —que si no, la vez
+  siguiente vuelve a caer aquí—. Repetir un plan bueno es mejor que dar uno cojo.
+
+**«Pongo en guagua y no se habla para nada de las guaguas».** Tenía razón a
+medias, y la mitad que la tenía es la que importa. El plan **sí** decía la
+parada —«la tienen al lado, se llama MENCEY BENCOMO»— pero **no decía qué
+coger**, que es como dar una dirección sin la calle. Un nombre de parada sin
+línea no lleva a nadie a ningún sitio.
+Y el dato llevaba **desde el 12 de septiembre en casa, sin usar**: el GTFS de
+TITSA cruza `stop_times` con `trips` y `routes` y da, para cada una de sus 3.896
+paradas, qué líneas paran ahí. Son 1.333.553 pasos leídos. Lo hace ahora
+`node guaguas.js lineas /ruta/al/gtfs [meter]`, y el campo es `bus_lineas`.
+**El cruce se hace por NOMBRE de parada, no por la más cercana**, y esa es la
+decisión: el nombre es el que ya está escrito en la ficha y el que el turista va
+a leer en el poste. Buscando la más cercana cuadraban 618 de 640 y las 22
+restantes se habrían llevado **las líneas de otra parada** —la ficha de Benijo
+dice «BENIJO» y la del GTFS más cercana es «ALMÁCIGA», a 1,1 km—. Antes ninguna
+línea que una equivocada.
+Resultado: **1.024 fichas con sus líneas** —630 sitios y 394 restaurantes—. Se
+quedan 7 cuya parada no existe con ese nombre en el GTFS y 3 cuyo nombre lleva
+comillas y no casa en el fichero; esas se quedan sin línea y no se inventan.
+En el informe va como `lineas_de_guagua`, y **solo sin coche**: a quien lleva
+coche la línea le sobra. Se dan **hasta cuatro** y el resto en un número — la
+mediana son 3 líneas por parada, pero por el Intercambiador de Santa Cruz pasan
+**62**, y una lista de 62 números no es una ayuda, es un horario. El prompt lo
+explica y le prohíbe inventarse ninguna y decir a qué hora pasa: ahí solo está
+qué para, no cuándo.
+Y se le añadió al prompt lo que faltaba por debajo: **si el plan entero cae
+dentro del mismo municipio no hay última guagua que dar** —no se cruza de
+término, y por eso `regreso` es solo «a pie o guagua urbana»—, pero eso no es
+excusa para callar el transporte: siguen yendo en guagua todo el día.
+
+**«Que cuando dice que son las fiestas del Cristo puedas pinchar y te diga los
+eventos que hay ese día».** Hecho, y al medirlo salió que hacía más falta de lo
+que parecía.
+Su plan era el 14 de septiembre en La Laguna, **con niños**, y el relato decía
+«no es que haya un acto a una hora concreta, es que el pueblo entero está de
+fiesta». Pero ese día La Laguna tiene **9 actos** fichados —el Repique a Gloria,
+la Procesión Cívico-Militar, la recepción del Rey, los Fuegos del Risco— y
+`actosDelDia()` los filtra por `q`: con niños solo pasa lo que el nombre dice que
+es de niños, y de esos nueve **ninguno lo es**. O sea que una familia, en la
+fiesta más grande de La Laguna, no veía ni uno.
+El botón lo arregla **sin tocar esa regla**, que está bien donde está: lo que el
+motor OFRECE sigue filtrado —no se le mete a un crío una misa a las siete de la
+mañana—, pero lo que el programa PONE se puede mirar entero. Son dos cosas
+distintas y hasta ahora solo existía la primera.
+Dos decisiones de pantalla:
+· **Se despliega DENTRO de la ficha**, no en una burbuja de Naira. Mandarlo a
+  una burbuja habría borrado el plan para enseñar una lista, y lo que se quiere
+  es mirarla y volver al día. Es el mismo gesto que ya hace el pie del
+  calendario al abrir un pueblo.
+· **El botón solo sale si ese pueblo tiene programa ese día**, con el número
+  dentro, que es la regla de siempre.
+
 ## El municipio de una ficha, y quién lo dice
 
 Zeben leyó el aviso del cartel de Vilaflor y cortó por lo sano: **«Teleférico
@@ -2263,7 +2350,7 @@ miradores en el catálogo (41 con posición aproximada), 35% de los planes y
 comparte candidatos con él. Eran 25 miradores y el 12%, así que este número
 mide sobre todo el catálogo, no el motor.
 
-**Con navegador** — `probar-web.js` con Playwright recorre catorce flujos en
+**Con navegador** — `probar-web.js` con Playwright recorre quince flujos en
 Chrome y captura los errores de consola. Sin argumentos va contra la web
 desplegada; con una URL detrás va contra lo que se le diga, y **eso es lo que
 hay que hacer para probar una rama**: se levanta un servidor de ficheros en el
@@ -2297,7 +2384,7 @@ la web: el proxy corta Leaflet y las tipografías de Google por certificado, y
 las funciones de Netlify no existen en un servidor de ficheros. Lo que hay que
 mirar es que **no haya ningún error de JavaScript propio** — y que, con la API
 caída, el plan salga igual por el narrador local, que es la red de seguridad.
-Referencia: **14 de 14 recorridos completan todos sus pasos, 0 errores de
+Referencia: **15 de 15 recorridos completan todos sus pasos, 0 errores de
 JavaScript propios**, y el plan sale con sus fichas y su caja de texto. Los dos
 últimos entran por caminos que ningún otro pisa:
 · `mapa-comarcas` — los siete primeros eligen el pueblo donde DUERMEN, y este
@@ -2321,6 +2408,9 @@ JavaScript propios**, y el plan sale con sus fichas y su caja de texto. Los dos
   cartas es el ÚNICO camino: sube dos adultos y comprueba que sale el número que
   se ha marcado. Y `con-ninos-playa` sube dos por el otro contador, que es lo que
   enciende `S.ninos` desde que no hay una carta que lo diga.
+· `programa-en-la-ficha` — pulsar la fiesta del plan para ver el programa del
+  día. Su último paso va OPCIONAL a propósito: la prueba corre con la fecha de
+  hoy y el botón solo sale si el pueblo del ancla tiene actos cargados ese día.
 · `otra-zona` — el botón de «llévame más lejos», que ningún otro pisa: arma el
   día, y desde el plan lo manda entero a otra zona. El paso NO va opcional a
   propósito: desde La Laguna con coche siempre hay zona que ofrecer —Candelaria
@@ -2492,6 +2582,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | Los dos carteles de coche y guagua | 13 sep | `img/cartas/`. Y aquí `recortar-cartel.js` se quedó corto: su rótulo va en una **caja centrada dentro del dibujo**, no en una franja de lado a lado, así que el corte se iba al pie y «CON COCHE» se quedaba quemado dentro. La herramienta busca ahora la banda por dos caminos y sube hasta su borde de arriba — los cinco carteles anteriores salen byte a byte idénticos, o sea que solo añade |
 | «No se ha cambiado ninguna de las últimas» | 13 sep | El zip estaba bien y las nueve ilustraciones dentro: lo que fallaba era **nuestra caché**. `netlify.toml` pedía guardar `/img/*` una semana y los carteles se reemplazan con el mismo nombre, así que su navegador no volvía a pedirlos. Arreglado por los dos lados: la cabecera pasa a preguntar siempre en las carpetas que cambian, y `vImg()` le pone versión a la URL, que es lo único que sirve a quien ya tiene la semana empezada |
 | Tres capturas de un plan suyo: «acabas echando un dulce en La Caseta, que está otra vez en la Punta» | 13 sep | Dos cosas. El remate medía «de vuelta a casa» **en línea recta** y no por desvío, que es la regla que esta casa ya aplica a los restaurantes y al regalo de ida: de 7,2 km de rodeo máximo a 1,8. Y su idea del «radar de kilómetros» llevó a medir que **el radio no es lo que aprieta** —18 km permitidos y el 98% de los días no pasa de 8—, así que el botón de «llévame más lejos» no toca el radio: **mueve el centro del día** a otra zona y deja que las mismas reglas lo aprieten allí |
+| Cinco capturas del hilo entero desde el móvil | 13 sep | Tres cosas, tres causas. «Tres veces la misma combinación y tres veces el mismo plan»: la semilla sale solo de la fecha, así que repetir da lo mismo — ahora una huella de lo pedido veta lo ya visto al repetir, con red de seguridad si el pueblo se queda sin fichas. «Pongo en guagua y no se habla de guaguas»: el plan decía la parada pero no la línea, y el dato estaba en el GTFS desde el día 12 — **1.024 fichas con sus líneas**, cruzadas por NOMBRE de parada y no por la más cercana. Y la fiesta del plan se pulsa y despliega el programa del día, que además destapó que **una familia no veía ninguno de los 9 actos del Cristo** |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
@@ -2501,7 +2592,7 @@ cada uno contra el catálogo:
 | fichero | qué trae | qué se ha hecho |
 |---|---|---|
 | `paradasdeguagua.csv` / `.geojson` | 3.872 paradas **con coordenada** | Se usó una vez para el campo `bus` y **no quedó herramienta**, así que 215 fichas nuevas se quedaron mudas. Cerrado con `guaguas.js`: quedan 4 sitios sin parada, los 4 que no tienen coordenada |
-| `google_transit.zip` (**GTFS de TITSA**) | 49.373 viajes, 3.897 paradas, 1.517 servicios y seis meses de calendario | Es el fichero que le faltaba a la matriz de municipios. Lo lee `matriz.js` y de ahí sale `datos/titsa-matriz.js` entera. El `shapes.txt` (31 MB, el trazado de cada línea) **no se usa**: el mapa dibuja las paradas del día, no el recorrido de la guagua |
+| `google_transit.zip` (**GTFS de TITSA**) | 49.373 viajes, 3.897 paradas, 1.517 servicios y seis meses de calendario | Es el fichero que le faltaba a la matriz de municipios. Lo lee `matriz.js` y de ahí sale `datos/titsa-matriz.js` entera. Y el 13 de septiembre dio una segunda cosecha que llevaba sin usar: **qué líneas paran en cada parada**, que es lo que le faltaba a un plan sin coche para decir qué coger (`guaguas.js lineas`, 1.024 fichas). El `shapes.txt` (31 MB, el trazado de cada línea) **no se usa**: el mapa dibuja las paradas del día, no el recorrido de la guagua |
 | `lineas-y-horarios.csv` / `.json` | los 182 números de línea con su nombre y su web | **No hace falta aparte**: lo mismo está en `routes.txt` del GTFS, que es de donde se lee |
 | `itinerarios__titsa1.csv` | 225 itinerarios del Cabildo, columnas BIEN puestas | Es `datos/senderos-tenerife.js`. **112 están fichados en `LUGARES` y los 112 cuadran** al metro con este fichero |
 | `itinerarios.geojson` y `itinerarios.geojson_1` | los mismos 225, con el trazado (15 MB cada uno, y son el mismo fichero dos veces) | De aquí solo se sacan los datos, no el trazado: el mapa dibuja las paradas del día, no la línea del sendero. Y **traen las etiquetas corridas** —`itinerario_distancia` contiene la altura máxima—, que es la trampa que ya está apuntada arriba |
