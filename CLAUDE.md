@@ -1789,6 +1789,35 @@ cuando se quedaba solo en la fila de dos columnas; con cinco pasa lo mismo con
 el quinto. Ahora la regla vale para el tercero y para el quinto. El uno no
 entra: un cartel solo va entero, no a media caja.
 
+## Y las dos cartas de qué comer
+
+Zeben mandó las suyas para la última pregunta del hilo: **«Te pongo dos
+carteles, uno para comida típica y quita el que está puesto, y otro para de
+todo un poco»**. Las dos sustituyen a las que había, recortadas con
+`recortar-cartel.js` como las cinco del tipo de día — venían otra vez con el
+título quemado en su banda blanca, que van ya tres tandas seguidas y por eso la
+herramienta existe.
+
+**Y de paso arregla una colisión que llevaba meses ahí.** Su cartel dice **«De
+todo un poco»** y el rótulo que teníamos era «Un poco de todo»… que es
+**exactamente el mismo texto que la carta del tipo de día**. Dos botones que se
+llaman igual en el mismo hilo son un problema de verdad y ya había mordido:
+`probar-web.js` busca por texto, y el recorrido del mapa daba sus ocho pasos y
+se quedaba sin plan porque el guion tenía una sola «Un poco de todo» habiendo
+dos preguntas. Ahora son dos nombres distintos, y en los tres idiomas con la
+misma vuelta que en español:
+
+| | tipo de día (`cTodo`) | qué comer (`cDeTodo`) |
+|---|---|---|
+| es | Un poco de todo | **De todo un poco** |
+| en | A bit of everything | **A little of everything** |
+| de | Von allem etwas | **Etwas von allem** |
+
+El fichero **no** cambia de nombre: sigue siendo `un-poco-de-todo.jpg`, que es
+el de la comida, y `dia-de-todo.jpg` el del tipo de día. Renombrarlo ahora solo
+serviría para que el día que alguien mire la carpeta se equivoque de otra
+manera.
+
 ## El municipio de una ficha, y quién lo dice
 
 Zeben leyó el aviso del cartel de Vilaflor y cortó por lo sano: **«Teleférico
@@ -2078,11 +2107,14 @@ la rota era ella:
   EVENTOS», que es el que abre el calendario: la prueba en inglés abría el
   calendario y luego se quejaba de no encontrar «With a car». Un paso que
   empieza por `=` se busca ahora **exacto**.
-· **Y dos pasos seguidos pueden llamarse igual.** «Un poco de todo» es la carta
-  del tipo de día y también la de qué comer. Al recorrido del mapa le faltaba
-  la segunda: daba sus ocho pasos y se quedaba sin plan —cero tarjetas y sin
-  caja de texto—, que parece un fallo de la web y es un paso que falta en el
-  guion.
+· **Y dos pasos seguidos podían llamarse igual.** «Un poco de todo» era la
+  carta del tipo de día y también la de qué comer. Al recorrido del mapa le
+  faltaba la segunda: daba sus ocho pasos y se quedaba sin plan —cero tarjetas
+  y sin caja de texto—, que parece un fallo de la web y es un paso que falta en
+  el guion. **Desde los carteles de comer del 13 de septiembre ya no chocan**:
+  la de comer se llama «De todo un poco». La trampa sigue apuntada porque el
+  día que entre otra carta puede volver, y porque el guion sigue teniendo las
+  dos preguntas.
 Y desde el contenedor **siempre** va a haber errores de consola que no son de
 la web: el proxy corta Leaflet y las tipografías de Google por certificado, y
 las funciones de Netlify no existen en un servidor de ficheros. Lo que hay que
@@ -2190,8 +2222,9 @@ pintan con `cartas()`, y el rótulo va
 DEBAJO, sacado de `tr()`. Los carteles originales traían el texto incrustado
 y en español: así no valían en inglés ni en alemán. Se recortaron por el
 círculo, y si se añaden más hay que hacer lo mismo — los cinco del tipo de día
-que mandó el 12 de septiembre venían otra vez con el título quemado dentro y
-hubo que cortarlo, que es el mismo trabajo dos veces. Los de «con quién viajan»
+del 12 de septiembre y los dos de qué comer del 13 venían otra vez con el
+título quemado dentro, que van ya tres tandas: para eso está
+`recortar-cartel.js`. Los de «con quién viajan»
 son apaisados y con forma de bocadillo: van uno por fila, con `ancho:true`, y
 se pintan con `object-fit:contain` sobre el color del fondo, porque
 recortarlos por el centro les cortaría el pico.
@@ -2273,6 +2306,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Elegir los días en el calendario, máximo 3» + «el tiempo debajo» + «el contador no se ve» | 13 sep | El calendario pasa a decidir el CUÁNDO él solo —un día es un plan, dos o tres son la escapada— y los tres chips se van enteros; en su hueco va el parte de AEMET, vacío si no contesta. Y el contador de personas sube ENCIMA de las cartas: medido en un móvil, caía a 865 px por debajo de lo que se ve. De paso, la escapada dejaba de respetar el tipo de día del paso 1 |
 | «El tenderete por municipio con las estampas» + «rígete al artefacto en el sitio» + «quita las imágenes de las personas» | 13 sep | El tenderete pasa a dos niveles con la cuadrícula de estampas que ya existía. De los 22 actos sin sitio, los 22 venían de la agenda pegada a mano: `eventos.js cruzadas` destapa el punto ciego de la hora y junta 3 (571 → 568); y los 19 que quedaban los cierra `eventos.js artefacto`, que **ahí sí estaban** —yo había buscado el gemelo en nuestros propios actos y no en el artefacto—: 19 sitios rellenados, 32 afinados, 3 actos nuevos (568 → **571**) y **0 sin sitio**. Y las tres cartas de «con quién viajan» se van enteras: 140 KB menos y `personas` deja de ser una cifra nuestra en ningún caso |
 | El artefacto de las cartas otra vez, la captura del sitio de la Pandorga y las tres ilustraciones | 13 sep | La captura le daba la razón: el sitio estaba en el artefacto y yo lo había buscado en el sitio equivocado. De ahí sale `eventos.js artefacto`, que vuelve a pasarlo entero: **19 sitios rellenados —`ACTOS` se queda en 0 sin sitio—, 32 afinados con el municipio detrás, 3 que no cuadran y se cantan, y 3 actos nuevos** (568 → 571). Las tres ilustraciones son **las mismas de ayer** —byte a byte— y los rótulos ya decían lo suyo, así que no había nada que recortar |
+| Los dos carteles de qué comer | 13 sep | «Te pongo dos carteles, uno para comida típica y quita el que está puesto, y otro para de todo un poco». Recortados con `recortar-cartel.js`, que otra vez traían el título quemado dentro. Y su nombre deshace una colisión vieja: la carta de comer pasa a llamarse **«De todo un poco»** y deja de ser el mismo texto que la del tipo de día, que es la trampa con la que ya había tropezado `probar-web.js` |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
