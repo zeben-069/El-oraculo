@@ -2495,6 +2495,42 @@ levantaron los vecinos y el mar abierto queda justo al lado: se baña uno
 tranquilo, pero con niños hay que estar encima». Antes tenía los −6 y no decía
 nada, que es lo peor de los dos mundos: penalizaba sin explicar.
 
+## El recordatorio de cuidar el sitio salía solo con la API caída
+
+Zeben: **«últimamente otra cosa que me da la sensación de que no sale son las
+frases de no dejes las cosas tiradas, no botes basura… los mensajes que habíamos
+hablado de dejar todo bien».** No era una sensación. Las cinco frases existen
+—en los tres idiomas, rotando por fecha para no repetir—, pero vivían **solo en
+las plantillas de `narrarLocal`**, o sea en la red de seguridad. Con la clave
+puesta el relato lo escribe el modelo, y **el prompt no las mencionaba en
+ninguna parte**: `grep basura prompt.js` no devolvía nada.
+
+O sea que se veían **únicamente los días en que la API se caía**. Es la regla de
+la casa incumplida por dentro, la que está escrita arriba con todas las letras:
+*«los datos nuevos entran por el informe, nunca por fuera; si añades un campo y
+no lo mencionas en el prompt, el modelo lo ignora»*. Aquí ni siquiera era un
+campo nuevo: era una frase que nunca llegó a salir del narrador de repuesto.
+
+Se arregla por los dos sitios, que hacen falta los dos:
+· **`recordatorio_de_cuidar` en el informe**, ya escrito en el idioma de la
+  conversación. No es un dato del catálogo —es la voz de la casa— y la tenemos
+  en los tres, así que no hay nada que traducir.
+· **Su párrafo en el prompt**: se dice **lo último de todo**, después del
+  remate, en una frase, con el tono de la vecina que te lo suelta al
+  despedirse y no con el del cartel del ayuntamiento. Y si el campo no viene,
+  **no se inventa**.
+
+**Y al mirarlo salió lo segundo, que es de las que se descubren tarde:** se
+soltaba SIEMPRE, también un día de museos y cascos, donde «no se lleven piedras
+ni plantas» no significa nada. Medido sobre 124 planes barridos, **32 no pisan
+el campo en toda la jornada**. Ahora el recordatorio solo sale si alguna parada
+es de tipo sendero, playa, charco, piscina, paisaje, mirador, barranco, volcán,
+área recreativa, monte, jardín o árbol. Un día de museos no lleva regañina.
+La rotación por fecha se queda como estaba: cinco frases, una por día, y la
+misma en el informe y en el relato local, que la escribe `recordatorioCuidar()`
+una sola vez para los dos. Si cada uno la eligiera por su cuenta, el día que la
+API se cayera a mitad de conversación el turista leería dos distintas.
+
 ## El municipio de una ficha, y quién lo dice
 
 Zeben leyó el aviso del cartel de Vilaflor y cortó por lo sano: **«Teleférico
@@ -3056,6 +3092,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | El formulario de los niños, relleno (32 fichas) | 14 sep | Venía contra la versión **vieja**, la de tres casillas, y su cabecera decía que marcaba `cuidado` los museos aburridos «aprovechando que el motor lo lee como no es de niños» — que es justo la confusión que él había corregido. Aplicada su regla encima: de 18 `cuidado`, **14 pasan a `se aburren`** y solo se queda el del **Charco de Isla Cangrejo**, que su propia nota describe como peligro de verdad. Con eso **no queda ninguna ficha sin mirar**: 14 «Sí» (8 divertidas), 14 miradas y neutras, 1 con cuidado. **Cambian 48 de 62 planes** de museos con niños, y las paradas aptas pasan del 54% al 70%. Dos cosas más del fichero: el **Observatorio del Teide** tiene **edad mínima de 8 años** —ni aburrimiento ni peligro, es acceso: va por `ojo_para_llegar`— y el **Ecomuseo de El Tanque** estaba en Santiago del Teide, **y el Cabildo le da la razón** |
 | «Solo hay un cuidado de peligro, el de la playa, y un cuidado de precaución, el de la piscina» | 14 sep | Los museos ya estaban bien; lo otro no, y **yo lo había escrito mal**: puse que el Charco de Isla Cangrejo era «peligro de verdad» y es la precaución. Y su frase destapó un fallo de debajo: el filtro que saca fichas del día con niños miraba **`l.seg` a secas**, o sea cualquier texto, así que a un charco `Con cuidado` le bastaba con llevar escrito algo para desaparecer y viajar con `es_por_seguridad`. Probado sobre las Piscinas de Bajamar: ponerles una nota que dice expresamente que NO es un peligro las hacía desaparecer. Manda `esPeligro()`, ahí y en el aviso de arriba, que salía de olfatear el texto. Y la categoría que faltaba gana canal propio: `seg_tipo:'precaucion'` → **`ojo_con_los_peques`**, solo con niños, **junto a su parada y no arriba** con los peligros —ponerlo arriba diría por la posición justo lo que no es—, con `avPrecaucion` en los tres idiomas (233 claves). El charco por fin dice por qué tiene sus −6 |
 | Las ocho discrepancias de municipio resueltas + «es verdad que el observatorio es para mayores de 8 años» | 14 sep | Contestó una por una: cinco coincidían con el Cabildo —Arenas Negras y la Ermita de San Francisco a Garachico, Sámara y el **Museo Etnográfico Juan Évora a Guía de Isora**—. Las otras tres caen **en la raya del término** y ahí le di más vueltas de las que hacía falta: le pregunté por dos y le propuse un aviso para Guía de Isora. Lo cortó —**«respeta lo que ponga el Cabildo y nos curamos en salud… tú misma te estás enrollando»**— y es la regla buena: el Barranco de Erques a Guía de Isora, el Risco de la Fortaleza y Montaña Negra a San Juan de la Rambla, la Ermita de Lourdes a Los Silos. **Cero discrepancias por debajo de 300 m.** La lección: donde hay fuente oficial que dice exactamente lo que se pregunta, **preguntar es hacerle perder el tiempo**; su conocimiento vale donde el dato abierto no llega, y la raya de un término no es eso. Al mover el Juan Évora, el aviso de Vilaflor **se calló solo**, como estaba anunciado aquí. Y confirma la edad mínima del Observatorio, que había entrado por una anotación y no por fuente oficial |
+| «Las frases de no dejes las cosas tiradas últimamente no salen» | 14 sep | Cierto, y llevaba así desde siempre: las cinco frases vivían **solo en las plantillas de `narrarLocal`**, o sea en la red de seguridad, y el prompt no las mencionaba —`grep basura prompt.js`, cero—. O sea que se veían **únicamente los días en que la API se caía**. Es la regla de la casa incumplida por dentro. Ahora van por `recordatorio_de_cuidar` en el informe, con su párrafo en el prompt: lo último de todo, una frase, tono de vecina y no de cartel. Y de paso, **solo los días que el plan pisa el campo**: se soltaban también en un día de museos, donde «no se lleven piedras ni plantas» no significa nada — son 32 de 124 planes |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si

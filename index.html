@@ -2629,6 +2629,10 @@ function construir(){
     sin_porque: sinPorque.map(p=>p.n),
     avisos: R.avisos
   };
+  /* Va DESPUÉS de armar el objeto porque necesita `brief.paradas` para saber si
+     el día pisa el campo. Viene ya en el idioma de la conversación: no es un
+     dato del catálogo, es la voz de la casa, y la tenemos escrita en los tres. */
+  brief.recordatorio_de_cuidar = recordatorioCuidar(brief) || null;
   jsonBrief.textContent=JSON.stringify(brief,null,2);
   return {R,brief};
 }
@@ -3736,6 +3740,27 @@ function unir(l){
   if(l.length===1) return l[0];
   return l.slice(0,-1).join(', ')+' y '+l[l.length-1];
 }
+/* EL RECORDATORIO DE CUIDAR EL SITIO, Y POR QUÉ ESTABA MUDO.
+   Lo cazó Zeben: «últimamente me da la sensación de que no salen las frases de
+   no dejes las cosas tiradas, no botes basura». Y no era una sensación: esas
+   cinco frases vivían SOLO en las plantillas de `narrarLocal`, o sea en la red
+   de seguridad, y el prompt no las mencionaba. Con la clave puesta el relato lo
+   escribe el modelo, así que se veían únicamente cuando la API estaba caída. Es
+   la regla de la casa incumplida por dentro: lo que no está en el informe y en
+   el prompt, el modelo no lo sabe.
+   Y al mirarlo salió lo segundo: se soltaban SIEMPRE, también un día de museos
+   y cascos, donde «no se lleven piedras ni plantas» no significa nada. Son 32
+   de 124 planes barridos. Así que solo va cuando el día pisa el campo. */
+const TIPO_AL_AIRE=/Sendero|Playa|Charco|Piscina|Paisaje|Mirador|Barranco|Volcán|Área recreativa|Monte|Jardín|Árbol|Naturaleza|Refugio/;
+function recordatorioCuidar(b){
+  const F=nf();
+  if(!F.cuida||!F.cuida.length) return '';
+  if(!(b.paradas||[]).some(p=>TIPO_AL_AIRE.test(p.tipo||''))) return '';
+  /* Rota por fecha: uno distinto cada día y nunca dos veces el mismo seguido. */
+  const sem=(b.fecha||'').replace(/-/g,'');
+  return F.cuida[parseInt(sem.slice(-3)||'0',10)%F.cuida.length];
+}
+
 function narrarLocal(b){
   const F=nf(), t=[];
   const ev=b.evento_ancla;
@@ -3960,10 +3985,8 @@ function narrarLocal(b){
 
   /* Turismo responsable: un recordatorio corto y distinto cada día,
      nunca dos veces el mismo ni en tono de sermón. */
-  if(F.cuida&&F.cuida.length){
-    const sem=(b.fecha||'').replace(/-/g,'');
-    t.push(F.cuida[parseInt(sem.slice(-3)||'0',10)%F.cuida.length]);
-  }
+  const cuidar=recordatorioCuidar(b);
+  if(cuidar) t.push(cuidar);
 
   if(S.idioma!=='es'&&(b.porques||[]).length) t.push(F.soloEs);
   else if((!b.porques||!b.porques.length)&&(b.sin_porque||[]).length>1) t.push(F.sinPorque);
