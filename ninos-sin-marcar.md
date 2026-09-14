@@ -1,6 +1,6 @@
 # Qué vale con niños, y qué no
 
-Estas **30 fichas** son de los tipos que el motor premia cuando el plan es
+Estas **29 fichas** son de los tipos que el motor premia cuando el plan es
 con niños —playa, charco, piscina, parque, museo, jardín— y **no dicen nada**
 sobre si valen. Sin decirlo salen a competir con hasta 19 puntos menos, o sea
 que en la práctica no salen: es lo que le pasaba al MUNA, que está fichado
@@ -78,11 +78,7 @@ el Museo de la Ciencia de la casa-museo de un coleccionista.
   > Ocupa una casa señorial del siglo XVI y cuenta cómo se formó la sociedad canaria tras la conquista.
   - [ ] Sí   - [ ] se aburren   - [ ] cuidado   - [ ] NO   · y además: [ ] divertido
 
-## Santa Cruz de Tenerife  (6)
-
-- **Auditorio de Tenerife** · _Museo_
-  > Las miles de teselas de cerámica blanca que cubren el edificio fueron colocadas a mano para reflejar la luz del sol imitando la espuma del mar.
-  - [x] Sí   - [ ] se aburren   - [ ] cuidado   - [ ] NO   · y además: [ ] divertido
+## Santa Cruz de Tenerife  (5)
 
 - **Antigua Estación de Tren** · _Museo_
   > Conserva la estructura original del único tranvía a vapor que tuvo la isla a principios del siglo XX y que fue desmantelado porque los camiones result
