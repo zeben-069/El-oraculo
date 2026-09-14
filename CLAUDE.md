@@ -98,6 +98,8 @@ guaguas.js                    le pone a cada ficha su parada de guagua
 matriz.js                     rehace la matriz de TITSA desde el GTFS oficial
 municipios.js                 cruza el municipio de cada ficha con el Cabildo
 municipios-dudosos.md         esa lista, con casillas, para que la mire él
+ninos.js                      qué fichas valen con niños y no lo dicen
+ninos-sin-marcar.md           esa lista, con casillas, para que la marque él
 recortar-cartel.js            saca la ilustración de una maqueta de cartel
 fotos.js                      la lista de fotos que faltan, y las mete
 fotos-encargo.md              esa lista para encargársela a otro (con reglas)
@@ -2259,6 +2261,57 @@ Está apuntado para no volver a pensarlo:
 **Si algún día se hace, se hace por ahí** —Places para el horario, desde la
 función, sin guardar— y nunca poniendo la clave en `index.html`, que es público.
 
+## El MUNA estaba fichado y no salía: `ninos.js`
+
+Zeben, de pasada: **«el MUNA también es un museo que está muy guapo para
+visitar con los niños, no sé si lo tienes metido, y está en Santa Cruz»**.
+Estaba metido — con su foto de Commons, su crédito, su parada de guagua, sus
+once líneas y hasta su dato curioso de las momias guanches envueltas en pieles
+de cabra. Lo que le faltaba era **una palabra**: `ninos`.
+
+**Y esa palabra vale 19 puntos.** Con niños el motor da +9 a lo marcado «Sí»
+de tipo playa/charco/piscina/parque/museo/jardín, +3 a todo lo marcado «Sí» y
++7 a lo que lleva la etiqueta `diversion`. Un museo bueno pesa 3,5 × 3 = 10,5.
+O sea que una ficha sin marcar **no es que pierda: es que no juega**. Medido
+sobre 20 planes de la zona metropolitana (cinco bases × museos/un poco de todo
+× con y sin niños): el MUNA salía en **2**, y marcado sale en **6**. Desde
+Santa Cruz pidiendo museos con niños, ahora el día es Museo de la Ciencia ·
+MUNA · Museo Histórico Militar.
+
+**Pero la ficha no era el problema, era el síntoma.** Repasado el catálogo: de
+las **150 fichas de esos tipos, 32 no dicen nada** — y **28 son museos**. Las
+playas y los charcos los repasó alguien en su día (118 de 150 están marcadas);
+los museos no. Es el mismo patrón que los `lug`/`rest` de `BASES`: un campo
+escrito a mano que se pudre según crece el catálogo.
+**Con una diferencia que manda, y es la que decide la forma de la herramienta:**
+aquello se podía contar del catálogo, y esto no. Si un museo está guapo con un
+crío de siete años no lo dice ni el peso, ni el tipo, ni el Cabildo — lo dice
+quien ha estado. Marcar «Sí» todo lo que sea Museo y no tenga aviso de
+seguridad sería facilísimo y sería la regla de la casa rota por dentro.
+
+Así que `ninos.js` **lista y espera**, como `municipios-dudosos.md` y
+`actos-parecidos.md`:
+
+    node ninos.js                             escribe ninos-sin-marcar.md
+    node ninos.js meter ninos-sin-marcar.md   mete lo marcado
+
+Cuatro decisiones de cómo está hecho:
+· **Solo pregunta por los tipos que el motor premia.** Fuera de
+  playa/charco/piscina/parque/museo/jardín la marca no cambia el orden del día,
+  así que preguntarlo sería pedir trabajo a cambio de nada.
+· **Tres casillas, no una.** El campo admite «Sí», «Con cuidado» y «NO», y con
+  una sola casilla solo se puede decir que sí. Y una cuarta aparte,
+  `divertido`, que son los otros 7 puntos y es lo que separa el Museo de la
+  Ciencia —donde se tocan botones— de la casa-museo de un coleccionista.
+· **Si se marcan dos casillas de la misma ficha, no se toca** y se canta.
+  Elegir por él sería peor que dejarlo, que es la regla de siempre.
+· **Va agrupado por pueblo y con el dato curioso debajo de cada nombre.** Con
+  veintiocho museos seguidos y tres llamados «Museo Etnográfico», el nombre
+  solo no basta para acordarse de cuál es; y quien vive aquí repasa «los de La
+  Laguna» de una vez, que es la misma razón por la que `municipios-dudosos.md`
+  va por nidos.
+Quedan **31 por mirar**, 27 de ellas museos.
+
 ## El municipio de una ficha, y quién lo dice
 
 Zeben leyó el aviso del cartel de Vilaflor y cortó por lo sano: **«Teleférico
@@ -2477,7 +2530,7 @@ estaban fichados.
 
 Y un bloque de **perfiles**: el mismo día en cuatro versiones (coche/guagua ×
 pareja/niños) desde las 31 bases. Referencia: 0 sitios no aptos con niños, 71%
-de paradas «niños: Sí» con niños contra 23% en pareja, 59% de tipo divertido,
+de paradas «niños: Sí» con niños contra 24% en pareja, 59% de tipo divertido,
 2% de planes iguales entre pareja y niños, 47% iguales entre coche y guagua
 —esos son legítimos: sitios que ya están junto a una parada— y 213 m de media
 a la guagua sin coche. Ese 47% era 53% antes de `guaguas.js`: con las 215
@@ -2765,6 +2818,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | Cinco capturas del hilo entero desde el móvil | 13 sep | Tres cosas, tres causas. «Tres veces la misma combinación y tres veces el mismo plan»: la semilla sale solo de la fecha, así que repetir da lo mismo — ahora una huella de lo pedido veta lo ya visto al repetir, con red de seguridad si el pueblo se queda sin fichas. «Pongo en guagua y no se habla de guaguas»: el plan decía la parada pero no la línea, y el dato estaba en el GTFS desde el día 12 — **1.024 fichas con sus líneas**, cruzadas por NOMBRE de parada y no por la más cercana. Y la fiesta del plan se pulsa y despliega el programa del día, que además destapó que **una familia no veía ninguno de los 9 actos del Cristo** |
 | El artefacto de las fiestas, actualizado + «¿se puede actualizar solo?» | 14 sep | La versión nueva son **660 actos de 26 programas** (eran 538 de 22): entran **121**, con cuatro programas que no teníamos —Tacoronte, Benijos, El Lomo de Tegueste y Guía de Isora— y por primera vez octubre. De paso `parecidos` destapó que los «3 actos nuevos» del día 13 eran **3 gemelos reescritos por el artefacto**: fuera, y `ACTOS` queda en **689**. El importador avisa ahora de los que caen encima de uno nuestro, y se arregló un campo mudo —el corredor se llama `corr` y ponía `c`, así que 122 actos estaban con `c:null`—. Lo de actualizarse solo: **no, y no debería** —ni el contenedor ni el navegador pueden pedir el artefacto, y una pasada sin mirar habría dejado los tres gemelos dentro—, pero volver a pasarlo es un comando y `avisar-fiestas.js` ya avisa los lunes de cuándo toca |
 | Un plan suyo entero + «piensa como un guía de verdad» + «¿me vale una API key de Google?» | 14 sep | Tres cosas. **«Siempre me sale el mismo plan»**: el arreglo del día 13 funcionaba dentro de la pantalla y se perdía al recargar, que es lo que él hace — la memoria de lo ya visto pasa al navegador, y de paso se vio que `banco.js` tenía un `localStorage` de mentira que se tragaba lo que se escribía. **Los fuegos de las 23:00**: ese día La Laguna los tiene y una familia no los veía, porque `q` es excluyente y además hay un corte por reloj. `q` gana el tercer valor que estaba pendiente, **`todos`** —fuegos, pirotecnia y romería, 28 de 689—, que pasa a los dos públicos y no lo corta el reloj: **77 actos que una familia antes no veía**, y el prompt los coloca al final, después del cafelito, con su hora. Y la clave de Google: **para poco** —mapas y geocodificación ya están resueltos gratis; lo único que valdría es el horario de las 119 fichas sin confirmar, y los términos de Google no dejan guardarlo— |
+| «El MUNA también está muy guapo para visitar con los niños» | 14 sep | Estaba fichado —con foto, crédito y sus momias guanches— pero **sin `ninos`**, y esa palabra vale 19 puntos: salía en 2 de 20 planes y marcado sale en 6. Y no era la ficha, era el síntoma: de las 150 de los tipos que el motor premia con niños, **32 no dicen nada y 28 son museos**. De ahí sale **`ninos.js`**, que escribe `ninos-sin-marcar.md` con tres casillas por ficha —Sí / cuidado / NO, y `divertido` aparte— agrupado por pueblo y con el dato curioso debajo. **No adivina**: marcar «Sí» todo lo que sea museo sería la regla de la casa rota por dentro |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
