@@ -151,7 +151,7 @@ Dentro de `index.html`, como constantes:
   fiestas × sus años) llevan ya `la`/`lo`/`lu`**, colocadas por Zeben con
   `node eventos.js sitios`, y entonces mandan ellas sobre el casco del pueblo.
   Quedan 13 sin colocar, en 6 municipios.
-- `ACTOS` (571) — los actos de 31 programas de fiestas de 16 municipios:
+- `ACTOS` (689) — los actos de 37 programas de fiestas de 16 municipios:
   día, municipio,
   hora, dónde es y `q` («ninos»/«noche»), que dice a quién le sirve. No son
   fiestas: cuelgan de una que ya está en `EVENTOS` y no anclan el día.
@@ -1668,11 +1668,88 @@ cuánto se fía de sí mismo:
 · **Mete los actos que no teníamos**, con `clasificaActo()` puesto por las reglas
   de hoy. Fueron **3**: la celebración eucarística y el Descendimiento del 9, la
   recepción de la representación del Rey del 14 —las dos en La Laguna— y el
-  partido de solteros contra casados de Los Abrigos.
+  partido de solteros contra casados de Los Abrigos. **Y aquí me equivoqué otra
+  vez: esos tres no eran actos nuevos, eran los mismos tres contados con otras
+  palabras.** Ver abajo, «El artefacto actualizado».
 `ACTOS` pasa de **568 a 571**. El cruce se hace por municipio —normalizado, sin
 acentos, sin artículos y quitando «Villa de» y «San Cristóbal de»—, fecha y
 nombre (exacto o el 80% de las palabras del más corto), que es la misma atadura
 que `parecidos` y por la misma razón: sin ella, dos misas del mismo día se juntan.
+
+## El artefacto actualizado, y por qué no puede pasarse solo
+
+Zeben mandó otra vez el enlace: «revisa el artefacto de la fiesta que está
+actualizado y mira que todos los eventos estén metidos en Naira. ¿Habría alguna
+manera de que cuando Claude Cowork actualiza el artefacto se actualice a la vez
+en Naira?». Las dos mitades tienen respuesta y la segunda no es la que parece.
+
+**Lo que traía de nuevo.** La versión del 14 de septiembre son **660 actos de 26
+programas** contra los 538 de 22 de la del 13. Cuatro programas que no teníamos
+—Tacoronte (Cristo de Los Dolores, 53), La Orotava (Benijos, 35), Tegueste (El
+Lomo - El Infierno, 10) y Guía de Isora (Patronales, 9)— y actos sueltos dentro
+de los que ya estaban; y por primera vez llega a **octubre** (la Fiesta del
+Picacho de El Médano, el 11). Pasado con `node eventos.js artefacto … hazlo`:
+**121 actos nuevos, 0 sitios que rellenar —ya estábamos a cero— y los mismos 3
+que no cuadran**, que son de redacción y están apuntados arriba. `ACTOS` pasa de
+571 a **692**, y con eso `avisar-fiestas.js` baja a tres fiestas sin programa en
+los próximos 21 días.
+
+**Y ahí salieron los tres gemelos de la pasada anterior.** `node eventos.js
+parecidos` cantó **4 parejas** donde antes había una. Tres eran justo los «3
+actos nuevos» del día 13: el mismo acto, el mismo pueblo, el mismo día y **la
+misma hora**, con otra redacción —«Solemne eucaristía y ceremonia del
+Descendimiento» contra «Solemne celebración eucarística y ceremonia del
+Descendimiento», «Partido **de** solteros/as **contra** casados/as» contra
+«Partido **entre** solteros/as **y** casados/as»—. Dos eucaristías a las 11:00
+del mismo día en el mismo santuario no son dos actos. Se quitaron con la lista de
+casillas de siempre y `ACTOS` queda en **689**. Cuál se quedó, que es lo que él
+puede querer cambiar: gana el nombre más completo, o sea el del artefacto en la
+eucaristía del 9 y **el nuestro** en la recepción del Rey del 14 —el suyo se
+deja la eucaristía y la procesión de retorno— y en el partido de Los Abrigos
+—que además tenía el sitio más fino—.
+
+**Por qué se colaron, y el aviso que ahora lo impide.** El emparejado del
+importador es por NOMBRE: el 80% de las palabras del más corto. El artefacto
+**reescribe** los actos entre una versión y la siguiente, y con «eucaristía» →
+«eucarística» se baja del 80% y el acto entra como nuevo. Ahora `artefacto`
+canta, antes de escribir nada, **los que caen encima de uno nuestro** —mismo
+pueblo, mismo día, misma hora y el 60% de palabras, que es la regla ya calibrada
+de `parecidos`—. No los descarta, y eso es a propósito: las dos ferias de Los
+Realejos del 26 comparten pueblo, día y hora y el 67% de las palabras, y **son
+dos ferias distintas**. Aquí no se decide; se enseña.
+
+**Y un fallo mudo que llevaba dos pasadas dentro.** En `BASES` el corredor se
+llama **`corr`**, no `c`, y el importador escribía `c:(b&&b.c)||null`: los
+**122** actos que han entrado alguna vez por el artefacto estaban con `c:null`.
+Hoy no lo lee nadie —la cercanía de un acto se mide en kilómetros, no por
+corredor, que es la regla de siempre—, pero era un campo vacío esperando a que
+alguien se fiara de él. Arreglado el importador y rellenados los 122.
+
+**Y la pregunta de fondo: ¿puede actualizarse solo?** La respuesta honrada es
+**a medias, y la mitad que falta no es técnica**.
+· **Desde aquí no se puede pedir el artefacto.** La política de red del
+  contenedor deniega todo lo de fuera (403 en el CONNECT), igual que con
+  Commons, GRAFCAN y Netlify.
+· **Desde la web de Naira tampoco.** El artefacto vive en `claude.ai` y no manda
+  cabeceras de CORS a `leafy-cobbler-d24e23.netlify.app`: el navegador tiraría
+  la respuesta. Es el mismo muro que ya obligó a que las fotos y los miradores
+  los pregunte el navegador de casa.
+· **La máquina de GitHub sí tiene red** —es la que manda el aviso de las fiestas
+  los lunes— pero el artefacto es de su cuenta: sin sesión no lo va a leer, y
+  pedirle que meta ahí una credencial para que un robot entre a su cuenta es
+  mucho pedir para ahorrar un comando.
+· **Y aunque se pudiera, no debería meterse solo.** Lo que acaba de pasar es la
+  prueba: una pasada automática habría metido los 121 buenos **y** habría dejado
+  los tres gemelos dentro sin que nadie los viera, porque separarlos no lo hace
+  una regla, lo hace quien lee los dos nombres. Esta casa ya tiene esa decisión
+  tomada en otros cuatro sitios —`duplicados`, `parecidos`, `sitios`,
+  `municipios-dudosos`—: la herramienta **lista y espera**.
+**Lo que sí está hecho, que es lo que de verdad ahorra el trabajo:** volver a
+pasar el artefacto es **un comando**, y pasarlo dos veces no duplica nada mientras
+no se haya resuelto un gemelo a favor del nuestro. Mandar el enlace y decir
+«pásalo» es todo lo que hace falta. Y **el aviso de cuándo toca ya llega solo**:
+`avisar-fiestas.js` manda cada lunes las fiestas que vienen sin programa cargado,
+que es exactamente la señal de que el artefacto tiene algo nuevo.
 
 ## Cuántos son, y el número que nadie había dicho
 
@@ -2307,11 +2384,11 @@ fichas mudas ya medidas, el motor puede descartar de verdad lo que queda lejos
 de una parada, y el plan sin coche se separa más del plan con coche.
 
 Y cierra con los **actos**: por cada día y municipio con programa cargado,
-un plan con niños y otro sin ellos —380 planes—. Lo que se vigila ahí no es la
+un plan con niños y otro sin ellos —454 planes—. Lo que se vigila ahí no es la
 dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: de los
-**571 actos cargados** (63 marcados de niños, 170 de noche, 338 sin marcar),
-**802 ofrecidos** y **0 ofrecidos a quien no toca**. Ese cero es la prueba de
-toda la regla; los 482 «sin clasificar y ofrecido» ya NO son un fallo, que
+**689 actos cargados** (76 marcados de niños, 200 de noche, 413 sin marcar),
+**1.002 ofrecidos** y **0 ofrecidos a quien no toca**. Ese cero es la prueba de
+toda la regla; los 621 «sin clasificar y ofrecido» ya NO son un fallo, que
 desde que `q` dice solo si es de niños, lo que no está marcado va a los
 adultos y eso es lo normal.
 
@@ -2576,13 +2653,14 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Más que dónde duerme podemos poner ¿de dónde sale?» | 13 sep | El paso 2 deja de preguntar por la cama y pregunta por el punto de partida, con el botón de la ubicación debajo del mapa. `localizar()` lleva ahora a dónde seguir y a dónde volver, que desde ahí no son lo mismo |
 | «¿Dónde metemos el botón de ahora mismo / día entero / varios días?» + «¿falta el de los muñequitos?» | 13 sep | Las tres puertas del «cuándo» se juntan en una fila de chips debajo del calendario, que es la misma pregunta que la fecha; el hilo se queda en cinco pasos. Y los muñequitos ganan un contador opcional: el número inventado de las cartas (2, 4, 6) deja de viajar al informe como si lo hubieran dicho ellos. De paso salió que «Sorpréndame» pisaba la respuesta del paso 1 |
 | «Elegir los días en el calendario, máximo 3» + «el tiempo debajo» + «el contador no se ve» | 13 sep | El calendario pasa a decidir el CUÁNDO él solo —un día es un plan, dos o tres son la escapada— y los tres chips se van enteros; en su hueco va el parte de AEMET, vacío si no contesta. Y el contador de personas sube ENCIMA de las cartas: medido en un móvil, caía a 865 px por debajo de lo que se ve. De paso, la escapada dejaba de respetar el tipo de día del paso 1 |
-| «El tenderete por municipio con las estampas» + «rígete al artefacto en el sitio» + «quita las imágenes de las personas» | 13 sep | El tenderete pasa a dos niveles con la cuadrícula de estampas que ya existía. De los 22 actos sin sitio, los 22 venían de la agenda pegada a mano: `eventos.js cruzadas` destapa el punto ciego de la hora y junta 3 (571 → 568); y los 19 que quedaban los cierra `eventos.js artefacto`, que **ahí sí estaban** —yo había buscado el gemelo en nuestros propios actos y no en el artefacto—: 19 sitios rellenados, 32 afinados, 3 actos nuevos (568 → **571**) y **0 sin sitio**. Y las tres cartas de «con quién viajan» se van enteras: 140 KB menos y `personas` deja de ser una cifra nuestra en ningún caso |
-| El artefacto de las cartas otra vez, la captura del sitio de la Pandorga y las tres ilustraciones | 13 sep | La captura le daba la razón: el sitio estaba en el artefacto y yo lo había buscado en el sitio equivocado. De ahí sale `eventos.js artefacto`, que vuelve a pasarlo entero: **19 sitios rellenados —`ACTOS` se queda en 0 sin sitio—, 32 afinados con el municipio detrás, 3 que no cuadran y se cantan, y 3 actos nuevos** (568 → 571). Las tres ilustraciones son **las mismas de ayer** —byte a byte— y los rótulos ya decían lo suyo, así que no había nada que recortar |
+| «El tenderete por municipio con las estampas» + «rígete al artefacto en el sitio» + «quita las imágenes de las personas» | 13 sep | El tenderete pasa a dos niveles con la cuadrícula de estampas que ya existía. De los 22 actos sin sitio, los 22 venían de la agenda pegada a mano: `eventos.js cruzadas` destapa el punto ciego de la hora y junta 3 (571 → 568); y los 19 que quedaban los cierra `eventos.js artefacto`, que **ahí sí estaban** —yo había buscado el gemelo en nuestros propios actos y no en el artefacto—: 19 sitios rellenados, 32 afinados, 3 «actos nuevos» (568 → **571**) —que resultaron ser 3 gemelos, ver la fila del 14— y **0 sin sitio**. Y las tres cartas de «con quién viajan» se van enteras: 140 KB menos y `personas` deja de ser una cifra nuestra en ningún caso |
+| El artefacto de las cartas otra vez, la captura del sitio de la Pandorga y las tres ilustraciones | 13 sep | La captura le daba la razón: el sitio estaba en el artefacto y yo lo había buscado en el sitio equivocado. De ahí sale `eventos.js artefacto`, que vuelve a pasarlo entero: **19 sitios rellenados —`ACTOS` se queda en 0 sin sitio—, 32 afinados con el municipio detrás, 3 que no cuadran y se cantan, y 3 «actos nuevos»** (568 → 571) —que el artefacto del día siguiente destapó como 3 gemelos reescritos—. Las tres ilustraciones son **las mismas de ayer** —byte a byte— y los rótulos ya decían lo suyo, así que no había nada que recortar |
 | Los dos carteles de qué comer | 13 sep | «Te pongo dos carteles, uno para comida típica y quita el que está puesto, y otro para de todo un poco». Recortados con `recortar-cartel.js`, que otra vez traían el título quemado dentro. Y su nombre deshace una colisión vieja: la carta de comer pasa a llamarse **«De todo un poco»** y deja de ser el mismo texto que la del tipo de día, que es la trampa con la que ya había tropezado `probar-web.js` |
 | Los dos carteles de coche y guagua | 13 sep | `img/cartas/`. Y aquí `recortar-cartel.js` se quedó corto: su rótulo va en una **caja centrada dentro del dibujo**, no en una franja de lado a lado, así que el corte se iba al pie y «CON COCHE» se quedaba quemado dentro. La herramienta busca ahora la banda por dos caminos y sube hasta su borde de arriba — los cinco carteles anteriores salen byte a byte idénticos, o sea que solo añade |
 | «No se ha cambiado ninguna de las últimas» | 13 sep | El zip estaba bien y las nueve ilustraciones dentro: lo que fallaba era **nuestra caché**. `netlify.toml` pedía guardar `/img/*` una semana y los carteles se reemplazan con el mismo nombre, así que su navegador no volvía a pedirlos. Arreglado por los dos lados: la cabecera pasa a preguntar siempre en las carpetas que cambian, y `vImg()` le pone versión a la URL, que es lo único que sirve a quien ya tiene la semana empezada |
 | Tres capturas de un plan suyo: «acabas echando un dulce en La Caseta, que está otra vez en la Punta» | 13 sep | Dos cosas. El remate medía «de vuelta a casa» **en línea recta** y no por desvío, que es la regla que esta casa ya aplica a los restaurantes y al regalo de ida: de 7,2 km de rodeo máximo a 1,8. Y su idea del «radar de kilómetros» llevó a medir que **el radio no es lo que aprieta** —18 km permitidos y el 98% de los días no pasa de 8—, así que el botón de «llévame más lejos» no toca el radio: **mueve el centro del día** a otra zona y deja que las mismas reglas lo aprieten allí |
 | Cinco capturas del hilo entero desde el móvil | 13 sep | Tres cosas, tres causas. «Tres veces la misma combinación y tres veces el mismo plan»: la semilla sale solo de la fecha, así que repetir da lo mismo — ahora una huella de lo pedido veta lo ya visto al repetir, con red de seguridad si el pueblo se queda sin fichas. «Pongo en guagua y no se habla de guaguas»: el plan decía la parada pero no la línea, y el dato estaba en el GTFS desde el día 12 — **1.024 fichas con sus líneas**, cruzadas por NOMBRE de parada y no por la más cercana. Y la fiesta del plan se pulsa y despliega el programa del día, que además destapó que **una familia no veía ninguno de los 9 actos del Cristo** |
+| El artefacto de las fiestas, actualizado + «¿se puede actualizar solo?» | 14 sep | La versión nueva son **660 actos de 26 programas** (eran 538 de 22): entran **121**, con cuatro programas que no teníamos —Tacoronte, Benijos, El Lomo de Tegueste y Guía de Isora— y por primera vez octubre. De paso `parecidos` destapó que los «3 actos nuevos» del día 13 eran **3 gemelos reescritos por el artefacto**: fuera, y `ACTOS` queda en **689**. El importador avisa ahora de los que caen encima de uno nuestro, y se arregló un campo mudo —el corredor se llama `corr` y ponía `c`, así que 122 actos estaban con `c:null`—. Lo de actualizarse solo: **no, y no debería** —ni el contenedor ni el navegador pueden pedir el artefacto, y una pasada sin mirar habría dejado los tres gemelos dentro—, pero volver a pasarlo es un comando y `avisar-fiestas.js` ya avisa los lunes de cuándo toca |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si

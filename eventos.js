@@ -909,7 +909,12 @@ function cruzadas(hazlo){
      Abrigos, Granadilla de Abona»— y en 2 lo es el suyo —«Playa de El Tablado»
      contra «El Tablado»—. Coger el del artefacto a ciegas habría EMPEORADO
      tres. Así que: quitado el municipio, si uno contiene al otro gana el que
-     contiene; si no se parecen en nada, se deja el nuestro y se canta. */
+     contiene; si no se parecen en nada, se deja el nuestro y se canta.
+   Ojo con el corredor: en `BASES` el campo se llama **`corr`**, no `c`. Aquí
+   ponía `b.c`, así que TODOS los actos que entraron por el artefacto se
+   guardaron con `c:null` —122 de ellos—. Hoy no lo lee nadie (la cercanía de
+   un acto se mide en kilómetros, no por corredor), pero era un campo mudo
+   esperando a que alguien se fiara de él. */
 function delArtefacto(fichero,hazlo){
   const F='datos/actos.js';
   const txt=fs.readFileSync(F,'utf8');
@@ -945,7 +950,7 @@ function delArtefacto(fichero,hazlo){
   /* Y los que el artefacto tiene y nosotros no */
   const nuevos=EV.filter(e=>!A.some(a=>casa(a,e))).map(e=>{
     const b=Object.values(BASES).find(x=>muni(x.m)===muni(e.m));
-    const o={f:e.d,n:e.t,m:(b&&b.m)||e.m,c:(b&&b.c)||null,fr:franjaDe(e.h),
+    const o={f:e.d,n:e.t,m:(b&&b.m)||e.m,c:(b&&b.corr)||null,fr:franjaDe(e.h),
       h:e.h||'',lu:e.p,fi:e.f,of:'Artefacto «Fiestas de Tenerife» de Cowork · lagenda.org'};
     const q=clasificaActo(o.n,o.h); if(q) o.q=q;
     if(!o.h) delete o.h;
@@ -963,13 +968,40 @@ function delArtefacto(fichero,hazlo){
     '\n       nuestro:   '+x.a.lu+'\n       artefacto: '+x.e.p));
   console.log('\nACTOS QUE NO TENÍAMOS: '+nuevos.length);
   nuevos.forEach(o=>console.log('   · '+o.f+' '+(o.h||'--')+'  '+o.m+' · '+o.n.slice(0,46)+'  →  '+o.lu));
+  /* Y el aviso que faltaba, que costó tres gemelos.
+     ------------------------------------------------------------------
+     El emparejado de arriba es por NOMBRE (el 80% de las palabras del más
+     corto). El artefacto reescribe los actos entre una versión y la
+     siguiente —«Solemne eucaristía y ceremonia del Descendimiento» pasó a
+     «Solemne celebración eucarística y ceremonia del Descendimiento»—, y
+     con eso baja del 80% y entra como acto nuevo: el mismo acto, dos veces,
+     el mismo día y a la misma hora. Pasó con tres en la pasada del 13 de
+     septiembre y se colaron enteros al catálogo.
+     Aquí NO se decide nada —dos actos seguidos de la misma fiesta también
+     comparten pueblo, día y hora, que es la regla de la casa de siempre—:
+     se cantan y se manda a `parecidos`, que es quien escribe la lista con
+     sus casillas para que la mire quien vive allí. */
+  const gemelos=[];
+  nuevos.forEach(o=>{ if(!o.h) return;
+    A.forEach(a=>{ if(a.m!==o.m||a.f!==o.f||a.h!==o.h) return;
+      const x=palabrasDe(a.n), y=palabrasDe(o.n);
+      if(x.size<2||y.size<2) return;
+      let c=0; x.forEach(w=>{ if(y.has(w)) c++; });
+      const parecido=c/Math.min(x.size,y.size);
+      if(parecido>=0.6) gemelos.push({a,o,parecido});
+    });
+  });
+  console.log('\nOJO · DE LOS QUE ENTRAN, CAEN ENCIMA DE UNO NUESTRO: '+gemelos.length+
+    (gemelos.length?'   (mismo pueblo, día y hora, y el nombre se parece)':''));
+  gemelos.forEach(x=>console.log('   · '+x.o.f+' '+x.o.h+'  '+x.o.m+'   ('+Math.round(x.parecido*100)+'%)'+
+    '\n       nuestro:   '+x.a.n.slice(0,66)+'\n       artefacto: '+x.o.n.slice(0,66)));
   const total=A.concat(nuevos);
   console.log('\nactos antes: '+A.length+'  ·  entran: '+nuevos.length+'  ·  quedan: '+total.length);
   if(!hazlo) return console.log('\nesto es un ensayo. «node eventos.js artefacto '+fichero+' hazlo» para hacerlo.');
   total.sort((a,b)=>a.f<b.f?-1:a.f>b.f?1:(a.h||'')<(b.h||'')?-1:1);
   fs.writeFileSync(F,txt.slice(0,txt.indexOf('const ACTOS='))+'const ACTOS='+
     JSON.stringify(total,null,0).replace(/\},\{/g,'},\n{')+';\n');
-  console.log('hecho. Pasa ahora: node lote.js');
+  console.log('hecho. Pasa ahora: node eventos.js parecidos  ·  y luego node lote.js');
 }
 
 const arg=process.argv[2];
