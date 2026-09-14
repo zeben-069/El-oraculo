@@ -354,12 +354,14 @@ nada y el relato cierra con la última parada.
 
 **En `seg` no todo es un peligro.** Conviven avisos de seguridad de verdad (50),
 avisos de acceso (`seg_tipo:'acceso'`: pista de tierra, carretera estrecha,
-obras, cortes por romería), notas que no avisan de nada (`'nota'`) y un aviso
-sobre el relato de un sitio (`'relato'`). Sin etiqueta se trata como peligro,
+obras, cortes por romería), **precauciones** (`'precaucion'`: el sitio vale y va
+en el plan, pero con niños hay algo que decir), notas que no avisan de nada
+(`'nota'`) y un aviso sobre el relato de un sitio (`'relato'`). Sin etiqueta se trata como peligro,
 que es lo prudente. Sin distinguir, la ficha de Las Teresitas —«la mejor para
 familias de toda la zona metropolitana»— viajaba al informe como
 `aviso_seguridad` y el modelo la leía como una advertencia. Ahora salen por
-`ojo_para_llegar`, `nota_del_sitio` y `el_relato_no_esta_probado`.
+`ojo_para_llegar`, `ojo_con_los_peques`, `nota_del_sitio` y
+`el_relato_no_esta_probado`.
 
 **El programa de la fiesta se cuenta según con quién viajan.** Una fiesta de
 `EVENTOS` es una línea —«Fiesta del Santísimo Cristo, La Laguna, 14 de
@@ -2371,12 +2373,11 @@ verdad. Quedó así:
 | **se aburren** | 14 | `ninos_visto:1`, y el motor ni las premia ni las castiga |
 | **cuidado** | 1, el Charco de Isla Cangrejo | `ninos:'Con cuidado'` |
 
-El único `cuidado` que sobrevive es el que su propia nota describe: «muro de
-hormigón en zona de acantilados, con el mar abierto justo al lado». Los otros
-trece son colecciones de arte y casas de coleccionista donde el crío se aburre
-a los cuatro minutos, que es justo para lo que se inventó la casilla nueva.
-**Con esto no queda ninguna ficha sin mirar** de los tipos que el motor premia:
-148 en total, 80 «Sí», 48 «Con cuidado», 5 «NO» y 15 miradas y neutras.
+Los trece que pasan a `se aburren` son colecciones de arte y casas de
+coleccionista donde el crío se aburre a los cuatro minutos, que es justo para lo
+que se inventó la casilla nueva. **Con esto no queda ninguna ficha sin mirar**
+de los tipos que el motor premia: 148 en total, 80 «Sí», 48 «Con cuidado», 5
+«NO» y 15 miradas y neutras.
 
 **Lo que mueve, medido sobre 62 planes de museos con niños** (31 bases × coche y
 guagua): **cambian 48**. Y no es que se muevan, es que mejoran — puntuando las
@@ -2420,6 +2421,77 @@ le pegue a nada: el Ecomuseo se quedó en «Suroeste» teniendo un vecino fichad
 que la herramienta **lo canta** ahora, con la regla que ya usan los miradores y
 los caseríos —manda el vecino fichado más cercano— y lo decide quien mire la
 lista. El del Ecomuseo, corregido a mano a «Isla Baja».
+
+## «Un cuidado de peligro y un cuidado de precaución» — y no eran lo mismo
+
+Zeben, leyendo el formulario ya metido: **«El cuidado que está puesto en los
+museos es de aburrimiento. Solo hay un cuidado de peligro, y es el de la playa,
+y un cuidado de precaución, que es el de la piscina.»** Los museos ya estaban
+bien. Lo otro **no**, y yo lo había escrito mal aquí arriba: puse que el Charco
+de Isla Cangrejo era «peligro de verdad» y no lo es — es la piscina de la que
+él habla, un charco con el muro hecho por los vecinos. La playa (Troche) sí, y
+por eso está en `NO`, que es más fuerte que `cuidado`.
+
+**Tres cosas, no dos.** Hasta ahora el motor solo sabía distinguir dos —el sitio
+del que hay que avisar y el sitio del que no—, y eso deja fuera la de en medio:
+el sitio al que se va, que está bien, y del que aun así se dice algo porque van
+niños. Son categorías distintas y cada una hace algo distinto:
+
+| | qué es | qué hace el motor |
+|---|---|---|
+| **peligro** | «clasificada como PELIGROSA en el registro oficial» | con niños, **fuera del día**, y se cuenta con `es_por_seguridad` |
+| **precaución** | «el mar abierto está al lado: encima de ellos» | **se queda en el día**, con sus −6, y se dice |
+| **aburrimiento** | el museo de orfebrería | `ninos_visto`: ni premia ni castiga, y no se dice nada |
+
+**Y debajo había un fallo de verdad, que su frase destapó.** El filtro que saca
+las fichas del día con niños decía:
+
+    else if(l.ninos==='Con cuidado'&&['Charco','Playa'].includes(l.tipo)&&l.seg)
+
+**`l.seg` a secas**, o sea: CUALQUIER texto en ese campo. Así que a un charco
+marcado `Con cuidado` le bastaba con llevar escrito algo —lo que fuera— para
+desaparecer del día y viajar al informe con `es_por_seguridad: true`. Probado
+sobre las **Piscinas naturales de Bajamar**: con `Con cuidado` y sin texto salen
+de parada desde Tegueste; poniéndoles una nota que dice **expresamente que no es
+un peligro**, desaparecen y se cuentan como peligro. Es el mismo fallo que ya
+está escrito arriba para `seg` —«en `seg` no todo es un peligro»— repitiéndose
+en el sitio que decide quién sale del día. Manda ahora `esPeligro()`, que es
+quien sabe leer `seg_tipo`. Las tres, comprobadas:
+
+| la ficha lleva | antes | ahora |
+|---|---|---|
+| `Con cuidado`, sin texto | sale | sale |
+| `Con cuidado` + precaución | **desaparecía, contada como peligro** | sale, y lo dice |
+| `Con cuidado` + peligro real | desaparece, contada como peligro | igual |
+
+**Y el aviso de arriba salía de olfatear el texto.** `R.avisos` subía «Cuidado
+con X» si el `seg` contenía `/PELIGRO|AVISO|NO es|prohibido/`, sin mirar
+`seg_tipo`. Una nota con la palabra «aviso» dentro se contaba como peligro.
+Manda `esPeligro()` también ahí.
+
+**El canal nuevo: `seg_tipo:'precaucion'` → `ojo_con_los_peques`.** Meter la
+precaución por `'nota'` habría sido repetir el fallo que él acababa de corregir
+—un valor haciendo un trabajo que su nombre no describe—, que `'nota'` está
+documentado como «no avisa de nada» y esto sí avisa. Cuatro decisiones:
+· **Solo sale con niños.** A dos adultos, decirles «con los peques, ojo» es
+  ruido. Va cerrado con `S.ninos` en el propio informe, así que lo que dice el
+  prompt es verdad.
+· **`esPeligro()` ya lo deja fuera** de `aviso_seguridad` sin tocar nada: mira
+  `!l.seg_tipo || l.seg_tipo==='peligro'`.
+· **No sube a los avisos de arriba, y eso es la mitad del asunto.** Arriba viven
+  la reserva obligatoria y los peligros; poner ahí la precaución diría, **por la
+  posición**, justo lo que no es. Va **junto a su parada**, como los servicios.
+  En el panel sí queda el apunte, que eso es la trastienda.
+· **El relato local también lo dice**, y hubo que ponerlo a mano: `narrarLocal`
+  solo sube los avisos que casan con su regex y **tira el resto**, así que por
+  ahí no habría llegado nunca. Clave `avPrecaucion` en los tres idiomas (233).
+  El texto de la ficha se queda en español, como los porqués del Cabildo.
+
+Con eso, el Charco de Isla Cangrejo se queda en `Con cuidado` —que es la
+precaución— y por primera vez **dice por qué**: «el muro de hormigón lo
+levantaron los vecinos y el mar abierto queda justo al lado: se baña uno
+tranquilo, pero con niños hay que estar encima». Antes tenía los −6 y no decía
+nada, que es lo peor de los dos mundos: penalizaba sin explicar.
 
 ## El municipio de una ficha, y quién lo dice
 
@@ -2810,7 +2882,7 @@ costa a la cumbre y con el centroide ganaba el Observatorio del Teide, a 10 km
 y 2.400 m de altura. Quien sí sabe lo que quiere ver tiene el botón «Prefiero
 elegir el sitio yo».
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 230 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 233 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **La leyenda del mapa también.** Los cuatro rótulos —«Dónde duermen», «La
@@ -2930,6 +3002,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | «El MUNA también está muy guapo para visitar con los niños» | 14 sep | Estaba fichado —con foto, crédito y sus momias guanches— pero **sin `ninos`**, y esa palabra vale 19 puntos: salía en 2 de 20 planes y marcado sale en 6. Y no era la ficha, era el síntoma: de las 150 de los tipos que el motor premia con niños, **32 no dicen nada y 28 son museos**. De ahí sale **`ninos.js`**, que escribe `ninos-sin-marcar.md` con tres casillas por ficha —Sí / cuidado / NO, y `divertido` aparte— agrupado por pueblo y con el dato curioso debajo. **No adivina**: marcar «Sí» todo lo que sea museo sería la regla de la casa rota por dentro |
 | El formulario de los niños, corregido: «algún cuidado es por el aburrimiento, no porque sea peligroso» | 14 sep | **Y el vocabulario que yo había escrito estaba mal**: `Con cuidado` en el motor es una penalización de SEGURIDAD —−6, −12 con aviso, y en playa o charco lo saca del día—, así que marcar así un museo aburrido le mete un castigo de riesgo donde no hay riesgo. El estado que hacía falta ya existía —no marcar nada—; lo que faltaba era poder decir **que ya se miró**, y eso es `ninos_visto`, un campo que el motor no lee. Cuatro casillas ahora: Sí / se aburren / cuidado / NO. Además: la **Playa de Troche** a `NO` —y las cerradas dejan de preguntarse, que esa ya estaba fuera del catálogo—, y el **Auditorio** a `Sí` con su porqué —«por dentro se les hace largo, por fuera hay explanada para correr y cafés»— metido como `seg_tipo:'nota'`, que llega al informe por `nota_del_sitio` y no como advertencia |
 | El formulario de los niños, relleno (32 fichas) | 14 sep | Venía contra la versión **vieja**, la de tres casillas, y su cabecera decía que marcaba `cuidado` los museos aburridos «aprovechando que el motor lo lee como no es de niños» — que es justo la confusión que él había corregido. Aplicada su regla encima: de 18 `cuidado`, **14 pasan a `se aburren`** y solo se queda el del **Charco de Isla Cangrejo**, que su propia nota describe como peligro de verdad. Con eso **no queda ninguna ficha sin mirar**: 14 «Sí» (8 divertidas), 14 miradas y neutras, 1 con cuidado. **Cambian 48 de 62 planes** de museos con niños, y las paradas aptas pasan del 54% al 70%. Dos cosas más del fichero: el **Observatorio del Teide** tiene **edad mínima de 8 años** —ni aburrimiento ni peligro, es acceso: va por `ojo_para_llegar`— y el **Ecomuseo de El Tanque** estaba en Santiago del Teide, **y el Cabildo le da la razón** |
+| «Solo hay un cuidado de peligro, el de la playa, y un cuidado de precaución, el de la piscina» | 14 sep | Los museos ya estaban bien; lo otro no, y **yo lo había escrito mal**: puse que el Charco de Isla Cangrejo era «peligro de verdad» y es la precaución. Y su frase destapó un fallo de debajo: el filtro que saca fichas del día con niños miraba **`l.seg` a secas**, o sea cualquier texto, así que a un charco `Con cuidado` le bastaba con llevar escrito algo para desaparecer y viajar con `es_por_seguridad`. Probado sobre las Piscinas de Bajamar: ponerles una nota que dice expresamente que NO es un peligro las hacía desaparecer. Manda `esPeligro()`, ahí y en el aviso de arriba, que salía de olfatear el texto. Y la categoría que faltaba gana canal propio: `seg_tipo:'precaucion'` → **`ojo_con_los_peques`**, solo con niños, **junto a su parada y no arriba** con los peligros —ponerlo arriba diría por la posición justo lo que no es—, con `avPrecaucion` en los tres idiomas (233 claves). El charco por fin dice por qué tiene sus −6 |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
