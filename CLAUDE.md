@@ -2401,7 +2401,9 @@ que se descubre tarde cuando no se escribe.
 **Dos cosas más que venían en el formulario y no caben en una casilla.**
 · **El Observatorio del Teide no es aburrido ni peligroso: tiene edad mínima.**
   La visita guiada no admite menores de 8 años, dura hora y media y está a 2.400
-  metros. Eso no es ninguna de las cuatro casillas — es **acceso**, el mismo
+  metros. **Confirmado por Zeben** —«es verdad que el observatorio del Teide es
+  para niños mayores de 8 años»—, que el dato había entrado por la anotación del
+  formulario y no por una fuente oficial. Eso no es ninguna de las cuatro casillas — es **acceso**, el mismo
   canal que la pista de tierra y la carretera estrecha. Va como `seg` con
   `seg_tipo:'acceso'`, sale por `ojo_para_llegar` con `aviso_seguridad` en
   `null` —comprobado sobre un plan real— y la ficha queda en `ninos_visto`, o
@@ -2558,7 +2560,55 @@ fueron con ellos. A La Laguna le quedan Chinamada y los caseríos de arriba —L
 Casillas y la Cumbilla—, y a Santa Cruz le entran los dos nombres de Anaga que
 el turista de verdad conoce. No hizo falta tocar el código para que no mintiera:
 el aviso comprueba que la ficha siga siendo del pueblo antes de nombrarla.
-Quedan **8 discrepancias sin mirar**, todas sueltas y ninguna de los dos nidos.
+**Y las ocho sueltas las resolvió al día siguiente, de un tirón.** Cinco entran
+tal cual y coinciden con el Cabildo: Arenas Negras y la Ermita de San Francisco
+de Asís **a Garachico**, Montaña de Sámara y el **Museo Etnográfico Juan Évora a
+Guía de Isora**. Las otras tres enseñan por qué esta lista no la cierra una
+medición:
+
+· **«El Barranco de Erques divide Guía de Isora y Adeje.»** O sea que las dos
+  respuestas son ciertas y no hay nada que corregir. Se queda en Adeje.
+· **«El Risco de La Fortaleza — La Orotava»**, que no es lo que dice la ficha
+  (Los Realejos) **ni lo que dice el Cabildo** (San Juan de la Rambla, testigo a
+  127 m). Y al mirarlo se entiende: en un kilómetro a la redonda hay **cuatro
+  fichas de cuatro municipios distintos** —San Juan de la Rambla a 130 m, La
+  Guancha a 450, Los Realejos a 830 y La Orotava a 940—. Es el nudo donde se
+  juntan las tiras de término en la cumbre. Manda él.
+· **«Montaña Negra está entre El Tanque y Garachico.»** Cierto de UNA Montaña
+  Negra, y **no de la nuestra**: la ficha está a 16,7 km de Garachico, a 18,9 de
+  El Tanque y a **449 metros del Risco de la Fortaleza**. Dos cerros con el
+  mismo nombre, que es la trampa que esta casa ya tiene apuntada al revés
+  —«Ermita de San Roque» y «Ermita de San Roque (Vilaflor)»—. Lo que lo delata
+  es cruzarlo: dio dos respuestas separadas 17 km para dos fichas separadas 450
+  metros. Se queda sin tocar y se le pregunta.
+
+**Y el Juan Évora se llevó por delante lo que estaba anunciado aquí:** era el
+primer nombre del aviso de Vilaflor, y al pasar a Guía de Isora **el aviso se
+calló solo**, sin tocar código, porque comprueba que la ficha siga siendo del
+pueblo. A Vilaflor le quedan La Zapatilla de la Reina (6,3 km) y el Roque de la
+Grieta (8,8). El nombre muerto se quitó de `AVISO_CARTEL` a mano: el filtro ya
+lo tiraba, pero un dato tiene que decir lo que es.
+Y salió una segunda cosa, esta sin resolver: **Guía de Isora se queda con 16 de
+sus 35 fichas a más de 6 km del casco** —las Narices del Teide, Sámara, el
+propio Juan Évora—, o sea el mismo caso que puso a La Orotava en la lista de
+avisos. No se le ha metido aviso: los nombres de un aviso **se eligen a mano**
+—ordenando por peso salen «Ramal de Chafarí» y «Boca Tauce - El Jaral», que no
+le dicen nada a un turista— y eso lo elige quien vive allí.
+
+**Y aquí salió el mismo agujero que tenía el formulario de niños: la lista no
+convergía.** Dos de las ocho quedan decididas **sin cambiar el municipio** —el
+Barranco de Erques porque las dos respuestas valen, el Risco porque gana Zeben y
+el Cabildo sigue diciendo otra cosa—, así que iban a salir en
+`municipios-dudosos.md` cada vez que alguien la pidiera, para siempre. El cierre
+es el mismo que `ninos_visto`: **`m_visto`**, un campo que el motor no lee y que
+solo dice «esto ya se miró y se deja como está».
+
+    node municipios.js visto "Barranco de Erques" "Risco de la Fortaleza"
+
+La cabecera sigue diciendo cuántas hay apartadas, que si no se vuelven
+invisibles y el día que alguien quiera repasarlas no sabría que existen.
+Quedan **2 discrepancias sin mirar**: la Ermita de Lourdes, que él no nombró, y
+Montaña Negra.
 
 **Y la corrección rompió dos cosas debajo, las dos por el mismo motivo: había
 datos decidiendo contra qué se comparaba.**
@@ -3003,6 +3053,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | El formulario de los niños, corregido: «algún cuidado es por el aburrimiento, no porque sea peligroso» | 14 sep | **Y el vocabulario que yo había escrito estaba mal**: `Con cuidado` en el motor es una penalización de SEGURIDAD —−6, −12 con aviso, y en playa o charco lo saca del día—, así que marcar así un museo aburrido le mete un castigo de riesgo donde no hay riesgo. El estado que hacía falta ya existía —no marcar nada—; lo que faltaba era poder decir **que ya se miró**, y eso es `ninos_visto`, un campo que el motor no lee. Cuatro casillas ahora: Sí / se aburren / cuidado / NO. Además: la **Playa de Troche** a `NO` —y las cerradas dejan de preguntarse, que esa ya estaba fuera del catálogo—, y el **Auditorio** a `Sí` con su porqué —«por dentro se les hace largo, por fuera hay explanada para correr y cafés»— metido como `seg_tipo:'nota'`, que llega al informe por `nota_del_sitio` y no como advertencia |
 | El formulario de los niños, relleno (32 fichas) | 14 sep | Venía contra la versión **vieja**, la de tres casillas, y su cabecera decía que marcaba `cuidado` los museos aburridos «aprovechando que el motor lo lee como no es de niños» — que es justo la confusión que él había corregido. Aplicada su regla encima: de 18 `cuidado`, **14 pasan a `se aburren`** y solo se queda el del **Charco de Isla Cangrejo**, que su propia nota describe como peligro de verdad. Con eso **no queda ninguna ficha sin mirar**: 14 «Sí» (8 divertidas), 14 miradas y neutras, 1 con cuidado. **Cambian 48 de 62 planes** de museos con niños, y las paradas aptas pasan del 54% al 70%. Dos cosas más del fichero: el **Observatorio del Teide** tiene **edad mínima de 8 años** —ni aburrimiento ni peligro, es acceso: va por `ojo_para_llegar`— y el **Ecomuseo de El Tanque** estaba en Santiago del Teide, **y el Cabildo le da la razón** |
 | «Solo hay un cuidado de peligro, el de la playa, y un cuidado de precaución, el de la piscina» | 14 sep | Los museos ya estaban bien; lo otro no, y **yo lo había escrito mal**: puse que el Charco de Isla Cangrejo era «peligro de verdad» y es la precaución. Y su frase destapó un fallo de debajo: el filtro que saca fichas del día con niños miraba **`l.seg` a secas**, o sea cualquier texto, así que a un charco `Con cuidado` le bastaba con llevar escrito algo para desaparecer y viajar con `es_por_seguridad`. Probado sobre las Piscinas de Bajamar: ponerles una nota que dice expresamente que NO es un peligro las hacía desaparecer. Manda `esPeligro()`, ahí y en el aviso de arriba, que salía de olfatear el texto. Y la categoría que faltaba gana canal propio: `seg_tipo:'precaucion'` → **`ojo_con_los_peques`**, solo con niños, **junto a su parada y no arriba** con los peligros —ponerlo arriba diría por la posición justo lo que no es—, con `avPrecaucion` en los tres idiomas (233 claves). El charco por fin dice por qué tiene sus −6 |
+| Las ocho discrepancias de municipio resueltas + «es verdad que el observatorio es para mayores de 8 años» | 14 sep | **Cinco entran tal cual** y coinciden con el Cabildo: Arenas Negras y la Ermita de San Francisco a Garachico, Sámara y el **Museo Etnográfico Juan Évora a Guía de Isora**. Las otras tres enseñan por qué esto no lo cierra una medición: el **Barranco de Erques «divide Guía de Isora y Adeje»** —las dos respuestas son ciertas—; el **Risco de la Fortaleza a La Orotava**, que no es ni lo nuestro ni lo del Cabildo, y al mirarlo hay **cuatro municipios en un kilómetro**, o sea el nudo de la cumbre; y **Montaña Negra «entre El Tanque y Garachico»**, que es cierto de otra Montaña Negra —la nuestra está a 16,7 km de Garachico y a **449 m del Risco**—, así que se queda y se pregunta. Al mover el Juan Évora, el aviso de Vilaflor **se calló solo**, como estaba anunciado aquí. Y salió el mismo agujero que el formulario de niños: dos quedan decididas sin cambiar el municipio y saldrían en la lista para siempre — cierre `m_visto`, igual que `ninos_visto`. De 31 a **2 sin mirar**. Y confirma la edad mínima del Observatorio, que había entrado por una anotación y no por fuente oficial |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
@@ -3682,20 +3733,17 @@ Lo que sigue **sin usar** de lo suyo, y por qué:
   Lo publicado se marca en la página y **el navegador lo recuerda**, así que
   volver a abrirla no obliga a acordarse de por dónde iba.
 
-- **Las 8 discrepancias de municipio que quedan por mirar.** `node municipios.js
-  lista 300` las vuelve a escribir en `municipios-dudosos.md` con su casilla.
-  Eran 31: Zeben resolvió los dos nidos —Anaga a Santa Cruz y el Teide a La
-  Orotava, 23 fichas— y estas son las sueltas que nadie ha mirado:
-  Arenas Negras y la Ermita de San Francisco de Asís (El Tanque → Garachico),
-  la Ermita de Lourdes (El Tanque → Los Silos), el Barranco de Erques (Adeje →
-  Guía de Isora), Montaña de Sámara (Santiago del Teide → Guía de Isora), el
-  Museo Etnográfico Juan Évora (Vilaflor → Guía de Isora), el Risco de la
-  Fortaleza (Los Realejos → San Juan de la Rambla) y Montaña Negra (La Guancha
-  → San Juan de la Rambla).
-  Ojo con el Museo Etnográfico Juan Évora: es **lo primero que nombra hoy el
-  aviso de Vilaflor**, así que si resulta ser de Guía de Isora ese aviso se
-  queda con dos nombres —La Zapatilla de la Reina y el Roque de la Grieta— y
-  Vilaflor pasa a tener muy poco que avisar.
+- **De las 31 discrepancias de municipio quedan DOS.** Zeben resolvió los dos
+  nidos el 13 de septiembre —Anaga a Santa Cruz y el Teide a La Orotava, 23
+  fichas— y las ocho sueltas el 14. Las dos que quedan:
+  · **Ermita Nuestra Señora de Lourdes** (El Tanque → Los Silos, testigo a 47 m).
+    **No la nombró**, así que se queda como está y nadie la ha mirado.
+  · **Montaña Negra** (La Guancha → San Juan de la Rambla). Él contestó «está
+    entre El Tanque y Garachico» — y tiene razón sobre UNA Montaña Negra, pero
+    **no sobre la nuestra**: la ficha está a **16,7 km de Garachico y 18,9 de El
+    Tanque**, y a **449 metros del Risco de la Fortaleza**, arriba en la cumbre.
+    Son dos cerros con el mismo nombre. Se pregunta, no se adivina.
+  `node municipios.js lista 300` las vuelve a escribir con su casilla.
 - **Mirador El Frontón tiene la coordenada mal.** Es de San Miguel y su nota
   dice «medianías altas camino a Vilaflor», pero la coordenada —estimada, a dos
   decimales— cae a **3,7 km de la cima del Teide**, dentro del Parque Nacional y

@@ -167,7 +167,6 @@ const AVISO_CARTEL={
    "Paisaje Lunar de Vilaflor"
   ],
   "lejos": [
-   "Museo Etnográfico Juan Évora",
    "La Zapatilla de la Reina",
    "Roque de la Grieta"
   ]

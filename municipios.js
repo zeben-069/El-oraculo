@@ -28,6 +28,9 @@
        node municipios.js meter 300    escribe los de menos de ese radio
        node municipios.js meter "Roques de García" "Pico Teide"
                                        escribe SOLO los que se nombren
+       node municipios.js visto "Barranco de Erques"
+                                       la da por mirada y la deja como está:
+                                       deja de salir en la lista
        node municipios.js lista        escribe municipios-dudosos.md, con una
                                        casilla en cada uno, para que los mire
                                        quien vive allí
@@ -75,9 +78,18 @@ function testigos(){
   return {P, itinerarios:TF.length, compartidos};
 }
 
+/* `m_visto` es la casilla de «esto ya se miró y se deja como está». Hace falta
+   porque el Cabildo y quien vive allí no siempre coinciden, y cuando gana el
+   segundo la discrepancia NO desaparece: el Risco de la Fortaleza es de La
+   Orotava porque lo dijo Zeben, y el testigo del Cabildo a 127 m sigue diciendo
+   San Juan de la Rambla. Sin esto, esa ficha y el Barranco de Erques —que
+   «divide Guía de Isora y Adeje», o sea que las dos respuestas son ciertas—
+   saldrían en la lista cada vez que alguien la pida, para siempre. Es el mismo
+   cierre que `ninos_visto` en ninos.js, y por lo mismo: una lista que no
+   converge se deja de mirar. El motor NO lee este campo. */
 function discrepancias(P){
   const R=[];
-  LUGARES.filter(l=>l.la!=null).forEach(l=>{
+  LUGARES.filter(l=>l.la!=null&&!l.m_visto).forEach(l=>{
     let d=1e9,q=null;
     for(const p of P){ const x=km(l.la,l.lo,p.la,p.lo); if(x<d){ d=x; q=p; } }
     if(q&&q.m!==l.m) R.push({n:l.n, dice:l.m, es:q.m, metros:Math.round(d*1000), por:q.n});
@@ -149,11 +161,40 @@ function leerLista(f){
     .map(l=>(l.match(/\*\*(.+?)\*\*/)||[])[1]).filter(Boolean);
 }
 
+/* Escribe `m_visto` en las fichas que se nombren. No cambia el municipio: dice
+   que ya se miró y se deja como está. */
+function marcarVistas(nombres){
+  const f=path.join(RAIZ,'datos/lugares.js');
+  let txt=fs.readFileSync(f,'utf8');
+  const hechas=[], fallan=[];
+  for(const n of nombres){
+    const l=LUGARES.find(z=>z.n===n);
+    if(!l){ fallan.push(n+' (no está en el catálogo)'); continue; }
+    if(l.m_visto){ hechas.push(n+' (ya lo estaba)'); continue; }
+    const nom=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    const re=new RegExp('\\{"n":"'+nom+'"[^{]*?\\}','g');
+    const t=txt.match(re)||[];
+    if(t.length!==1){ fallan.push(n+' (sale '+t.length+' veces)'); continue; }
+    txt=txt.replace(t[0], t[0].slice(0,-1)+',"m_visto":1}');
+    hechas.push(n);
+  }
+  if(hechas.length) fs.writeFileSync(f,txt);
+  console.log('Marcadas como miradas '+hechas.length+':');
+  hechas.forEach(x=>console.log('  · '+x));
+  if(fallan.length) console.log('SIN TOCAR:\n  '+fallan.join('\n  '));
+  console.log('\nNo se les cambia el municipio: dejan de salir en la lista y ya.');
+}
+
 function main(){
   const args=process.argv.slice(2);
   const meter=args.includes('meter');
   const soloLista=args.includes('lista');
-  let resto=args.filter(a=>a!=='meter'&&a!=='lista');
+  const visto=args.includes('visto');
+  let resto=args.filter(a=>a!=='meter'&&a!=='lista'&&a!=='visto');
+  if(visto){
+    if(!resto.length) return console.log('Dime qué fichas: node municipios.js visto "Nombre" …');
+    return marcarVistas(resto);
+  }
   let marcados=null;
   const md=resto.find(a=>/\.md$/.test(a));
   if(md){
@@ -172,8 +213,10 @@ function main(){
 
   const todas=discrepancias(P);
   const dentro=todas.filter(x=>x.metros<=radio);
+  const vistas=LUGARES.filter(l=>l.la!=null&&l.m_visto).length;
   console.log('Fichas con coordenada: '+LUGARES.filter(l=>l.la!=null).length+
-    ' · el Cabildo discrepa en '+todas.length+' · a menos de '+radio+' m: '+dentro.length+'\n');
+    ' · el Cabildo discrepa en '+todas.length+' · a menos de '+radio+' m: '+dentro.length+
+    (vistas?'\nApartadas por estar ya miradas (`m_visto`): '+vistas:'')+'\n');
 
   if(soloLista){
     const g=escribirLista(dentro,radio);
