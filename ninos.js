@@ -22,6 +22,38 @@
    del catálogo y esto no. Si un museo está guapo con un crío de siete años no
    lo dice ni el peso ni el tipo ni el Cabildo: lo dice quien ha estado.
 
+   ── Y el vocabulario estaba MAL, lo corrigió él al rellenarla ──
+   La primera versión ofrecía «Sí / cuidado / NO» y explicaba `cuidado` como
+   «se puede ir, pero hay que tenerlos encima». Zeben lo rellenó y dijo: **«De
+   resto todo bien; algún cuidado es por el aburrimiento, no porque sea
+   peligroso»**. Y eso es un problema de verdad, no de redacción, porque
+   `Con cuidado` en el motor **es una penalización de seguridad**:
+     −6 con niños, y −12 si además tiene aviso de peligro
+     y en un Charco o una Playa con `seg`, **queda excluido del día**
+     y el motivo viaja al informe con `clase:'peligro'`
+   O sea que marcar «cuidado» un museo aburrido le mete un castigo de riesgo a
+   un sitio donde no hay riesgo ninguno, y Naira podría acabar avisando de algo
+   que no pasa. Es el mismo fallo que ya está apuntado en `seg` —«en `seg` no
+   todo es un peligro»— repitiéndose en otro campo.
+   **Y el estado que hacía falta ya existía: no marcar nada.** Una ficha sin
+   `ninos` no gana los +9/+3 y no pierde nada, que es exactamente «aquí un crío
+   se aburre pero no pasa nada». Lo único que faltaba era **poder decir que ya
+   se ha mirado**, para que no vuelva a salir en la lista la próxima vez. Eso es
+   `ninos_visto`, un campo que **el motor no lee** y que solo existe para cerrar
+   el ciclo de esta herramienta.
+   Así que las casillas son ahora cuatro y cada una escribe una cosa distinta:
+     Sí          → ninos:'Sí'            (+9 y +3)
+     se aburren  → ninos_visto:1         (nada, y deja de preguntarse)
+     cuidado     → ninos:'Con cuidado'   (−6 / −12, y es POR RIESGO)
+     NO          → ninos:'NO'            (fuera, y se cuenta como aviso)
+
+   ── Y no se pregunta por lo que el motor no va a ofrecer nunca ──
+   En la primera lista iba la **Playa de Troche**, que está marcada `cerrado`:
+   «DE USO PROHIBIDO en el registro oficial de zonas de baño». El motor la
+   excluye del catálogo entero, así que preguntar si es buena con niños era
+   hacerle perder el tiempo con una ficha que no sale jamás. Las cerradas se
+   saltan.
+
    Así que la herramienta **lista y espera**, como `municipios-dudosos.md` y
    `actos-parecidos.md`:
 
@@ -51,8 +83,11 @@ function lugares(){
 
 function lista(){
   const L=lugares();
-  const dentro=L.filter(l=>PREMIA.test(l.tipo||''));
-  const sin=dentro.filter(l=>!l.ninos);
+  /* Las cerradas fuera: el motor no las ofrece nunca, así que preguntar por
+     ellas es pedir trabajo por nada. Y `ninos_visto` es «ya lo miré y no es de
+     niños, pero tampoco pasa nada»: no vuelve a salir. */
+  const dentro=L.filter(l=>PREMIA.test(l.tipo||'')&&!l.cerrado);
+  const sin=dentro.filter(l=>!l.ninos&&!l.ninos_visto);
   if(!sin.length) return console.log('no queda ninguna sin marcar de los tipos que el motor premia.');
 
   /* Agrupadas por pueblo, que es como se leen: quien vive aquí repasa «los de
@@ -70,14 +105,19 @@ function lista(){
     'con foto y con sus momias guanches y no aparecía en ningún plan de familia.\n\n'+
     'Marca **una** casilla de cada ficha y luego:\n\n'+
     '    node ninos.js meter ninos-sin-marcar.md\n\n'+
-    'Lo que no marques se queda como está, o sea sin decir nada, que es lo de hoy.\n'+
-    'Y si además es de los que un crío disfruta de verdad —de tocar, de mirar con\n'+
-    'la boca abierta— marca también **`divertido`**: eso son 7 puntos más y es lo\n'+
-    'que separa el Museo de la Ciencia de una casa-museo de un coleccionista.\n\n'+
-    '· **Sí** — un crío está a gusto ahí.\n'+
-    '· **cuidado** — se puede ir, pero hay que tenerlos encima (roques, borde de mar,\n'+
-    '  desnivel). El motor lo trata como «no es de niños», no como peligro.\n'+
-    '· **NO** — ahí no se lleva a un niño.\n\n';
+    'Lo que no marques se queda igual y volverá a salir la próxima vez.\n\n'+
+    '## Las cuatro casillas, que NO son lo mismo\n\n'+
+    '· **Sí** — un crío está a gusto ahí. Sube mucho en el plan con niños.\n'+
+    '· **se aburren** — no es para ellos, pero **no pasa nada**: no hay riesgo.\n'+
+    '  No se castiga, solo deja de premiarse — y no vuelvo a preguntarte por ella.\n'+
+    '  Esta es la que hay que usar para un museo de pintura o una casa señorial.\n'+
+    '· **cuidado** — **es por RIESGO**, no por aburrimiento: hay que tenerlos\n'+
+    '  encima (roques, borde de mar, desnivel, corriente). El motor le mete un\n'+
+    '  castigo de seguridad y en una playa o un charco lo puede sacar del día.\n'+
+    '· **NO** — ahí no se lleva a un niño, y Naira lo dice.\n\n'+
+    'Y aparte de esas cuatro, **`divertido`**: los que un crío disfruta de verdad\n'+
+    '—de tocar, de mirar con la boca abierta—. Son 7 puntos más y es lo que separa\n'+
+    'el Museo de la Ciencia de la casa-museo de un coleccionista.\n\n';
 
   pueblos.forEach(m=>{
     t+='## '+m+'  ('+por[m].length+')\n\n';
@@ -88,7 +128,7 @@ function lista(){
          veintiséis seguidos y tres se llaman «Museo Etnográfico». */
       const q=l.fx||l.desc||l.nota;
       if(q) t+='  > '+String(q).replace(/\s+/g,' ').slice(0,150)+'\n';
-      t+='  - [ ] Sí   - [ ] cuidado   - [ ] NO   · y además: [ ] divertido\n\n';
+      t+='  - [ ] Sí   - [ ] se aburren   - [ ] cuidado   - [ ] NO   · y además: [ ] divertido\n\n';
     });
   });
   fs.writeFileSync(path.join(RAIZ,'ninos-sin-marcar.md'),t);
@@ -111,10 +151,15 @@ function leer(f){
        por él sería peor que dejarlo, que es la regla de siempre. */
     const vals=[];
     if(/\[[xX]\]\s*Sí/.test(l)) vals.push('Sí');
+    /* «se aburren» NO escribe `ninos`: escribe `ninos_visto`, que el motor no
+       lee. Ver la cabecera — marcarlo «Con cuidado» le metería un castigo de
+       seguridad a un sitio donde no hay riesgo ninguno. */
+    if(/\[[xX]\]\s*se aburren/.test(l)) vals.push('(se aburren)');
     if(/\[[xX]\]\s*cuidado/.test(l)) vals.push('Con cuidado');
     if(/\[[xX]\]\s*NO/.test(l)) vals.push('NO');
     const div=/\[[xX]\]\s*divertido/.test(l);
-    if(vals.length===1) out.push({n:nom,ninos:vals[0],div});
+    if(vals.length===1)
+      out.push(vals[0]==='(se aburren)' ? {n:nom,visto:true,div} : {n:nom,ninos:vals[0],div});
     else if(vals.length>1) out.push({n:nom,choque:vals});
     else if(div) out.push({n:nom,div:true});
     nom=null;
@@ -145,6 +190,9 @@ function meter(f){
     const trozos=txt.match(re)||[];
     if(trozos.length!==1){ fallan.push(x.n+' (sale '+trozos.length+' veces)'); continue; }
     let ficha=trozos[0];
+    /* Mirado y no es de niños: no se toca `ninos` —el motor lo trata igual que
+       hoy, ni premio ni castigo— y solo se apunta que ya se miró. */
+    if(x.visto && !/"ninos_visto":/.test(ficha)) ficha=ficha.replace(/\}$/,',"ninos_visto":1}');
     if(x.ninos){
       ficha=/"ninos":/.test(ficha)
         ? ficha.replace(/"ninos":"[^"]*"/,'"ninos":"'+x.ninos+'"')
@@ -162,7 +210,9 @@ function meter(f){
   }
   if(hechos.length) fs.writeFileSync(fi,txt);
   console.log('MARCADAS: '+hechos.length);
-  hechos.forEach(x=>console.log('   · '+x.n+' → '+(x.ninos||'(solo divertido)')+(x.div&&x.ninos?' + divertido':'')));
+  hechos.forEach(x=>console.log('   · '+x.n+' → '+
+    (x.ninos||(x.visto?'se aburren (mirado, no se toca el motor)':'(solo divertido)'))+
+    (x.div&&(x.ninos||x.visto)?' + divertido':'')));
   if(fallan.length){
     console.log('\nNO SE PUDIERON TOCAR: '+fallan.length);
     fallan.forEach(s=>console.log('   · '+s));

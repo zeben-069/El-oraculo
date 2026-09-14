@@ -2299,10 +2299,9 @@ Cuatro decisiones de cómo está hecho:
 · **Solo pregunta por los tipos que el motor premia.** Fuera de
   playa/charco/piscina/parque/museo/jardín la marca no cambia el orden del día,
   así que preguntarlo sería pedir trabajo a cambio de nada.
-· **Tres casillas, no una.** El campo admite «Sí», «Con cuidado» y «NO», y con
-  una sola casilla solo se puede decir que sí. Y una cuarta aparte,
-  `divertido`, que son los otros 7 puntos y es lo que separa el Museo de la
-  Ciencia —donde se tocan botones— de la casa-museo de un coleccionista.
+· **Varias casillas, no una.** Con una sola solo se puede decir que sí. Y una
+  aparte, `divertido`, que son los otros 7 puntos y es lo que separa el Museo de
+  la Ciencia —donde se tocan botones— de la casa-museo de un coleccionista.
 · **Si se marcan dos casillas de la misma ficha, no se toca** y se canta.
   Elegir por él sería peor que dejarlo, que es la regla de siempre.
 · **Va agrupado por pueblo y con el dato curioso debajo de cada nombre.** Con
@@ -2310,7 +2309,50 @@ Cuatro decisiones de cómo está hecho:
   solo no basta para acordarse de cuál es; y quien vive aquí repasa «los de La
   Laguna» de una vez, que es la misma razón por la que `municipios-dudosos.md`
   va por nidos.
-Quedan **31 por mirar**, 27 de ellas museos.
+
+**Y el vocabulario estaba mal, lo corrigió él al rellenarla.** La primera
+versión ofrecía «Sí / cuidado / NO» y explicaba `cuidado` como «se puede ir,
+pero hay que tenerlos encima». Él lo devolvió con una frase que es de las que
+hay que apuntar: **«De resto todo bien; algún cuidado es por el aburrimiento,
+no porque sea peligroso»**.
+Y eso no es de redacción, es de fondo, porque **`Con cuidado` en el motor es
+una penalización de SEGURIDAD**: −6 con niños, −12 si además tiene aviso de
+peligro, en un Charco o una Playa con `seg` **queda excluido del día**, y el
+motivo viaja al informe con `clase:'peligro'`. O sea que marcar «cuidado» un
+museo aburrido le mete un castigo de riesgo a un sitio donde no hay riesgo
+ninguno, y Naira podría acabar avisando de algo que no pasa. **Es el mismo
+fallo que ya está escrito arriba para `seg` —«en `seg` no todo es un peligro»—
+repitiéndose en otro campo**, y esta vez lo metí yo en el formulario.
+**El estado que hacía falta ya existía: no marcar nada.** Una ficha sin `ninos`
+no gana los +9/+3 y no pierde nada, que es exactamente «aquí un crío se aburre
+pero no pasa nada». Lo único que faltaba era poder decir **que ya se ha
+mirado**, para que no vuelva a salir en la lista. Eso es `ninos_visto`, un campo
+que **el motor no lee** y que solo existe para cerrar el ciclo de la
+herramienta. Las casillas son ahora cuatro y cada una escribe una cosa distinta:
+
+| casilla | escribe | qué hace el motor |
+|---|---|---|
+| **Sí** | `ninos:'Sí'` | +9 y +3 |
+| **se aburren** | `ninos_visto:1` | nada, y deja de preguntarse |
+| **cuidado** | `ninos:'Con cuidado'` | −6 / −12, **y es por RIESGO** |
+| **NO** | `ninos:'NO'` | fuera del día, y se cuenta como aviso |
+
+**Y no se pregunta por lo que el motor no va a ofrecer nunca.** En la primera
+lista iba la **Playa de Troche**, y él contestó que «no es para ir con niños,
+aunque puse cuidado». Tiene razón dos veces: es `ninos:'NO'`, y además esa ficha
+ya lleva `cerrado` —«DE USO PROHIBIDO en el registro oficial de zonas de baño»—,
+así que el motor la excluye del catálogo entero. Preguntar por ella era hacerle
+perder el tiempo con una ficha que no sale jamás. Ahora las cerradas se saltan.
+
+**Y el Auditorio de Tenerife enseña para qué sirve de verdad esto.** Él: «es
+verdad que quizás para los niños es aburrido, pero por fuera tiene donde correr
+y los padres se pueden echar un café por allí». Eso no es un «sí» ni un «no
+pasa nada»: es **el porqué**, y es justo el dato que no está en ningún fichero
+abierto. Va marcado **Sí** —sin `divertido`, que lo de dentro es lo aburrido— y
+su frase entra en la ficha como `seg` con `seg_tipo:'nota'`, que es el canal que
+ya existe para lo que **no** avisa de nada: llega al informe por
+`nota_del_sitio` y **no** por `aviso_seguridad`. Comprobado sobre un plan real.
+Quedan **30 por mirar**, 27 de ellas museos.
 
 ## El municipio de una ficha, y quién lo dice
 
@@ -2819,6 +2861,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | El artefacto de las fiestas, actualizado + «¿se puede actualizar solo?» | 14 sep | La versión nueva son **660 actos de 26 programas** (eran 538 de 22): entran **121**, con cuatro programas que no teníamos —Tacoronte, Benijos, El Lomo de Tegueste y Guía de Isora— y por primera vez octubre. De paso `parecidos` destapó que los «3 actos nuevos» del día 13 eran **3 gemelos reescritos por el artefacto**: fuera, y `ACTOS` queda en **689**. El importador avisa ahora de los que caen encima de uno nuestro, y se arregló un campo mudo —el corredor se llama `corr` y ponía `c`, así que 122 actos estaban con `c:null`—. Lo de actualizarse solo: **no, y no debería** —ni el contenedor ni el navegador pueden pedir el artefacto, y una pasada sin mirar habría dejado los tres gemelos dentro—, pero volver a pasarlo es un comando y `avisar-fiestas.js` ya avisa los lunes de cuándo toca |
 | Un plan suyo entero + «piensa como un guía de verdad» + «¿me vale una API key de Google?» | 14 sep | Tres cosas. **«Siempre me sale el mismo plan»**: el arreglo del día 13 funcionaba dentro de la pantalla y se perdía al recargar, que es lo que él hace — la memoria de lo ya visto pasa al navegador, y de paso se vio que `banco.js` tenía un `localStorage` de mentira que se tragaba lo que se escribía. **Los fuegos de las 23:00**: ese día La Laguna los tiene y una familia no los veía, porque `q` es excluyente y además hay un corte por reloj. `q` gana el tercer valor que estaba pendiente, **`todos`** —fuegos, pirotecnia y romería, 28 de 689—, que pasa a los dos públicos y no lo corta el reloj: **77 actos que una familia antes no veía**, y el prompt los coloca al final, después del cafelito, con su hora. Y la clave de Google: **para poco** —mapas y geocodificación ya están resueltos gratis; lo único que valdría es el horario de las 119 fichas sin confirmar, y los términos de Google no dejan guardarlo— |
 | «El MUNA también está muy guapo para visitar con los niños» | 14 sep | Estaba fichado —con foto, crédito y sus momias guanches— pero **sin `ninos`**, y esa palabra vale 19 puntos: salía en 2 de 20 planes y marcado sale en 6. Y no era la ficha, era el síntoma: de las 150 de los tipos que el motor premia con niños, **32 no dicen nada y 28 son museos**. De ahí sale **`ninos.js`**, que escribe `ninos-sin-marcar.md` con tres casillas por ficha —Sí / cuidado / NO, y `divertido` aparte— agrupado por pueblo y con el dato curioso debajo. **No adivina**: marcar «Sí» todo lo que sea museo sería la regla de la casa rota por dentro |
+| El formulario de los niños, corregido: «algún cuidado es por el aburrimiento, no porque sea peligroso» | 14 sep | **Y el vocabulario que yo había escrito estaba mal**: `Con cuidado` en el motor es una penalización de SEGURIDAD —−6, −12 con aviso, y en playa o charco lo saca del día—, así que marcar así un museo aburrido le mete un castigo de riesgo donde no hay riesgo. El estado que hacía falta ya existía —no marcar nada—; lo que faltaba era poder decir **que ya se miró**, y eso es `ninos_visto`, un campo que el motor no lee. Cuatro casillas ahora: Sí / se aburren / cuidado / NO. Además: la **Playa de Troche** a `NO` —y las cerradas dejan de preguntarse, que esa ya estaba fuera del catálogo—, y el **Auditorio** a `Sí` con su porqué —«por dentro se les hace largo, por fuera hay explanada para correr y cafés»— metido como `seg_tipo:'nota'`, que llega al informe por `nota_del_sitio` y no como advertencia |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
