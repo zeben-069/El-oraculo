@@ -2352,7 +2352,74 @@ abierto. Va marcado **Sí** —sin `divertido`, que lo de dentro es lo aburrido�
 su frase entra en la ficha como `seg` con `seg_tipo:'nota'`, que es el canal que
 ya existe para lo que **no** avisa de nada: llega al informe por
 `nota_del_sitio` y **no** por `aviso_seguridad`. Comprobado sobre un plan real.
-Quedan **30 por mirar**, 27 de ellas museos.
+
+**Y el formulario volvió relleno, contra la versión vieja: 32 fichas, 18 de
+ellas marcadas `cuidado`.** Su cabecera lo decía tal cual —«van como *cuidado*,
+aprovechando que el motor lo lee como "no es de niños" y no como peligro»—, que
+es **exactamente la confusión que él acababa de corregir**: `Con cuidado` en el
+motor es −6, −12 con aviso, y en playa o charco saca la ficha del día. Meterlo
+como venía habría puesto dieciocho castigos de riesgo donde no hay riesgo
+ninguno. Pero tampoco se tira su trabajo: lo que hacía falta era **su propia
+regla encima** —«algún cuidado es por el aburrimiento, no porque sea
+peligroso»—, y las anotaciones del fichero dicen de cuál es cada uno. Así que el
+`cuidado` se traduce a `se aburren` salvo donde la nota describe un peligro de
+verdad. Quedó así:
+
+| marca | cuántas | qué escribe |
+|---|---|---|
+| **Sí** | 14 (8 además `divertido`) | `ninos:'Sí'` |
+| **se aburren** | 14 | `ninos_visto:1`, y el motor ni las premia ni las castiga |
+| **cuidado** | 1, el Charco de Isla Cangrejo | `ninos:'Con cuidado'` |
+
+El único `cuidado` que sobrevive es el que su propia nota describe: «muro de
+hormigón en zona de acantilados, con el mar abierto justo al lado». Los otros
+trece son colecciones de arte y casas de coleccionista donde el crío se aburre
+a los cuatro minutos, que es justo para lo que se inventó la casilla nueva.
+**Con esto no queda ninguna ficha sin mirar** de los tipos que el motor premia:
+148 en total, 80 «Sí», 48 «Con cuidado», 5 «NO» y 15 miradas y neutras.
+
+**Lo que mueve, medido sobre 62 planes de museos con niños** (31 bases × coche y
+guagua): **cambian 48**. Y no es que se muevan, es que mejoran — puntuando las
+paradas VIEJAS con lo que ahora sabemos, solo el 54% valían con niños; ahora son
+el **70%**, y las de tipo divertido pasan del 18% al **38%**. En `lote.js`, las
+paradas «niños: Sí» suben del 71% al **76%** y las divertidas del 59% al **65%**.
+Cuatro ejemplos de lo que arregla:
+
+| desde | antes | ahora |
+|---|---|---|
+| Candelaria | el casco de Candelaria y su paseo marítimo | **Pirámides de Güímar** y el casco de Arafo |
+| El Sauzal | Fundación Cristino de Vera (pintura) | **Casa Lercaro**, que programa talleres |
+| El Rosario | el Auditorio de cierre | **TEA**, por el MiniTEA |
+| El Tanque | Espacio de Arte la Casa de Piedra | **Ecomuseo de El Tanque**, con su realidad virtual |
+
+**Y no es gratis: la dispersión mediana sube de 4,1 a 4,6 km** (el máximo, de
+9,6 a 9,8). Medio kilómetro de más por cinco puntos de aptitud con niños, con
+las banderas de `lote.js` todas en cero. Se apunta porque es la clase de número
+que se descubre tarde cuando no se escribe.
+
+**Dos cosas más que venían en el formulario y no caben en una casilla.**
+· **El Observatorio del Teide no es aburrido ni peligroso: tiene edad mínima.**
+  La visita guiada no admite menores de 8 años, dura hora y media y está a 2.400
+  metros. Eso no es ninguna de las cuatro casillas — es **acceso**, el mismo
+  canal que la pista de tierra y la carretera estrecha. Va como `seg` con
+  `seg_tipo:'acceso'`, sale por `ojo_para_llegar` con `aviso_seguridad` en
+  `null` —comprobado sobre un plan real— y la ficha queda en `ninos_visto`, o
+  sea neutra: puede salir, pero avisando. Se nota en el barrido: desde Arafo con
+  niños el Observatorio deja de abrir el día.
+· **El Ecomuseo de El Tanque estaba en el municipio equivocado**, en Santiago
+  del Teide. Lo cazó el formulario y **el Cabildo lo confirma**: `municipios.js`
+  lo cruza contra el testigo «San José de Los Llanos - Montaña Chinyero» a 1.333
+  metros. Cambiado con la herramienta, que movió `m` y `co`.
+
+**Y eso destapó un hueco en `municipios.js`: mueve `m` y `co`, y el corredor no.**
+Y no debe moverlo solo, que eso ya está escrito arriba —`c` dice **cómo se
+llega**, no dónde está, y a las Cañadas se sube por cuatro lados—. Lo que sí
+pasa es que la ficha puede quedarse con el corredor del municipio VIEJO sin que
+le pegue a nada: el Ecomuseo se quedó en «Suroeste» teniendo un vecino fichado a
+**180 metros** en «Isla Baja», que es además el corredor de su propia base. Así
+que la herramienta **lo canta** ahora, con la regla que ya usan los miradores y
+los caseríos —manda el vecino fichado más cercano— y lo decide quien mire la
+lista. El del Ecomuseo, corregido a mano a «Isla Baja».
 
 ## El municipio de una ficha, y quién lo dice
 
@@ -2552,7 +2619,7 @@ restaurantes, 76 mencionan días de cierre y **cero se contradicen**.
 
 `lote.js` es el que hay que pasar **después de tocar el motor**. Marca
 DISPERSO, SALTO, CIERRE-LEJOS, COMIDA-LEJOS, RECINTO, CURVAS-NOCHE.
-Referencia actual: dispersión mediana 4,1 km, **cero banderas de todas** y
+Referencia actual: dispersión mediana 4,6 km, **cero banderas de todas** y
 **ningún** día de 2 paradas — eran 3, y el último se cerró al fichar Charco del
 Pino. La de comida lejos fueron 3, luego 1 y ahora 0: las dos primeras no eran
 escasez de catálogo, era el filtro de municipio ganándole a la cercanía; la
@@ -2571,10 +2638,10 @@ Referencia: 0 reventones, 0 días por encima de 25 km de dispersión (mediana
 estaban fichados.
 
 Y un bloque de **perfiles**: el mismo día en cuatro versiones (coche/guagua ×
-pareja/niños) desde las 31 bases. Referencia: 0 sitios no aptos con niños, 71%
-de paradas «niños: Sí» con niños contra 24% en pareja, 59% de tipo divertido,
+pareja/niños) desde las 31 bases. Referencia: 0 sitios no aptos con niños, 76%
+de paradas «niños: Sí» con niños contra 29% en pareja, 65% de tipo divertido,
 2% de planes iguales entre pareja y niños, 47% iguales entre coche y guagua
-—esos son legítimos: sitios que ya están junto a una parada— y 213 m de media
+—esos son legítimos: sitios que ya están junto a una parada— y 204 m de media
 a la guagua sin coche. Ese 47% era 53% antes de `guaguas.js`: con las 215
 fichas mudas ya medidas, el motor puede descartar de verdad lo que queda lejos
 de una parada, y el plan sin coche se separa más del plan con coche.
@@ -2583,8 +2650,8 @@ Y cierra con los **actos**: por cada día y municipio con programa cargado,
 un plan con niños y otro sin ellos —454 planes—. Lo que se vigila ahí no es la
 dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: de los
 **689 actos cargados** (76 marcados de niños, **28 de todo el pueblo**, 176 de
-noche, 409 sin marcar), **1.069 ofrecidos**, **0 ofrecidos a quien no toca** y
-**77 de todo el pueblo ofrecidos a una familia** —los fuegos y las romerías, que
+noche, 409 sin marcar), **1.071 ofrecidos**, **0 ofrecidos a quien no toca** y
+**78 de todo el pueblo ofrecidos a una familia** —los fuegos y las romerías, que
 antes no veía—. Ese cero es la prueba de toda la regla; los 600 «sin clasificar
 y ofrecido» ya NO son un fallo, que
 desde que `q` dice solo si es de niños, lo que no está marcado va a los
@@ -2862,6 +2929,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | Un plan suyo entero + «piensa como un guía de verdad» + «¿me vale una API key de Google?» | 14 sep | Tres cosas. **«Siempre me sale el mismo plan»**: el arreglo del día 13 funcionaba dentro de la pantalla y se perdía al recargar, que es lo que él hace — la memoria de lo ya visto pasa al navegador, y de paso se vio que `banco.js` tenía un `localStorage` de mentira que se tragaba lo que se escribía. **Los fuegos de las 23:00**: ese día La Laguna los tiene y una familia no los veía, porque `q` es excluyente y además hay un corte por reloj. `q` gana el tercer valor que estaba pendiente, **`todos`** —fuegos, pirotecnia y romería, 28 de 689—, que pasa a los dos públicos y no lo corta el reloj: **77 actos que una familia antes no veía**, y el prompt los coloca al final, después del cafelito, con su hora. Y la clave de Google: **para poco** —mapas y geocodificación ya están resueltos gratis; lo único que valdría es el horario de las 119 fichas sin confirmar, y los términos de Google no dejan guardarlo— |
 | «El MUNA también está muy guapo para visitar con los niños» | 14 sep | Estaba fichado —con foto, crédito y sus momias guanches— pero **sin `ninos`**, y esa palabra vale 19 puntos: salía en 2 de 20 planes y marcado sale en 6. Y no era la ficha, era el síntoma: de las 150 de los tipos que el motor premia con niños, **32 no dicen nada y 28 son museos**. De ahí sale **`ninos.js`**, que escribe `ninos-sin-marcar.md` con tres casillas por ficha —Sí / cuidado / NO, y `divertido` aparte— agrupado por pueblo y con el dato curioso debajo. **No adivina**: marcar «Sí» todo lo que sea museo sería la regla de la casa rota por dentro |
 | El formulario de los niños, corregido: «algún cuidado es por el aburrimiento, no porque sea peligroso» | 14 sep | **Y el vocabulario que yo había escrito estaba mal**: `Con cuidado` en el motor es una penalización de SEGURIDAD —−6, −12 con aviso, y en playa o charco lo saca del día—, así que marcar así un museo aburrido le mete un castigo de riesgo donde no hay riesgo. El estado que hacía falta ya existía —no marcar nada—; lo que faltaba era poder decir **que ya se miró**, y eso es `ninos_visto`, un campo que el motor no lee. Cuatro casillas ahora: Sí / se aburren / cuidado / NO. Además: la **Playa de Troche** a `NO` —y las cerradas dejan de preguntarse, que esa ya estaba fuera del catálogo—, y el **Auditorio** a `Sí` con su porqué —«por dentro se les hace largo, por fuera hay explanada para correr y cafés»— metido como `seg_tipo:'nota'`, que llega al informe por `nota_del_sitio` y no como advertencia |
+| El formulario de los niños, relleno (32 fichas) | 14 sep | Venía contra la versión **vieja**, la de tres casillas, y su cabecera decía que marcaba `cuidado` los museos aburridos «aprovechando que el motor lo lee como no es de niños» — que es justo la confusión que él había corregido. Aplicada su regla encima: de 18 `cuidado`, **14 pasan a `se aburren`** y solo se queda el del **Charco de Isla Cangrejo**, que su propia nota describe como peligro de verdad. Con eso **no queda ninguna ficha sin mirar**: 14 «Sí» (8 divertidas), 14 miradas y neutras, 1 con cuidado. **Cambian 48 de 62 planes** de museos con niños, y las paradas aptas pasan del 54% al 70%. Dos cosas más del fichero: el **Observatorio del Teide** tiene **edad mínima de 8 años** —ni aburrimiento ni peligro, es acceso: va por `ojo_para_llegar`— y el **Ecomuseo de El Tanque** estaba en Santiago del Teide, **y el Cabildo le da la razón** |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si

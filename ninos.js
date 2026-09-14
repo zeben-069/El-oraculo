@@ -88,7 +88,16 @@ function lista(){
      niños, pero tampoco pasa nada»: no vuelve a salir. */
   const dentro=L.filter(l=>PREMIA.test(l.tipo||'')&&!l.cerrado);
   const sin=dentro.filter(l=>!l.ninos&&!l.ninos_visto);
-  if(!sin.length) return console.log('no queda ninguna sin marcar de los tipos que el motor premia.');
+  /* Y si no queda ninguna, se BORRA el formulario viejo. Dejarlo ahí diciendo
+     «faltan 29» cuando ya están todas es una trampa para quien lo abra mañana:
+     marcaría otra vez cosas ya decididas, y el importador las pisaría. */
+  if(!sin.length){
+    const f=path.join(RAIZ,'ninos-sin-marcar.md');
+    const habia=fs.existsSync(f);
+    if(habia) fs.unlinkSync(f);
+    return console.log('no queda ninguna sin marcar de los tipos que el motor premia.'+
+      (habia?'\nBorrado ninos-sin-marcar.md, que ya no describe nada.':''));
+  }
 
   /* Agrupadas por pueblo, que es como se leen: quien vive aquí repasa «los de
      La Laguna» de una vez y no una lista de treinta sueltos por orden de peso.

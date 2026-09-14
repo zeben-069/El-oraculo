@@ -198,6 +198,36 @@ function main(){
   console.log('\nCambiadas '+hechos.length+' fichas en datos/lugares.js'+
     ' (y la comarca en '+hechos.filter(x=>x.coTambien).length+')');
   if(fallan.length) console.log('SIN TOCAR (el nombre no es único): \n  '+fallan.join('\n  '));
+  corredorEnDuda(hechos);
+}
+
+/* Y EL CORREDOR NO SE MUEVE SOLO, A PROPÓSITO — pero hay que mirarlo.
+   `c` dice CÓMO SE LLEGA, no dónde está: a las Cañadas se sube por cuatro
+   lados, así que cambiar de municipio no implica cambiar de corredor y esta
+   herramienta no lo toca. Lo que sí puede pasar es que la ficha llevara el
+   corredor del municipio VIEJO y ahora no le pegue a nada: el Ecomuseo de El
+   Tanque se quedó en «Suroeste» al pasar de Santiago del Teide a El Tanque,
+   teniendo un vecino fichado a 180 metros en «Isla Baja». Así que se canta,
+   con la regla que ya usan los miradores y los caseríos —manda el vecino
+   fichado más cercano— y lo decide quien mire la lista. */
+function corredorEnDuda(hechos){
+  const avisos=[];
+  for(const x of hechos){
+    const l=LUGARES.find(z=>z.n===x.n);
+    if(!l||l.la==null) continue;
+    let mejor=null;
+    for(const z of LUGARES){
+      if(z===l||z.la==null||!z.c) continue;
+      const d=km(l.la,l.lo,z.la,z.lo);
+      if(!mejor||d<mejor.d) mejor={d,z};
+    }
+    if(mejor&&mejor.z.c!==l.c)
+      avisos.push('  '+x.n+': lleva «'+l.c+'» y su vecino más cercano '+
+        '('+mejor.z.n+', a '+mejor.d.toFixed(2)+' km) es «'+mejor.z.c+'»');
+  }
+  if(!avisos.length) return;
+  console.log('\nMIRA EL CORREDOR (no se toca solo, que `c` dice cómo se llega):');
+  avisos.forEach(a=>console.log(a));
 }
 
 main();
