@@ -938,8 +938,16 @@ function actosDelDia(f,munis,corr,conNinos){
      A dos adultos se les ofrece TODO lo demás —la procesión, la misa cantada,
      el torneo de dominó—, que es lo que pidió Zeben: «a lo mejor hay una
      procesión y eso le puede interesar a mucha gente». La etiqueta `q` dejó de
-     ser una caja excluyente y pasa a decir solo una cosa: si es de niños. */
-  const paraQuien=a=>conNinos?a.q==='ninos':a.q!=='ninos';
+     ser una caja excluyente y pasa a decir solo una cosa: si es de niños.
+     **Y un tercer valor, `todos`**, que lo pidió él mirando un plan de familia
+     del 14 de septiembre: ese día La Laguna tiene los Fuegos del Risco a las
+     23:00 y la familia no los veía, porque los fuegos están marcados `noche` y
+     `q` es excluyente. «Si le comentas que hay fiesta, puedes recordarles que
+     hoy a las 23:00 hay fuegos artificiales muy bonitos en La Laguna.» Lo que
+     sale a la calle —fuegos, pirotecnia, romería— lo ve el pueblo entero, así
+     que pasa a los dos públicos. La lista es corta a propósito: ver
+     `ACTO_DE_TODOS` en eventos.js. */
+  const paraQuien=a=>conNinos?(a.q==='ninos'||a.q==='todos'):a.q!=='ninos';
   const mismo=a=>munis.indexOf(a.m)>=0;
   const centro=m=>{for(const k in BASES) if(BASES[k].m===m) return BASES[k]; return BASES[m]||null;};
   const centros=munis.map(centro).filter(b=>b&&b.la!=null);
@@ -955,12 +963,20 @@ function actosDelDia(f,munis,corr,conNinos){
   const madrugada=a=>!!(a.h&&a.h<'06:00');
   const esDeHoy=a=>(a.f===f&&!madrugada(a))||(a.f===sig&&madrugada(a));
   return ACTOS.filter(a=>esDeHoy(a)&&paraQuien(a)&&cerca(a))
-    /* con niños, nada que empiece de madrugada */
-    .filter(a=>!(conNinos&&a.h&&(a.h>='23:00'||a.h<'07:00')))
-    /* Para elegir CUÁLES caben mandan los del propio pueblo; para contarlos,
-       manda la hora. Y la madrugada es el final del día, no el principio: los
-       fuegos de la víspera son a las 00:00 y van los últimos. */
-    .sort((a,b)=>(mismo(b)?1:0)-(mismo(a)?1:0)||hDia(a.h)-hDia(b.h))
+    /* Con niños, nada que empiece de madrugada — **salvo lo que ve el pueblo
+       entero**, que es justo lo que hay a esa hora: unos fuegos a las once son
+       LA cosa del día para una familia, y esconderlos por el reloj era el fallo
+       que él cazó. Que se queden despiertos o no lo deciden ellos; el prompt
+       manda ofrecerlo como remate voluntario, no meterlo en el plan. */
+    .filter(a=>!(conNinos&&a.q!=='todos'&&a.h&&(a.h>='23:00'||a.h<'07:00')))
+    /* Para elegir CUÁLES caben mandan los del propio pueblo y, detrás, los que
+       ve todo el pueblo: los fuegos son los últimos por hora y con cuatro
+       huecos se los llevaba por delante la procesión de la mañana. Para
+       contarlos manda la hora, y por eso se vuelve a ordenar abajo. La
+       madrugada es el final del día, no el principio: los fuegos de la víspera
+       son a las 00:00 y van los últimos. */
+    .sort((a,b)=>(mismo(b)?1:0)-(mismo(a)?1:0)||
+                 (b.q==='todos'?1:0)-(a.q==='todos'?1:0)||hDia(a.h)-hDia(b.h))
     /* A dos adultos les caben seis: ahora compiten todos los actos del pueblo
        y con cuatro huecos la procesión de la mañana tapaba la verbena. */
     .slice(0,conNinos?4:6)
@@ -2453,6 +2469,11 @@ function construir(){
       para: S.ninos?'una familia con niños':'dos adultos',
       /* con niños viene elegido; sin ellos es el programa tal cual */
       elegido_para_ellos: !!S.ninos,
+      /* Con niños la lista viene filtrada, pero ya no solo con lo que el nombre
+         dice que es infantil: también lo que ve el pueblo entero. Si el modelo
+         no sabe eso, cuenta unos fuegos de las once como si fueran cosa de
+         críos, y no lo son: son de todos, y por eso se les ofrecen. */
+      incluye_lo_de_todo_el_pueblo: S.ninos?actosHoy.some(a=>a.q==='todos'):null,
       /* Un día puede llevar actos de dos pueblos —quien duerme en Tegueste ve
          los del Cristo de La Laguna—, así que la cabecera es el pueblo que más
          pone, no el que casualmente empieza más temprano. */
@@ -2467,7 +2488,7 @@ function construir(){
         /* un acto a las 00:00 es esta noche, no mañana por la mañana */
         de_madrugada:(a.f!==f)?true:null})),
       como_contarlo: S.ninos
-        ? 'Esto es el programa de las fiestas del pueblo, no una parada más. Ofréceselo como un extra del día —«y además, hoy en el pueblo hay…»—, con la hora y el sitio si los tiene. Si cae a una hora que no encaja con el resto del plan, dilo y que decidan ellos; no reordenes el día por esto.'
+        ? 'Esto es el programa de las fiestas del pueblo, no una parada más. Ofréceselo como un extra del día —«y además, hoy en el pueblo hay…»—, con la hora y el sitio si los tiene. Si cae a una hora que no encaja con el resto del plan, dilo y que decidan ellos; no reordenes el día por esto. Van los actos que el nombre dice que son para niños Y lo que sale a la calle y lo ve el pueblo entero —fuegos, pirotecnia, una romería—, que a eso va la familia igual. Si alguno es de noche, va AL FINAL de todo, después del café o el helado con que cierras el día, con su hora y su sitio: «y si aguantan despiertos, a las once hay fuegos en el Barranco del Cristo, que se ven desde medio pueblo». Ofrécelo, no lo metas en el plan: quedarse o no lo deciden ellos.'
         : 'Esto es el programa de las fiestas del pueblo tal cual lo publica el ayuntamiento, sin elegir por ellos: puede traer una procesión, una misa cantada o un campeonato de envite junto a la verbena. Cuéntalo como lo que está pasando en el pueblo —«hoy allí hay de todo: a las siete la procesión y a las once verbena»— y no como un plan hecho a su medida. Lo de la noche va DESPUÉS del plan, como el remate opcional del día, con su hora y su sitio. Y no te inventes que algo les va a encantar: enseña lo que hay.'
       };
     })():null,
@@ -4064,7 +4085,39 @@ function huellaDeLoPedido(){
   return [S.fecha,S.base,S.apetece,S.coche?'c':'g',S.ninos?'n':'-',S.comida,
           S.anclaElegida,S.forzarEvento,S.ritmo,S.diaEntero?'d':'-',S.ahora].join('|');
 }
+/* ── Y la memoria tiene que sobrevivir a RECARGAR la página ──
+   Zeben otra vez, con un plan delante: «cuando pongo esos parámetros siempre
+   me sale el mismo plan; no puede ser que con todas las playas que hay y todos
+   los sitios y restaurantes que tenemos siempre salga lo mismo». Y tenía razón
+   aunque lo de arriba funcione: medido, tres llamadas seguidas **dentro de la
+   misma pantalla** dan tres días distintos, pero él rehacía el hilo desde el
+   principio —o recargaba— y ahí `S` nace de cero, la huella se pierde y vuelve
+   el plan de siempre. O sea que lo de arriba no servía para nada en el único
+   sitio donde se usa.
+   Así que la memoria se guarda en el navegador. Lo que eso cambia y lo que no:
+   · **La primera vez sigue saliendo el mejor plan.** Otro turista, otro
+     navegador, su plan bueno. Eso no se toca, que es lo que tiene que pasar.
+   · **Repetir la misma pregunta da otro día, aunque se haya recargado**, que es
+     lo que él pide.
+   · **Se caduca sola**: la huella lleva la fecha dentro, así que el día
+     siguiente ya no vale y no hay nada que limpiar.
+   · Y si el navegador no deja guardar —pestaña privada, permisos— esto se
+     calla y sigue funcionando como antes. Un plan es más importante que la
+     variedad. */
+const VAR_KEY='naira-visto';
+function leeVisto(){
+  if(S._huella!==undefined) return;
+  try{
+    const g=JSON.parse(localStorage.getItem(VAR_KEY)||'null');
+    if(g&&g.h){ S._huella=g.h; S._ultimasParadas=new Set(g.p||[]); S.saltoComida=g.c||0; }
+  }catch(e){}
+}
+function guardaVisto(){
+  try{ localStorage.setItem(VAR_KEY,JSON.stringify(
+    {h:S._huella,p:[...(S._ultimasParadas||[])],c:S.saltoComida||0})); }catch(e){}
+}
 function construirConVariedad(){
+  leeVisto();
   const huella=huellaDeLoPedido();
   const repite = huella===S._huella && S._ultimasParadas && S._ultimasParadas.size;
   const comidaAntes=S.saltoComida;
@@ -4094,6 +4147,7 @@ function construirConVariedad(){
   const ahora=new Set((r.brief.paradas||[]).map(p=>p.nombre));
   if(repite && vuelta && S._ultimasParadas) S._ultimasParadas.forEach(x=>ahora.add(x));
   S._ultimasParadas=ahora;
+  guardaVisto();
   return r;
 }
 

@@ -202,6 +202,23 @@ function sacaLugar(n){
    manda ahí es el infantil. */
 const ACTO_NINOS=/infantil|para (los |l@s )?ni[ñn]os|familiar|para toda la familia|fiesta de la familia|fiesta del agua|castillos? acu[áa]tic|actividades? infantil|pinta ?caras|hinchable|colchoneta|castillo de agua|fiesta de la espuma|globoflexia|payaso|t[íi]teres|marionet|cuentacuentos|taller(es)? infantil|juegos (infantiles|tradicionales|populares)|cine (al aire libre|de verano|en la calle)|circo|cabalgata|mascota|parque acu[áa]tico|espuma|gui[ñn]ol/i;
 const ACTO_NOCHE=/verbena|megaverbena|orquesta|gran baile|baile (del|de|tardeo)|tardeo|\bdj\b|concierto|drag|noche de humor|humorista|rock|festival|fuegos artificiales|fuegos del|fuegos de la|pirotecni|gala|noche de|cata de vinos|romer[íi]a|bailable|parranda/i;
+/* ── Y lo que sale a la calle lo ve el pueblo entero, niños incluidos ──
+   Zeben, mirando un plan suyo de familia el 14 de septiembre: «hoy tienes los
+   horarios de los fuegos; si le comentas que hay fiesta, puedes ofrecer
+   después del cafelito de por la tarde recordarles que hoy a las 23:00 hay
+   fuegos artificiales muy bonitos en La Laguna». Y tenía razón: ese día La
+   Laguna tiene los Fuegos del Risco a las 23:00 y **una familia no los veía**,
+   porque `q` es excluyente y los fuegos están marcados `noche`.
+   La regla de la casa para los niños es «lee el enunciado». Pues el enunciado
+   de unos fuegos dice exactamente lo que son, y en esta isla a los fuegos va
+   todo el mundo con los críos en hombros. Lo mismo una romería: carretas,
+   trajes y gente por la calle a mediodía — estaba marcada `noche` y por eso
+   tampoco la veía una familia.
+   Así que `q` gana un tercer valor, **`todos`**: pasa a los dos públicos. Es
+   deliberadamente CORTO —fuegos, pirotecnia y romería— porque cada palabra que
+   se meta aquí se le está ofreciendo a un niño: una misa cantada o un torneo
+   de envite siguen siendo solo de los adultos. Son 26 actos de 689. */
+const ACTO_DE_TODOS=/fuegos artificiales|fuegos del|fuegos de la|fuegos de |pirot[eé]cni|pirotecnia|romer[íi]a/i;
 /* ── Y hay palabras que no dicen para quién es: lo dice la HORA ──
    Las reglas de arriba se escribieron con 300 actos y ahora hay 648, y el
    vocabulario nuevo trae cosas que valen para los dos: un pasacalle, una
@@ -246,6 +263,9 @@ function clasificaActo(n,h){
      explícitas saben lo que dicen; el guardián solo está para que la hora no
      se invente lo que no sabe. */
   if(ACTO_NINOS.test(t)) return 'ninos';
+  /* delante de `noche` a propósito: los fuegos casan con las dos y lo que hay
+     que decir de ellos es que los ve todo el pueblo, no que son de noche */
+  if(ACTO_DE_TODOS.test(t)) return 'todos';
   if(ACTO_NOCHE.test(t)) return 'noche';
   if(ACTO_SEGUN_HORA.test(t) && !NO_ES_PARA_NADIE.test(t) && h && (h>=CORTE_NOCHE||h<'06:00'))
     return 'noche';

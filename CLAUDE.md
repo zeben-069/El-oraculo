@@ -153,7 +153,7 @@ Dentro de `index.html`, como constantes:
   Quedan 13 sin colocar, en 6 municipios.
 - `ACTOS` (689) — los actos de 37 programas de fiestas de 16 municipios:
   día, municipio,
-  hora, dónde es y `q` («ninos»/«noche»), que dice a quién le sirve. No son
+  hora, dónde es y `q` («ninos»/«todos»/«noche»), que dice a quién le sirve. No son
   fiestas: cuelgan de una que ya está en `EVENTOS` y no anclan el día.
 - `BASES` (31) — los municipios, con su centro y corredor.
 - `ESTAMPA` (31) — por municipio, la ruta de su foto (`f`) y su lema.
@@ -2158,6 +2158,107 @@ Dos decisiones de pantalla:
 · **El botón solo sale si ese pueblo tiene programa ese día**, con el número
   dentro, que es la regla de siempre.
 
+## Los fuegos de las once, y el plan que siempre era el mismo
+
+Zeben mandó un plan suyo entero —14 de septiembre, Santa Cruz, coche, dos
+adultos y dos niños, playa, comida típica— con dos cosas y una pregunta.
+
+**«Cuando pongo esos parámetros siempre me sale el mismo plan. No puede ser que
+con todas las playas que hay y todos los sitios y restaurantes que tenemos
+siempre salga lo mismo.»** Y tenía razón, **aunque el arreglo del día 13 fuera
+correcto**. Medido: tres llamadas seguidas a `construirConVariedad()` **dentro de
+la misma pantalla** dan tres días distintos; pero él rehacía el hilo desde el
+principio o recargaba, y ahí `S` nace de cero, la huella se pierde y vuelve el
+plan de siempre. O sea que la memoria funcionaba en todos lados menos en el
+único sitio donde se usa. **Un arreglo que solo vive en memoria de página no
+existe para quien recarga.**
+Ahora la memoria se guarda en el navegador (`localStorage`, clave
+`naira-visto`). Lo que eso cambia y lo que no:
+· **La primera vez sigue saliendo el mejor plan.** Otro turista, otro navegador,
+  su plan bueno. Eso es lo que tiene que pasar y no se toca.
+· **Repetir la misma pregunta da otro día, aunque se haya recargado.**
+· **Se caduca sola**: la huella lleva la fecha dentro, así que al día siguiente
+  ya no vale y no hay nada que limpiar.
+· Y si el navegador no deja guardar —pestaña privada, permisos—, se calla y
+  sigue como antes. Un plan importa más que la variedad.
+Desde Santa Cruz con niños el 14, recargando entre medias: Museo de la Ciencia ·
+Mercado de La Laguna → Museo Histórico Militar · Casco de Santa Cruz → Museo de
+Arte Sacro · Ex-convento de San Agustín → Fundación Cristino de Vera · Casco de
+La Laguna.
+**Y esto destapó que la prueba no podía verlo.** `banco.js` montaba un
+`localStorage` de mentira con `setItem:noop`: se escribía en el vacío y al
+releer salía `null`. O sea que desde aquí la memoria nueva habría dado por
+buena una cosa que en el navegador hace otra. Ahora el tapón es un almacén de
+memoria de verdad, que muere con el proceso — cada ejecución sigue siendo un
+navegador recién estrenado. **La rota era la prueba**, otra vez.
+
+**«Tienes los horarios de los fuegos: si le comentas que hay fiesta, puedes
+ofrecer, después del cafelito de por la tarde, recordarles que hoy a las 23:00
+hay fuegos artificiales muy bonitos en La Laguna. Piensa como lo haría un guía
+de verdad.»** Esto es lo gordo, y el fallo estaba justo donde él lo señalaba.
+Ese día La Laguna tiene los **Fuegos del Risco a las 23:00** — y su plan decía
+«no es que haya un acto a una hora concreta, es que el pueblo entero está de
+fiesta». Por qué: los fuegos están clasificados `noche`, `q` es **excluyente**
+(`conNinos ? q==='ninos' : q!=='ninos'`) y encima hay un corte por reloj que con
+niños tira todo lo posterior a las 23:00. Dos puertas cerradas para la misma
+cosa. El botón «ver el programa del día» del día 13 dejaba **mirarlo**; lo que
+faltaba era que el plan lo **contara**.
+La regla de la casa para los niños es «lee el enunciado» —la puso él—. Pues el
+enunciado de unos fuegos dice exactamente lo que son, y a los fuegos va todo el
+mundo con los críos en hombros. Así que `q` gana el **tercer valor** que este
+fichero llevaba apuntado como pendiente: **`todos`**, y pasa a los dos públicos.
+· **`ACTO_DE_TODOS` es corto a propósito**: fuegos, pirotecnia y romería. Cada
+  palabra que entre aquí se le está ofreciendo a un niño, así que una misa
+  cantada o un torneo de envite siguen siendo solo de los adultos. Son **28 de
+  689**. Y una romería estaba marcada `noche` teniendo carretas, trajes y gente
+  por la calle a mediodía: para una familia eso es el plan del día.
+· **Va DELANTE de `noche` en `clasificaActo()`**: los fuegos casan con las dos y
+  lo que hay que decir de ellos es que los ve el pueblo entero.
+· **El corte por reloj no le aplica**: unos fuegos a las once son LA cosa del
+  día para una familia, y esconderlos por la hora era el fallo. Quedarse o no lo
+  deciden ellos; el prompt manda ofrecerlo como remate voluntario, no meterlo en
+  el plan.
+· **Y no se los puede comer el tope de cuatro.** La lista se recorta por (pueblo
+  propio, hora) y los fuegos son los últimos por hora: con cuatro huecos se los
+  llevaba por delante la procesión de la mañana. Ahora `todos` sube en el orden
+  de **selección** y luego se vuelve a ordenar por hora para **contarlos**, que
+  es la regla de siempre.
+Medido: de 1.002 actos ofrecidos se pasa a **1.069**, con **77 de todo el pueblo
+que una familia antes no veía** y **0 ofrecidos a quien no toca**, que es el cero
+que vigila toda la regla.
+Y la otra mitad es el tono, que es lo que él pedía: el `como_contarlo` de los
+niños y el prompt dicen ahora que lo de la noche va **al final de todo, después
+del café o el helado con que se cierra el día**, con su hora y su sitio, y
+ofreciéndolo: «y si aguantan despiertos, a las once hay fuegos en el Barranco
+del Cristo, que se ven desde medio pueblo». El informe lleva
+`incluye_lo_de_todo_el_pueblo` para que el modelo no cuente unos fuegos como si
+fueran cosa de críos: no lo son, son de todos, y por eso se les ofrecen. El
+relato local ya lo hacía bien por orden —el bloque de los actos va después del
+remate—, así que ahí no hubo que tocar nada.
+
+**Y la pregunta: «tengo una API key de Google, ¿te valdría para algo?»** La
+respuesta honrada es **para poco, y lo poco que valdría tiene letra pequeña**.
+Está apuntado para no volver a pensarlo:
+· **Mapas y mosaicos — no.** Leaflet con OpenStreetMap no pide clave, no cuesta
+  y ya está funcionando. Cambiar a Google sería meter una clave facturable en
+  una página pública para ver lo mismo.
+· **Gemini como narrador — no.** La voz de Naira está escrita contra el prompt
+  de Claude y la clave ya está puesta.
+· **Geocodificar sitios — no hace falta.** Es justo lo que resuelven
+  `buscar-nucleos.html` y `buscar-miradores.html` con Overpass, gratis y con
+  licencia clara (ODbL, citando el nodo). Y el problema nunca fue encontrar un
+  punto: fue **decidir cuál es el bueno**, que lo dice quien vive allí.
+· **Lo único que de verdad taparía un agujero es Places: el horario de las 119
+  fichas que hoy dicen «Horario sin confirmar: llamen antes».** Ahí hay valor
+  real. Pero: los términos de Google **no dejan guardar** ese contenido más allá
+  de la caché corta (solo el `place_id` se puede conservar) ni enseñarlo fuera de
+  un mapa suyo, así que no se puede volcar a `datos/restaurantes.js`, que es
+  como funciona todo aquí; habría que preguntarlo en vivo desde la función de
+  Netlify, con su coste por llamada y su clave que se gasta. Para 119 fichas que
+  ya dicen honradamente «llamen antes», no compensa.
+**Si algún día se hace, se hace por ahí** —Places para el horario, desde la
+función, sin guardar— y nunca poniendo la clave en `index.html`, que es público.
+
 ## El municipio de una ficha, y quién lo dice
 
 Zeben leyó el aviso del cartel de Vilaflor y cortó por lo sano: **«Teleférico
@@ -2386,9 +2487,11 @@ de una parada, y el plan sin coche se separa más del plan con coche.
 Y cierra con los **actos**: por cada día y municipio con programa cargado,
 un plan con niños y otro sin ellos —454 planes—. Lo que se vigila ahí no es la
 dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: de los
-**689 actos cargados** (76 marcados de niños, 200 de noche, 413 sin marcar),
-**1.002 ofrecidos** y **0 ofrecidos a quien no toca**. Ese cero es la prueba de
-toda la regla; los 621 «sin clasificar y ofrecido» ya NO son un fallo, que
+**689 actos cargados** (76 marcados de niños, **28 de todo el pueblo**, 176 de
+noche, 409 sin marcar), **1.069 ofrecidos**, **0 ofrecidos a quien no toca** y
+**77 de todo el pueblo ofrecidos a una familia** —los fuegos y las romerías, que
+antes no veía—. Ese cero es la prueba de toda la regla; los 600 «sin clasificar
+y ofrecido» ya NO son un fallo, que
 desde que `q` dice solo si es de niños, lo que no está marcado va a los
 adultos y eso es lo normal.
 
@@ -2661,6 +2764,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | Tres capturas de un plan suyo: «acabas echando un dulce en La Caseta, que está otra vez en la Punta» | 13 sep | Dos cosas. El remate medía «de vuelta a casa» **en línea recta** y no por desvío, que es la regla que esta casa ya aplica a los restaurantes y al regalo de ida: de 7,2 km de rodeo máximo a 1,8. Y su idea del «radar de kilómetros» llevó a medir que **el radio no es lo que aprieta** —18 km permitidos y el 98% de los días no pasa de 8—, así que el botón de «llévame más lejos» no toca el radio: **mueve el centro del día** a otra zona y deja que las mismas reglas lo aprieten allí |
 | Cinco capturas del hilo entero desde el móvil | 13 sep | Tres cosas, tres causas. «Tres veces la misma combinación y tres veces el mismo plan»: la semilla sale solo de la fecha, así que repetir da lo mismo — ahora una huella de lo pedido veta lo ya visto al repetir, con red de seguridad si el pueblo se queda sin fichas. «Pongo en guagua y no se habla de guaguas»: el plan decía la parada pero no la línea, y el dato estaba en el GTFS desde el día 12 — **1.024 fichas con sus líneas**, cruzadas por NOMBRE de parada y no por la más cercana. Y la fiesta del plan se pulsa y despliega el programa del día, que además destapó que **una familia no veía ninguno de los 9 actos del Cristo** |
 | El artefacto de las fiestas, actualizado + «¿se puede actualizar solo?» | 14 sep | La versión nueva son **660 actos de 26 programas** (eran 538 de 22): entran **121**, con cuatro programas que no teníamos —Tacoronte, Benijos, El Lomo de Tegueste y Guía de Isora— y por primera vez octubre. De paso `parecidos` destapó que los «3 actos nuevos» del día 13 eran **3 gemelos reescritos por el artefacto**: fuera, y `ACTOS` queda en **689**. El importador avisa ahora de los que caen encima de uno nuestro, y se arregló un campo mudo —el corredor se llama `corr` y ponía `c`, así que 122 actos estaban con `c:null`—. Lo de actualizarse solo: **no, y no debería** —ni el contenedor ni el navegador pueden pedir el artefacto, y una pasada sin mirar habría dejado los tres gemelos dentro—, pero volver a pasarlo es un comando y `avisar-fiestas.js` ya avisa los lunes de cuándo toca |
+| Un plan suyo entero + «piensa como un guía de verdad» + «¿me vale una API key de Google?» | 14 sep | Tres cosas. **«Siempre me sale el mismo plan»**: el arreglo del día 13 funcionaba dentro de la pantalla y se perdía al recargar, que es lo que él hace — la memoria de lo ya visto pasa al navegador, y de paso se vio que `banco.js` tenía un `localStorage` de mentira que se tragaba lo que se escribía. **Los fuegos de las 23:00**: ese día La Laguna los tiene y una familia no los veía, porque `q` es excluyente y además hay un corte por reloj. `q` gana el tercer valor que estaba pendiente, **`todos`** —fuegos, pirotecnia y romería, 28 de 689—, que pasa a los dos públicos y no lo corta el reloj: **77 actos que una familia antes no veía**, y el prompt los coloca al final, después del cafelito, con su hora. Y la clave de Google: **para poco** —mapas y geocodificación ya están resueltos gratis; lo único que valdría es el horario de las 119 fichas sin confirmar, y los términos de Google no dejan guardarlo— |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
