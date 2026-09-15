@@ -324,7 +324,7 @@ const T={
      frDeManana:'Por la mañana',frDeMediodia:'A mediodía',frDeTarde:'Por la tarde',frDeAtardecer:'Al caer el día',frDeNoche:'De noche',
      holaSolo:'¡Buenas! ',
      elijoYo:'Prefiero elegir el sitio yo',
-     agenda:'¿Qué evento hay hoy?',hoyEs:'hoy',mananaEs:'mañana',deMadrugada:'de madrugada',enMuniBien:(m)=>'En '+m+', muy bien.',abrirMapa:'Abrir en Google Maps',errServidor:(n)=>'el servidor respondió '+n,errSinClave:'no hay clave de API configurada',errCortado:'la respuesta se cortó a mitad',errVacio:'no llegó texto',frecMucha:'muy a menudo, no hace falta mirar el horario',frecMedia:'cada media hora aproximadamente',frecHora:'cada hora aproximadamente',frecPocas:(n)=>'unas '+n+' al día: conviene mirar el horario antes de salir',frecMuyPocas:(n)=>'solo '+n+' al día, así que hay que planificarla',rgTitulo:(m)=>'La última guagua a '+m,rgQuedan:(h,t)=>'Sale a las '+h+'. Le quedan '+t+'.',rgLinea:(l)=>'Línea '+l+'.',rgConCambios:(l,n)=>'Línea '+l+', con '+n+(n>1?' cambios':' cambio')+'.',rgYaSalio:(h)=>'Ya salió, a las '+h+'.',rgBuho:(h)=>'Queda el búho de las '+h+', que es el servicio de noche.',rgTaxi:'De aquí en adelante, taxi.',rgVayanSaliendo:'Vayan saliendo.',rgHM:(h,m)=>h+' h '+m+' min',rgM:(m)=>m+' min',avEstanFuera:(a,b,h,l)=>'Están en '+a+' y duermen en '+b+'. La última guagua de vuelta sale a las '+h+', '+l+'. Cuenten con eso antes de alargar la tarde.',porLinea:(n)=>'línea '+n,cambiandoEn:(v)=>'cambiando en '+v,avAburre:(n)=>'Ojo, que en '+n+' a los peques se les puede hacer un poco largo — pero si a ustedes les apetece, vayan.',avPrecaucion:(n,t)=>'Con los peques, en '+n+': '+t,avVueltaPronto:(d,b,h)=>'Ojo con la vuelta: la última guagua de '+d+' hacia '+b+' sale a las '+h+', o sea antes del atardecer. Si se quieren quedar, cuenten con taxi.',
+     agenda:'¿Qué evento hay hoy?',hoyEs:'hoy',mananaEs:'mañana',deMadrugada:'de madrugada',enMuniBien:(m)=>'En '+m+', muy bien.',abrirMapa:'Abrir en Google Maps',errServidor:(n)=>'el servidor respondió '+n,errSinClave:'no hay clave de API configurada',errCortado:'la respuesta se cortó a mitad',errVacio:'no llegó texto',frecMucha:'muy a menudo, no hace falta mirar el horario',frecMedia:'cada media hora aproximadamente',frecHora:'cada hora aproximadamente',frecPocas:(n)=>'unas '+n+' al día: conviene mirar el horario antes de salir',frecMuyPocas:(n)=>'solo '+n+' al día, así que hay que planificarla',rgTitulo:(m)=>'La última guagua a '+m,rgQuedan:(h,t)=>'Sale a las '+h+'. Le quedan '+t+'.',rgLinea:(l)=>'Línea '+l+'.',rgConCambios:(l,n)=>'Línea '+l+', con '+n+(n>1?' cambios':' cambio')+'.',rgYaSalio:(h)=>'Ya salió, a las '+h+'.',rgBuho:(h)=>'Queda el búho de las '+h+', que es el servicio de noche.',rgTaxi:'De aquí en adelante, taxi.',rgVayanSaliendo:'Vayan saliendo.',rgHM:(h,m)=>h+' h '+m+' min',rgM:(m)=>m+' min',avEstanFuera:(a,b,h,l)=>'Están en '+a+' y duermen en '+b+'. La última guagua de vuelta sale a las '+h+', '+l+'. Cuenten con eso antes de alargar la tarde.',porLinea:(n)=>'línea '+n,cambiandoEn:(v)=>'cambiando en '+v,buscaMuni:'…o escriba aquí su pueblo',buscaMuniNada:'Por ese nombre no encuentro ningún municipio.',avAburre:(n)=>'Ojo, que en '+n+' a los peques se les puede hacer un poco largo — pero si a ustedes les apetece, vayan.',avPrecaucion:(n,t)=>'Con los peques, en '+n+': '+t,avVueltaPronto:(d,b,h)=>'Ojo con la vuelta: la última guagua de '+d+' hacia '+b+' sale a las '+h+', o sea antes del atardecer. Si se quieren quedar, cuenten con taxi.',
      fueraMapa:(k)=>'· fuera del mapa, a '+k+' km',
      qAgenda:(d,n)=>'Hay '+n+' '+(n===1?'cosa apuntada':'cosas apuntadas')+' en los próximos '+d+' días. ¿Le armo el día alrededor de alguna?',
      mapaNo:'El mapa no ha cargado',
@@ -386,7 +386,7 @@ const T={
      frDeManana:'In the morning',frDeMediodia:'At midday',frDeTarde:'In the afternoon',frDeAtardecer:'As the day ends',frDeNoche:'At night',
      holaSolo:'Hello! ',
      elijoYo:'I would rather pick the place myself',
-     agenda:'What is on today?',hoyEs:'today',mananaEs:'tomorrow',deMadrugada:'after midnight',enMuniBien:(m)=>m+', very good.',abrirMapa:'Open in Google Maps',errServidor:(n)=>'the server answered '+n,errSinClave:'no API key configured',errCortado:'the answer was cut off',errVacio:'no text arrived',frecMucha:'very often, no need to check the timetable',frecMedia:'roughly every half hour',frecHora:'roughly every hour',frecPocas:(n)=>'about '+n+' a day: worth checking the timetable before you go',frecMuyPocas:(n)=>'only '+n+' a day, so it needs planning',rgTitulo:(m)=>'Last bus back to '+m,rgQuedan:(h,t)=>'It leaves at '+h+'. You have '+t+' left.',rgLinea:(l)=>'Line '+l+'.',rgConCambios:(l,n)=>'Line '+l+', with '+n+(n>1?' changes':' change')+'.',rgYaSalio:(h)=>'It already left, at '+h+'.',rgBuho:(h)=>'There is still the '+h+' bus, but that is the night service.',rgTaxi:'After that it is a taxi.',rgVayanSaliendo:'Time to head off.',rgHM:(h,m)=>h+' h '+m+' min',rgM:(m)=>m+' min',avEstanFuera:(a,b,h,l)=>'You are in '+a+' and sleeping in '+b+'. The last bus back leaves at '+h+', '+l+'. Bear that in mind before stretching the evening.',porLinea:(n)=>'line '+n,cambiandoEn:(v)=>'changing at '+v,avAburre:(n)=>'Fair warning: '+n+' can drag a little for the little ones — but if you fancy it, go.',avPrecaucion:(n,t)=>'With the little ones at '+n+': '+t,avVueltaPronto:(d,b,h)=>'Careful with the way back: the last bus from '+d+' to '+b+' leaves at '+h+', before sunset. If you want to stay on, count on a taxi.',
+     agenda:'What is on today?',hoyEs:'today',mananaEs:'tomorrow',deMadrugada:'after midnight',enMuniBien:(m)=>m+', very good.',abrirMapa:'Open in Google Maps',errServidor:(n)=>'the server answered '+n,errSinClave:'no API key configured',errCortado:'the answer was cut off',errVacio:'no text arrived',frecMucha:'very often, no need to check the timetable',frecMedia:'roughly every half hour',frecHora:'roughly every hour',frecPocas:(n)=>'about '+n+' a day: worth checking the timetable before you go',frecMuyPocas:(n)=>'only '+n+' a day, so it needs planning',rgTitulo:(m)=>'Last bus back to '+m,rgQuedan:(h,t)=>'It leaves at '+h+'. You have '+t+' left.',rgLinea:(l)=>'Line '+l+'.',rgConCambios:(l,n)=>'Line '+l+', with '+n+(n>1?' changes':' change')+'.',rgYaSalio:(h)=>'It already left, at '+h+'.',rgBuho:(h)=>'There is still the '+h+' bus, but that is the night service.',rgTaxi:'After that it is a taxi.',rgVayanSaliendo:'Time to head off.',rgHM:(h,m)=>h+' h '+m+' min',rgM:(m)=>m+' min',avEstanFuera:(a,b,h,l)=>'You are in '+a+' and sleeping in '+b+'. The last bus back leaves at '+h+', '+l+'. Bear that in mind before stretching the evening.',porLinea:(n)=>'line '+n,cambiandoEn:(v)=>'changing at '+v,buscaMuni:'…or type your town here',buscaMuniNada:'No municipality matches that name.',avAburre:(n)=>'Fair warning: '+n+' can drag a little for the little ones — but if you fancy it, go.',avPrecaucion:(n,t)=>'With the little ones at '+n+': '+t,avVueltaPronto:(d,b,h)=>'Careful with the way back: the last bus from '+d+' to '+b+' leaves at '+h+', before sunset. If you want to stay on, count on a taxi.',
      fueraMapa:(k)=>'· off the map, '+k+' km away',
      qAgenda:(d,n)=>'I have '+n+' '+(n===1?'thing':'things')+' on in the next '+d+' days. Shall I build the day around one of them?',
      mapaNo:'The map did not load',
@@ -448,7 +448,7 @@ const T={
      frDeManana:'Am Vormittag',frDeMediodia:'Mittags',frDeTarde:'Am Nachmittag',frDeAtardecer:'Zum Tagesausklang',frDeNoche:'Abends',
      holaSolo:'Hallo! ',
      elijoYo:'Ich wähle den Ort lieber selbst',
-     agenda:'Was ist heute los?',hoyEs:'heute',mananaEs:'morgen',deMadrugada:'nach Mitternacht',enMuniBien:(m)=>m+', sehr gut.',abrirMapa:'In Google Maps öffnen',errServidor:(n)=>'der Server antwortete '+n,errSinClave:'kein API-Schlüssel konfiguriert',errCortado:'die Antwort brach ab',errVacio:'es kam kein Text an',frecMucha:'sehr oft, Sie müssen nicht in den Fahrplan schauen',frecMedia:'etwa alle halbe Stunde',frecHora:'etwa stündlich',frecPocas:(n)=>'etwa '+n+' am Tag: schauen Sie vorher in den Fahrplan',frecMuyPocas:(n)=>'nur '+n+' am Tag, das muss man planen',rgTitulo:(m)=>'Der letzte Bus zurück nach '+m,rgQuedan:(h,t)=>'Er fährt um '+h+'. Sie haben noch '+t,rgLinea:(l)=>'Linie '+l+'.',rgConCambios:(l,n)=>'Linie '+l+', mit '+n+(n>1?' Umstiegen':' Umstieg')+'.',rgYaSalio:(h)=>'Er ist schon um '+h+' gefahren.',rgBuho:(h)=>'Es bleibt der Bus um '+h+', aber das ist der Nachtdienst.',rgTaxi:'Danach hilft nur noch ein Taxi.',rgVayanSaliendo:'Machen Sie sich auf den Weg.',rgHM:(h,m)=>h+' Std. '+m+' Min.',rgM:(m)=>m+' Min.',avEstanFuera:(a,b,h,l)=>'Sie sind in '+a+' und übernachten in '+b+'. Der letzte Bus zurück fährt um '+h+', '+l+'. Denken Sie daran, bevor der Abend länger wird.',porLinea:(n)=>'Linie '+n,cambiandoEn:(v)=>'Umstieg in '+v,avAburre:(n)=>'Kleiner Hinweis: In '+n+' kann es den Kleinen etwas lang werden — wenn Sie aber Lust darauf haben, gehen Sie ruhig.',avPrecaucion:(n,t)=>'Mit den Kleinen an '+n+': '+t,avVueltaPronto:(d,b,h)=>'Achtung beim Rückweg: der letzte Bus von '+d+' nach '+b+' fährt um '+h+', also vor Sonnenuntergang. Wenn Sie länger bleiben wollen, rechnen Sie mit einem Taxi.',
+     agenda:'Was ist heute los?',hoyEs:'heute',mananaEs:'morgen',deMadrugada:'nach Mitternacht',enMuniBien:(m)=>m+', sehr gut.',abrirMapa:'In Google Maps öffnen',errServidor:(n)=>'der Server antwortete '+n,errSinClave:'kein API-Schlüssel konfiguriert',errCortado:'die Antwort brach ab',errVacio:'es kam kein Text an',frecMucha:'sehr oft, Sie müssen nicht in den Fahrplan schauen',frecMedia:'etwa alle halbe Stunde',frecHora:'etwa stündlich',frecPocas:(n)=>'etwa '+n+' am Tag: schauen Sie vorher in den Fahrplan',frecMuyPocas:(n)=>'nur '+n+' am Tag, das muss man planen',rgTitulo:(m)=>'Der letzte Bus zurück nach '+m,rgQuedan:(h,t)=>'Er fährt um '+h+'. Sie haben noch '+t,rgLinea:(l)=>'Linie '+l+'.',rgConCambios:(l,n)=>'Linie '+l+', mit '+n+(n>1?' Umstiegen':' Umstieg')+'.',rgYaSalio:(h)=>'Er ist schon um '+h+' gefahren.',rgBuho:(h)=>'Es bleibt der Bus um '+h+', aber das ist der Nachtdienst.',rgTaxi:'Danach hilft nur noch ein Taxi.',rgVayanSaliendo:'Machen Sie sich auf den Weg.',rgHM:(h,m)=>h+' Std. '+m+' Min.',rgM:(m)=>m+' Min.',avEstanFuera:(a,b,h,l)=>'Sie sind in '+a+' und übernachten in '+b+'. Der letzte Bus zurück fährt um '+h+', '+l+'. Denken Sie daran, bevor der Abend länger wird.',porLinea:(n)=>'Linie '+n,cambiandoEn:(v)=>'Umstieg in '+v,buscaMuni:'…oder tippen Sie Ihren Ort hier ein',buscaMuniNada:'Zu diesem Namen finde ich keine Gemeinde.',avAburre:(n)=>'Kleiner Hinweis: In '+n+' kann es den Kleinen etwas lang werden — wenn Sie aber Lust darauf haben, gehen Sie ruhig.',avPrecaucion:(n,t)=>'Mit den Kleinen an '+n+': '+t,avVueltaPronto:(d,b,h)=>'Achtung beim Rückweg: der letzte Bus von '+d+' nach '+b+' fährt um '+h+', also vor Sonnenuntergang. Wenn Sie länger bleiben wollen, rechnen Sie mit einem Taxi.',
      fueraMapa:(k)=>'· außerhalb der Karte, '+k+' km entfernt',
      qAgenda:(d,n)=>'Ich habe '+n+' '+(n===1?'Sache':'Sachen')+' in den nächsten '+d+' Tagen. Soll ich den Tag darum herum bauen?',
      mapaNo:'Die Karte wurde nicht geladen',
@@ -5434,6 +5434,10 @@ async function elegirSitio(comoBase){
     comoBase?'Las seis comarcas de la isla, y el botón de la ubicación para quien ya anda por ahí. Los dos carteles —Anaga y la cumbre— no salen aquí: no son municipios y en ellos no se duerme.'
       :'Seis comarcas y dos carteles aparte. Anaga y la cumbre no son municipios —son un macizo y la parte de arriba de cuatro pueblos—, así que no van pintados: van debajo.');
   acc.appendChild(caja);
+  /* La barra de buscar el pueblo, para quien sabe dónde duerme y no en qué
+     comarca cae. Va en los dos caminos —elegir cama y elegir a dónde ir—,
+     que la duda es la misma. */
+  acc.appendChild(barraMunicipios(comoBase));
   /* Y el atajo de la ubicación, SOLO en el paso 2: es donde se decide de
      dónde sale el día, y a quien ya está en la isla le ahorra buscarse en el
      mapa. Va debajo del mapa y no en su lugar, que el turista que aún no ha
@@ -5514,13 +5518,104 @@ async function elegirMunicipio(k,comoBase){
   await naira(tr('qZonaDetalle')(comarcaTr(v)),360);
   paso('ok','entrada · nivel 2, el pueblo','Los <span class="am">'+lista.length+
     '</span> municipios de '+v.rot+', cada uno con su estampa.');
-  cuadriculaMunicipios(lista,kb=>{
-    if(comoBase){ S.base=kb; pCoche(); return; }
-    const m=BASES[kb].m;
-    const av=AVISO_CARTEL[m];
-    if(av) avisarDelCartel(m,av,()=>queApeteceEn(m));
-    else queApeteceEn(m);
-  },()=>elegirSitio(comoBase));
+  cuadriculaMunicipios(lista,kb=>elegidoMunicipio(kb,comoBase),()=>elegirSitio(comoBase));
+}
+
+/* Qué pasa cuando ya se ha elegido pueblo. Vive aparte porque ahora se llega
+   por DOS caminos —la cuadrícula de estampas y la barra de buscar— y si cada
+   uno lo hiciera a su manera, el aviso del cartel saltaría por uno y no por el
+   otro. Es el mismo cuidado que obligó a escribir `hayCosasEseDia()`. */
+function elegidoMunicipio(kb,comoBase){
+  if(comoBase){ S.base=kb; pCoche(); return; }
+  const m=BASES[kb].m;
+  const av=AVISO_CARTEL[m];
+  if(av) avisarDelCartel(m,av,()=>queApeteceEn(m));
+  else queApeteceEn(m);
+}
+
+/* ── LA BARRA DE BUSCAR EL PUEBLO ──
+   Idea de Zeben: «una barra de autocompletar para los municipios, que la gente
+   que no sepa en qué comarca está rellene la barra».
+   El mapa es bueno para quien mira la isla desde fuera, pero le pide al turista
+   algo que puede no saber: en qué comarca cae su hotel. Quien ya sabe el nombre
+   del pueblo no tiene por qué aprenderse la comarca para poder escribirlo.
+   Cuatro decisiones:
+   · **Va DEBAJO del mapa, no en su lugar**, por lo mismo que el botón de la
+     ubicación: quien no sabe el pueblo sigue teniendo el mapa entero.
+   · **Se compara sin acentos ni artículos**, que es la regla que ya usan el
+     padrón y el registro del Cabildo: «guimar» encuentra Güímar, «laguna»
+     encuentra San Cristóbal de La Laguna y «vilaflor» encuentra Vilaflor de
+     Chasna. Sin eso, la barra solo le sirve a quien ya escribe el nombre
+     oficial, o sea a quien no la necesita.
+   · **Cada resultado dice SU COMARCA**, que es justo lo que la persona no
+     sabía: además de llevarla a su pueblo, se lo enseña.
+   · **No inventa un pueblo que no existe.** Si no casa nada, lo dice y el mapa
+     sigue ahí. */
+/* `sinTildes` ya existe arriba y solo quita acentos; aquí hace falta además
+   soltar los artículos y los genéricos, que es la misma cuenta con la que el
+   padrón y el registro del Cabildo cruzan municipios. Sin eso, «laguna» no
+   encuentra San Cristóbal de La Laguna y la barra solo le sirve a quien ya
+   escribe el nombre oficial — o sea, a quien no la necesita. */
+const llaveMuni=x=>sinTildes(x).replace(/\b(el|la|los|las|de|del|san|santa|villa)\b/g,' ')
+  .replace(/\s+/g,' ').trim();
+function barraMunicipios(comoBase){
+  const caja=document.createElement('div');
+  caja.className='buscaMuni';
+  caja.innerHTML='<input type="search" class="bmInput" autocomplete="off" '+
+    'placeholder="'+escapar(tr('buscaMuni'))+'" aria-label="'+escapar(tr('buscaMuni'))+'">'+
+    '<div class="bmLista"></div>';
+  const inp=caja.querySelector('input'), lis=caja.querySelector('.bmLista');
+  /* De qué comarca es cada pueblo, para poder decírselo. Sale de COMARCAS, no
+     de una tabla escrita a mano: si mañana se mueve un municipio, se mueve. */
+  const deQuien={};
+  Object.values(COMARCAS).forEach(v=>(v.mun||[]).forEach(m=>deQuien[m]=v));
+  const todos=Object.keys(BASES).map(kb=>({kb,m:BASES[kb].m,rot:BASES[kb].m,
+    llave:llaveMuni(BASES[kb].m),co:deQuien[BASES[kb].m]}));
+  /* Y LAS LOCALIDADES, que es donde está la gracia de verdad. Quien duerme en
+     Los Cristianos no tiene por qué saber que eso es Arona — es exactamente el
+     caso que describió Zeben—. El dato ya está en el catálogo: 59 fichas de
+     tipo «Casco histórico» o «Caserío» SON una localidad y traen su municipio.
+     Se les quita el genérico de delante, como en `nucleos.js`, y se descarta lo
+     que ya sea uno de los 31 para no ofrecer «Candelaria» dos veces.
+     El botón dice A QUÉ PUEBLO lleva: si no, el turista pulsa «Los Cristianos»
+     y acaba en un sitio que no ha pedido sin saber por qué. */
+  const yaEstan=new Set(todos.map(x=>x.llave));
+  LUGARES.filter(l=>/^(Casco histórico|Caserío)$/.test(l.tipo||'')).forEach(l=>{
+    const loc=l.n.replace(/^(casco histórico|casco|caserío)\s+de\s+/i,'').trim();
+    const kb=Object.keys(BASES).find(x=>BASES[x].m===l.m);
+    const k=llaveMuni(loc), km_=llaveMuni(BASES[kb]?BASES[kb].m:'');
+    /* Y no se ofrece dos veces el mismo sitio con dos nombres: «Casco histórico
+       de La Laguna» da «La Laguna», que ya está dentro de «San Cristóbal de La
+       Laguna». La llave no lo caza sola porque una es «laguna» y la otra
+       «cristobal laguna», así que se mira si una contiene a la otra. */
+    if(!kb||!k||yaEstan.has(k)||km_.includes(k)||k.includes(km_)) return;
+    yaEstan.add(k);
+    todos.push({kb,m:BASES[kb].m,rot:loc,llave:k,co:deQuien[BASES[kb].m],loc:true});
+  });
+  const pinta=()=>{
+    const q=llaveMuni(inp.value);
+    lis.replaceChildren();
+    if(!q){ lis.className='bmLista'; return; }
+    const hay=todos.filter(x=>x.llave.includes(q))
+      .sort((a,b)=>a.llave.indexOf(q)-b.llave.indexOf(q)||a.m.localeCompare(b.m))
+      .slice(0,8);
+    lis.className='bmLista abierta';
+    if(!hay.length){ lis.innerHTML='<p class="bmNada">'+escapar(tr('buscaMuniNada'))+'</p>'; return; }
+    lis.innerHTML=hay.map(x=>'<button type="button" class="bmOpt" data-kb="'+escapar(x.kb)+'">'+
+      '<span>'+escapar(x.rot)+(x.loc?' <i class="bmEn">· '+escapar(x.m)+'</i>':'')+'</span>'+
+      (x.co?'<span class="bmCo">'+escapar(comarcaTr(x.co))+'</span>':'')+
+      '</button>').join('');
+  };
+  inp.addEventListener('input',pinta);
+  lis.addEventListener('click',e=>{
+    const b=e.target.closest&&e.target.closest('[data-kb]');
+    if(!b) return;
+    const kb=b.getAttribute('data-kb');
+    acc.replaceChildren(); acc.innerHTML='';
+    burbuja(BASES[kb].m,'yo');
+    elegidoMunicipio(kb,comoBase);
+  });
+  return caja;
 }
 
 /* ── EL AVISO DE «ESO ESTÁ EN EL OTRO CARTEL» ──

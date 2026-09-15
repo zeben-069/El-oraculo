@@ -2498,6 +2498,51 @@ levantaron los vecinos y el mar abierto queda justo al lado: se baña uno
 tranquilo, pero con niños hay que estar encima». Antes tenía los −6 y no decía
 nada, que es lo peor de los dos mundos: penalizaba sin explicar.
 
+## La barra de buscar el pueblo, para quien no sabe su comarca
+
+Zeben: **«quedamos en hacer una barra de autocompletar para los municipios, que
+la gente que no sepa en qué comarca está rellene la barra».** El mapa es bueno
+para quien mira la isla desde fuera, pero le pide al turista algo que puede no
+saber: en qué comarca cae su hotel. Quien ya sabe el nombre del pueblo no tiene
+por qué aprenderse la comarca para poder escribirlo.
+
+Va **debajo del mapa, no en su lugar** —lo mismo que el botón de la ubicación, y
+por lo mismo: quien no sabe el pueblo sigue teniendo el mapa entero— y en los
+**dos caminos**, elegir cama y elegir a dónde ir, que la duda es la misma.
+
+**Y la gracia de verdad no son los 31 municipios: son las localidades.** Quien
+duerme en Los Cristianos no tiene por qué saber que eso es Arona, que es
+literalmente el caso que él describió. El dato ya estaba en el catálogo: las
+fichas de tipo **«Casco histórico» y «Caserío» SON una localidad** y traen su
+municipio. Se les quita el genérico de delante —como en `nucleos.js`— y quedan
+**35 localidades sobre los 31 pueblos: 66 cosas buscables**. El resultado dice
+las tres: el nombre escrito, a qué municipio lleva y en qué comarca cae, que es
+justo lo que no sabía.
+
+Cuatro cosas de cómo está hecho:
+· **Se compara sin acentos ni artículos**, que es la cuenta con la que el padrón
+  y el registro del Cabildo ya cruzan municipios: «guimar» encuentra Güímar,
+  «laguna» encuentra San Cristóbal de La Laguna y «vilaflor» encuentra Vilaflor
+  de Chasna. Sin eso la barra solo le sirve a quien escribe el nombre oficial, o
+  sea a quien no la necesita. **`sinTildes` ya existía** y solo quita acentos:
+  lo de los artículos va aparte, en `llaveMuni`, sin duplicar el de arriba.
+· **No se ofrece el mismo sitio dos veces con dos nombres.** «Casco histórico de
+  La Laguna» da «La Laguna», que ya está dentro de «San Cristóbal de La Laguna»,
+  y la llave no lo caza sola —una es «laguna» y la otra «cristobal laguna»—, así
+  que se mira si una contiene a la otra. Sin eso salían 46 localidades con once
+  duplicados; con eso, 35.
+· **Un solo destino para los dos caminos.** Elegir pueblo por la cuadrícula y
+  por la barra va ahora por `elegidoMunicipio()`. Si cada uno lo hiciera a su
+  manera, el aviso del cartel saltaría por un camino y no por el otro — el mismo
+  cuidado que obligó a escribir `hayCosasEseDia()`.
+· **No inventa un pueblo que no existe.** Si no casa nada lo dice, y el mapa
+  sigue debajo.
+
+Lo que **no** hace, y conviene saberlo: no tolera erratas. «tegeste» no
+encuentra Tegueste. Meter búsqueda difusa es otro problema y trae sus propios
+falsos positivos; hoy la salida es que el mapa sigue ahí.
+Dos claves nuevas de `tr()` en los tres idiomas (236).
+
 ## Que un sitio aburra a un crío no es motivo para no ofrecerlo
 
 Zeben, antes de soltar el zip: **«una cosa que tiene que quedar clara: que un
@@ -3014,7 +3059,7 @@ costa a la cumbre y con el centroide ganaba el Observatorio del Teide, a 10 km
 y 2.400 m de altura. Quien sí sabe lo que quiere ver tiene el botón «Prefiero
 elegir el sitio yo».
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 234 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 236 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **La leyenda del mapa también.** Los cuatro rótulos —«Dónde duermen», «La
@@ -3138,6 +3183,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | Las ocho discrepancias de municipio resueltas + «es verdad que el observatorio es para mayores de 8 años» | 14 sep | Contestó una por una: cinco coincidían con el Cabildo —Arenas Negras y la Ermita de San Francisco a Garachico, Sámara y el **Museo Etnográfico Juan Évora a Guía de Isora**—. Las otras tres caen **en la raya del término** y ahí le di más vueltas de las que hacía falta: le pregunté por dos y le propuse un aviso para Guía de Isora. Lo cortó —**«respeta lo que ponga el Cabildo y nos curamos en salud… tú misma te estás enrollando»**— y es la regla buena: el Barranco de Erques a Guía de Isora, el Risco de la Fortaleza y Montaña Negra a San Juan de la Rambla, la Ermita de Lourdes a Los Silos. **Cero discrepancias por debajo de 300 m.** La lección: donde hay fuente oficial que dice exactamente lo que se pregunta, **preguntar es hacerle perder el tiempo**; su conocimiento vale donde el dato abierto no llega, y la raya de un término no es eso. Al mover el Juan Évora, el aviso de Vilaflor **se calló solo**, como estaba anunciado aquí. Y confirma la edad mínima del Observatorio, que había entrado por una anotación y no por fuente oficial |
 | «Las frases de no dejes las cosas tiradas últimamente no salen» | 14 sep | Cierto, y llevaba así desde siempre: las cinco frases vivían **solo en las plantillas de `narrarLocal`**, o sea en la red de seguridad, y el prompt no las mencionaba —`grep basura prompt.js`, cero—. O sea que se veían **únicamente los días en que la API se caía**. Es la regla de la casa incumplida por dentro. Ahora van por `recordatorio_de_cuidar` en el informe, con su párrafo en el prompt: lo último de todo, una frase, tono de vecina y no de cartel. Y de paso, **solo los días que el plan pisa el campo**: se soltaban también en un día de museos, donde «no se lleven piedras ni plantas» no significa nada — son 32 de 124 planes |
 | «Que un plan sea aburrido para niños no quiere decir que no se ofrezca» | 15 sep | Medido antes de tocar: **el motor ya no las excluía** —una ficha con `ninos_visto` sale en 16 paradas de 339 en 124 planes con niños—, pero **no se decía nada**: `ninos_visto` era un apunte de la herramienta que no leía ni el informe ni el prompt. Ahora va por **`puede_aburrir_a_los_peques`**: media frase, de pasada, solo con niños, **sin proponer cambiar el sitio por otro** —quien decide son los padres— y **en una sola frase aunque sean varias paradas**, que repetirlo tres veces es un sermón y él pidió «y listo». `avAburre` en los tres idiomas (234 claves), impersonal para que valga con uno o con tres nombres. El orden del día NO se toca: tocar los puntos habría deshecho lo del MUNA |
+| «Una barra de autocompletar para los municipios» + «¿los planes no hacen zigzags?» | 15 sep | La barra va debajo del mapa, en los dos caminos, y **la gracia no son los 31 pueblos sino las 35 localidades**: quien duerme en Los Cristianos no tiene por qué saber que eso es Arona. El dato ya estaba —las fichas «Casco histórico» y «Caserío» SON una localidad y traen su municipio—, así que son **66 cosas buscables**, sin acentos ni artículos, y el resultado dice pueblo, municipio y comarca. Un solo destino para la cuadrícula y la barra, `elegidoMunicipio()`. Y del zigzag: medido sobre 248 planes, **rodeo mediano 2,2 km**, pero **20 pasan de 10 km** — el peor es Arico con museos, tres paradas a 6,7–8,9 km de casa pero en lados opuestos: 42,6 km de recorrido para un día que cabe en 17,7. El motor mide cada parada contra la anterior y **nunca mira la forma del día entero**. Apuntado, no tocado: cambiar las penalizaciones trae de vuelta el peor fallo que ha tenido |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
@@ -3823,6 +3869,31 @@ Lo que sigue **sin usar** de lo suyo, y por qué:
   **Cero por debajo de 300 metros.** Las 183 que quedan están todas más lejos y
   son ruido —un testigo a dos kilómetros no manda—; `node municipios.js lista
   1000` las saca si algún día se quieren repasar.
+- **El motor nunca mira la forma del día entero, y en 20 planes de 248 se
+  nota.** Zeben preguntó si los planes hacen zigzags raros. Medido sobre 248
+  planes (31 bases × 4 tipos de día × coche y guagua), comparando el recorrido
+  real —casa → paradas en orden → casa— contra el mínimo posible —ir y volver
+  al punto más lejano—: **rodeo mediano 2,2 km**, 50 planes pasan de 5 km y
+  **20 pasan de 10**. El peor, Arico pidiendo museos:
+
+  | | |
+  |---|---|
+  | ruta | Sanatorio de Abades → Iglesia de Fasnia → Los Blanquitos |
+  | desde el casco de Arico | 6,7 · 7,5 · 8,9 km — **las tres cerca** |
+  | entre ellas | 10,7 y 16,4 km — **en lados opuestos** |
+  | recorrido | **42,6 km** para un día que cabe en 17,7 |
+
+  Por qué pasa: cada parada se mide contra la ANTERIOR (1,4 por km más allá de
+  3) y contra la cama, y las tres pasan las dos pruebas. Lo que no hay es
+  ninguna regla que mire **el dibujo del día completo**. En un municipio con
+  catálogo fino —Arico tiene pocos museos— las alternativas puntúan aún peor y
+  el zigzag gana.
+  **No se ha tocado**, y es a propósito: subir las penalizaciones deja sin día a
+  los pueblos flacos, y bajarlas trae de vuelta los días de Bajamar con
+  Torviscas a 65 km. Lo que sí cabría, sin tocar el scoring, es **reordenar las
+  paradas ya elegidas** cuando el rodeo se dispara —cambia el orden, no las
+  fichas, así que no puede deshacer lo del MUNA ni mover las banderas—. Está sin
+  hacer y sin decidir.
 - **Mirador El Frontón tiene la coordenada mal.** Es de San Miguel y su nota
   dice «medianías altas camino a Vilaflor», pero la coordenada —estimada, a dos
   decimales— cae a **3,7 km de la cima del Teide**, dentro del Parque Nacional y
@@ -3831,6 +3902,28 @@ Lo que sigue **sin usar** de lo suyo, y por qué:
   el día si la ficha entra en un plan. **No se corrige desde aquí**: una
   coordenada se pregunta, no se adivina.
 
+- **«¿En ese bar dejan entrar perros?» — la respuesta es el teléfono, y no por
+  ahorrar tokens.** Zeben lo preguntó así: «si Naira tiene inteligencia
+  artificial, cuando un cliente le diga "en ese bar se permiten perros", ¿ella
+  no puede decir "ahora mismo no sé, pero si me das un minuto te lo busco" y
+  vaya a la base de datos de Google? ¿O mejor que llame el cliente y nos
+  ahorramos token?». Lo segundo, y el ahorro es lo de menos:
+  · **Un buscador da la política de OTRO sitio web sobre ese bar**, escrita quién
+    sabe cuándo. Si dejan entrar perros hoy lo sabe el bar, y nadie más.
+  · **Medido**: de 394 restaurantes, **335 traen teléfono** y solo **3** dicen
+    algo de mascotas en su nota. O sea que el dato bueno está a una llamada en
+    el 85% de los casos y fichado en el 0,8%.
+  · Y rompería el sello de «todo sale del informe», que es lo que diferencia a
+    Naira — la misma razón por la que la búsqueda web está descartada abajo.
+  **Lo que sí faltaba era decirle qué hacer.** El prompt tenía la regla dura
+  —«si un dato no está en el informe, no existe»— pero **no decía qué contestar**,
+  así que el modelo podía quedarse mudo o, peor, decir «déjame que lo mire». Va
+  ahora un apartado propio: se dice en una frase que eso no está fichado, que lo
+  sabe el sitio, y **se da el teléfono**; nunca prometer que lo busca, que no
+  puede; y nunca deducirlo de lo que «suele ser», que un guachinche suela
+  admitir perros no dice nada de ESE guachinche. Con alergias o celiaquía deja
+  de ser una preferencia y es la única respuesta válida, que eso ya estaba
+  decidido abajo.
 - **Búsqueda web: decidido que NO, por ahora.** Rompería el sello de «todo
   sale del informe», que es lo que diferencia a Naira. Y nunca para
   alergias o celiaquía: ahí la respuesta correcta es el teléfono del sitio.

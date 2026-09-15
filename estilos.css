@@ -717,3 +717,25 @@ body[data-luz="noche"] button.capa[aria-pressed="true"]{background:var(--laurisi
 .relojG.ok{border-left-color:var(--laurisilva)}
 .relojG.aviso{border-left-color:var(--malvasia);background:#FDF6E7}
 .relojG.justo,.relojG.ya{border-left-color:var(--cochinilla);background:#FBEDE9;font-weight:600}
+
+/* ── La barra de buscar el pueblo (paso 2) ──
+   Va debajo del mapa y por encima del botón de la ubicación. Se separa con
+   aire, no con un filete: el filete ya lo lleva la invitación de la ubicación
+   y dos seguidos parten la pantalla en tres trozos. */
+.buscaMuni{margin:14px 0 4px;position:relative}
+.buscaMuni .bmInput{width:100%;box-sizing:border-box;padding:11px 14px;
+  font:inherit;font-size:1rem;color:var(--tinta);
+  background:var(--papel);border:1px solid var(--linea);border-radius:12px}
+.buscaMuni .bmInput:focus{outline:none;border-color:var(--mar);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--mar) 22%,transparent)}
+.bmLista{display:none}
+.bmLista.abierta{display:block;margin-top:6px;border:1px solid var(--linea);
+  border-radius:12px;overflow:hidden;background:var(--papel)}
+.bmOpt{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  width:100%;padding:10px 14px;font:inherit;text-align:left;cursor:pointer;
+  background:none;border:0;border-bottom:1px solid var(--linea);color:var(--tinta)}
+.bmOpt:last-child{border-bottom:0}
+.bmOpt:hover,.bmOpt:focus{background:color-mix(in srgb,var(--mar) 10%,transparent)}
+.bmCo{font-size:.82rem;opacity:.65;white-space:nowrap}
+.bmNada{margin:0;padding:10px 14px;font-size:.9rem;opacity:.7}
+.bmEn{font-style:normal;opacity:.6}
