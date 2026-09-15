@@ -2328,16 +2328,19 @@ repitiéndose en otro campo**, y esta vez lo metí yo en el formulario.
 **El estado que hacía falta ya existía: no marcar nada.** Una ficha sin `ninos`
 no gana los +9/+3 y no pierde nada, que es exactamente «aquí un crío se aburre
 pero no pasa nada». Lo único que faltaba era poder decir **que ya se ha
-mirado**, para que no vuelva a salir en la lista. Eso es `ninos_visto`, un campo
-que **el motor no lee** y que solo existe para cerrar el ciclo de la
-herramienta. Las casillas son ahora cuatro y cada una escribe una cosa distinta:
+mirado**, para que no vuelva a salir en la lista. Eso es `ninos_visto`. Las
+casillas son ahora cuatro y cada una escribe una cosa distinta:
 
 | casilla | escribe | qué hace el motor |
 |---|---|---|
 | **Sí** | `ninos:'Sí'` | +9 y +3 |
-| **se aburren** | `ninos_visto:1` | nada, y deja de preguntarse |
+| **se aburren** | `ninos_visto:1` | ni premia ni castiga, **y lo dice en media frase** |
 | **cuidado** | `ninos:'Con cuidado'` | −6 / −12, **y es por RIESGO** |
 | **NO** | `ninos:'NO'` | fuera del día, y se cuenta como aviso |
+
+(`ninos_visto` nació como apunte de la herramienta, un campo que el motor no
+leía. Dejó de serlo el 15 de septiembre — abajo, «que un sitio aburra no es
+motivo para no ofrecerlo».)
 
 **Y no se pregunta por lo que el motor no va a ofrecer nunca.** En la primera
 lista iba la **Playa de Troche**, y él contestó que «no es para ir con niños,
@@ -2494,6 +2497,47 @@ precaución— y por primera vez **dice por qué**: «el muro de hormigón lo
 levantaron los vecinos y el mar abierto queda justo al lado: se baña uno
 tranquilo, pero con niños hay que estar encima». Antes tenía los −6 y no decía
 nada, que es lo peor de los dos mundos: penalizaba sin explicar.
+
+## Que un sitio aburra a un crío no es motivo para no ofrecerlo
+
+Zeben, antes de soltar el zip: **«una cosa que tiene que quedar clara: que un
+plan sea aburrido para niños no quiere decir que no se ofrezca, porque a lo
+mejor a los padres sí les interesa ver ese museo. Simplemente se dice: bueno,
+si van con niños puede ser que se aburran un poquito, o algo así, y listo.»**
+
+Lo primero fue medirlo, porque la mitad de la frase ya se cumplía y la otra
+mitad no. **El motor no las excluye**: una ficha con `ninos_visto` y sin `ninos`
+ni gana los +9/+3 ni pierde nada, y en un barrido de 124 planes con niños sale
+en **16 paradas de 339, repartidas por 11 planes**. O sea que compiten peor —que
+es lo correcto, para eso está el +9— pero salen.
+
+**Lo que no pasaba es lo segundo: no se decía nada.** `ninos_visto` se escribió
+como apunte de la herramienta —«esto ya se miró»— y **no lo leía nadie**, ni el
+informe ni el prompt ni el relato. Así que una familia se plantaba en una casa
+de coleccionista sin que Naira le hubiera dicho media palabra. Ahora va por
+**`puede_aburrir_a_los_peques`**, y el campo deja de ser solo un apunte.
+
+Cuatro decisiones, y las cuatro salen de su frase:
+· **No cambia el orden del día.** Nada de scoring nuevo: la ficha sigue ni
+  premiada ni castigada. Tocar los puntos habría deshecho lo del MUNA, que es
+  lo que hace que el plan con niños sea distinto al de pareja (77% contra 29%).
+· **Solo con niños.** A dos adultos no se les dice que un museo de pintura
+  aburre: a ellos no les aburre. Va cerrado con `S.ninos` en el informe.
+· **Media frase, y no es un aviso.** El prompt manda decirlo de pasada al
+  nombrar la parada —«si van con los peques igual se les hace un poco largo,
+  pero merece la pena»—, **sin proponer cambiarlo por otra cosa**: quien decide
+  son los padres. No sube a los avisos de arriba, que ahí viven los peligros.
+· **Y en UNA sola frase aunque sean varias.** Un día de museos trae dos o tres
+  —desde Adeje salen la Casa Fuerte y la Casa La Bodega—, y soltar la misma
+  advertencia tres veces seguidas deja de ser un apunte y se convierte en un
+  sermón, que es justo lo contrario del «y listo» que él pidió. El relato local
+  las junta con `tr('y')`, no con la `y` a pelo de `unir()`.
+
+Clave `avAburre` en los tres idiomas (234). Ojo con la redacción: con dos
+nombres, «que Casa Fuerte y Casa La Bodega **se les puede hacer** largo» cojea
+en español y en alemán, así que las dos frases van **impersonales** —«que **en**
+X e Y a los peques se les puede hacer un poco largo», «**In** X und Y **kann
+es** den Kleinen etwas lang werden»— y valen igual para uno que para tres.
 
 ## El recordatorio de cuidar el sitio salía solo con la API caída
 
@@ -2798,7 +2842,7 @@ Referencia: 0 reventones, 0 días por encima de 25 km de dispersión (mediana
 estaban fichados.
 
 Y un bloque de **perfiles**: el mismo día en cuatro versiones (coche/guagua ×
-pareja/niños) desde las 31 bases. Referencia: 0 sitios no aptos con niños, 76%
+pareja/niños) desde las 31 bases. Referencia: 0 sitios no aptos con niños, 77%
 de paradas «niños: Sí» con niños contra 29% en pareja, 65% de tipo divertido,
 2% de planes iguales entre pareja y niños, 47% iguales entre coche y guagua
 —esos son legítimos: sitios que ya están junto a una parada— y 204 m de media
@@ -2970,7 +3014,7 @@ costa a la cumbre y con el centroide ganaba el Observatorio del Teide, a 10 km
 y 2.400 m de altura. Quien sí sabe lo que quiere ver tiene el botón «Prefiero
 elegir el sitio yo».
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 233 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 234 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **La leyenda del mapa también.** Los cuatro rótulos —«Dónde duermen», «La
@@ -3093,6 +3137,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Solo hay un cuidado de peligro, el de la playa, y un cuidado de precaución, el de la piscina» | 14 sep | Los museos ya estaban bien; lo otro no, y **yo lo había escrito mal**: puse que el Charco de Isla Cangrejo era «peligro de verdad» y es la precaución. Y su frase destapó un fallo de debajo: el filtro que saca fichas del día con niños miraba **`l.seg` a secas**, o sea cualquier texto, así que a un charco `Con cuidado` le bastaba con llevar escrito algo para desaparecer y viajar con `es_por_seguridad`. Probado sobre las Piscinas de Bajamar: ponerles una nota que dice expresamente que NO es un peligro las hacía desaparecer. Manda `esPeligro()`, ahí y en el aviso de arriba, que salía de olfatear el texto. Y la categoría que faltaba gana canal propio: `seg_tipo:'precaucion'` → **`ojo_con_los_peques`**, solo con niños, **junto a su parada y no arriba** con los peligros —ponerlo arriba diría por la posición justo lo que no es—, con `avPrecaucion` en los tres idiomas (233 claves). El charco por fin dice por qué tiene sus −6 |
 | Las ocho discrepancias de municipio resueltas + «es verdad que el observatorio es para mayores de 8 años» | 14 sep | Contestó una por una: cinco coincidían con el Cabildo —Arenas Negras y la Ermita de San Francisco a Garachico, Sámara y el **Museo Etnográfico Juan Évora a Guía de Isora**—. Las otras tres caen **en la raya del término** y ahí le di más vueltas de las que hacía falta: le pregunté por dos y le propuse un aviso para Guía de Isora. Lo cortó —**«respeta lo que ponga el Cabildo y nos curamos en salud… tú misma te estás enrollando»**— y es la regla buena: el Barranco de Erques a Guía de Isora, el Risco de la Fortaleza y Montaña Negra a San Juan de la Rambla, la Ermita de Lourdes a Los Silos. **Cero discrepancias por debajo de 300 m.** La lección: donde hay fuente oficial que dice exactamente lo que se pregunta, **preguntar es hacerle perder el tiempo**; su conocimiento vale donde el dato abierto no llega, y la raya de un término no es eso. Al mover el Juan Évora, el aviso de Vilaflor **se calló solo**, como estaba anunciado aquí. Y confirma la edad mínima del Observatorio, que había entrado por una anotación y no por fuente oficial |
 | «Las frases de no dejes las cosas tiradas últimamente no salen» | 14 sep | Cierto, y llevaba así desde siempre: las cinco frases vivían **solo en las plantillas de `narrarLocal`**, o sea en la red de seguridad, y el prompt no las mencionaba —`grep basura prompt.js`, cero—. O sea que se veían **únicamente los días en que la API se caía**. Es la regla de la casa incumplida por dentro. Ahora van por `recordatorio_de_cuidar` en el informe, con su párrafo en el prompt: lo último de todo, una frase, tono de vecina y no de cartel. Y de paso, **solo los días que el plan pisa el campo**: se soltaban también en un día de museos, donde «no se lleven piedras ni plantas» no significa nada — son 32 de 124 planes |
+| «Que un plan sea aburrido para niños no quiere decir que no se ofrezca» | 15 sep | Medido antes de tocar: **el motor ya no las excluía** —una ficha con `ninos_visto` sale en 16 paradas de 339 en 124 planes con niños—, pero **no se decía nada**: `ninos_visto` era un apunte de la herramienta que no leía ni el informe ni el prompt. Ahora va por **`puede_aburrir_a_los_peques`**: media frase, de pasada, solo con niños, **sin proponer cambiar el sitio por otro** —quien decide son los padres— y **en una sola frase aunque sean varias paradas**, que repetirlo tres veces es un sermón y él pidió «y listo». `avAburre` en los tres idiomas (234 claves), impersonal para que valga con uno o con tres nombres. El orden del día NO se toca: tocar los puntos habría deshecho lo del MUNA |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
