@@ -3165,6 +3165,14 @@ JavaScript propios**, y el plan sale con sus fichas y su caja de texto. Los dos
 · `hoy-con-lo-que-queda` — la prueba corre con la fecha de hoy y sin tocarla, o
   sea que TODOS los recorridos van por esa rama: el reloj recorta el día. Lo
   que se mide es que salga plan igual a cualquier hora a la que se ejecute.
+  **Y por eso el número de tarjetas NO se puede comparar entre dos pasadas a
+  distinta hora.** Se vio el 17 de septiembre y asustó: la misma rama daba 7
+  tarjetas a las 13:44 y **2 a las 21:57**, y parecía que algo se había roto al
+  cambiar las URLs del dominio. No se había roto nada — a las diez de la noche
+  no queda día que repartir. Lo que lo demuestra sin discusión son los **dos
+  únicos recorridos que NO usan hoy**, `dia-futuro-entero` y `rango-escapada`:
+  dieron **8 y 11 en las dos pasadas, idénticos**. Si alguna vez bajan ESOS, ahí
+  sí hay algo que mirar.
 · `dia-futuro-entero` y `rango-escapada` — las otras dos ramas del «cuándo», que
   ningún otro recorrido pisa: un día del mes que viene da el día entero, y dos
   días seguidos dan la escapada sin preguntar cuántos.
