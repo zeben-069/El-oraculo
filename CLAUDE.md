@@ -115,6 +115,8 @@ nucleos.js                    arma la página de poner un caserío en el mapa
 plantilla-nucleos.html        su molde
 buscar-nucleos.html           esa página, lista para abrir
 eventos.js                    arma la página de pegar fiestas, y mete las marcadas
+                              · `artefacto` pasa el de Cowork · `rotulos` junta
+                                el mismo programa escrito de dos maneras
 actos-parecidos.md            las parejas de actos que pueden ser el mismo
 plantilla-sitios.html         el molde de la página de dónde es cada fiesta
 sitios-fiestas.html           esa página, lista para abrir
@@ -153,7 +155,7 @@ Dentro de `index.html`, como constantes:
   fiestas × sus años) llevan ya `la`/`lo`/`lu`**, colocadas por Zeben con
   `node eventos.js sitios`, y entonces mandan ellas sobre el casco del pueblo.
   Quedan 13 sin colocar, en 6 municipios.
-- `ACTOS` (689) — los actos de 37 programas de fiestas de 16 municipios:
+- `ACTOS` (790) — los actos de 36 programas de fiestas de 19 municipios:
   día, municipio,
   hora, dónde es y `q` («ninos»/«todos»/«noche»), que dice a quién le sirve. No son
   fiestas: cuelgan de una que ya está en `EVENTOS` y no anclan el día.
@@ -1733,7 +1735,9 @@ alguien se fiara de él. Arreglado el importador y rellenados los 122.
 **a medias, y la mitad que falta no es técnica**.
 · **Desde aquí no se puede pedir el artefacto.** La política de red del
   contenedor deniega todo lo de fuera (403 en el CONNECT), igual que con
-  Commons, GRAFCAN y Netlify.
+  Commons, GRAFCAN y Netlify. **(Esto dejó de ser verdad el 17 de septiembre:
+  la sesión tiene ya herramienta de artefactos y los lee sin pasar por el
+  proxy. La red sigue cerrada; lo que cambió es que hay otra puerta. Abajo.)**
 · **Desde la web de Naira tampoco.** El artefacto vive en `claude.ai` y no manda
   cabeceras de CORS a `leafy-cobbler-d24e23.netlify.app`: el navegador tiraría
   la respuesta. Es el mismo muro que ya obligó a que las fotos y los miradores
@@ -1754,6 +1758,85 @@ no se haya resuelto un gemelo a favor del nuestro. Mandar el enlace y decir
 «pásalo» es todo lo que hace falta. Y **el aviso de cuándo toca ya llega solo**:
 `avisar-fiestas.js` manda cada lunes las fiestas que vienen sin programa cargado,
 que es exactamente la señal de que el artefacto tiene algo nuevo.
+
+## Y el 17 de septiembre el artefacto se leyó DESDE AQUÍ
+
+Lo de arriba —«desde aquí no se puede pedir el artefacto»— **dejó de ser
+verdad**. No porque se abriera la red: la política del contenedor sigue
+denegando todo lo de fuera. Lo que hay ahora es una **herramienta de artefactos**
+en la propia sesión, que los lee sin pasar por el proxy. Zeben manda el enlace y
+se abre aquí; no hace falta que copie ni descargue nada.
+Lo que **no** cambia, y es la mitad que importa: **sigue sin meterse solo**. Esta
+pasada lo demuestra otra vez, ver abajo. Lo que se ahorra es el acarreo, no la
+decisión.
+
+**Lo que traía.** La versión del 17 son **761 actos de 31 programas y 19
+municipios** (la anterior, 660 de 26). Cuatro programas que no teníamos —**El
+Tanque** (Sagrada Familia), **San Miguel de Abona** (Patronales), **Icod de los
+Vinos** (Patronales) y dos de **Santa Cruz**, Cueva Bermeja y El Draguillo— y
+actos sueltos dentro de los que ya estaban. Pasado con `artefacto … hazlo`:
+**103 actos nuevos, 0 sitios que rellenar** —seguimos a cero— y los mismos **3
+que no cuadran**, que son de redacción y están apuntados arriba. Con
+`avisar-fiestas.js` queda **una sola fiesta sin programa** en los próximos 21
+días (la Romería de Los Roques, Fasnia).
+
+**Y volvieron los dos gemelos que se resolvieron a favor del nuestro.** Está
+escrito arriba que pasar el artefacto dos veces no duplica nada **mientras no se
+haya resuelto un gemelo a favor del nuestro** — pues eran justo esos dos: la
+recepción del Rey del 14 y el partido de Los Abrigos. El importador los cantó
+antes de escribir, y se quitaron con la lista de casillas de siempre. `ACTOS`
+queda en **790**.
+
+**Y aquí salió un fallo de verdad, que la regla se comía un acto sola.**
+`duplicados()` juntaba dos actos cuando **los 24 primeros caracteres eran
+iguales**, sin mirar lo que venía detrás. En Benijos, el 14 de septiembre, hay
+**DOS exhibiciones de fuegos a las seis** —«de Pirotécnica Tanausú, patrocinada
+por **los vecinos de la zona**» y «…patrocinada por **la comisión de fiestas**»—,
+y sus veinticuatro primeros caracteres son «Exhibición de fuegos arti»: puro
+encabezado. La regla se llevaba una de las dos **sin preguntar**, que es
+exactamente lo que esta casa no hace.
+Lo que decidió el arreglo fue medirlo antes de tocar nada: sobre los 792 actos,
+la regla de los 24 caracteres cazaba **una sola pareja en todo el catálogo y era
+justo esa**, y **las dos reglas no coincidían ni una vez** — todo lo de verdad lo
+caza la de prefijo. Y el caso para el que se escribió, «Diana floreada» contra
+«Diana floreada por las calles», lo cubre la de prefijo entera. Así que se fue.
+Lo que comparte cabecera y luego se separa **no se pierde**: cae en la lista de
+los que SE PARECEN, que es donde ya vivían las dos ferias de Los Realejos y por
+la misma razón.
+· **Y en pantalla los dos salían idénticos.** La lista recorta los nombres a 70
+  caracteres y lo que separa a los fuegos de Benijos está en el carácter
+  noventa, así que quien tenía que elegir cuál sobra leía dos líneas iguales.
+  Ahora, si los dos cortes salen iguales, **no se recorta**. Una lista para
+  elegir que no deja elegir no sirve de nada.
+
+**Y el mismo programa venía con dos rótulos, desde antes.** `fi` es cómo se llama
+la fiesta de la que cuelga el acto, y cada fuente lo escribe a su manera: la
+agenda pone «De la Luz», el artefacto «De la Luz (Los Silos)» y un programa
+pegado a mano «Fiestas de Nuestra Señora de La Luz». **No era invisible**: la
+cabecera del día solo nombra la fiesta si **todos** los actos del pueblo son de
+la misma —regla que existe porque en La Laguna coinciden el Cristo y San Mateo—,
+así que un día entero de la misma fiesta parecía tener dos y **la cabecera se
+callaba el nombre**. Medido: **12 días-pueblo de 176**.
+Lo arregla **`node eventos.js rotulos`** (ensayo) / `rotulos hazlo`. Tres
+ataduras:
+· **Solo dentro del mismo municipio** — «De la Luz» está en Los Silos, en La
+  Orotava y en Tacoronte, y son tres fiestas de tres pueblos.
+· **Y solo si uno CONTIENE al otro** quitado el paréntesis y el «Fiestas de /
+  Nuestra Señora de» de delante: la misma atadura de `parecidos`, que compartir
+  palabras no basta.
+· **Gana el más completo SIN el paréntesis del municipio**, que ese lo pusimos
+  nosotros y en pantalla sobra —`fi` siempre se enseña debajo del pueblo—. Lo
+  que **no** se toca es el resto del nombre: «Fiestas de El Tablado» y «El
+  Tablado» se quedan como los publica quien los publica. Reescribir el nombre de
+  una fiesta es justo lo que esta casa no hace.
+Fueron **87 actos y 6 grupos**; los programas pasan de 42 a **36**. Los **45
+días** que siguen sin nombrar la fiesta son legítimos y se comprobaron uno a
+uno: Cristo y San Mateo en La Laguna, El Socorro y El Tablado en Güímar, Los
+Abrigos y El Médano en Granadilla.
+
+Con todo: `ACTOS` **790**, cero sin sitio, cero sin corredor, **1.321 actos
+ofrecidos** (eran 1.071) y **0 ofrecidos a quien no toca**, que es el cero que
+vigila toda la regla.
 
 ## Cuántos son, y el número que nadie había dicho
 
@@ -2213,8 +2296,8 @@ mundo con los críos en hombros. Así que `q` gana el **tercer valor** que este
 fichero llevaba apuntado como pendiente: **`todos`**, y pasa a los dos públicos.
 · **`ACTO_DE_TODOS` es corto a propósito**: fuegos, pirotecnia y romería. Cada
   palabra que entre aquí se le está ofreciendo a un niño, así que una misa
-  cantada o un torneo de envite siguen siendo solo de los adultos. Son **28 de
-  689**. Y una romería estaba marcada `noche` teniendo carretas, trajes y gente
+  cantada o un torneo de envite siguen siendo solo de los adultos. Son **33 de
+  790**. Y una romería estaba marcada `noche` teniendo carretas, trajes y gente
   por la calle a mediodía: para una familia eso es el plan del día.
 · **Va DELANTE de `noche` en `clasificaActo()`**: los fuegos casan con las dos y
   lo que hay que decir de ellos es que los ve el pueblo entero.
@@ -2896,12 +2979,12 @@ fichas mudas ya medidas, el motor puede descartar de verdad lo que queda lejos
 de una parada, y el plan sin coche se separa más del plan con coche.
 
 Y cierra con los **actos**: por cada día y municipio con programa cargado,
-un plan con niños y otro sin ellos —454 planes—. Lo que se vigila ahí no es la
+un plan con niños y otro sin ellos —528 planes—. Lo que se vigila ahí no es la
 dispersión, es que a nadie se le ofrezca lo que no le toca. Referencia: de los
-**689 actos cargados** (76 marcados de niños, **28 de todo el pueblo**, 176 de
-noche, 409 sin marcar), **1.071 ofrecidos**, **0 ofrecidos a quien no toca** y
-**78 de todo el pueblo ofrecidos a una familia** —los fuegos y las romerías, que
-antes no veía—. Ese cero es la prueba de toda la regla; los 600 «sin clasificar
+**790 actos cargados** (82 marcados de niños, **33 de todo el pueblo**, 207 de
+noche, 468 sin marcar), **1.321 ofrecidos**, **0 ofrecidos a quien no toca** y
+**99 de todo el pueblo ofrecidos a una familia** —los fuegos y las romerías, que
+antes no veía—. Ese cero es la prueba de toda la regla; los 735 «sin clasificar
 y ofrecido» ya NO son un fallo, que
 desde que `q` dice solo si es de niños, lo que no está marcado va a los
 adultos y eso es lo normal.
@@ -3191,6 +3274,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Las frases de no dejes las cosas tiradas últimamente no salen» | 14 sep | Cierto, y llevaba así desde siempre: las cinco frases vivían **solo en las plantillas de `narrarLocal`**, o sea en la red de seguridad, y el prompt no las mencionaba —`grep basura prompt.js`, cero—. O sea que se veían **únicamente los días en que la API se caía**. Es la regla de la casa incumplida por dentro. Ahora van por `recordatorio_de_cuidar` en el informe, con su párrafo en el prompt: lo último de todo, una frase, tono de vecina y no de cartel. Y de paso, **solo los días que el plan pisa el campo**: se soltaban también en un día de museos, donde «no se lleven piedras ni plantas» no significa nada — son 32 de 124 planes |
 | «Que un plan sea aburrido para niños no quiere decir que no se ofrezca» | 15 sep | Medido antes de tocar: **el motor ya no las excluía** —una ficha con `ninos_visto` sale en 16 paradas de 339 en 124 planes con niños—, pero **no se decía nada**: `ninos_visto` era un apunte de la herramienta que no leía ni el informe ni el prompt. Ahora va por **`puede_aburrir_a_los_peques`**: media frase, de pasada, solo con niños, **sin proponer cambiar el sitio por otro** —quien decide son los padres— y **en una sola frase aunque sean varias paradas**, que repetirlo tres veces es un sermón y él pidió «y listo». `avAburre` en los tres idiomas (234 claves), impersonal para que valga con uno o con tres nombres. El orden del día NO se toca: tocar los puntos habría deshecho lo del MUNA |
 | «Una barra de autocompletar para los municipios» + «¿los planes no hacen zigzags?» | 15 sep | La barra va debajo del mapa, en los dos caminos, y **la gracia no son los 31 pueblos sino las 35 localidades**: quien duerme en Los Cristianos no tiene por qué saber que eso es Arona. El dato ya estaba —las fichas «Casco histórico» y «Caserío» SON una localidad y traen su municipio—, así que son **66 cosas buscables**, sin acentos ni artículos, y el resultado dice pueblo, municipio y comarca. Un solo destino para la cuadrícula y la barra, `elegidoMunicipio()`. Y del zigzag: medido sobre 248 planes, **rodeo mediano 2,2 km**, pero **20 pasan de 10 km** — el peor es Arico con museos, tres paradas a 6,7–8,9 km de casa pero en lados opuestos: 42,6 km de recorrido para un día que cabe en 17,7. El motor mide cada parada contra la anterior y **nunca mira la forma del día entero**. Apuntado, no tocado: cambiar las penalizaciones trae de vuelta el peor fallo que ha tenido |
+| El artefacto de las fiestas, actualizado otra vez | 17 sep | **Y por primera vez se leyó desde aquí**: la sesión tiene ya herramienta de artefactos, así que basta con mandar el enlace — la red del contenedor sigue cerrada, esto va por otro sitio. Lo que **no** cambia es que siga sin meterse solo, y esta pasada lo prueba. Son **761 actos de 31 programas y 19 municipios** (eran 660 de 26): entran **103**, con cuatro programas nuevos —**El Tanque**, **San Miguel de Abona**, **Icod de los Vinos** y dos de **Santa Cruz**—, y queda **una sola fiesta sin programa** en tres semanas. Volvieron los **dos gemelos** que se habían resuelto a favor del nuestro —el importador los cantó antes de escribir— y `ACTOS` queda en **790**. Y destapó dos cosas debajo: la regla de los **24 primeros caracteres** se comía un acto **sola** —en Benijos hay dos exhibiciones de fuegos a las seis y solo se distinguen en quién las paga, que está en el carácter noventa—, y medida sobre los 792 cazaba **una pareja en todo el catálogo y era esa**, así que se fue; y el mismo programa venía con **dos rótulos** desde antes, lo que callaba el nombre de la fiesta en **12 días de 176**, cerrado con `eventos.js rotulos` |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si

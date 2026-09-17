@@ -413,16 +413,30 @@ function duplicados(hazlo,flojo){
      calles» —el mismo pasacalle contado por dos fuentes, mismo pueblo, mismo
      día y misma hora— no casaban, porque uno tiene 13 caracteres y el otro 22.
      Salió a la vista al agrupar el calendario por sitio: los dos aparecían
-     seguidos bajo «Los Abrigos» a las nueve de la mañana. Ahora vale también
+     seguidos bajo «Los Abrigos» a las nueve de la mañana. Ahora lo que vale es
      que uno EMPIECE por el otro, con doce caracteres de mínimo para que un
      nombre corto no se coma a otro. Coincidir en pueblo, día y hora ya es una
-     atadura fuerte; aun así esto **lista y espera**, como siempre. */
+     atadura fuerte; aun así esto **lista y espera**, como siempre.
+
+     Y la de los 24 primeros caracteres a secas SE FUE, que daba por buena una
+     cabecera compartida sin mirar lo que venía detrás. En Benijos el 14 de
+     septiembre hay DOS exhibiciones de fuegos a las seis —«de Pirotécnica
+     Tanausú, patrocinada por los vecinos de la zona» y «…patrocinada por la
+     comisión de fiestas»—, y sus veinticuatro primeros caracteres son
+     «Exhibición de fuegos arti»: puro encabezado. La regla se comía una de las
+     dos SOLA, sin preguntar. Medido sobre los 792 actos antes de quitarla:
+     cazaba **una sola pareja en todo el catálogo y era justo esa**, y todo lo
+     de verdad lo caza la de prefijo —las dos reglas no coincidían ni una vez—.
+     El caso para el que se escribió, «Diana floreada» contra «Diana floreada
+     por las calles», lo cubre la de prefijo entera.
+     Lo que comparten cabecera y luego se separan no se pierde: cae en la lista
+     de los que SE PARECEN, que es donde ya vivían las dos ferias de Los
+     Realejos, y ahí lo mira alguien. Es la regla de la casa: mismo pueblo,
+     mismo día y misma hora NO quiere decir que sean lo mismo. */
   const clave=a=>a.m+'|'+a.f+'|'+(a.h||'');
-  const cab=n=>norm(n).slice(0,24);
   const MIN=12;
   const mismoNombre=(x,y)=>{
     const a=norm(x), b=norm(y);
-    if(cab(x)===cab(y)) return true;
     const [c,l]=a.length<=b.length?[a,b]:[b,a];
     return c.length>=MIN&&l.indexOf(c)===0;
   };
@@ -571,9 +585,16 @@ function sospechosos(A){
   console.log('Pueden ser el mismo acto contado por dos fuentes, o dos actos');
   console.log('seguidos de la misma fiesta. Si sobra uno, se quita a mano.');
   pares.sort((p,q)=>String(p.a.f+p.a.h).localeCompare(String(q.a.f+q.a.h)));
-  pares.slice(0,12).forEach(x=>
+  /* Se recorta a 70 para que quepa, PERO si los dos cortes salen iguales no
+     se recorta: dos líneas idénticas en pantalla no dejan elegir cuál sobra, y
+     esa es la única razón por la que esta lista existe. Pasa cuando lo que los
+     separa va al final —los dos fuegos de Benijos solo se distinguen en quién
+     los paga, y eso está en el carácter noventa—. */
+  const corta=(a,b)=>a.slice(0,70)===b.slice(0,70)?[a,b]:[a.slice(0,70),b.slice(0,70)];
+  pares.slice(0,12).forEach(x=>{
+    const [na,nb]=corta(x.a.n,x.b.n);
     console.log('\n· '+x.a.m+' · '+x.a.f+' '+x.a.h+'   ('+Math.round(x.parecido*100)+'% de palabras en común)'+
-      '\n    '+x.a.n.slice(0,70)+'\n    '+x.b.n.slice(0,70)));
+      '\n    '+na+'\n    '+nb);});
   console.log('\nson '+pares.length+(pares.length===1?' pareja.':' parejas.'));
   /* Y en un fichero, que doce en pantalla no son setenta y cinco y esto lo
      tiene que mirar alguien con calma. Es el mismo camino de
@@ -1024,6 +1045,83 @@ function delArtefacto(fichero,hazlo){
   console.log('hecho. Pasa ahora: node eventos.js parecidos  ·  y luego node lote.js');
 }
 
+
+/* ===== EL MISMO PROGRAMA CON DOS RÓTULOS ==============================
+   El campo `fi` es cómo se llama la fiesta de la que cuelga el acto, y cada
+   fuente lo escribe a su manera: la agenda pone «De la Luz», el artefacto
+   «De la Luz (Los Silos)» y un programa pegado a mano «Fiestas de Nuestra
+   Señora de La Luz». Los tres son la misma fiesta del mismo pueblo.
+
+   Eso no era invisible: la cabecera del día **solo nombra la fiesta si TODOS
+   los actos del pueblo son de la misma** —regla que existe porque en La Laguna
+   coinciden el Cristo y San Mateo de Punta del Hidalgo, y decir una como si
+   fuera todo es contar mal—. Con el rótulo partido, un día entero de la misma
+   fiesta parecía tener dos y la cabecera se callaba el nombre. Medido sobre el
+   calendario cargado: **12 días-pueblo de 176** se quedaban sin decir de qué
+   fiesta eran, teniéndolo.
+
+   Cómo se junta, y lo que NO hace:
+   · **Solo dentro del mismo municipio.** «De la Luz» está en Los Silos, en La
+     Orotava y en Tacoronte, y son tres fiestas distintas de tres pueblos.
+   · **Y solo si uno CONTIENE al otro** una vez quitado el paréntesis del
+     municipio y el «Fiestas de / Nuestra Señora de» de delante. Es la misma
+     atadura de `parecidos` y por la misma razón: compartir palabras no basta
+     —«De la Luz» y «De los Dolores» comparten dos—.
+   · **Gana el que dice más, PERO sin el paréntesis del municipio**, que ese lo
+     pusimos nosotros para desambiguar y en pantalla sobra — el porqué está
+     abajo, junto al código que lo hace. Lo demás del nombre no se toca.
+   · No toca ningún otro campo, y sin `hazlo` no escribe nada. */
+function rotulos(hazlo){
+  const F='datos/actos.js';
+  const A=eval(fs.readFileSync(F,'utf8')+';ACTOS');
+  const pela=s=>norm(String(s||'').replace(/\s*\([^)]*\)\s*/g,' '))
+    .replace(/^fiestas? (de |del )?/,'').replace(/^(de |del |de la |de los |de las )/,'')
+    .replace(/^(nuestra senora de |ntra sra de |santisimo |santisima |san |santa )/,'')
+    .replace(/\s+/g,' ').trim();
+  const porMuni={};
+  A.forEach(a=>{ if(!a.fi) return; (porMuni[a.m]=porMuni[a.m]||new Set()).add(a.fi); });
+  const cambios=[];
+  Object.keys(porMuni).forEach(m=>{
+    const fis=[...porMuni[m]];
+    const usado=new Set();
+    fis.forEach((x,i)=>fis.forEach((y,j)=>{
+      if(j<=i||usado.has(x)||usado.has(y)) return;
+      const px=pela(x), py=pela(y);
+      if(!px||!py) return;
+      const [c,l]=px.length<=py.length?[px,py]:[py,px];
+      if(c.length<4||l.indexOf(c)!==0) return;          /* uno dentro del otro */
+      /* Y el que gana es el más completo SIN el paréntesis del municipio, que
+         ese lo pusimos nosotros para desambiguar y en pantalla sobra: `fi`
+         siempre se enseña debajo del pueblo —`actosPorPueblo()` agrupa por `m`
+         y el informe manda `de_las_fiestas` junto al municipio—, así que «De la
+         Luz (Los Silos)» dice dos veces lo mismo. Lo que NO se toca es el resto
+         del nombre: «Fiestas de El Tablado» y «El Tablado» se quedan como los
+         publica quien los publica, y gana el que dice más. Reescribir el nombre
+         de una fiesta es justo lo que esta casa no hace. */
+      const sinMuni=t=>String(t).replace(new RegExp('\\s*\\(\\s*'+
+        m.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*\\)\\s*','i'),'').trim();
+      const cx=sinMuni(x), cy=sinMuni(y);
+      const gana=cx.length>=cy.length?cx:cy, pierde=gana===x?y:x;
+      usado.add(pierde);
+      cambios.push({m:m,gana:gana,pierde:pierde,
+        cuantos:A.filter(a=>a.m===m&&a.fi===pierde).length});
+    }));
+  });
+  if(!cambios.length){ console.log('ningún programa con dos rótulos.'); return; }
+  console.log('\n=== EL MISMO PROGRAMA CON DOS RÓTULOS ===');
+  cambios.forEach(c=>console.log('   · '+c.m+'\n       queda: '+c.gana+
+    '\n       se une: '+c.pierde+'   ('+c.cuantos+' actos)'));
+  const n=cambios.reduce((s,c)=>s+c.cuantos,0);
+  console.log('\nactos que cambian de rótulo: '+n+'  ·  programas: '+
+    (new Set(A.filter(a=>a.fi).map(a=>a.m+'|'+a.fi)).size)+' → '+
+    (new Set(A.filter(a=>a.fi).map(a=>a.m+'|'+a.fi)).size-cambios.length));
+  if(!hazlo){ console.log('\nesto era el ensayo · «node eventos.js rotulos hazlo» para hacerlo'); return; }
+  cambios.forEach(c=>A.forEach(a=>{ if(a.m===c.m&&a.fi===c.pierde) a.fi=c.gana; }));
+  fs.writeFileSync(F,'const ACTOS='+
+    JSON.stringify(A,null,0).replace(/\},\{/g,'},\n{')+';\n');
+  console.log('hecho. Pasa ahora: node lote.js');
+}
+
 const arg=process.argv[2];
 if(!arg||arg==='pegar') pagina();
 else if(arg==='actos') meterActos(process.argv[3],process.argv[4]);
@@ -1035,6 +1133,7 @@ else if(arg==='parecidos'){
 }
 else if(arg==='artefacto') delArtefacto(process.argv[3],process.argv[4]==='hazlo');
 else if(arg==='cruzadas') cruzadas(process.argv[3]==='hazlo');
+else if(arg==='rotulos') rotulos(process.argv[3]==='hazlo');
 else if(arg==='repetidas') repetidas(process.argv[3]==='hazlo');
 else if(arg==='en-el-programa') enElPrograma(process.argv[3]);
 else if(arg==='sitios') paginaSitios();
