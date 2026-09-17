@@ -3857,8 +3857,19 @@ Lo que sigue **sin usar** de lo suyo, y por qué:
   estar a menos de 150 m de un mirador ya fichado.
 - La imagen de compartir está dibujada a mano; `generar-imagen.html` la
   rehace en el navegador con las tipografías buenas.
-- Si algún día hay dominio propio, hay que cambiar la URL en **cuatro
-  sitios** del `<head>`: canonical, og:url y las dos de imagen.
+- **Si algún día hay dominio propio**, son **diez sitios**, no cuatro, y la nota
+  vieja se quedaba corta: los 4 del `<head>` (canonical, og:url y las dos de
+  imagen), los **5 de `sitemap.xml`** —la `loc` y los cuatro `hreflang`— y el
+  **`Sitemap:` de `robots.txt`**. Los tres idiomas se declaran ahí, así que
+  olvidarse del sitemap deja a Google mirando a la dirección vieja.
+  Lo que **no** hay que tocar es la función: `esDeCasa()` ya acepta cualquier
+  host que empiece por `naira.`, que se escribió pensando en esto. Y `SITIO`
+  puede quedarse como está —el de Netlify sigue siendo casa— hasta que se
+  quiera cerrar; si se cambia, se cambia en `naira.js` **y** en
+  `naira-stream.mjs`, que llevan el cierre copiado a propósito.
+  Y **cuanto antes mejor**: desde el 17 de septiembre el Cabildo enlaza a la
+  dirección de Netlify desde `datos.tenerife.es`. Cada enlace que se acumule
+  apuntando ahí es uno que luego hay que pedir que cambien.
 - **El proxy tiene freno, y hacía falta.** `netlify/functions/naira.js` es una
   URL pública que gasta la clave de Zeben. Aceptaba el `system` que le
   mandaran, así que valía de ChatGPT gratis a su costa. Tres cierres, de más
