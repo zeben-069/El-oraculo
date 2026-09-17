@@ -892,6 +892,10 @@ Queda **una pareja sin resolver a propósito**: las dos ferias de Los Realejos
 del 26, que son distintas de verdad. Y el informe la sigue enseñando aunque no
 se junte nada, que si no, el día que el catálogo esté limpio las parejas
 dudosas desaparecerían sin que nadie las hubiera mirado.
+(**El 17 de septiembre eso se quedó a medias y hubo que rematarlo:** enseñarla
+para siempre está bien, **preguntarla** para siempre no. Zeben tuvo que
+contestar dos veces lo mismo. Ahora la pareja decidida se marca con
+`repe_visto` y deja de preguntarse — abajo, en la pasada del artefacto.)
 
 **Y antes de armar nada, se enseña lo que hay y se elige.** Este es el fallo
 de fondo que destapó Zeben probándolo con su novia: desde Güímar, con coche y
@@ -1833,6 +1837,29 @@ Fueron **87 actos y 6 grupos**; los programas pasan de 42 a **36**. Los **45
 días** que siguen sin nombrar la fiesta son legítimos y se comprobaron uno a
 uno: Cristo y San Mateo en La Laguna, El Socorro y El Tablado en Güímar, Los
 Abrigos y El Médano en Granadilla.
+
+**Y la lista no sabía recordar un «son dos distintas», así que iba a volver a
+preguntarlo siempre.** Le pregunté a Zeben por las dos ferias de Los Realejos
+del 26 y me contestó **«son dos distintas, ya te lo dije la otra vez»** — y
+tenía razón dos veces: está decidido y está escrito aquí arriba. El fallo no fue
+la pregunta suelta, fue que `actos-parecidos.md` se escribe **entero en cada
+pasada** y una pareja legítima volvía a salir como pregunta abierta cada vez que
+entrara un artefacto nuevo. O sea que se lo iba a preguntar otra vez en octubre.
+Es la misma lección que dejaron los municipios del Cabildo, un piso más abajo:
+**preguntar lo ya contestado es hacerle perder el tiempo a quien vive allí.**
+El estado que faltaba es el de siempre en esta casa —`m_visto`, `ninos_visto`—:
+poder decir **que ya se miró**. Ahora cada pareja lleva una **tercera casilla**,
+«son dos actos distintos · no preguntar más», que **no quita nada**: escribe
+`repe_visto` en los dos y `sospechosos()` salta la pareja.
+· **Hacen falta LOS DOS para callarla.** Si mañana entra un acto nuevo que choca
+  con uno ya visto, esa pareja es otra y tiene que salir.
+· Se sabe de qué pareja es porque la casilla va **justo debajo de sus dos
+  actos**, bajo el mismo bullet de la hora.
+Marcadas las dos que había: las ferias de Los Realejos —suyas— y **los dos
+fuegos de Benijos**, que esa la contesta **el propio artefacto**, donde vienen
+como dos entradas con patrocinador distinto. Preguntarle por ella habría sido
+repetir el error en la misma tarde. Con eso la lista queda **sin ninguna
+pregunta abierta**, y los cuatro actos siguen en el catálogo.
 
 Con todo: `ACTOS` **790**, cero sin sitio, cero sin corredor, **1.321 actos
 ofrecidos** (eran 1.071) y **0 ofrecidos a quien no toca**, que es el cero que
@@ -3274,7 +3301,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Las frases de no dejes las cosas tiradas últimamente no salen» | 14 sep | Cierto, y llevaba así desde siempre: las cinco frases vivían **solo en las plantillas de `narrarLocal`**, o sea en la red de seguridad, y el prompt no las mencionaba —`grep basura prompt.js`, cero—. O sea que se veían **únicamente los días en que la API se caía**. Es la regla de la casa incumplida por dentro. Ahora van por `recordatorio_de_cuidar` en el informe, con su párrafo en el prompt: lo último de todo, una frase, tono de vecina y no de cartel. Y de paso, **solo los días que el plan pisa el campo**: se soltaban también en un día de museos, donde «no se lleven piedras ni plantas» no significa nada — son 32 de 124 planes |
 | «Que un plan sea aburrido para niños no quiere decir que no se ofrezca» | 15 sep | Medido antes de tocar: **el motor ya no las excluía** —una ficha con `ninos_visto` sale en 16 paradas de 339 en 124 planes con niños—, pero **no se decía nada**: `ninos_visto` era un apunte de la herramienta que no leía ni el informe ni el prompt. Ahora va por **`puede_aburrir_a_los_peques`**: media frase, de pasada, solo con niños, **sin proponer cambiar el sitio por otro** —quien decide son los padres— y **en una sola frase aunque sean varias paradas**, que repetirlo tres veces es un sermón y él pidió «y listo». `avAburre` en los tres idiomas (234 claves), impersonal para que valga con uno o con tres nombres. El orden del día NO se toca: tocar los puntos habría deshecho lo del MUNA |
 | «Una barra de autocompletar para los municipios» + «¿los planes no hacen zigzags?» | 15 sep | La barra va debajo del mapa, en los dos caminos, y **la gracia no son los 31 pueblos sino las 35 localidades**: quien duerme en Los Cristianos no tiene por qué saber que eso es Arona. El dato ya estaba —las fichas «Casco histórico» y «Caserío» SON una localidad y traen su municipio—, así que son **66 cosas buscables**, sin acentos ni artículos, y el resultado dice pueblo, municipio y comarca. Un solo destino para la cuadrícula y la barra, `elegidoMunicipio()`. Y del zigzag: medido sobre 248 planes, **rodeo mediano 2,2 km**, pero **20 pasan de 10 km** — el peor es Arico con museos, tres paradas a 6,7–8,9 km de casa pero en lados opuestos: 42,6 km de recorrido para un día que cabe en 17,7. El motor mide cada parada contra la anterior y **nunca mira la forma del día entero**. Apuntado, no tocado: cambiar las penalizaciones trae de vuelta el peor fallo que ha tenido |
-| El artefacto de las fiestas, actualizado otra vez | 17 sep | **Y por primera vez se leyó desde aquí**: la sesión tiene ya herramienta de artefactos, así que basta con mandar el enlace — la red del contenedor sigue cerrada, esto va por otro sitio. Lo que **no** cambia es que siga sin meterse solo, y esta pasada lo prueba. Son **761 actos de 31 programas y 19 municipios** (eran 660 de 26): entran **103**, con cuatro programas nuevos —**El Tanque**, **San Miguel de Abona**, **Icod de los Vinos** y dos de **Santa Cruz**—, y queda **una sola fiesta sin programa** en tres semanas. Volvieron los **dos gemelos** que se habían resuelto a favor del nuestro —el importador los cantó antes de escribir— y `ACTOS` queda en **790**. Y destapó dos cosas debajo: la regla de los **24 primeros caracteres** se comía un acto **sola** —en Benijos hay dos exhibiciones de fuegos a las seis y solo se distinguen en quién las paga, que está en el carácter noventa—, y medida sobre los 792 cazaba **una pareja en todo el catálogo y era esa**, así que se fue; y el mismo programa venía con **dos rótulos** desde antes, lo que callaba el nombre de la fiesta en **12 días de 176**, cerrado con `eventos.js rotulos` |
+| El artefacto de las fiestas, actualizado otra vez | 17 sep | **Y por primera vez se leyó desde aquí**: la sesión tiene ya herramienta de artefactos, así que basta con mandar el enlace — la red del contenedor sigue cerrada, esto va por otro sitio. Lo que **no** cambia es que siga sin meterse solo, y esta pasada lo prueba. Son **761 actos de 31 programas y 19 municipios** (eran 660 de 26): entran **103**, con cuatro programas nuevos —**El Tanque**, **San Miguel de Abona**, **Icod de los Vinos** y dos de **Santa Cruz**—, y queda **una sola fiesta sin programa** en tres semanas. Volvieron los **dos gemelos** que se habían resuelto a favor del nuestro —el importador los cantó antes de escribir— y `ACTOS` queda en **790**. Y destapó dos cosas debajo: la regla de los **24 primeros caracteres** se comía un acto **sola** —en Benijos hay dos exhibiciones de fuegos a las seis y solo se distinguen en quién las paga, que está en el carácter noventa—, y medida sobre los 792 cazaba **una pareja en todo el catálogo y era esa**, así que se fue; y el mismo programa venía con **dos rótulos** desde antes, lo que callaba el nombre de la fiesta en **12 días de 176**, cerrado con `eventos.js rotulos`. Y cuando le pregunté por las dos ferias de Los Realejos contestó **«son dos distintas, ya te lo dije la otra vez»** — cierto, y estaba escrito: el fallo es que la lista se reescribe entera en cada pasada y **no sabía recordar un «ya se miró»**, así que se lo iba a volver a preguntar en octubre. Tercera casilla (`repe_visto`), que no quita nada y calla la pareja |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si

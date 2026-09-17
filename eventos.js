@@ -531,15 +531,30 @@ function quitarMarcados(fichero){
      «## 2026-09-12 · Los Realejos» encima: por el nombre a secas no vale, que
      «Santa misa y procesión» está tres veces en el fichero y quitar «las dos
      primeras que aparezcan» habría borrado la de otro día. */
-  const marcados=[]; let dia=null, muni=null;
+  /* Y la TERCERA casilla de cada pareja —«son dos actos distintos»— no quita
+     nada: apunta `repe_visto` en los DOS para que esa pareja no se vuelva a
+     preguntar. Se sabe cuáles son porque van justo encima, bajo el mismo
+     `- \`HH:MM\`` de la pareja; por eso se lleva la cuenta de los dos últimos
+     nombres leídos y un bullet de hora los reinicia. */
+  const marcados=[], distintas=[]; let dia=null, muni=null, ult=[];
   md.split('\n').forEach(l=>{
     const cab=l.match(/^##\s*(\d{4}-\d{2}-\d{2})\s*·\s*(.+?)\s*$/);
-    if(cab){ dia=cab[1]; muni=cab[2]; return; }
-    const mk=l.match(/^\s*-\s*\[[xX]\]\s*(.+)$/);
-    if(mk) marcados.push({n:mk[1].split(/\s+·\s+_/)[0].trim(), f:dia, m:muni});
+    if(cab){ dia=cab[1]; muni=cab[2]; ult=[]; return; }
+    if(/^\s*-\s*`/.test(l)){ ult=[]; return; }
+    const linea=l.match(/^\s*-\s*\[([ xX])\]\s*(.+)$/);
+    if(!linea) return;
+    const puesta=linea[1].toLowerCase()==='x';
+    const txt=linea[2].split(/\s+·\s+_/)[0].trim();
+    if(/^\*\*son dos actos distintos\*\*/.test(txt)){
+      if(puesta&&ult.length===2) distintas.push({m:muni,f:dia,n:ult.slice()});
+      return;
+    }
+    ult.push(txt); if(ult.length>2) ult.shift();
+    if(puesta) marcados.push({n:txt, f:dia, m:muni});
   });
-  if(!marcados.length) return console.log('no hay ninguna casilla marcada en '+fichero+
-    '.\nMarca con una equis —[x]— el acto que sobra de cada pareja.');
+  if(!marcados.length&&!distintas.length) return console.log('no hay ninguna casilla marcada en '+fichero+
+    '.\nMarca con una equis —[x]— el acto que sobra de cada pareja, o la\n'+
+    'tercera casilla si son dos actos distintos de verdad.');
   const fuera=new Set(), sinEncontrar=[];
   marcados.forEach(x=>{
     const i=A.findIndex((a,k)=>!fuera.has(k)&&a.n===x.n&&
@@ -551,6 +566,18 @@ function quitarMarcados(fichero){
     (x.f||'?')+' · '+x.n.slice(0,62)));
   if(sinEncontrar.length) console.log('\nOjo: '+sinEncontrar.length+
     ' no se encontraron por su nombre. Puede que ya se hubieran quitado.');
+  if(distintas.length){
+    let n=0;
+    distintas.forEach(d=>d.n.forEach(nom=>{
+      const a=A.find(x=>x.n===nom&&x.f===d.f&&x.m===d.m);
+      if(a&&!a.repe_visto){ a.repe_visto=1; n++; }
+    }));
+    console.log('\n=== YA MIRADAS, SON DOS DISTINTAS · '+distintas.length+
+      (distintas.length===1?' pareja':' parejas')+' ===');
+    distintas.forEach(d=>console.log('   · '+d.f+' · '+d.m+'\n       '+
+      d.n[0].slice(0,62)+'\n       '+d.n[1].slice(0,62)));
+    console.log('\nmarcadas: '+n+' actos con repe_visto. No se vuelven a preguntar.');
+  }
   const limpio=A.filter((a,i)=>!fuera.has(i));
   console.log('\nactos antes: '+A.length+'  ·  se van: '+fuera.size+'  ·  quedan: '+limpio.length);
   fs.writeFileSync(F,txt.slice(0,txt.indexOf('const ACTOS='))+'const ACTOS='+
@@ -577,6 +604,16 @@ function sospechosos(A){
     if(x.size<2||y.size<2) return;
     let comun=0; x.forEach(w=>{ if(y.has(w)) comun++; });
     const parecido=comun/Math.min(x.size,y.size);
+    /* Y si LOS DOS llevan `repe_visto`, la pareja ya se miró y son distintos:
+       no se vuelve a preguntar. Hace falta porque esta lista se escribe entera
+       en cada pasada, así que una pareja legítima —las dos ferias de Los
+       Realejos del 26, que son de verdad dos— volvía a salir como pregunta
+       abierta cada vez que entraba un artefacto nuevo. Preguntar dos veces lo
+       ya contestado es hacerle perder el tiempo a quien vive allí, que es la
+       misma lección que dejaron los municipios del Cabildo.
+       Se exigen LOS DOS a propósito: si mañana entra un acto nuevo que choca
+       con uno ya visto, esa pareja es otra y tiene que salir. */
+    if(a.repe_visto&&b.repe_visto) return;
     if(parecido>=0.6) pares.push({a,b,parecido});
   }));
   if(!pares.length) return;
@@ -607,13 +644,16 @@ function sospechosos(A){
     'programa que pegaste a mano y el artefacto de Cowork—, pero también pueden\n'+
     'ser **dos actos seguidos de la misma fiesta**, y eso desde aquí no se sabe.\n'+
     'Por eso no se ha tocado ninguno.\n\n'+
-    'Marca el que sobre de cada pareja y se quita.\n\n'+
+    'Marca el que sobre de cada pareja y se quita. Y si son **dos actos\n'+
+    'distintos de verdad**, marca la tercera casilla y no se vuelve a\n'+
+    'preguntar por esa pareja.\n\n'+
     'Son **'+pares.length+(pares.length===1?' pareja**.\n':' parejas**.\n');
   Object.keys(porDia).sort().forEach(k=>{
     md+='\n## '+k+'\n';
     porDia[k].forEach(x=>{ md+='\n- `'+(x.a.h||'')+'`  ('+Math.round(x.parecido*100)+'%)\n'+
       '  - [ ] '+x.a.n+(x.a.lu?'  · _'+x.a.lu+'_':'')+'\n'+
-      '  - [ ] '+x.b.n+(x.b.lu?'  · _'+x.b.lu+'_':'')+'\n'; });
+      '  - [ ] '+x.b.n+(x.b.lu?'  · _'+x.b.lu+'_':'')+'\n'+
+      '  - [ ] **son dos actos distintos** · no preguntar más\n'; });
   });
   fs.writeFileSync('actos-parecidos.md',md);
   console.log('\nla lista entera está en actos-parecidos.md');
