@@ -37,13 +37,27 @@ const FIRMA = "Eres Naira, gu";
 // Los mismos dos agujeros que en naira.js, cerrados igual: se EXIGE la
 // cabecera —sin ella entraba un curl a pelo— y el host es el sitio exacto, no
 // «cualquier cosa que contenga naira» ni «cualquier netlify.app».
+// Y los dominios propios van en una LISTA ampliable desde el entorno
+// (`NAIRA_DOMINIOS`), no en un regex: el `naira.` de antes dejaba fuera
+// `nairatenerife.com`. El porqué entero está en naira.js — este fichero lleva
+// el cierre COPIADO a propósito, así que quien toque uno tiene que tocar el
+// otro o deja la puerta abierta por el lado que no mire.
 const SITIO = "leafy-cobbler-d24e23.netlify.app";
+const DOMINIOS = ["nairatenerife.com", "nairatenerife.es", "naira.guide"];
+function dominiosDeCasa() {
+  const l = DOMINIOS.slice();
+  String((process.env && process.env.NAIRA_DOMINIOS) || "").split(",").forEach(d => {
+    d = String(d).trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+    if (d && !l.includes(d)) l.push(d);
+  });
+  return l;
+}
 function esDeCasa(host) {
   if (!host) return false;
-  host = String(host).toLowerCase();
-  if (/^localhost(:|$)/.test(host) || /^127\.0\.0\.1(:|$)/.test(host)) return true;
+  host = String(host).toLowerCase().replace(/:\d+$/, "");
+  if (/^localhost$/.test(host) || /^127\.0\.0\.1$/.test(host)) return true;
   if (host === SITIO || host.endsWith("--" + SITIO) || host.endsWith("." + SITIO)) return true;
-  return /^naira\.[a-z0-9.-]+$/.test(host);
+  return dominiosDeCasa().some(d => host === d || host === "www." + d);
 }
 const POR_IP_HORA = 20;
 const TECHO_DIA = 600;

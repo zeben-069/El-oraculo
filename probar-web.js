@@ -28,6 +28,12 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
 
+/* Sin argumento va contra la dirección de Netlify y NO contra el dominio
+   propio, a propósito: esa es el origen y contesta siempre, mientras que
+   `nairatenerife.com` depende de que el DNS esté apuntado y de que no haya una
+   redirección por medio. Sirven lo mismo. Para probar el dominio de verdad
+   —que es lo que hay que hacer el día que se apunte— se le pasa detrás:
+   `node probar-web.js https://nairatenerife.com`. */
 const URL = process.argv[2] || 'https://leafy-cobbler-d24e23.netlify.app';
 const CARPETA = './capturas';
 

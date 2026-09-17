@@ -2904,6 +2904,69 @@ comarca**, así que estaba ordenando mal. Los dos campos se han quitado de
 filtro con el que se arma el día. Un número que se escribe a mano se pudre; uno
 que se cuenta, no.
 
+## El Cabildo publica Naira, y Naira tiene dominio
+
+El 17 de septiembre llegó un correo del **Portal de Datos Abiertos del Cabildo**:
+Naira está publicada en la sección **Apps y Empresas** de `datos.tenerife.es`,
+por reutilizar sus conjuntos de datos. Es el primer enlace serio que apunta aquí
+y viene de un dominio institucional.
+
+**Lo primero que se miró fue si la ficha decía la verdad**, que es la regla de la
+casa apuntando hacia fuera. Lista seis conjuntos, y **dos no se usan**: *Afluencia
+de las áreas recreativas* —que ni se tiene— y *Actividades en la naturaleza*, que
+está documentado arriba como descartado (son permisos de acampada y barranquismo,
+no plan de un día). Zeben lo zanjó y su criterio es razonable: **«se leyeron y se
+estudiaron, y si alguien pregunta decimos que en primera instancia la idea era
+usarlos y luego decidimos que no»**. Se queda así. Lo de las guaguas sí lo
+recoge la ficha —*Líneas y horarios de guaguas*—, que es lo que se consume vía
+GTFS.
+
+**Y de ahí salió lo del dominio, que era lo urgente.** El enlace del Cabildo
+apuntaba a `leafy-cobbler-d24e23.netlify.app`. Dos problemas: no parece un
+producto, y cada enlace que se acumule contra esa dirección es uno que luego hay
+que pedir que cambien. Comprobado por DNS antes de recomendar nada: `naira.es`,
+`naira.com`, `naira.app`, `naira.eu` y `naira.info` **están cogidos**. Zeben
+compró **`nairatenerife.com`** (el principal), **`nairatenerife.es`** y
+**`naira.guide`**.
+
+**Y ahí estaba la trampa, y era nuestra.** `esDeCasa()` —el cierre que protege la
+clave— aceptaba solo hosts que empezaran **literalmente por `naira.`**. O sea que
+`nairatenerife.com` daba **403** y la web se habría visto perfectamente **narrando
+en local**, que es el fallo que ya costó días de hipótesis en su día. Un regex
+escrito meses antes estaba decidiendo qué dominio se podía comprar, y eso es al
+revés: **el dominio lo elige el negocio**.
+Cómo queda:
+· Los dominios de casa van en una **lista**, ampliable desde el entorno con
+  **`NAIRA_DOMINIOS`** (separados por comas) **sin tocar código ni soltar el
+  zip**. La lista de dentro es el respaldo si esa variable no está puesta.
+· **Se acepta el `www.` de cada uno.** Netlify redirige los alias al dominio
+  principal, pero una redirección que no salte deja al turista sin plan: mejor
+  aceptarlo que fiarse.
+· **Y de paso se cerró un agujero que no se buscaba.** El `^naira\.` viejo
+  aceptaba `naira.example.com` — cualquiera que pudiera crear un subdominio
+  llamado `naira.` en SU dominio gastaba la clave de Zeben. Ahora la comparación
+  es **exacta** contra la lista, así que eso pasa a 403.
+· El cierre está **copiado en los dos ficheros a propósito** —`naira.js` y
+  `naira-stream.mjs`— y se tocaron los dos. Quien arregle uno y no el otro deja
+  la puerta abierta por el lado que no mire.
+Probado con **19 casos** que cubren los tres dominios, sus `www.`, mayúsculas,
+puerto, el sitio de Netlify, sus previos de despliegue y localhost; y del otro
+lado `nairatenerife.com.evil.net`, `evil-nairatenerife.com`,
+`naira-gratis.example.com`, `naira.example.com`, `otracosa.netlify.app` y
+`nairatenerife.org`. **Los 19 correctos y los dos ficheros diciendo lo mismo.**
+
+**El orden de la mudanza importa, y es al revés de lo que parece.** Si se apunta
+el dominio ANTES de que suba el código nuevo, la función lo rechaza y la web
+narra en local: parecería un problema del dominio y es del cierre. Así que:
+**primero el zip, después el DNS.**
+
+**`SITIO` se queda como está.** La dirección de Netlify sigue siendo casa, y tiene
+que seguir siéndolo: es el origen, los previos de despliegue cuelgan de ella y
+`probar-web.js` la usa como destino por defecto —a propósito, porque contesta
+siempre y no depende de que el DNS esté apuntado ni de que no haya una
+redirección por medio—. Para probar el dominio de verdad se le pasa detrás:
+`node probar-web.js https://nairatenerife.com`.
+
 ## Trampas conocidas
 
 **El ancla del turista pasa por un camino aparte.** Cuando eligen un sitio
@@ -3302,6 +3365,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Que un plan sea aburrido para niños no quiere decir que no se ofrezca» | 15 sep | Medido antes de tocar: **el motor ya no las excluía** —una ficha con `ninos_visto` sale en 16 paradas de 339 en 124 planes con niños—, pero **no se decía nada**: `ninos_visto` era un apunte de la herramienta que no leía ni el informe ni el prompt. Ahora va por **`puede_aburrir_a_los_peques`**: media frase, de pasada, solo con niños, **sin proponer cambiar el sitio por otro** —quien decide son los padres— y **en una sola frase aunque sean varias paradas**, que repetirlo tres veces es un sermón y él pidió «y listo». `avAburre` en los tres idiomas (234 claves), impersonal para que valga con uno o con tres nombres. El orden del día NO se toca: tocar los puntos habría deshecho lo del MUNA |
 | «Una barra de autocompletar para los municipios» + «¿los planes no hacen zigzags?» | 15 sep | La barra va debajo del mapa, en los dos caminos, y **la gracia no son los 31 pueblos sino las 35 localidades**: quien duerme en Los Cristianos no tiene por qué saber que eso es Arona. El dato ya estaba —las fichas «Casco histórico» y «Caserío» SON una localidad y traen su municipio—, así que son **66 cosas buscables**, sin acentos ni artículos, y el resultado dice pueblo, municipio y comarca. Un solo destino para la cuadrícula y la barra, `elegidoMunicipio()`. Y del zigzag: medido sobre 248 planes, **rodeo mediano 2,2 km**, pero **20 pasan de 10 km** — el peor es Arico con museos, tres paradas a 6,7–8,9 km de casa pero en lados opuestos: 42,6 km de recorrido para un día que cabe en 17,7. El motor mide cada parada contra la anterior y **nunca mira la forma del día entero**. Apuntado, no tocado: cambiar las penalizaciones trae de vuelta el peor fallo que ha tenido |
 | El artefacto de las fiestas, actualizado otra vez | 17 sep | **Y por primera vez se leyó desde aquí**: la sesión tiene ya herramienta de artefactos, así que basta con mandar el enlace — la red del contenedor sigue cerrada, esto va por otro sitio. Lo que **no** cambia es que siga sin meterse solo, y esta pasada lo prueba. Son **761 actos de 31 programas y 19 municipios** (eran 660 de 26): entran **103**, con cuatro programas nuevos —**El Tanque**, **San Miguel de Abona**, **Icod de los Vinos** y dos de **Santa Cruz**—, y queda **una sola fiesta sin programa** en tres semanas. Volvieron los **dos gemelos** que se habían resuelto a favor del nuestro —el importador los cantó antes de escribir— y `ACTOS` queda en **790**. Y destapó dos cosas debajo: la regla de los **24 primeros caracteres** se comía un acto **sola** —en Benijos hay dos exhibiciones de fuegos a las seis y solo se distinguen en quién las paga, que está en el carácter noventa—, y medida sobre los 792 cazaba **una pareja en todo el catálogo y era esa**, así que se fue; y el mismo programa venía con **dos rótulos** desde antes, lo que callaba el nombre de la fiesta en **12 días de 176**, cerrado con `eventos.js rotulos`. Y cuando le pregunté por las dos ferias de Los Realejos contestó **«son dos distintas, ya te lo dije la otra vez»** — cierto, y estaba escrito: el fallo es que la lista se reescribe entera en cada pasada y **no sabía recordar un «ya se miró»**, así que se lo iba a volver a preguntar en octubre. Tercera casilla (`repe_visto`), que no quita nada y calla la pareja |
+| El correo del Cabildo: Naira publicada en datos abiertos + los tres dominios | 17 sep | Naira sale ya en **Apps y Empresas** de `datos.tenerife.es`. Lo primero fue mirar si la ficha decía la verdad: lista seis conjuntos y **dos no se usan** —*Afluencia de las áreas recreativas*, que ni se tiene, y *Actividades en la naturaleza*, descartado por ser permisos—. Él lo zanjó: **«se leyeron y se estudiaron, y si alguien pregunta decimos que en primera instancia la idea era usarlos y luego decidimos que no»**. De ahí salió lo urgente: el enlace apuntaba a la dirección de Netlify. Comprobado por DNS que `naira.es`, `.com`, `.app`, `.eu` y `.info` están cogidos, compró **`nairatenerife.com`**, **`nairatenerife.es`** y **`naira.guide`**. Y la trampa era nuestra: `esDeCasa()` solo aceptaba hosts que empezaran por `naira.`, así que **`nairatenerife.com` daba 403 y la web habría narrado en local**. Ahora los dominios van en una lista ampliable desde el entorno (`NAIRA_DOMINIOS`), se acepta el `www.`, y **de paso se cerró un agujero**: el regex viejo dejaba entrar `naira.example.com`, o sea el subdominio de cualquiera. 19 casos probados en los dos ficheros |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
@@ -3857,19 +3921,9 @@ Lo que sigue **sin usar** de lo suyo, y por qué:
   estar a menos de 150 m de un mirador ya fichado.
 - La imagen de compartir está dibujada a mano; `generar-imagen.html` la
   rehace en el navegador con las tipografías buenas.
-- **Si algún día hay dominio propio**, son **diez sitios**, no cuatro, y la nota
-  vieja se quedaba corta: los 4 del `<head>` (canonical, og:url y las dos de
-  imagen), los **5 de `sitemap.xml`** —la `loc` y los cuatro `hreflang`— y el
-  **`Sitemap:` de `robots.txt`**. Los tres idiomas se declaran ahí, así que
-  olvidarse del sitemap deja a Google mirando a la dirección vieja.
-  Lo que **no** hay que tocar es la función: `esDeCasa()` ya acepta cualquier
-  host que empiece por `naira.`, que se escribió pensando en esto. Y `SITIO`
-  puede quedarse como está —el de Netlify sigue siendo casa— hasta que se
-  quiera cerrar; si se cambia, se cambia en `naira.js` **y** en
-  `naira-stream.mjs`, que llevan el cierre copiado a propósito.
-  Y **cuanto antes mejor**: desde el 17 de septiembre el Cabildo enlaza a la
-  dirección de Netlify desde `datos.tenerife.es`. Cada enlace que se acumule
-  apuntando ahí es uno que luego hay que pedir que cambien.
+- **El dominio propio: hecho el 17 de septiembre.** Ver abajo, «Naira tiene
+  dominio». Son **diez sitios** y no cuatro como decía la nota vieja: los 4 del
+  `<head>`, los **5 de `sitemap.xml`** y el **`Sitemap:` de `robots.txt`**.
 - **El proxy tiene freno, y hacía falta.** `netlify/functions/naira.js` es una
   URL pública que gasta la clave de Zeben. Aceptaba el `system` que le
   mandaran, así que valía de ChatGPT gratis a su costa. Tres cierres, de más

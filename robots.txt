@@ -7,4 +7,4 @@ Allow: /
 # pero no tiene nada que buscar nadie desde Google.
 Disallow: /probar-aereo.html
 
-Sitemap: https://leafy-cobbler-d24e23.netlify.app/sitemap.xml
+Sitemap: https://nairatenerife.com/sitemap.xml

@@ -5,11 +5,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://leafy-cobbler-d24e23.netlify.app/</loc>
-    <xhtml:link rel="alternate" hreflang="es" href="https://leafy-cobbler-d24e23.netlify.app/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://leafy-cobbler-d24e23.netlify.app/?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="de" href="https://leafy-cobbler-d24e23.netlify.app/?lang=de"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://leafy-cobbler-d24e23.netlify.app/"/>
+    <loc>https://nairatenerife.com/</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://nairatenerife.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://nairatenerife.com/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://nairatenerife.com/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nairatenerife.com/"/>
     <changefreq>weekly</changefreq>
   </url>
 </urlset>

@@ -57,14 +57,44 @@ var FIRMA = "Eres Naira, gu";
 //      sitio de Netlify del mundo. Ahora es el sitio exacto, sus previos de
 //      despliegue (`algo--leafy-cobbler…`) y un dominio propio que empiece por
 //      `naira.`, que es lo único que se pretendía dejar abierto.
+//   Y el 17 de septiembre ese `naira.` se quedó corto, que es lo que pasa
+//   cuando un regex decide una cosa que no le toca: Zeben compró
+//   `nairatenerife.com`, `nairatenerife.es` y `naira.guide`, y los dos
+//   primeros NO empiezan por `naira.`, así que la web se habría visto y Naira
+//   habría narrado en local con un 403 mudo — el mismo fallo que costó días de
+//   hipótesis en su día. El dominio lo elige el negocio, no una expresión
+//   regular escrita meses antes.
+//   Ahora los dominios de casa están en una LISTA, y la lista se puede
+//   ampliar desde el entorno con `NAIRA_DOMINIOS` (separados por comas) sin
+//   tocar el código ni volver a soltar el zip. La de dentro es el respaldo,
+//   por si esa variable no está puesta.
+//   Y se acepta el `www.` de cada uno, que también fallaba: Netlify redirige
+//   los alias al dominio principal, pero una redirección que no salte deja la
+//   petición en el aire y el turista sin plan. Mejor aceptarlo que fiarse.
+//   Lo que NO se abre: sigue siendo comparación EXACTA contra la lista. Nada
+//   de «contiene naira», que es justo el agujero que cerró la auditoría.
 var SITIO = "leafy-cobbler-d24e23.netlify.app";
+var DOMINIOS = ["nairatenerife.com", "nairatenerife.es", "naira.guide"];
+function dominiosDeCasa() {
+  var extra = (process.env && process.env.NAIRA_DOMINIOS) || "";
+  var l = DOMINIOS.slice();
+  String(extra).split(",").forEach(function (d) {
+    d = String(d).trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+    if (d && l.indexOf(d) < 0) l.push(d);
+  });
+  return l;
+}
 function esDeCasa(host) {
   if (!host) return false;
-  host = String(host).toLowerCase();
-  if (/^localhost(:|$)/.test(host) || /^127\.0\.0\.1(:|$)/.test(host)) return true;
+  host = String(host).toLowerCase().replace(/:\d+$/, "");
+  if (/^localhost$/.test(host) || /^127\.0\.0\.1$/.test(host)) return true;
   if (host === SITIO || host.slice(-(SITIO.length + 2)) === "--" + SITIO) return true;
   if (host.slice(-(SITIO.length + 1)) === "." + SITIO) return true;
-  return /^naira\.[a-z0-9.-]+$/.test(host);
+  var l = dominiosDeCasa();
+  for (var i = 0; i < l.length; i++) {
+    if (host === l[i] || host === "www." + l[i]) return true;
+  }
+  return false;
 }
 function hostDe(cadena) {
   if (!cadena) return "";
