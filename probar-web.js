@@ -58,6 +58,14 @@ const GUIONES = [
   { nombre: 'con-ninos-playa',
     pasos: ['Charcos y playas', 'Güímar', 'Candelaria', 'Con coche',
             '@[data-p="n+"]', '@[data-p="n+"]', 'Seguimos', 'Comida típica'] },
+  /* LA BARRA DE BUSCAR EL PUEBLO, que es el único sitio del hilo donde se
+     teclea. Y se busca a propósito por una LOCALIDAD y no por un municipio:
+     «los cristi» tiene que encontrar Los Cristianos y llevar a Arona, que es
+     para lo que se hizo la barra —quien duerme allí no sabe que eso es Arona—.
+     Si algún día se rompe el cruce de localidades, este paso lo caza. */
+  { nombre: 'buscar-pueblo',
+    pasos: ['Un poco de todo', '>.bmInput::los cristi', '@.bmOpt',
+            'Con coche', 'Seguimos', 'De todo un poco'] },
   { nombre: 'sin-coche',
     pasos: ['Senderos y naturaleza', 'Valle de La Orotava', 'Puerto de la Cruz',
             'Sin coche, en guagua', 'Seguimos', 'De todo un poco'] },
@@ -211,6 +219,25 @@ async function main() {
            cada día. Buscarlos por texto es justo la trampa del `=EN` que ya
            está apuntada arriba, por el otro lado. */
         const porSel = crudo.startsWith('@');
+        /* Y uno que empieza por «>» es ESCRIBIR, no pulsar: `>selector::texto`.
+           Hace falta desde que existe la barra de buscar el pueblo, que es el
+           único sitio del hilo donde el turista teclea en vez de elegir. Sin
+           esto la barra no la pisaba ningún recorrido, y los caminos que no
+           pisa nadie son donde se esconden los fallos. */
+        if (crudo.startsWith('>')) {
+          const [sel, txt] = crudo.slice(1).split('::');
+          try {
+            await pag.locator(sel).first().waitFor({ state: 'visible', timeout: opcional ? 2500 : 9000 });
+            await pag.locator(sel).first().fill(txt);
+            dados.push(crudo);
+            await pag.waitForTimeout(700);
+          } catch (e) {
+            if (opcional) continue;
+            fallados.push(crudo);
+            break;
+          }
+          continue;
+        }
         const busca = exacto ? crudo.slice(1) : porSel ? crudo.slice(1) : crudo;
         /* `button:visible` y no `button`: el calendario cerrado NO se quita del
            DOM, solo se oculta, así que sus chips de pueblo siguen ahí. Sin el

@@ -2941,7 +2941,7 @@ miradores en el catálogo (41 con posición aproximada), 35% de los planes y
 comparte candidatos con él. Eran 25 miradores y el 12%, así que este número
 mide sobre todo el catálogo, no el motor.
 
-**Con navegador** — `probar-web.js` con Playwright recorre quince flujos en
+**Con navegador** — `probar-web.js` con Playwright recorre dieciséis flujos en
 Chrome y captura los errores de consola. Sin argumentos va contra la web
 desplegada; con una URL detrás va contra lo que se le diga, y **eso es lo que
 hay que hacer para probar una rama**: se levanta un servidor de ficheros en el
@@ -2975,7 +2975,7 @@ la web: el proxy corta Leaflet y las tipografías de Google por certificado, y
 las funciones de Netlify no existen en un servidor de ficheros. Lo que hay que
 mirar es que **no haya ningún error de JavaScript propio** — y que, con la API
 caída, el plan salga igual por el narrador local, que es la red de seguridad.
-Referencia: **15 de 15 recorridos completan todos sus pasos, 0 errores de
+Referencia: **16 de 16 recorridos completan todos sus pasos, 0 errores de
 JavaScript propios**, y el plan sale con sus fichas y su caja de texto. Los dos
 últimos entran por caminos que ningún otro pisa:
 · `mapa-comarcas` — los siete primeros eligen el pueblo donde DUERMEN, y este
@@ -3002,6 +3002,13 @@ JavaScript propios**, y el plan sale con sus fichas y su caja de texto. Los dos
 · `programa-en-la-ficha` — pulsar la fiesta del plan para ver el programa del
   día. Su último paso va OPCIONAL a propósito: la prueba corre con la fecha de
   hoy y el botón solo sale si el pueblo del ancla tiene actos cargados ese día.
+· `buscar-pueblo` — la barra del paso 2, que es **el único sitio del hilo donde
+  el turista teclea** en vez de elegir, y por eso ningún otro recorrido la
+  pisaba. Para esto hizo falta un prefijo nuevo: **un paso que empieza por `>`
+  es ESCRIBIR**, con la forma `>selector::texto`. Y busca a propósito por una
+  LOCALIDAD y no por un municipio —«los cristi» tiene que encontrar Los
+  Cristianos y llevar a Arona—, que es justo para lo que se hizo la barra; si
+  algún día se rompe el cruce de localidades, este paso lo caza.
 · `otra-zona` — el botón de «llévame más lejos», que ningún otro pisa: arma el
   día, y desde el plan lo manda entero a otra zona. El paso NO va opcional a
   propósito: desde La Laguna con coche siempre hay zona que ofrecer —Candelaria
