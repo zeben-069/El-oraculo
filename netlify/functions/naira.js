@@ -216,6 +216,122 @@ async function frenoCompartido(ip, ev) {
     return null;                             // que lo resuelva la memoria
   }
 }
+/* ── EL REGISTRO DE LOS PLANES ────────────────────────────────────────────
+   Desde el 11 de septiembre el freno apunta en Blobs cuántas peticiones van
+   cada día, en `dia-YYYY-MM-DD`, y **no lo leía nadie**. O sea que había
+   semanas de uso guardadas y sin manera de mirarlas. Esto es la otra mitad.
+
+   QUÉ SE GUARDA, Y QUÉ NO. Un contador al día en `reg-YYYY-MM-DD` con cuántos
+   planes y cómo eran: idioma, pueblo de salida, tipo de día, con coche o sin
+   él, con niños o sin ellos. **Nada de personas**: no se guarda la IP, ni la
+   fecha del plan, ni el texto, ni nada que apunte a nadie. Son cuentas.
+   El freno sí lleva la IP en su propia clave, pero esa caduca a la hora y solo
+   guarda un número; aquí no entra.
+
+   POR QUÉ ES APROXIMADO, Y HAY QUE DECIRLO. Tres motivos, los tres de fondo:
+   · **No es atómico.** Dos peticiones a la vez leen el mismo número y escriben
+     el mismo+1. Igual que el freno. Se pierde alguna.
+   · **Solo cuenta los planes que narra el modelo.** Si la API está caída, si
+     el freno corta o si no hay clave, el turista recibe su plan igual —narrado
+     en local, que para eso está la red de seguridad— y eso no pasa por aquí.
+     El registro es el suelo del uso real, nunca el techo.
+   · **Lo manda el navegador.** El apunte viaja en el cuerpo, así que quien
+     sepa llamar a la función podría mandar uno raro. Por eso se sanea a lo
+     bruto —valores cortos, sin nada que no sea letra o espacio— y cada rama
+     tiene tope de claves: lo peor que se puede hacer es ensuciar una línea,
+     no reventar el fichero.
+
+   CÓMO SE MIRA: `…/.netlify/functions/naira?registro=LA_LLAVE`, y la llave es
+   la variable de entorno `NAIRA_REGISTRO`. **Si no está puesta, esto no
+   existe**: falla cerrado, que esa URL es pública y las cuentas de uso no son
+   asunto de quien pase por ahí. Se pone desde el panel de Netlify como las
+   demás, sin tocar código ni soltar el zip.
+*/
+var REG_MAX_CLAVES = 40;   // 31 municipios + margen: por encima es basura
+var REG_DIAS = 60;
+
+// Se queda con letras, números, espacios y poco más, y corta a 40. Un nombre
+// de pueblo cabe de sobra y una inyección no.
+function regLimpio(v) {
+  if (typeof v !== "string") return null;
+  var t = v.normalize("NFC").replace(/[^\p{L}\p{N} .'’-]/gu, "").trim().slice(0, 40);
+  return t || null;
+}
+function regSube(o, rama, k) {
+  if (!k) return;
+  o[rama] = o[rama] || {};
+  if (o[rama][k] === undefined && Object.keys(o[rama]).length >= REG_MAX_CLAVES) return;
+  o[rama][k] = (o[rama][k] || 0) + 1;
+}
+var SI_NO = function (v) { return v === true ? "si" : v === false ? "no" : null; };
+
+async function apuntar(ev, ap) {
+  var t = await tienda(ev);
+  if (!t) return;                       // sin cajón no hay registro, y no pasa nada
+  var clave = "reg-" + new Date().toISOString().slice(0, 10);
+  try {
+    var o = null;
+    try { o = await t.get(clave, { type: "json" }); } catch (e) {}
+    if (!o || typeof o !== "object") o = { n: 0 };
+    o.n = (o.n || 0) + 1;
+    ap = (ap && typeof ap === "object") ? ap : {};
+    // El idioma es de una lista cerrada: ahí no hace falta sanear, se compara.
+    regSube(o, "idioma", ["es", "en", "de"].indexOf(ap.idioma) >= 0 ? ap.idioma : "otro");
+    regSube(o, "pueblo", regLimpio(ap.base));
+    regSube(o, "tipo", regLimpio(ap.tipo) || "sin pedir");
+    regSube(o, "coche", SI_NO(ap.coche));
+    regSube(o, "ninos", SI_NO(ap.ninos));
+    await t.setJSON(clave, o);
+  } catch (e) {
+    console.warn("no se pudo apuntar el plan:", e && e.message);
+  }
+}
+
+// La llave se compara entera y siempre, sin cortar en el primer carácter que
+// falle: no es criptografía seria, pero tampoco regala la longitud.
+function laLlaveVale(dada) {
+  var buena = (process.env && process.env.NAIRA_REGISTRO) || "";
+  if (!buena || typeof dada !== "string") return false;
+  var mal = dada.length !== buena.length ? 1 : 0;
+  for (var i = 0; i < Math.max(dada.length, buena.length); i++) {
+    if (dada.charCodeAt(i) !== buena.charCodeAt(i)) mal = 1;
+  }
+  return !mal;
+}
+
+async function leerRegistro(ev, dias) {
+  var t = await tienda(ev);
+  if (!t) return { error: "no hay cajón: el registro solo existe con Netlify Blobs" };
+  var hoy = new Date(), fuera = [];
+  for (var i = 0; i < dias; i++) {
+    var d = new Date(hoy.getTime() - i * 86400000).toISOString().slice(0, 10);
+    var reg = null, freno = null;
+    try { reg = await t.get("reg-" + d, { type: "json" }); } catch (e) {}
+    try { freno = await t.get("dia-" + d, { type: "json" }); } catch (e) {}
+    if (!reg && !freno) continue;
+    fuera.push({
+      dia: d,
+      planes: (reg && reg.n) || null,
+      // El contador del freno lleva desde el 11 de septiembre y cuenta
+      // PETICIONES aceptadas, no planes: los días anteriores al registro es
+      // lo único que hay, y no es lo mismo. Va con su nombre.
+      peticiones: (freno && freno.n) || null,
+      idioma: (reg && reg.idioma) || null,
+      pueblo: (reg && reg.pueblo) || null,
+      tipo: (reg && reg.tipo) || null,
+      coche: (reg && reg.coche) || null,
+      ninos: (reg && reg.ninos) || null
+    });
+  }
+  return {
+    dias: fuera,
+    ojo: "Cuenta solo los planes que narra el modelo: si la API se cae, si el " +
+         "freno corta o si no hay clave, el turista recibe su plan en local y " +
+         "eso no pasa por aquí. Es el suelo del uso, no el techo. Y no es " +
+         "atómico, así que dos a la vez pueden contar por una."
+  };
+}
+
 // Para `?probar=1`: ida y vuelta de verdad, que saber que el módulo carga no
 // es saber que el cajón escribe.
 async function pruebaDelCajon(ev) {
@@ -256,6 +372,19 @@ exports.handler = async function (event) {
   var cabeceras = { "Content-Type": "application/json" };
 
   var q = event.queryStringParameters || {};
+
+  // El registro de los planes. Falla CERRADO: sin `NAIRA_REGISTRO` puesta en
+  // el entorno esto no existe, porque la URL es pública.
+  if (q.registro) {
+    if (!laLlaveVale(q.registro)) {
+      return { statusCode: 403, headers: cabeceras,
+               body: JSON.stringify({ error: "Desde ahí no" }) };
+    }
+    var cuantos = Math.min(Math.max(parseInt(q.dias, 10) || REG_DIAS, 1), 365);
+    return { statusCode: 200, headers: cabeceras,
+             body: JSON.stringify(await leerRegistro(event, cuantos), null, 2) };
+  }
+
   if (q.probar) {
     var k = buscarClave();
     var cajon = await pruebaDelCajon(event);
@@ -375,6 +504,12 @@ exports.handler = async function (event) {
       .filter(function (x) { return x.type === "text"; })
       .map(function (x) { return x.text; })
       .join("\n");
+
+    // Se apunta AQUÍ y no antes: lo que cuenta el registro son los planes
+    // servidos, no los intentos. Y va sin `await` a propósito —el turista no
+    // tiene por qué esperar a que se escriba una estadística—, con su `catch`
+    // para que un fallo del cajón no se lleve por delante el plan.
+    try { apuntar(event, cuerpo.apunte).catch(function () {}); } catch (e) {}
 
     return { statusCode: 200, headers: cabeceras, body: JSON.stringify({ texto: texto }) };
   } catch (e) {

@@ -69,14 +69,14 @@ herramientas ni los ficheros del Cabildo.
 ## Estructura
 
 ```
-index.html                    el motor y la interfaz (~228 KB)
-estilos.css                   el CSS (27 KB)
-prompt.js                     el prompt de Naira (18 KB)
-datos/lugares.js              LUGARES (328 KB)
-datos/restaurantes.js         REST (118 KB)
+index.html                    el motor y la interfaz (415 KB)
+estilos.css                   el CSS (47 KB)
+prompt.js                     el prompt de Naira (35 KB)
+datos/lugares.js              LUGARES (384 KB)
+datos/restaurantes.js         REST (168 KB)
 datos/eventos.js              EVENTOS · datos/actos.js · datos/bases.js · datos/estampas.js
 datos/comarcas.js             COMARCAS, SUELTOS, AVISO_CARTEL y el SVG del mapa
-datos/titsa-matriz.js         MATRIZ (542 KB) · datos/ine.js
+datos/titsa-matriz.js         MATRIZ (541 KB) · datos/ine.js
 manifest.webmanifest          para instalar en la pantalla de inicio
 icono.svg / icono-*.png
 img/naira-social.jpg          previsualización al compartir
@@ -96,6 +96,8 @@ datos/senderos-tenerife.js    225 itinerarios del Cabildo │ se cargan: nadie
 datos/miradores.js            18 miradores de Santa Cruz  │ leía su constante
 datos/titsa-regreso.js        el regreso por corredor     ┘ (159 KB de menos)
 empaquetar.js                 arma el zip que se suelta en Netlify Drop
+afluencia.js                  a qué hora y qué días se llena un área recreativa
+correo-cabildo.md             el correo para que cambien el enlace de la ficha
 probar-aereo.html             prueba en casa qué ortofoto contesta
 fusionar.js                   junta sitios repetidos (ensayo sin tocar nada)
 hosteleria.js                 rellena con el registro del Cabildo donde falta comer
@@ -135,9 +137,13 @@ pegar-eventos.html            esa página, lista para abrir
 ```
 
 **`index.html` ya está partido.** Era una sola pieza de 1,1 MB con los datos,
-el CSS, el motor y el prompt dentro; ahora son 228 KB de motor e interfaz, y
-los 827 KB de datos, los 27 de CSS y los 18 del prompt viven en ficheros
-aparte que el navegador carga con su propio `<script>` antes que el motor.
+el CSS, el motor y el prompt dentro; ahora el motor y la interfaz van por su
+lado y los datos, el CSS y el prompt viven en ficheros aparte que el navegador
+carga con su propio `<script>` antes que el motor.
+(**Las cifras de arriba son una foto del 18 de septiembre, no una promesa.**
+Estaban puestas el día del corte y llevaban semanas sin tocar: decían 228 KB de
+`index.html` cuando ya iba por 415. Un número escrito a mano se pudre, que es
+lo mismo que pasó con los «N sitios» de las 31 estampas.)
 Como son `<script>` clásicos, las constantes de nivel superior siguen estando
 disponibles para el motor igual que cuando vivían dentro.
 
@@ -2917,12 +2923,16 @@ por reutilizar sus conjuntos de datos. Es el primer enlace serio que apunta aqu�
 y viene de un dominio institucional.
 
 **Lo primero que se miró fue si la ficha decía la verdad**, que es la regla de la
-casa apuntando hacia fuera. Lista seis conjuntos, y **dos no se usan**: *Afluencia
-de las áreas recreativas* —que ni se tiene— y *Actividades en la naturaleza*, que
-está documentado arriba como descartado (son permisos de acampada y barranquismo,
-no plan de un día). Zeben lo zanjó y su criterio es razonable: **«se leyeron y se
-estudiaron, y si alguien pregunta decimos que en primera instancia la idea era
-usarlos y luego decidimos que no»**. Se queda así. Lo de las guaguas sí lo
+casa apuntando hacia fuera. Lista seis conjuntos, y **dos no se usaban**:
+*Afluencia de las áreas recreativas* —que ni se tenía— y *Actividades en la
+naturaleza*, que está documentado arriba como descartado (son permisos de
+acampada y barranquismo, no plan de un día). Zeben lo zanjó y su criterio es
+razonable: **«se leyeron y se estudiaron, y si alguien pregunta decimos que en
+primera instancia la idea era usarlos y luego decidimos que no»**.
+**Y al día siguiente la afluencia dejó de ser cierto**: él la descargó y la
+mandó, se midió y entró por `afluencia.js`. Así que ahora la ficha del Cabildo
+dice la verdad en cinco de los seis, y el único que sigue sin usarse son las
+actividades con permiso, con su porqué escrito. Lo de las guaguas sí lo
 recoge la ficha —*Líneas y horarios de guaguas*—, que es lo que se consume vía
 GTFS.
 
@@ -3018,6 +3028,153 @@ que seguir siéndolo: es el origen, los previos de despliegue cuelgan de ella y
 siempre y no depende de que el DNS esté apuntado ni de que no haya una
 redirección por medio—. Para probar el dominio de verdad se le pasa detrás:
 `node probar-web.js https://nairatenerife.com`.
+
+## La afluencia de las áreas recreativas: la mitad de la corazonada
+
+Zeben mandó el conjunto del Cabildo con una intuición: **«no sé para qué nos
+puede servir esto, con decir si vas al merendero por ejemplo de Las Mesas en
+Los Campitos vaya temprano porque se llena… Tenerife está llena de turismo y a
+todos los sitios que vas, si no vas temprano, están llenos»**. Se midió antes
+de tocar nada, que una corazonada tiene que sostenerse en el dato o no entra.
+
+**Lo que el dato SÍ dice.** Son 5.195 filas de 2026 —enero a agosto, 38 sitios
+de 20 municipios—, y el patrón es de los que no admiten discusión:
+
+| | |
+|---|---|
+| coches un **domingo** | **14.266** |
+| coches un **miércoles** | **2.258** |
+| por sitio, lo peor | Las Raíces: **75** un domingo contra **9** un miércoles (×8) |
+| un domingo, coches que han entrado **a las 14:00** | **85%** |
+| las dos horas de 13:00 a 14:59 | **79%** del día |
+
+O sea que «vaya temprano» es un consejo con número detrás: antes de la una está
+medio vacío y a las dos ya está el pueblo entero.
+
+**Lo que el dato NO dice, y por eso Naira no lo dice.** «Se llena» no se
+sostiene: **cada sitio toca su máximo un solo día de unos doscientos**. No hay
+techo a la vista, así que lo medido es que hay muchísimos más coches y a qué
+hora llegan, **no** que no quepan. El prompt lo prohíbe con todas las letras:
+no se puede decir que se llena ni que no van a entrar.
+
+**Y el merendero que él nombró no está.** En las 5.195 filas **no hay ni una de
+Santa Cruz**: son las 38 áreas del monte del Cabildo. Las Mesas y Los Campitos
+son municipales y de esas no hay dato. No se inventa uno.
+
+**Cómo entra: `afluencia.js`**, en el patrón de siempre —una herramienta, no
+una importación a mano, que eso ya costó las 215 fichas sin `bus`—:
+
+    node afluencia.js /ruta/al/afluencia-2026.csv          ensayo, no toca nada
+    node afluencia.js /ruta/al/afluencia-2026.csv meter    lo escribe
+
+Cuatro decisiones, y dos de ellas son la misma lección de siempre:
+
+· **Va de la FICHA al dato, no al revés, y suma.** El Cabildo apunta «CHIO» y
+  «CHIO A.R.» por separado y son el mismo aparcamiento; yendo del dato a la
+  ficha más cercana, uno pisaría al otro.
+· **La cercanía sola NO vale, que es la trampa de las paradas de guagua otra
+  vez.** A 500 m del Llano de los Viejos hay un mirador y un laurel monumental,
+  y a 500 m de Lagunetilla Chica hay dos pinos con nombre: ninguno es el área
+  recreativa y en ninguno se llena el aparcamiento. Así que además de estar
+  cerca, la ficha tiene que **ser** el sitio: o es de tipo «Área recreativa», o
+  su nombre lleva dentro el topónimo del área. Con eso se cae el **Barranco de
+  Toledo**, que está a 90 m de Lomo la Jara y es otra cosa. Y **sí** entra el
+  sendero que arranca del área —«Circular Área Recreativa Las Raíces»—, que
+  comparte su mismo aparcamiento. De 24 fichas que cruzan por distancia se pasa
+  a 19 que son de verdad el sitio.
+· **Tres umbrales, y los tres existen para no decir una tontería con cara de
+  dato**: 15 coches de media un día de finde —La Tahona tiene cuatro, y cuatro
+  coches no llenan nada—, el doble que entre semana —Llano de los Viejos va
+  ×1,9 y se queda fuera— y 8 días de finde medidos, que la media de dos
+  domingos no es una media. Quedan **9 fichas**.
+· **La hora es la del cuarto del día, no la del pico.** El campo dice la
+  primera hora en la que ya ha entrado el 25%: ese es el momento en que empieza
+  a llenarse. El pico llega una hora después y entonces ya no hay sitio bueno.
+
+**Y solo viaja en finde o festivo.** El campo es `lleno:{x,h,n}` en la ficha y
+`se_llena_los_findes` en el informe, cerrado con `tipoDeDia(f)!=='laborable'`:
+un martes no hay nada que avisar. Medido sobre 558 planes de seis findes: de
+las nueve áreas, **14 salen de parada y las 14 llevan el campo**; entre semana,
+**ninguna**. El motor no se entera —esto no puntúa ni descarta nada, así que
+`lote.js` sigue con la dispersión mediana en 4,6 km y todas las banderas a
+cero—.
+
+**Va en el prompt Y en el relato local**, que es la lección de las frases de
+cuidar el sitio por el otro lado: aquello vivía solo en `narrarLocal` y se veía
+únicamente los días en que la API se caía. La clave nueva es `avLleno` en los
+tres idiomas (**237**), y la frase va **con el nombre delante** —«un apunte de
+aquí sobre X: …»— porque «a Área Recreativa Las Calderetas» cojea en español y
+«nach Área Recreativa» en alemán: así vale con cualquier nombre de ficha.
+
+## El registro de los planes, que llevaba una semana escribiéndose solo
+
+Desde el 11 de septiembre el freno apunta en Netlify Blobs cuántas peticiones
+van cada día, en `dia-YYYY-MM-DD`. **Y no lo leía nadie.** O sea que había
+semanas de uso guardadas y ninguna manera de mirarlas. Esto es la otra mitad,
+y lo pidió él de una línea: «y luego métete con el registro de los planes».
+
+**Qué se guarda.** Un contador al día en `reg-YYYY-MM-DD` con cuántos planes y
+cómo eran: idioma, pueblo de salida, tipo de día, con coche o sin él, con niños
+o sin ellos. **Nada de personas**: no va la IP, ni la fecha del plan, ni el
+sitio elegido, ni cuántos son, ni el texto. Son cuentas. El freno sí lleva la
+IP en su propia clave, pero esa caduca a la hora y solo guarda un número.
+
+**Por qué es aproximado, y hay que decirlo.** Tres motivos y los tres de fondo:
+· **No es atómico**, como el freno: dos a la vez leen el mismo número y
+  escriben el mismo+1. Se pierde alguno.
+· **Solo cuenta los planes que narra el modelo.** Si la API se cae, si el freno
+  corta o si no hay clave, el turista recibe su plan igual —narrado en local,
+  que para eso está la red de seguridad— y eso no pasa por la función. **El
+  registro es el suelo del uso real, nunca el techo.**
+· **El apunte lo manda el navegador**, así que quien sepa llamar a la función
+  podría mandar uno raro. Se sanea a lo bruto —sin nada que no sea letra,
+  número o espacio, cortado a 40 caracteres— y cada rama tiene **tope de 40
+  claves**: lo peor que se puede hacer es ensuciar una línea, no reventar el
+  fichero. Probado metiendo un `<script>` y noventa caracteres.
+
+**Y `planes` y `peticiones` son DOS columnas a propósito.** El contador del
+freno cuenta peticiones aceptadas —incluida la pregunta suelta de después del
+plan, que no es un plan— y lleva desde el 11 de septiembre; el registro cuenta
+planes servidos y empieza ahora. Juntarlos en una cifra sería inventarse una
+serie que no existe.
+
+**Cómo se mira, y por qué falla cerrado.** `…/functions/naira?registro=LA_LLAVE`,
+y la llave es la variable de entorno **`NAIRA_REGISTRO`**. Si no está puesta,
+**la puerta no existe**: esa URL es pública y las cuentas de uso no son asunto
+de quien pase por ahí. Se pone desde el panel de Netlify como `AEMET_KEY`, sin
+tocar código ni soltar el zip. En pantalla va en una pestaña nueva del panel
+—la trastienda—, con la llave guardada solo en ese navegador.
+Probado con un cajón de mentira: **403 sin llave, con llave mala y con llave
+corta; 403 también sin la variable puesta**; y por el otro lado, tres planes
+contados con su idioma, su pueblo y su tipo, el `<script>` saneado, el valor
+de noventa caracteres cortado a 40, un `coche:'sí'` que no es booleano
+**ignorado**, y el tope de 40 pueblos aguantando sesenta distintos.
+
+**El apunte se manda en `cuerpoDeLaPeticion()`**, que es el cuerpo del PLAN y
+lo comparten los dos caminos —el streaming y el clásico—. La pregunta suelta de
+después arma su propio cuerpo y no lleva apunte: no es un plan y no se cuenta.
+Y el `apuntar()` va **sin `await` y con su `catch`** en las dos funciones: una
+estadística no puede retrasar ni tumbar un plan.
+
+**Copiado en los dos ficheros a propósito**, como los tres cierres: cualquier
+cosa dentro de `netlify/functions` la trata Netlify como otra función, así que
+no hay dónde poner lo común. **Quien cambie el registro en uno y no en el otro
+va a leer la mitad de los planes.** Lo que no se copia es la puerta de lectura:
+se lee por `naira.js`, donde vive `?probar=1`, y las dos escriben en el mismo
+cajón.
+
+## El correo al Cabildo
+
+Está escrito en **`correo-cabildo.md`**, listo para copiar. Pide **una sola
+cosa**: que la ficha de Apps y Empresas enlace a `nairatenerife.com` en vez de
+a la dirección de Netlify. Un asunto por correo — si se mezcla el
+agradecimiento con una consulta técnica, se contesta la consulta y el cambio de
+enlace se queda sin hacer.
+
+**Y no pregunta nada de la afluencia**, que lo dijo él: el dato ya está
+descargado y medido. Preguntar por algo que ya se tiene es la misma regla que
+zanjó lo de los municipios del Cabildo — **hacerle perder el tiempo a quien
+contesta**.
 
 ## Trampas conocidas
 
@@ -3299,7 +3456,7 @@ costa a la cumbre y con el centroide ganaba el Observatorio del Teide, a 10 km
 y 2.400 m de altura. Quien sí sabe lo que quiere ver tiene el botón «Prefiero
 elegir el sitio yo».
 
-**Todo texto de interfaz pasa por `tr()`.** Hay 236 claves en tres idiomas
+**Todo texto de interfaz pasa por `tr()`.** Hay 237 claves en tres idiomas
 y las tres tienen que cuadrar. Se han colado pantallas enteras en español.
 
 **La leyenda del mapa también.** Los cuatro rótulos —«Dónde duermen», «La
@@ -3426,6 +3583,9 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Una barra de autocompletar para los municipios» + «¿los planes no hacen zigzags?» | 15 sep | La barra va debajo del mapa, en los dos caminos, y **la gracia no son los 31 pueblos sino las 35 localidades**: quien duerme en Los Cristianos no tiene por qué saber que eso es Arona. El dato ya estaba —las fichas «Casco histórico» y «Caserío» SON una localidad y traen su municipio—, así que son **66 cosas buscables**, sin acentos ni artículos, y el resultado dice pueblo, municipio y comarca. Un solo destino para la cuadrícula y la barra, `elegidoMunicipio()`. Y del zigzag: medido sobre 248 planes, **rodeo mediano 2,2 km**, pero **20 pasan de 10 km** — el peor es Arico con museos, tres paradas a 6,7–8,9 km de casa pero en lados opuestos: 42,6 km de recorrido para un día que cabe en 17,7. El motor mide cada parada contra la anterior y **nunca mira la forma del día entero**. Apuntado, no tocado: cambiar las penalizaciones trae de vuelta el peor fallo que ha tenido |
 | El artefacto de las fiestas, actualizado otra vez | 17 sep | **Y por primera vez se leyó desde aquí**: la sesión tiene ya herramienta de artefactos, así que basta con mandar el enlace — la red del contenedor sigue cerrada, esto va por otro sitio. Lo que **no** cambia es que siga sin meterse solo, y esta pasada lo prueba. Son **761 actos de 31 programas y 19 municipios** (eran 660 de 26): entran **103**, con cuatro programas nuevos —**El Tanque**, **San Miguel de Abona**, **Icod de los Vinos** y dos de **Santa Cruz**—, y queda **una sola fiesta sin programa** en tres semanas. Volvieron los **dos gemelos** que se habían resuelto a favor del nuestro —el importador los cantó antes de escribir— y `ACTOS` queda en **790**. Y destapó dos cosas debajo: la regla de los **24 primeros caracteres** se comía un acto **sola** —en Benijos hay dos exhibiciones de fuegos a las seis y solo se distinguen en quién las paga, que está en el carácter noventa—, y medida sobre los 792 cazaba **una pareja en todo el catálogo y era esa**, así que se fue; y el mismo programa venía con **dos rótulos** desde antes, lo que callaba el nombre de la fiesta en **12 días de 176**, cerrado con `eventos.js rotulos`. Y cuando le pregunté por las dos ferias de Los Realejos contestó **«son dos distintas, ya te lo dije la otra vez»** — cierto, y estaba escrito: el fallo es que la lista se reescribe entera en cada pasada y **no sabía recordar un «ya se miró»**, así que se lo iba a volver a preguntar en octubre. Tercera casilla (`repe_visto`), que no quita nada y calla la pareja |
 | El correo del Cabildo: Naira publicada en datos abiertos + los tres dominios | 17 sep | Naira sale ya en **Apps y Empresas** de `datos.tenerife.es`. Lo primero fue mirar si la ficha decía la verdad: lista seis conjuntos y **dos no se usan** —*Afluencia de las áreas recreativas*, que ni se tiene, y *Actividades en la naturaleza*, descartado por ser permisos—. Él lo zanjó: **«se leyeron y se estudiaron, y si alguien pregunta decimos que en primera instancia la idea era usarlos y luego decidimos que no»**. De ahí salió lo urgente: el enlace apuntaba a la dirección de Netlify. Comprobado por DNS que `naira.es`, `.com`, `.app`, `.eu` y `.info` están cogidos, compró **`nairatenerife.com`**, **`nairatenerife.es`** y **`naira.guide`**. Y la trampa era nuestra: `esDeCasa()` solo aceptaba hosts que empezaran por `naira.`, así que **`nairatenerife.com` daba 403 y la web habría narrado en local**. Ahora los dominios van en una lista ampliable desde el entorno (`NAIRA_DOMINIOS`), se acepta el `www.`, y **de paso se cerró un agujero**: el regex viejo dejaba entrar `naira.example.com`, o sea el subdominio de cualquiera. 19 casos probados en los dos ficheros |
+| El conjunto de **afluencia de áreas recreativas** + «no sé para qué nos puede servir» | 18 sep | Medido antes de tocar nada, y sostiene **la mitad** de su corazonada. Lo que sí: el domingo entran **14.266 coches** en las 38 áreas y el miércoles **2.258** —×6,3, y hasta ×8 en Las Raíces—, y un domingo **el 85% ha entrado a las 14:00**. O sea que «vaya temprano» tiene número detrás. Lo que **no**: «se llena» no se sostiene —cada sitio toca su máximo **un solo día de doscientos**—, así que Naira dice cuántos coches y a qué hora, y el prompt le prohíbe decir que se llena o que no van a entrar. Y **el merendero que él nombró no está**: en las 5.195 filas no hay ni una de Santa Cruz, que Las Mesas y Los Campitos son municipales. Entra por `afluencia.js` en **9 fichas**, y la cercanía sola no valió: a 500 m del área hay miradores y pinos con nombre que no son el área, la misma trampa que las paradas de guagua |
+| «Escríbele al Cabildo para darle las gracias y pedirle que cambien el dominio» | 18 sep | `correo-cabildo.md`, listo para copiar. Pide **solo** el cambio de enlace, y **no** pregunta por la afluencia — lo dijo él, que el dato ya lo tiene. Un asunto por correo: mezclarlo con una consulta técnica es quedarse sin el cambio de enlace |
+| «Y luego métete con el registro de los planes» | 18 sep | El freno llevaba desde el 11 de septiembre apuntando las peticiones del día en Blobs y **nadie lo leía**. Ahora hay un registro de verdad —planes, idioma, pueblo de salida, tipo de día, coche y niños, **sin nada de personas**— y una pestaña en el panel para mirarlo. La puerta **falla cerrada**: sin la variable `NAIRA_REGISTRO` no existe, que la URL es pública. Y se dice lo que no cuenta: los planes que narra el relato local no pasan por la función, así que esto es el **suelo** del uso, no el techo |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
@@ -3445,6 +3605,7 @@ cada uno contra el catálogo:
 | `bic_inmuebles_entornos.geojson` | 125 polígonos | **No se usa y no hace falta**: es el perímetro de protección alrededor de cada BIC, no un sitio |
 | `equipamientos.geojson` | 101 equipamientos del monte | De los 37 visitables (áreas recreativas, miradores, centros de visitantes) **36 ya están**. El que falta es el Aula en la Naturaleza del Barranco de la Arena |
 | `actividadesenlanaturaleza.json` | 47 actividades, 23 con coordenada | **No se usa**: son permisos —acampada, barranquismo, escalada, estancia de grupos—, con aforo y solicitud previa. No es plan de un día para quien viene de vacaciones. Sus áreas recreativas ya están fichadas por otro lado |
+| `afluencia-de-areas-recreativas-2026.csv` / `.json` + diccionario | 5.195 registros de ocupación de 38 áreas del monte, con hora de entrada y de salida | **Sí se usa**, desde el 18 de septiembre: lo lee `afluencia.js` y de ahí sale el campo `lleno` de 9 fichas. Arriba está medido qué sostiene y qué no |
 | `miradores.geojson.json` | los 18 miradores de Santa Cruz | Es `datos/miradores.js`, y arriba está medido por qué no aporta: 7 están dentro del Palmetum y 10 de los 11 restantes ya están en `LUGARES` |
 | `senderos_anaga.geojson.json` | 148 tramos **con el trazado de la línea** | `datos/senderos-anaga.js` sigue sin usarse, pero **la razón que había apuntada ya no vale**: decía que el csv no traía la geometría, y este geojson sí la trae. La razón buena es otra: hoy el mapa no dibuja el recorrido de un sendero, así que no hay dónde ponerla |
 | `establecimientos…csv` / `.json` + diccionario | los 13.678 sin coordenada | Los 43 restaurantes con `pos_aprox` |

@@ -176,6 +176,47 @@ async function frenoCompartido(ip, ev) {
     return null;                             // que lo resuelva la memoria
   }
 }
+/* EL REGISTRO DE LOS PLANES. Copiado de `naira.js` a propósito, como los tres
+   cierres: cualquier fichero dentro de `netlify/functions` lo trata Netlify
+   como otra función, así que no hay dónde poner lo común sin `package.json`
+   por medio. Quien cambie el registro en uno y no en el otro va a leer la
+   mitad de los planes. El porqué entero está escrito en `naira.js`.
+   Lo que NO se copia es la puerta de lectura: se lee por `naira.js`, que es
+   donde vive `?probar=1`, y las dos funciones escriben en el mismo cajón. */
+const REG_MAX_CLAVES = 40;
+function regLimpio(v) {
+  if (typeof v !== "string") return null;
+  const t = v.normalize("NFC").replace(/[^\p{L}\p{N} .'\u2019-]/gu, "").trim().slice(0, 40);
+  return t || null;
+}
+function regSube(o, rama, k) {
+  if (!k) return;
+  o[rama] = o[rama] || {};
+  if (o[rama][k] === undefined && Object.keys(o[rama]).length >= REG_MAX_CLAVES) return;
+  o[rama][k] = (o[rama][k] || 0) + 1;
+}
+const SI_NO = (v) => (v === true ? "si" : v === false ? "no" : null);
+async function apuntar(ev, ap) {
+  const t = await tienda(ev);
+  if (!t) return;
+  const clave = "reg-" + new Date().toISOString().slice(0, 10);
+  try {
+    let o = null;
+    try { o = await t.get(clave, { type: "json" }); } catch (e) {}
+    if (!o || typeof o !== "object") o = { n: 0 };
+    o.n = (o.n || 0) + 1;
+    ap = (ap && typeof ap === "object") ? ap : {};
+    regSube(o, "idioma", ["es", "en", "de"].indexOf(ap.idioma) >= 0 ? ap.idioma : "otro");
+    regSube(o, "pueblo", regLimpio(ap.base));
+    regSube(o, "tipo", regLimpio(ap.tipo) || "sin pedir");
+    regSube(o, "coche", SI_NO(ap.coche));
+    regSube(o, "ninos", SI_NO(ap.ninos));
+    await t.setJSON(clave, o);
+  } catch (e) {
+    console.warn("no se pudo apuntar el plan:", e && e.message);
+  }
+}
+
 // Para `?probar=1`: ida y vuelta de verdad, que saber que el módulo carga no
 // es saber que el cajón escribe.
 async function pruebaDelCajon(ev) {
@@ -300,6 +341,12 @@ export default async (req) => {
     console.error("La API respondio", r.status, detalle.slice(0, 300));
     return json(502, { error: "La API respondió " + r.status, detalle: detalle.slice(0, 200) });
   }
+
+  // El plan se da por servido cuando la API acepta y empieza a mandar: a
+  // diferencia del formato clásico, aquí no hay un momento «ya está el texto»
+  // antes de contestar — se contesta con el flujo. Sin `await`, con su
+  // `catch`: una estadística no puede retrasar ni tumbar un plan.
+  try { apuntar(null, cuerpo.apunte).catch(() => {}); } catch (e) {}
 
   /* Lo que va saliendo. La API manda su propio formato de eventos y aquí se
      traduce a uno más simple —una línea `data:` por trocito de texto— para que

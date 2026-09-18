@@ -198,6 +198,7 @@ if(typeof L==='undefined'){
     <button class="pes" role="tab" aria-selected="false" data-h="audit">Detector</button>
     <button class="pes" role="tab" aria-selected="false" data-h="valora">Qué funciona</button>
     <button class="pes" role="tab" aria-selected="false" data-h="programas">Programas</button>
+    <button class="pes" role="tab" aria-selected="false" data-h="registro">Registro</button>
   </div>
   <div class="hoja" data-hoja="razon" data-activa="1" id="hRazon">
     <p class="vacio">Pida un plan y aquí sale cada decisión con su regla.</p>
@@ -229,6 +230,24 @@ if(typeof L==='undefined'){
       Se busca en la web del ayuntamiento y se pega en la página de trabajo que
       arma <b>node eventos.js pegar</b>, que se abre desde la carpeta del proyecto.</p>
     <div id="listaProgramas"></div>
+  </div>
+  <div class="hoja" data-hoja="registro" id="hRegistro">
+    <!-- El registro de los planes. Desde el 11 de septiembre el freno apunta
+         en Netlify Blobs cuántas peticiones van al día y NADIE lo leía: había
+         semanas de uso guardadas sin manera de mirarlas. Esta es la otra mitad.
+         La llave no viaja en el código: se pone en Netlify como `NAIRA_REGISTRO`
+         y se teclea aquí una vez. Se guarda solo en este navegador. -->
+    <p class="nota">Cuántos planes se piden y cómo son. Necesita la llave que
+      esté puesta en Netlify como <b>NAIRA_REGISTRO</b>; se guarda solo en este
+      navegador. Cuenta <b>solo los planes que narra el modelo</b>: los que salen
+      por el relato local —API caída, freno, sin clave— no pasan por la función y
+      no se ven aquí. Es el suelo del uso, no el techo.</p>
+    <div class="fila-bot">
+      <input class="prompt" id="llaveReg" type="password" autocomplete="off"
+             spellcheck="false" placeholder="la llave" style="height:2.2rem">
+      <button class="accion" id="btnReg">Mirar el registro</button>
+    </div>
+    <div id="listaRegistro"><p class="vacio">Sin mirar todavía.</p></div>
   </div>
   <div class="hoja" data-hoja="audit" id="hAudit">
     <p class="nota">Cada cifra de la respuesta se compara con el informe. Lo que no esté, se marca.</p>
@@ -324,7 +343,7 @@ const T={
      frDeManana:'Por la mañana',frDeMediodia:'A mediodía',frDeTarde:'Por la tarde',frDeAtardecer:'Al caer el día',frDeNoche:'De noche',
      holaSolo:'¡Buenas! ',
      elijoYo:'Prefiero elegir el sitio yo',
-     agenda:'¿Qué evento hay hoy?',hoyEs:'hoy',mananaEs:'mañana',deMadrugada:'de madrugada',enMuniBien:(m)=>'En '+m+', muy bien.',abrirMapa:'Abrir en Google Maps',errServidor:(n)=>'el servidor respondió '+n,errSinClave:'no hay clave de API configurada',errCortado:'la respuesta se cortó a mitad',errVacio:'no llegó texto',frecMucha:'muy a menudo, no hace falta mirar el horario',frecMedia:'cada media hora aproximadamente',frecHora:'cada hora aproximadamente',frecPocas:(n)=>'unas '+n+' al día: conviene mirar el horario antes de salir',frecMuyPocas:(n)=>'solo '+n+' al día, así que hay que planificarla',rgTitulo:(m)=>'La última guagua a '+m,rgQuedan:(h,t)=>'Sale a las '+h+'. Le quedan '+t+'.',rgLinea:(l)=>'Línea '+l+'.',rgConCambios:(l,n)=>'Línea '+l+', con '+n+(n>1?' cambios':' cambio')+'.',rgYaSalio:(h)=>'Ya salió, a las '+h+'.',rgBuho:(h)=>'Queda el búho de las '+h+', que es el servicio de noche.',rgTaxi:'De aquí en adelante, taxi.',rgVayanSaliendo:'Vayan saliendo.',rgHM:(h,m)=>h+' h '+m+' min',rgM:(m)=>m+' min',avEstanFuera:(a,b,h,l)=>'Están en '+a+' y duermen en '+b+'. La última guagua de vuelta sale a las '+h+', '+l+'. Cuenten con eso antes de alargar la tarde.',porLinea:(n)=>'línea '+n,cambiandoEn:(v)=>'cambiando en '+v,buscaMuni:'…o escriba aquí su pueblo',buscaMuniNada:'Por ese nombre no encuentro ningún municipio.',avAburre:(n)=>'Ojo, que en '+n+' a los peques se les puede hacer un poco largo — pero si a ustedes les apetece, vayan.',avPrecaucion:(n,t)=>'Con los peques, en '+n+': '+t,avVueltaPronto:(d,b,h)=>'Ojo con la vuelta: la última guagua de '+d+' hacia '+b+' sale a las '+h+', o sea antes del atardecer. Si se quieren quedar, cuenten con taxi.',
+     agenda:'¿Qué evento hay hoy?',hoyEs:'hoy',mananaEs:'mañana',deMadrugada:'de madrugada',enMuniBien:(m)=>'En '+m+', muy bien.',abrirMapa:'Abrir en Google Maps',errServidor:(n)=>'el servidor respondió '+n,errSinClave:'no hay clave de API configurada',errCortado:'la respuesta se cortó a mitad',errVacio:'no llegó texto',frecMucha:'muy a menudo, no hace falta mirar el horario',frecMedia:'cada media hora aproximadamente',frecHora:'cada hora aproximadamente',frecPocas:(n)=>'unas '+n+' al día: conviene mirar el horario antes de salir',frecMuyPocas:(n)=>'solo '+n+' al día, así que hay que planificarla',rgTitulo:(m)=>'La última guagua a '+m,rgQuedan:(h,t)=>'Sale a las '+h+'. Le quedan '+t+'.',rgLinea:(l)=>'Línea '+l+'.',rgConCambios:(l,n)=>'Línea '+l+', con '+n+(n>1?' cambios':' cambio')+'.',rgYaSalio:(h)=>'Ya salió, a las '+h+'.',rgBuho:(h)=>'Queda el búho de las '+h+', que es el servicio de noche.',rgTaxi:'De aquí en adelante, taxi.',rgVayanSaliendo:'Vayan saliendo.',rgHM:(h,m)=>h+' h '+m+' min',rgM:(m)=>m+' min',avEstanFuera:(a,b,h,l)=>'Están en '+a+' y duermen en '+b+'. La última guagua de vuelta sale a las '+h+', '+l+'. Cuenten con eso antes de alargar la tarde.',porLinea:(n)=>'línea '+n,cambiandoEn:(v)=>'cambiando en '+v,buscaMuni:'…o escriba aquí su pueblo',buscaMuniNada:'Por ese nombre no encuentro ningún municipio.',avAburre:(n)=>'Ojo, que en '+n+' a los peques se les puede hacer un poco largo — pero si a ustedes les apetece, vayan.',avPrecaucion:(n,t)=>'Con los peques, en '+n+': '+t,avLleno:(n,h,c,x)=>'Y un apunte de aquí sobre '+n+': un día así entran unos '+c+' coches, '+x+' veces más que entre semana, y la mayoría llega a partir de las '+h+'. Si pueden, vayan por la mañana y lo tienen para ustedes.',avVueltaPronto:(d,b,h)=>'Ojo con la vuelta: la última guagua de '+d+' hacia '+b+' sale a las '+h+', o sea antes del atardecer. Si se quieren quedar, cuenten con taxi.',
      fueraMapa:(k)=>'· fuera del mapa, a '+k+' km',
      qAgenda:(d,n)=>'Hay '+n+' '+(n===1?'cosa apuntada':'cosas apuntadas')+' en los próximos '+d+' días. ¿Le armo el día alrededor de alguna?',
      mapaNo:'El mapa no ha cargado',
@@ -386,7 +405,7 @@ const T={
      frDeManana:'In the morning',frDeMediodia:'At midday',frDeTarde:'In the afternoon',frDeAtardecer:'As the day ends',frDeNoche:'At night',
      holaSolo:'Hello! ',
      elijoYo:'I would rather pick the place myself',
-     agenda:'What is on today?',hoyEs:'today',mananaEs:'tomorrow',deMadrugada:'after midnight',enMuniBien:(m)=>m+', very good.',abrirMapa:'Open in Google Maps',errServidor:(n)=>'the server answered '+n,errSinClave:'no API key configured',errCortado:'the answer was cut off',errVacio:'no text arrived',frecMucha:'very often, no need to check the timetable',frecMedia:'roughly every half hour',frecHora:'roughly every hour',frecPocas:(n)=>'about '+n+' a day: worth checking the timetable before you go',frecMuyPocas:(n)=>'only '+n+' a day, so it needs planning',rgTitulo:(m)=>'Last bus back to '+m,rgQuedan:(h,t)=>'It leaves at '+h+'. You have '+t+' left.',rgLinea:(l)=>'Line '+l+'.',rgConCambios:(l,n)=>'Line '+l+', with '+n+(n>1?' changes':' change')+'.',rgYaSalio:(h)=>'It already left, at '+h+'.',rgBuho:(h)=>'There is still the '+h+' bus, but that is the night service.',rgTaxi:'After that it is a taxi.',rgVayanSaliendo:'Time to head off.',rgHM:(h,m)=>h+' h '+m+' min',rgM:(m)=>m+' min',avEstanFuera:(a,b,h,l)=>'You are in '+a+' and sleeping in '+b+'. The last bus back leaves at '+h+', '+l+'. Bear that in mind before stretching the evening.',porLinea:(n)=>'line '+n,cambiandoEn:(v)=>'changing at '+v,buscaMuni:'…or type your town here',buscaMuniNada:'No municipality matches that name.',avAburre:(n)=>'Fair warning: '+n+' can drag a little for the little ones — but if you fancy it, go.',avPrecaucion:(n,t)=>'With the little ones at '+n+': '+t,avVueltaPronto:(d,b,h)=>'Careful with the way back: the last bus from '+d+' to '+b+' leaves at '+h+', before sunset. If you want to stay on, count on a taxi.',
+     agenda:'What is on today?',hoyEs:'today',mananaEs:'tomorrow',deMadrugada:'after midnight',enMuniBien:(m)=>m+', very good.',abrirMapa:'Open in Google Maps',errServidor:(n)=>'the server answered '+n,errSinClave:'no API key configured',errCortado:'the answer was cut off',errVacio:'no text arrived',frecMucha:'very often, no need to check the timetable',frecMedia:'roughly every half hour',frecHora:'roughly every hour',frecPocas:(n)=>'about '+n+' a day: worth checking the timetable before you go',frecMuyPocas:(n)=>'only '+n+' a day, so it needs planning',rgTitulo:(m)=>'Last bus back to '+m,rgQuedan:(h,t)=>'It leaves at '+h+'. You have '+t+' left.',rgLinea:(l)=>'Line '+l+'.',rgConCambios:(l,n)=>'Line '+l+', with '+n+(n>1?' changes':' change')+'.',rgYaSalio:(h)=>'It already left, at '+h+'.',rgBuho:(h)=>'There is still the '+h+' bus, but that is the night service.',rgTaxi:'After that it is a taxi.',rgVayanSaliendo:'Time to head off.',rgHM:(h,m)=>h+' h '+m+' min',rgM:(m)=>m+' min',avEstanFuera:(a,b,h,l)=>'You are in '+a+' and sleeping in '+b+'. The last bus back leaves at '+h+', '+l+'. Bear that in mind before stretching the evening.',porLinea:(n)=>'line '+n,cambiandoEn:(v)=>'changing at '+v,buscaMuni:'…or type your town here',buscaMuniNada:'No municipality matches that name.',avAburre:(n)=>'Fair warning: '+n+' can drag a little for the little ones — but if you fancy it, go.',avPrecaucion:(n,t)=>'With the little ones at '+n+': '+t,avLleno:(n,h,c,x)=>'A local tip about '+n+': on a day like this some '+c+' cars turn up, '+x+' times more than on a weekday, and most of them from '+h+' onwards. Go in the morning if you can and you will have it to yourselves.',avVueltaPronto:(d,b,h)=>'Careful with the way back: the last bus from '+d+' to '+b+' leaves at '+h+', before sunset. If you want to stay on, count on a taxi.',
      fueraMapa:(k)=>'· off the map, '+k+' km away',
      qAgenda:(d,n)=>'I have '+n+' '+(n===1?'thing':'things')+' on in the next '+d+' days. Shall I build the day around one of them?',
      mapaNo:'The map did not load',
@@ -448,7 +467,7 @@ const T={
      frDeManana:'Am Vormittag',frDeMediodia:'Mittags',frDeTarde:'Am Nachmittag',frDeAtardecer:'Zum Tagesausklang',frDeNoche:'Abends',
      holaSolo:'Hallo! ',
      elijoYo:'Ich wähle den Ort lieber selbst',
-     agenda:'Was ist heute los?',hoyEs:'heute',mananaEs:'morgen',deMadrugada:'nach Mitternacht',enMuniBien:(m)=>m+', sehr gut.',abrirMapa:'In Google Maps öffnen',errServidor:(n)=>'der Server antwortete '+n,errSinClave:'kein API-Schlüssel konfiguriert',errCortado:'die Antwort brach ab',errVacio:'es kam kein Text an',frecMucha:'sehr oft, Sie müssen nicht in den Fahrplan schauen',frecMedia:'etwa alle halbe Stunde',frecHora:'etwa stündlich',frecPocas:(n)=>'etwa '+n+' am Tag: schauen Sie vorher in den Fahrplan',frecMuyPocas:(n)=>'nur '+n+' am Tag, das muss man planen',rgTitulo:(m)=>'Der letzte Bus zurück nach '+m,rgQuedan:(h,t)=>'Er fährt um '+h+'. Sie haben noch '+t,rgLinea:(l)=>'Linie '+l+'.',rgConCambios:(l,n)=>'Linie '+l+', mit '+n+(n>1?' Umstiegen':' Umstieg')+'.',rgYaSalio:(h)=>'Er ist schon um '+h+' gefahren.',rgBuho:(h)=>'Es bleibt der Bus um '+h+', aber das ist der Nachtdienst.',rgTaxi:'Danach hilft nur noch ein Taxi.',rgVayanSaliendo:'Machen Sie sich auf den Weg.',rgHM:(h,m)=>h+' Std. '+m+' Min.',rgM:(m)=>m+' Min.',avEstanFuera:(a,b,h,l)=>'Sie sind in '+a+' und übernachten in '+b+'. Der letzte Bus zurück fährt um '+h+', '+l+'. Denken Sie daran, bevor der Abend länger wird.',porLinea:(n)=>'Linie '+n,cambiandoEn:(v)=>'Umstieg in '+v,buscaMuni:'…oder tippen Sie Ihren Ort hier ein',buscaMuniNada:'Zu diesem Namen finde ich keine Gemeinde.',avAburre:(n)=>'Kleiner Hinweis: In '+n+' kann es den Kleinen etwas lang werden — wenn Sie aber Lust darauf haben, gehen Sie ruhig.',avPrecaucion:(n,t)=>'Mit den Kleinen an '+n+': '+t,avVueltaPronto:(d,b,h)=>'Achtung beim Rückweg: der letzte Bus von '+d+' nach '+b+' fährt um '+h+', also vor Sonnenuntergang. Wenn Sie länger bleiben wollen, rechnen Sie mit einem Taxi.',
+     agenda:'Was ist heute los?',hoyEs:'heute',mananaEs:'morgen',deMadrugada:'nach Mitternacht',enMuniBien:(m)=>m+', sehr gut.',abrirMapa:'In Google Maps öffnen',errServidor:(n)=>'der Server antwortete '+n,errSinClave:'kein API-Schlüssel konfiguriert',errCortado:'die Antwort brach ab',errVacio:'es kam kein Text an',frecMucha:'sehr oft, Sie müssen nicht in den Fahrplan schauen',frecMedia:'etwa alle halbe Stunde',frecHora:'etwa stündlich',frecPocas:(n)=>'etwa '+n+' am Tag: schauen Sie vorher in den Fahrplan',frecMuyPocas:(n)=>'nur '+n+' am Tag, das muss man planen',rgTitulo:(m)=>'Der letzte Bus zurück nach '+m,rgQuedan:(h,t)=>'Er fährt um '+h+'. Sie haben noch '+t,rgLinea:(l)=>'Linie '+l+'.',rgConCambios:(l,n)=>'Linie '+l+', mit '+n+(n>1?' Umstiegen':' Umstieg')+'.',rgYaSalio:(h)=>'Er ist schon um '+h+' gefahren.',rgBuho:(h)=>'Es bleibt der Bus um '+h+', aber das ist der Nachtdienst.',rgTaxi:'Danach hilft nur noch ein Taxi.',rgVayanSaliendo:'Machen Sie sich auf den Weg.',rgHM:(h,m)=>h+' Std. '+m+' Min.',rgM:(m)=>m+' Min.',avEstanFuera:(a,b,h,l)=>'Sie sind in '+a+' und übernachten in '+b+'. Der letzte Bus zurück fährt um '+h+', '+l+'. Denken Sie daran, bevor der Abend länger wird.',porLinea:(n)=>'Linie '+n,cambiandoEn:(v)=>'Umstieg in '+v,buscaMuni:'…oder tippen Sie Ihren Ort hier ein',buscaMuniNada:'Zu diesem Namen finde ich keine Gemeinde.',avAburre:(n)=>'Kleiner Hinweis: In '+n+' kann es den Kleinen etwas lang werden — wenn Sie aber Lust darauf haben, gehen Sie ruhig.',avPrecaucion:(n,t)=>'Mit den Kleinen an '+n+': '+t,avLleno:(n,h,c,x)=>'Ein Tipp von hier zu '+n+': An so einem Tag kommen rund '+c+' Autos, '+x+'-mal mehr als unter der Woche, und die meisten ab '+h+'. Fahren Sie wenn möglich morgens, dann haben Sie es für sich.',avVueltaPronto:(d,b,h)=>'Achtung beim Rückweg: der letzte Bus von '+d+' nach '+b+' fährt um '+h+', also vor Sonnenuntergang. Wenn Sie länger bleiben wollen, rechnen Sie mit einem Taxi.',
      fueraMapa:(k)=>'· außerhalb der Karte, '+k+' km entfernt',
      qAgenda:(d,n)=>'Ich habe '+n+' '+(n===1?'Sache':'Sachen')+' in den nächsten '+d+' Tagen. Soll ich den Tag darum herum bauen?',
      mapaNo:'Die Karte wurde nicht geladen',
@@ -2529,6 +2548,20 @@ function construir(){
          deja de ser solo eso y pasa a ser media frase en el relato. */
       puede_aburrir_a_los_peques: (S.ninos&&!p.ninos&&p.ninos_visto)?true:null,
       el_relato_no_esta_probado: p.seg_tipo==='relato'?true:null,
+      /* A QUÉ HORA SE PONE DE COCHES, y solo en finde o festivo. Sale del
+         conjunto de afluencia del Cabildo con `afluencia.js`: en las nueve
+         áreas recreativas que tienen dato suficiente, un día de finde entran
+         entre dos y ocho veces más coches que un día de diario, y **el 85% ha
+         entrado a las 14:00**. La corazonada era de Zeben —«si vas al
+         merendero vaya temprano porque se llena»— y el dato la sostiene a
+         medias: sostiene que hay muchísimos más coches y a qué hora llegan,
+         **no** que no quepan. Cada sitio toca su máximo un solo día de
+         doscientos, así que aquí no se dice «se llena» ni «no va a entrar»:
+         se dice cuántos coches y desde qué hora, que es lo que se ha medido.
+         Un martes no viaja: no hay nada que avisar. */
+      se_llena_los_findes: (p.lleno && tipoDeDia(f)!=='laborable')
+        ? {a_partir_de:p.lleno.h+':00', coches_un_dia_asi:p.lleno.n,
+           veces_mas_que_entre_semana:p.lleno.x} : null,
       /* Datos oficiales del Cabildo para los senderos. Lo que cansa de una
          caminata no son los kilómetros, es la subida: se le dan las dos cosas
          para que no diga «un paseíto» de algo con 500 m de desnivel. */
@@ -3929,6 +3962,16 @@ function narrarLocal(b){
     aburren.length===1 ? aburren[0]
       : aburren.slice(0,-1).join(', ')+' '+tr('y')+' '+aburren[aburren.length-1]));
 
+  /* Y lo de los coches del finde, que si viviera solo en el prompt se vería
+     únicamente los días en que la API funciona — el fallo que ya costó las
+     frases de cuidar el sitio, por el otro lado. El campo solo llega en finde
+     o festivo, así que aquí no hace falta volver a mirar el día. */
+  (b.paradas||[]).forEach(p=>{
+    const q=p.se_llena_los_findes; if(!q) return;
+    t.push(tr('avLleno')(p.nombre,q.a_partir_de,q.coches_un_dia_asi,
+      q.veces_mas_que_entre_semana));
+  });
+
   const atd=de('atardecer');
   if(atd){
     const l=LUGARES.find(x=>x.n===atd.nombre)||{};
@@ -4029,7 +4072,16 @@ function cuerpoDeLaPeticion(brief){
       /* Sin sangría: son 2 KB menos de informe —un 25%— y al modelo le da
          igual leerlo así. Menos que mandar es menos que esperar. */
       'INFORME (único material que puedes usar):\n'+JSON.stringify(brief)+
-      '\n\nEscribe la respuesta de Naira. Solo el mensaje, sin comillas ni preámbulo.'}]
+      '\n\nEscribe la respuesta de Naira. Solo el mensaje, sin comillas ni preámbulo.'}],
+    /* EL APUNTE PARA EL REGISTRO. Cinco cosas y ninguna es de nadie: idioma,
+       pueblo de salida, qué tipo de día pidieron, si llevan coche y si van
+       con niños. No viaja la fecha del plan, ni el sitio elegido, ni cuántos
+       son, ni nada que se pueda cruzar con una persona — y la IP no sale de
+       aquí, que eso ya lo lleva el freno en su propia clave y caduca sola.
+       Va SOLO por este camino, que es el del plan: la pregunta suelta de
+       después usa su propio cuerpo y no es un plan, así que no se cuenta. */
+    apunte:{idioma:S.idioma||'es', base:S.base||null,
+      tipo:S.apetece||null, coche:!!S.coche, ninos:!!S.ninos}
   };
 }
 
@@ -6622,6 +6674,59 @@ btnPanel.onclick=()=>{
   btnPanel.setAttribute('aria-expanded',String(!ab));
   btnPanel.textContent=ab?tr('verPanel'):tr('cerrarPanel');
 };
+/* ── EL REGISTRO DE LOS PLANES, en la trastienda ─────────────────────────
+   Lee lo que las dos funciones apuntan en Netlify Blobs. La llave se teclea
+   una vez y se guarda en este navegador: en el código no puede ir, que
+   `index.html` es público. Si el navegador no deja guardar —pestaña privada,
+   permisos— se pide cada vez y ya está, como con la memoria de lo ya visto. */
+const REG_LLAVE='naira-llave-registro';
+function pintaRegistro(html){document.getElementById('listaRegistro').innerHTML=html;}
+function tablaRegistro(d){
+  if(!d||!d.dias||!d.dias.length) return '<p class="vacio">Todavía no hay nada apuntado.</p>';
+  const rama=o=>o?Object.entries(o).sort((a,b)=>b[1]-a[1])
+    .map(([k,v])=>escapar(k)+' '+v).join(' · '):'—';
+  /* Los días vienen del más nuevo al más viejo, que es como se mira esto.
+     `planes` y `peticiones` son DOS cosas y por eso van en dos columnas: el
+     contador del freno lleva desde el 11 de septiembre y cuenta peticiones
+     aceptadas; el registro empezó después y cuenta planes servidos. Juntarlos
+     en una sola cifra sería inventarse una serie que no existe. */
+  let t='<table class="reg"><thead><tr><th>día</th><th>planes</th><th>peticiones</th>'
+    +'<th>idioma</th><th>coche</th><th>niños</th><th>de dónde salen</th><th>qué piden</th>'
+    +'</tr></thead><tbody>';
+  d.dias.forEach(x=>{ t+='<tr><td>'+escapar(x.dia)+'</td><td>'+(x.planes||'—')+'</td><td>'
+    +(x.peticiones||'—')+'</td><td>'+rama(x.idioma)+'</td><td>'+rama(x.coche)+'</td><td>'
+    +rama(x.ninos)+'</td><td>'+rama(x.pueblo)+'</td><td>'+rama(x.tipo)+'</td></tr>'; });
+  t+='</tbody></table>';
+  const tot=d.dias.reduce((a,x)=>a+(x.planes||0),0);
+  return '<p class="nota"><b>'+tot+'</b> planes en '+d.dias.length+' días con algo apuntado.</p>'
+    +t+'<p class="nota">'+escapar(d.ojo||'')+'</p>';
+}
+document.getElementById('btnReg').onclick=async()=>{
+  const c=document.getElementById('llaveReg');
+  const k=(c.value||'').trim();
+  if(k){ try{localStorage.setItem(REG_LLAVE,k);}catch(e){} }
+  const llave=k||(()=>{try{return localStorage.getItem(REG_LLAVE)||'';}catch(e){return '';}})();
+  if(!llave){ pintaRegistro('<p class="vacio">Hace falta la llave.</p>'); return; }
+  pintaRegistro('<p class="vacio">Mirando…</p>');
+  /* Las dos rutas, como en todas las llamadas a la función: la bonita y la que
+     Netlify crea siempre. Desde un servidor de ficheros no existe ninguna de
+     las dos, y entonces lo que hay que decir es eso y no «no hay datos». */
+  const RUTAS=['/.netlify/functions/naira','/api/naira'];
+  for(const r of RUTAS){
+    try{
+      const x=await fetch(r+'?registro='+encodeURIComponent(llave)+'&dias=30');
+      if(x.status===403){ pintaRegistro('<p class="vacio">Esa llave no vale, o '
+        +'<b>NAIRA_REGISTRO</b> no está puesta en Netlify. Sin esa variable el '
+        +'registro no se puede leer, y es a propósito: la dirección es pública.</p>'); return; }
+      if(!x.ok) continue;
+      pintaRegistro(tablaRegistro(await x.json())); return;
+    }catch(e){}
+  }
+  pintaRegistro('<p class="vacio">La función no contesta. Desde un servidor de '
+    +'ficheros no existe: esto solo se ve en la web publicada.</p>');
+};
+document.getElementById('llaveReg').value='';
+
 document.getElementById('btnBorrarVal').onclick=()=>{
   try{localStorage.removeItem(VAL_KEY);}catch(e){}
   document.getElementById('listaValora').innerHTML=resumenValoraciones();
