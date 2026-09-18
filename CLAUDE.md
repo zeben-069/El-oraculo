@@ -2960,6 +2960,27 @@ el dominio ANTES de que suba el código nuevo, la función lo rechaza y la web
 narra en local: parecería un problema del dominio y es del cierre. Así que:
 **primero el zip, después el DNS.**
 
+**Y llegó, con unas horas de retraso que asustaron.** Zeben pegó las cuatro
+direcciones en IONOS a las 23:46 del 17 y al abrir la web **no salía nada**. No
+había hecho nada mal: era **caché de DNS**. Su móvil, su router y el proveedor
+tenían guardada la respuesta vieja —la página de aparcamiento de IONOS— con el
+TTL de una hora que había puesto.
+**La señal que lo diagnosticó sin tocar nada, y que vale para la próxima:**
+`www.nairatenerife.com` **ya resolvía bien** mientras el dominio pelado seguía
+en IONOS. ¿Por qué ese sí? Porque el `www` era un nombre **nuevo** que nadie
+había preguntado nunca, así que no había respuesta vieja guardada y fue directo
+a los servidores nuevos. El dominio pelado sí la tenía. **Cuando el `www` va y
+el pelado no, es caché y nada más** — no hay que tocar ni un registro.
+A la mañana siguiente, **los cuatro nombres resolviendo a Netlify**: el pelado,
+su `www`, `nairatenerife.es` y `naira.guide`. Netlify da el sitio como
+`https://nairatenerife.com` con su certificado.
+Y una cosa que se vio por el camino y que puede volver: al crear la zona,
+**Netlify se trae copiados los registros que hubiera en el DNS viejo**. `naira.guide`
+apareció con un `A` y un `AAAA` apuntando todavía a la página de aparcamiento de
+IONOS, servidos desde los nombres de servidor de Netlify — o sea, delegado bien y
+contestando mal. Se ve preguntándole **directamente a `198.51.44.4`** (dns1 de
+Netlify) en vez de al resolutor de siempre, que es lo que salta la caché.
+
 **`SITIO` se queda como está.** La dirección de Netlify sigue siendo casa, y tiene
 que seguir siéndolo: es el origen, los previos de despliegue cuelgan de ella y
 `probar-web.js` la usa como destino por defecto —a propósito, porque contesta
