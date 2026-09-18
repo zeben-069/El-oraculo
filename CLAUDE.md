@@ -18,7 +18,12 @@ Cuando él dice que algo está mal, está mal.
 
 ## Estado
 
-Desplegado en Netlify: `https://leafy-cobbler-d24e23.netlify.app`
+**En vivo en `https://nairatenerife.com`** desde el 18 de septiembre de 2026.
+`nairatenerife.es` y `naira.guide` son suyos también y redirigen al principal.
+Sigue alojado en Netlify y la dirección de la casa —
+`https://leafy-cobbler-d24e23.netlify.app`— **sigue siendo válida y hay que
+mantenerla**: es el origen, de ella cuelgan los previos de despliegue y es el
+destino por defecto de `probar-web.js`.
 
 **Y desde el 10 de septiembre se puede mirar desde aquí.** Zeben instaló la
 extensión de Netlify, y con ella se ve el proyecto, los despliegues y las
@@ -2974,6 +2979,32 @@ el pelado no, es caché y nada más** — no hay que tocar ni un registro.
 A la mañana siguiente, **los cuatro nombres resolviendo a Netlify**: el pelado,
 su `www`, `nairatenerife.es` y `naira.guide`. Netlify da el sitio como
 `https://nairatenerife.com` con su certificado.
+**Y el último paso fue el certificado, que asustó por segunda vez.** Con el DNS
+ya correcto en los tres, abrir `https://nairatenerife.com` daba **«este sitio web
+no puede proporcionar una conexión segura · ha enviado una respuesta no
+válida»**. Eso NO es que no llegue: es que **llega a Netlify, se conecta, y
+Netlify todavía no tiene certificado para ese nombre**, así que no hay con qué
+abrir la conexión. El panel lo decía con todas las letras en la tarjeta de
+HTTPS: *«Currently provisioning your Let's Encrypt certificate»*.
+Se resolvió **solo, esperando**, que es lo que había que hacer y nada más. Que
+tardara más de los «segundos» que promete Netlify es razonable: el certificado
+cubre **seis nombres** —los tres dominios y sus tres `www`— y Let's Encrypt los
+valida uno a uno contra un DNS delegado hacía unas horas. El umbral que da
+Netlify para preocuparse son **30 minutos**.
+**Aquí me equivoqué y conviene que quede escrito:** el día antes di el
+certificado por emitido porque `get-project` había pasado de `http://` a
+`https://` en `primarySiteUrl`. Eso es la configuración guardada, **no una
+comprobación de que el certificado exista**. Lo único que lo dice es la tarjeta
+de HTTPS del panel, y desde aquí no se ve: la extensión de Netlify deja mirar el
+proyecto, los despliegues y las variables, pero **no los certificados**.
+**Y la pregunta que hizo por el camino, que es la que hay que no hacer:** «¿no
+tendré que poner en IONOS el enlace de `leafy-cobbler…` para que vayan ahí?».
+**No.** Con el DNS ya delegado a Netlify, una redirección de IONOS ni siquiera
+se dispara; y aunque lo hiciera, el visitante acabaría viendo la dirección de
+Netlify en la barra, que es justo de lo que se estaba saliendo. Lo que se quiere
+no es que el dominio REBOTE a Netlify: es que Netlify **sirva la web en**
+`nairatenerife.com`.
+
 Y una cosa que se vio por el camino y que puede volver: al crear la zona,
 **Netlify se trae copiados los registros que hubiera en el DNS viejo**. `naira.guide`
 apareció con un `A` y un `AAAA` apuntando todavía a la página de aparcamiento de
