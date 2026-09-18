@@ -97,6 +97,8 @@ datos/miradores.js            18 miradores de Santa Cruz  │ leía su constante
 datos/titsa-regreso.js        el regreso por corredor     ┘ (159 KB de menos)
 empaquetar.js                 arma el zip que se suelta en Netlify Drop
 afluencia.js                  a qué hora y qué días se llena un área recreativa
+enriquecer.js                 el encargo de los miradores y las áreas recreativas
+enriquecer-encargo.md         esa lista, para dársela a otro (con reglas)
 correo-cabildo.md             el correo para que cambien el enlace de la ficha
 probar-aereo.html             prueba en casa qué ortofoto contesta
 fusionar.js                   junta sitios repetidos (ensayo sin tocar nada)
@@ -3163,6 +3165,80 @@ va a leer la mitad de los planes.** Lo que no se copia es la puerta de lectura:
 se lee por `naira.js`, donde vive `?probar=1`, y las dos escriben en el mismo
 cajón.
 
+## El Parque de Las Mesas, y el encargo de los miradores
+
+Zeben preguntó si teníamos algo del **Parque de Las Mesas, en Los Campitos**.
+La respuesta es sí y no, y el «no» es el interesante.
+
+**Lo que hay.** Dos fichas, las dos de los datos abiertos del **Ayuntamiento de
+Santa Cruz**: «Mirador de Parque Las Mesas» y «Mirador de Los Campitos», a
+1,32 km una de otra. Que son el sitio del que él habla lo dice el propio dato:
+la parada de guagua de la primera se llama **«EMBALSE DE LOS CAMPITOS»**.
+
+**Lo que falta, y es lo que importa.** Las dos están fichadas como **Mirador**,
+`dur:35` y franja de atardecer. O sea que Naira ofrece asomarse a ver la vista
+y **nunca ir a pasar el día**, que es exactamente lo que él describía. Del
+merendero, los fogales, las mesas o el aparcamiento no hay ni una palabra. Y
+casi no sale: barrido de 372 planes, **2 apariciones**.
+
+**Y del Cabildo no hay nada de ese sitio.** Comprobado uno a uno: ni en
+equipamientos del monte, ni en puntos de interés, ni en los BIC, ni en los
+itinerarios, ni en la afluencia — solo paradas de guagua. Eso confirma lo de la
+afluencia: las 38 áreas son las del **monte del Cabildo**, y el Parque de Las
+Mesas es **municipal**.
+
+**Y al cruzarlo salió una corrección de verdad: `Área Recreativa Las Lajas`
+estaba en Adeje y es de Vilaflor.** Tres testigos independientes dicen lo mismo
+y por eso no hubo que preguntar nada —es la regla de los municipios del
+Cabildo—: el propio fichero de afluencia la apunta en **Vilaflor a 60 metros**,
+el casco más cercano es Vilaflor (**4,6 km** contra 9,5 de Adeje) y **los tres
+vecinos fichados más cercanos son de Vilaflor de Chasna**. Se movieron `m` y
+`co`; el corredor **no**, que sigue siendo «Suroeste» y es el mismo del vecino
+más cercano. Vilaflor pasa de 15 a 16 sitios y Adeje de 33 a 32. No mueve el
+aviso del cartel: a 4,6 km el ancla la alcanza sola.
+
+**Y de ahí sale `enriquecer.js`**, porque él lo ofreció: «qué miradores y
+parques recreativos tiene, y yo hago un artefacto que complete la información
+que te falta».
+
+    node enriquecer.js encargo               escribe enriquecer-encargo.md
+    node enriquecer.js datos.json            ensayo, no toca nada
+    node enriquecer.js datos.json meter      rellena los huecos
+    node enriquecer.js datos.json meter corrige   y además cambia lo ya escrito
+
+Son **102 fichas de 29 municipios**: 88 miradores y 14 áreas recreativas. El
+hueco, medido: **63 sin `fx`** (qué se ve), **87 sin decir nada de niños**, y
+las 14 áreas con `dur:70`, `ninos:'Sí'` y **la misma frase de plantilla**
+—«Zona recreativa del Cabildo en X, con mesas y sitio para pasar el día»—, sin
+que ninguna diga si hay fogales ni si hacen falta permisos.
+
+**Lo que el encargo NO pide, que es la mitad del trabajo:**
+· **Coordenadas, nunca.** 41 miradores llevan `pos_aprox` y da rabia, pero un
+  punto no se adivina: lo de Los Abrigos vino en dos versiones a 16,8 km una de
+  otra y **las dos estaban mal**. Para eso está `buscar-miradores.html`, que se
+  lo pregunta a OpenStreetMap. El encargo lleva el punto de cada ficha **solo
+  para distinguir dos sitios con el mismo nombre**, y lo dice.
+· **`aparca` y `espacio`: no los lee nadie.** Medido sobre el motor, cero
+  apariciones de los dos. Pedir lo que nadie lee es la lección de `ninos.js`.
+· **Paradas, líneas y fotos**, que ya tienen herramienta y fuente oficial.
+
+**Y dos cosas que costaron, las dos probándolo:**
+· **La regla de «no pisar lo que ya está» no valía aquí, y por poco la dejo.**
+  Es la de `guaguas.js` con el `bus`, y allí es correcta porque el `bus` se
+  recalcula solo. Pero aquí es **Zeben corrigiendo una ficha**, y las 102 llevan
+  ya `tipo`, `dur` y `fr` escritos de una tirada: con la regla dura, **el caso
+  que motivó la herramienta —cambiarle el tipo al Parque Las Mesas— no se podía
+  arreglar nunca**. Ahora lo que choca se **aparta y se canta**, y hace falta
+  decir `corrige` a propósito. Lista y espera, como todo aquí.
+· **Un `seg` sin `seg_tipo` se avisaba y se escribía igual.** Eso es lo peor de
+  los dos mundos: sin clasificar **cuenta como peligro**, así que Naira habría
+  acabado avisando de que un escalón es un peligro. Ahora se tira, no se avisa.
+Probado con nueve casos: coordenadas rechazadas, ficha inexistente cantada, una
+playa que no es de estos tipos saltada, `ninos:"quizá"` y `carretera:"asfaltada"`
+rechazados, y la escritura real comprobada sobre una copia del catálogo — el
+Parque Las Mesas pasa a «Área recreativa, 120 min» con `corrige` y no se mueve
+sin él.
+
 ## El correo al Cabildo
 
 Está escrito en **`correo-cabildo.md`**, listo para copiar. Pide **una sola
@@ -3586,6 +3662,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | El conjunto de **afluencia de áreas recreativas** + «no sé para qué nos puede servir» | 18 sep | Medido antes de tocar nada, y sostiene **la mitad** de su corazonada. Lo que sí: el domingo entran **14.266 coches** en las 38 áreas y el miércoles **2.258** —×6,3, y hasta ×8 en Las Raíces—, y un domingo **el 85% ha entrado a las 14:00**. O sea que «vaya temprano» tiene número detrás. Lo que **no**: «se llena» no se sostiene —cada sitio toca su máximo **un solo día de doscientos**—, así que Naira dice cuántos coches y a qué hora, y el prompt le prohíbe decir que se llena o que no van a entrar. Y **el merendero que él nombró no está**: en las 5.195 filas no hay ni una de Santa Cruz, que Las Mesas y Los Campitos son municipales. Entra por `afluencia.js` en **9 fichas**, y la cercanía sola no valió: a 500 m del área hay miradores y pinos con nombre que no son el área, la misma trampa que las paradas de guagua |
 | «Escríbele al Cabildo para darle las gracias y pedirle que cambien el dominio» | 18 sep | `correo-cabildo.md`, listo para copiar. Pide **solo** el cambio de enlace, y **no** pregunta por la afluencia — lo dijo él, que el dato ya lo tiene. Un asunto por correo: mezclarlo con una consulta técnica es quedarse sin el cambio de enlace |
 | «Y luego métete con el registro de los planes» | 18 sep | El freno llevaba desde el 11 de septiembre apuntando las peticiones del día en Blobs y **nadie lo leía**. Ahora hay un registro de verdad —planes, idioma, pueblo de salida, tipo de día, coche y niños, **sin nada de personas**— y una pestaña en el panel para mirarlo. La puerta **falla cerrada**: sin la variable `NAIRA_REGISTRO` no existe, que la URL es pública. Y se dice lo que no cuenta: los planes que narra el relato local no pasan por la función, así que esto es el **suelo** del uso, no el techo |
+| «¿No hay nada del Parque de Las Mesas?» + «qué miradores y parques tiene y yo hago un artefacto» | 18 sep | Sí había: **dos fichas del Ayuntamiento de Santa Cruz**, pero las dos como **Mirador de 35 minutos**, así que Naira ofrecía asomarse y nunca ir a pasar el día — que es lo que él describía. Del Cabildo, **nada de ese sitio**: solo paradas de guagua, porque el parque es municipal y las 38 áreas de afluencia son del monte. De ahí sale **`enriquecer.js`** y su encargo de **102 fichas** —88 miradores y 14 áreas—, con lo que falta medido (63 sin «qué se ve», 87 sin nada de niños) y, sobre todo, **lo que NO se pide**: coordenadas jamás, y ni `aparca` ni `espacio`, que no los lee nadie. Y al cruzarlo salió una corrección de verdad: **`Área Recreativa Las Lajas` estaba en Adeje y es de Vilaflor**, con tres testigos diciendo lo mismo |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
