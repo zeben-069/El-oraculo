@@ -159,8 +159,9 @@ datos no obliga a tocar las pruebas. Y `fotos.js` escribe en
 
 Dentro de `index.html`, como constantes:
 
-- `LUGARES` (644) — sitios que visitar. Solo 4 sin coordenadas. **88 son
-  miradores**, y 41 llevan `pos_aprox` porque su coordenada es estimada.
+- `LUGARES` (644) — sitios que visitar. Solo 4 sin coordenadas. **87 son
+  miradores** —eran 88 hasta que el Parque de Las Mesas pasó a área recreativa—
+  y 41 llevan `pos_aprox` porque su coordenada es estimada.
 - `REST` (394) — restaurantes, incluidas 38 heladerías. **128 salen del
   registro del Cabildo** (`reg`): 43 del fichero que solo trae la calle, con
   `pos_aprox`, y 76 del que trae coordenadas, metidos con `hosteleria.js`.
@@ -3239,6 +3240,87 @@ rechazados, y la escritura real comprobada sobre una copia del catálogo — el
 Parque Las Mesas pasa a «Área recreativa, 120 min» con `corrige` y no se mueve
 sin él.
 
+## El artefacto de los miradores, y lo que destapó
+
+Zeben lo hizo y lo devolvió el mismo día: **77 fichas** con el formato exacto
+del encargo. **Las 77 cruzan por nombre y cero se rechazan** — ni una
+coordenada, ni un campo que no se acepte, ni un valor inventado en `ninos` o en
+`seg_tipo`. Lo que trajo:
+
+| campo | cuántas |
+|---|---|
+| `fx` (qué se ve) | **69** |
+| `seg` + `seg_tipo` | **40** — 23 nota, 13 acceso, 2 precaución, **2 peligro** |
+| `ninos` | 23 — 20 «Sí» y 3 «Con cuidado» |
+| `carretera:'dura'` | 10 |
+| `dur` | 7 |
+
+Y el hueco se cierra casi entero: los miradores **sin «qué se ve» pasan de 63 a
+10**, los avisos clasificados de 12 a **47** y las carreteras de curvas de 41 a
+**51**.
+
+**Lo que cambia el día, y es más de lo que parecía.** Diez de las catorce áreas
+recreativas ganaron `carretera:'dura'` —son pista forestal de verdad, alguna de
+9 km sin asfaltar y una solo apta para 4x4—, y eso son −20 puntos al atardecer.
+Resultado: **la dispersión mediana de `lote.js` baja de 4,6 a 3,7 km**, con
+todas las banderas en cero. Y **no es que los días se hayan quedado cortos**,
+que era lo primero que había que descartar: medido sobre 186 planes, **2,65
+paradas por plan antes y 2,65 después**, y los mismos 66 con menos de tres. Un
+área recreativa monte arriba por pista de tierra simplemente deja de ser una
+parada de puesta de sol, que es lo correcto.
+De paso, las paradas «niños: Sí» suben del 76% al **79%** y las divertidas del
+65% al 64% —dentro del ruido—, y el regalo de camino se queda clavado en el 35%
+con 1,1 km de desvío.
+
+**Y el Parque de Las Mesas pasa a ser lo que es**: `tipo` de Mirador a **Área
+recreativa**, `dur` de 35 a **120**, `flex`, `ninos:'Sí'` y su frase de verdad
+—«parque forestal sobre Santa Cruz, reabierto en 2022, con merenderos, fogones,
+aseos y bebederos»— con el horario en `seg_tipo:'nota'`. Los miradores pasan de
+88 a 87 y las áreas recreativas de 14 a 15, que es exactamente el cambio que
+motivó la herramienta.
+
+**Cuatro cosas que hubo que mirar antes de escribir, y dos siguen abiertas:**
+· **Los `dur` de los seis senderos disfrazados de mirador.** Montaña de Guaza,
+  Roque del Conde, Montaña Roja, la Cueva del Marqués, los 500 Escalones y los
+  Escurriales estaban fichados como **Mirador de 25 minutos** y son subidas de
+  entre hora y media y cinco horas. Corregirlo es evidentemente bueno —ofrecer
+  el Roque del Conde como un mirador de veinticinco minutos es mandar a alguien
+  a una paliza sin avisar—, pero **todos siguen con franja de atardecer**, así
+  que había que comprobar dónde caen. Medido: los Escurriales (300 min), Guaza
+  (150), Montaña Roja (90) y la Cueva (180) **no salen de parada ni una vez** en
+  186 planes; el Roque del Conde sale de mañana y de tarde. **El único que queda
+  raro es el Mirador de los 500 Escalones**, 70 minutos al atardecer bajando y
+  subiendo quinientos escalones que resbalan con humedad. Su propio aviso lo
+  dice, así que Naira avisa; pero la vuelta se hace de noche. **Apuntado, no
+  tocado**: mover su franja es una decisión, no un dato.
+· **Dos áreas recreativas están CERRADAS**, y eso lo trajo el artefacto: Los
+  Frailes «por seguridad y obras (septiembre de 2026)» y Hoya del Abade «desde
+  el incendio del verano de 2023». Entran como `seg_tipo:'acceso'`, o sea que
+  avisan, y comprobado que **no salen de parada en 124 planes**. **No se marcan
+  `cerrado`** a propósito: ese campo está para prohibiciones oficiales
+  permanentes —las dos playas del registro de zonas de baño— y «temporalmente»
+  no es eso; marcarlas ahí las sacaría del catálogo y el día que reabran no se
+  enteraría nadie. **Esto lo tiene que confirmar Zeben, que vive allí.**
+· **La Ruleta tenía otro aviso y se cambió, a sabiendas.** El nuestro decía
+  «carretera de alta montaña pero ancha y asfaltada, junto al Parador» con
+  `seg_tipo:'acceso'` — o sea **una tranquilidad metida en el canal de los
+  avisos**, que es justo el fallo que esta casa ya corrigió dos veces. El del
+  artefacto dice que de ahí sale un sendero adaptado hasta los Roques de García,
+  y eso es `nota` y además es algo que se puede hacer. Se toma el nuevo.
+· **Los dos `peligro` son de verdad y hacen lo que tienen que hacer**: el
+  Mirador de Aguaide —«apenas hay protección en el borde, la caída al mar es de
+  unos 500 m»— y el de La Quinta —búnker abandonado al borde del acantilado—,
+  los dos con `ninos:'Con cuidado'`, o sea −12 con niños y el aviso arriba. Y
+  `lote.js` sigue con **0 sitios no aptos con niños**.
+
+**Lo que hay que saber para fiarse de esto, y decirlo:** buena parte de lo que
+trajo el artefacto son **estados de hoy** —horarios de aseos, dos cierres
+temporales, un restaurante al lado, unas obras que acaban en octubre— y eso se
+pudre. No es como el municipio de una ficha, que no cambia. Vuelve a pasarse el
+encargo cuando haga falta: `node enriquecer.js encargo` lo reescribe con lo que
+falte en ese momento, y lo que ya esté se canta como conflicto en vez de
+pisarse.
+
 ## El correo al Cabildo
 
 Está escrito en **`correo-cabildo.md`**, listo para copiar. Pide **una sola
@@ -3663,6 +3745,7 @@ vez que entre algo nuevo, se apunta aquí.**
 | «Escríbele al Cabildo para darle las gracias y pedirle que cambien el dominio» | 18 sep | `correo-cabildo.md`, listo para copiar. Pide **solo** el cambio de enlace, y **no** pregunta por la afluencia — lo dijo él, que el dato ya lo tiene. Un asunto por correo: mezclarlo con una consulta técnica es quedarse sin el cambio de enlace |
 | «Y luego métete con el registro de los planes» | 18 sep | El freno llevaba desde el 11 de septiembre apuntando las peticiones del día en Blobs y **nadie lo leía**. Ahora hay un registro de verdad —planes, idioma, pueblo de salida, tipo de día, coche y niños, **sin nada de personas**— y una pestaña en el panel para mirarlo. La puerta **falla cerrada**: sin la variable `NAIRA_REGISTRO` no existe, que la URL es pública. Y se dice lo que no cuenta: los planes que narra el relato local no pasan por la función, así que esto es el **suelo** del uso, no el techo |
 | «¿No hay nada del Parque de Las Mesas?» + «qué miradores y parques tiene y yo hago un artefacto» | 18 sep | Sí había: **dos fichas del Ayuntamiento de Santa Cruz**, pero las dos como **Mirador de 35 minutos**, así que Naira ofrecía asomarse y nunca ir a pasar el día — que es lo que él describía. Del Cabildo, **nada de ese sitio**: solo paradas de guagua, porque el parque es municipal y las 38 áreas de afluencia son del monte. De ahí sale **`enriquecer.js`** y su encargo de **102 fichas** —88 miradores y 14 áreas—, con lo que falta medido (63 sin «qué se ve», 87 sin nada de niños) y, sobre todo, **lo que NO se pide**: coordenadas jamás, y ni `aparca` ni `espacio`, que no los lee nadie. Y al cruzarlo salió una corrección de verdad: **`Área Recreativa Las Lajas` estaba en Adeje y es de Vilaflor**, con tres testigos diciendo lo mismo |
+| El artefacto de los miradores, relleno (77 fichas) | 18 sep | **Las 77 cruzan y cero se rechazan**: ni una coordenada, ni un campo que no se acepte, ni un valor inventado. Trae **69 `fx`**, **40 avisos clasificados** (23 nota, 13 acceso, 2 precaución, **2 peligro**), 23 `ninos`, 10 carreteras de curvas y 7 `dur`. Los miradores sin «qué se ve» pasan de **63 a 10**. Y mueve el día más de lo que parecía: diez áreas recreativas ganan `carretera:'dura'` —pista forestal de verdad, una solo para 4x4— y **la dispersión mediana baja de 4,6 a 3,7 km** sin perder paradas (2,65 por plan antes y después). El **Parque de Las Mesas** pasa por fin a Área recreativa de 120 minutos. Lo que quedó apuntado y sin tocar: **seis senderos fichados como miradores de 25 minutos** que ahora duran de 90 a 300 —solo el de los 500 Escalones sigue cayendo al atardecer, y la vuelta se hace de noche— y **dos áreas cerradas** que avisan pero no se marcan `cerrado`, que «temporalmente» no es una prohibición oficial |
 | El Instagram de Naira | 9 sep | Suyo, hecho a mano. Ahora `instagram.js` le saca el contenido de la semana del calendario; publicar lo sigue haciendo él. La web todavía no lo enlaza |
 
 **Y los 16 ficheros del Cabildo, cada uno.** Los mandó de golpe preguntando si
